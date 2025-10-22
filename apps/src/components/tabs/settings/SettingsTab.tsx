@@ -1,0 +1,14 @@
+import { TabsContent } from '@radix-ui/react-tabs';
+
+import { __ } from '@/lib/utils';
+
+export default function SettingsTab() {
+  return (
+    <div className="container mx-auto px-4">
+      <h1 className="text-2xl font-bold">{__('Settings')}</h1>
+      <div className="mt-4 rounded-lg border p-4">
+        <p className="text-gray-600">{__('Welcome to the Settings tab!')}</p>
+      </div>
+    </div>
+  );
+}
