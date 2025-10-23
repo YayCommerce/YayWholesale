@@ -8,9 +8,10 @@ import {
   UserGearIcon,
 } from '@phosphor-icons/react';
 import * as TabsPrimitive from '@radix-ui/react-tabs';
+import { __ } from '@wordpress/i18n';
 import { useForm } from 'react-hook-form';
 
-import { __, cn } from '@/lib/utils';
+import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { FormProvider } from '@/components/ui/form';
 import { HeaderNavMenuItem, HeaderNavMenuList } from '@/components/ui/navmenu-header';
@@ -94,7 +95,7 @@ export default function App() {
                         className="block size-[24px] sm:inline-block sm:size-[20px]"
                         weight="regular"
                       />
-                      <span className="hidden sm:inline"> {__('Dashboard')}</span>
+                      <span className="hidden sm:inline"> {__('Dashboard', 'yay-wholesale')}</span>
                     </HeaderNavMenuItem>
                   </TabsPrimitive.Trigger>
                   <TabsPrimitive.Trigger value="request" asChild>
@@ -104,7 +105,7 @@ export default function App() {
                         weight="regular"
                       />
 
-                      <span className="hidden sm:inline"> {__('Request')}</span>
+                      <span className="hidden sm:inline"> {__('Request', 'yay-wholesale')}</span>
                     </HeaderNavMenuItem>
                   </TabsPrimitive.Trigger>
                   <TabsPrimitive.Trigger value="roles" asChild>
@@ -114,7 +115,7 @@ export default function App() {
                         weight="regular"
                       />
 
-                      <span className="hidden sm:inline"> {__('Roles')}</span>
+                      <span className="hidden sm:inline"> {__('Roles', 'yay-wholesale')}</span>
                     </HeaderNavMenuItem>
                   </TabsPrimitive.Trigger>
 
@@ -124,13 +125,15 @@ export default function App() {
                         className="block size-[24px] sm:inline-block sm:size-[20px]"
                         weight="regular"
                       />
-                      <span className="hidden sm:inline"> {__('Settings')}</span>
+                      <span className="hidden sm:inline"> {__('Settings', 'yay-wholesale')}</span>
                     </HeaderNavMenuItem>
                   </TabsPrimitive.Trigger>
                 </HeaderNavMenuList>
               </TabsPrimitive.List>
               <Button type="submit" disabled={isLoading} className="relative cursor-pointer">
-                <span className={isLoading ? 'invisible' : ''}>{__('Save Changes')}</span>
+                <span className={isLoading ? 'invisible' : ''}>
+                  {__('Save Changes', 'yay-wholesale')}
+                </span>
                 {isLoading && (
                   <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
                     <CircleNotchIcon className="animate-spin" />

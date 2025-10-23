@@ -8,8 +8,6 @@ apps/node_modules
 /blocks/node_modules
 /build
 /tools
-yarn.lock
-pnpm-lock.yaml
 yay-wholesale-pro.zip
 yay-wholesale-pro-edd.zip
 yay-wholesale-lite.zip

@@ -9,18 +9,17 @@ use Yay_Wholesale\Utils\SingletonTrait;
  */
 class Initialize {
 
-	use SingletonTrait;
+    use SingletonTrait;
 
-	/**
-	 * The Constructor that load the engine classes
-	 */
-	protected function __construct() {
-		// Engine
-		Helper::get_instance_classes( array( '\Yay_Wholesale', 'Engine' ), Helper::engine_classes() );
-		// Register
-		Helper::get_instance_classes( array( '\Yay_Wholesale', 'Engine', 'Register' ), Helper::register_classes() );
-		// BEPages
-		Helper::get_instance_classes( array( '\Yay_Wholesale', 'Engine', 'BEPages' ), Helper::backend_classes() );
-
-	}
+    /**
+     * The Constructor that load the engine classes
+     */
+    protected function __construct() {
+        // Engine
+        Helper::get_instance_classes( [ '\Yay_Wholesale', 'Engine' ], Helper::engine_classes() );
+        // Register
+        Helper::get_instance_classes( [ '\Yay_Wholesale', 'Engine', 'Register' ], Helper::register_classes() );
+        // BEPages
+        Helper::get_instance_classes( [ '\Yay_Wholesale', 'Engine', 'BEPages' ], Helper::backend_classes() );
+    }
 }

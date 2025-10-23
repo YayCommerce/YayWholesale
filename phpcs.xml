@@ -7,7 +7,7 @@
 	<rule ref="PHPCompatibilityWP"/>
 
 	<!-- https://github.com/WordPress-Coding-Standards/WordPress-Coding-Standards/wiki/Customizable-sniff-properties -->
-	<config name="minimum_supported_wp_version" value="6.2"/>
+	<config name="minimum_supported_wp_version" value="6.5"/>
 
 	<rule ref="WordPress-Core">
 		<exclude name="WordPress.Files.FileName.NotHyphenatedLowercase"/>
