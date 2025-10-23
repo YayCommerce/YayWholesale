@@ -15,6 +15,4 @@ yay-wholesale-pro-edd.zip
 yay-wholesale-lite.zip
 package-lock.json
 .DS_Store
-.vscode/
 .vscode/launch.json
-*.xml
