@@ -1,13 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
 
-import { markReviewed } from '@/lib/queries';
+import { markReviewed } from '@/lib/queries.ts';
 import { __, cn } from '@/lib/utils';
 
-export function Footer({
+export default function Footer({
   currentMenu,
   onBackToDefault,
 }: {
-  currentMenu: string;
+  currentMenu: string[];
   onBackToDefault: () => void;
 }) {
   const [hasReviewed, setHasReviewed] = useState(window.yayWholesale.reviewed || false);
@@ -107,8 +107,19 @@ export function Footer({
           <span className="text-muted-foreground cursor-pointer" onClick={onBackToDefault}>
             YayWholesale
           </span>
-          <span className="text-muted-foreground">{'>'}</span>
-          <span className="text-foreground">{formatMenuLabel(currentMenu)}</span>
+          {currentMenu.map((menu, index) => (
+            <span key={menu} className="flex items-center gap-2">
+              <span className="text-muted-foreground">{'>'}</span>
+              <span
+                className={cn(
+                  'text-foreground',
+                  index < currentMenu.length - 1 && 'text-muted-foreground',
+                )}
+              >
+                {formatMenuLabel(menu)}
+              </span>
+            </span>
+          ))}
         </div>
 
         {/* review text */}

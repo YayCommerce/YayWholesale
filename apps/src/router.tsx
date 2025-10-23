@@ -1,0 +1,63 @@
+import { createHashRouter, redirect } from 'react-router-dom';
+
+import DashboardPage from '@/components/pages/dashboard/DashboardPage';
+import RolesPage from '@/components/pages/roles/RolesPage';
+
+import AppLayout from './AppLayout';
+import NotFoundPage from './components/pages/404';
+import RequestPage from './components/pages/request/RequestPage';
+import SettingsPage from './components/pages/settings/SettingsPage';
+
+export function getManagerRouter() {
+  return createHashRouter([
+    {
+      path: '/',
+      element: <AppLayout />,
+      errorElement: <NotFoundPage />,
+      children: [
+        {
+          index: true,
+          loader: () => redirect('/dashboard'),
+        },
+        {
+          path: 'dashboard',
+          element: <DashboardPage />,
+        },
+        {
+          path: 'request',
+          element: <RequestPage />,
+        },
+        {
+          path: 'roles',
+          children: [
+            {
+              index: true,
+              element: <RolesPage />,
+            },
+            {
+              path: 'new',
+              element: <RolesPage />,
+            },
+            {
+              path: 'edit/:roleId',
+              element: <RolesPage />,
+            },
+          ],
+        },
+        {
+          path: 'settings',
+          children: [
+            {
+              index: true,
+              loader: () => redirect('/settings/general'),
+            },
+            {
+              path: ':subMenu',
+              element: <SettingsPage />,
+            },
+          ],
+        },
+      ],
+    },
+  ]);
+}

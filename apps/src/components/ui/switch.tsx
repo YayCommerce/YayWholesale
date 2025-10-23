@@ -11,6 +11,7 @@ const switchVariants = cva('', {
     size: {
       default: 'h-6 w-11',
       sm: 'h-[1.15rem] w-8',
+      md: 'h-[20px] w-[37px]',
       lg: 'h-7 w-13',
     },
   },
@@ -41,7 +42,7 @@ function Switch({
         data-slot="switch-thumb"
         data-size={size ?? 'default'}
         className={cn(
-          'bg-background dark:data-[state=unchecked]:bg-foreground dark:data-[state=checked]:bg-primary-foreground pointer-events-none block rounded-full shadow-sm ring-0 transition-transform data-[size=default]:size-5 data-[size=lg]:size-6 data-[size=sm]:size-3.5 data-[state=checked]:translate-x-full data-[state=unchecked]:translate-x-0',
+          'bg-background dark:data-[state=unchecked]:bg-foreground dark:data-[state=checked]:bg-primary-foreground pointer-events-none block rounded-full shadow-sm ring-0 transition-transform data-[size=default]:size-5 data-[size=lg]:size-6 data-[size=md]:size-[16.7px] data-[size=sm]:size-3.5 data-[state=checked]:translate-x-full data-[state=unchecked]:translate-x-0',
         )}
       />
     </SwitchPrimitive.Root>
