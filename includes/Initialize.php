@@ -9,7 +9,7 @@ use Yay_Wholesale\Utils\SingletonTrait;
  */
 class Initialize {
 
-	use SingletonTrait;
+    use SingletonTrait;
 
 	/**
 	 * The Constructor that load the engine classes

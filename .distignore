@@ -4,6 +4,7 @@
 .gitignore
 .distignore
 node_modules/
+README.md
 phpcs.xml
 log.xml
 composer.json

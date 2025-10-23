@@ -9,28 +9,29 @@ use Yay_Wholesale\Engine\Register\ScriptName;
  * Will get deleted in production
  */
 class RegisterDev {
-	use SingletonTrait;
+    use SingletonTrait;
 
-	/** Hooks Initialization */
-	protected function __construct() {
-		add_action( 'admin_footer', array( $this, 'render_dev_refresh' ), 5 );
+    /** Hooks Initialization */
+    protected function __construct() {
+        add_action( 'admin_footer', [ $this, 'render_dev_refresh' ], 5 );
 
-		add_action( 'init', array( $this, 'register_all_scripts' ) );
-	}
+        add_action( 'init', [ $this, 'register_all_scripts' ] );
+    }
 
-	public function render_dev_refresh() {
-		echo '<script type="module">
+    public function render_dev_refresh() {
+        echo '<script type="module">
         import RefreshRuntime from "http://localhost:3000/@react-refresh"
         RefreshRuntime.injectIntoGlobalHook(window)
         window.$RefreshReg$ = () => {}
         window.$RefreshSig$ = () => (type) => type
         window.__vite_plugin_react_preamble_installed__ = true
         </script>';
-	}
+    }
 
-	public function register_all_scripts() {
-		$deps = array( 'react', 'react-dom', 'wp-hooks', 'wp-i18n' );
+    public function register_all_scripts() {
+        $deps = [ 'react', 'react-dom', 'wp-hooks', 'wp-i18n' ];
 
-		wp_register_script( ScriptName::PAGE_SETTINGS, 'http://localhost:3000/main.tsx', $deps, null, true ); // phpcs:ignore WordPress.WP.EnqueuedResourceParameters.MissingVersion
-	}
+        wp_register_script( ScriptName::PAGE_SETTINGS, 'http://localhost:3000/main.tsx', $deps, YAY_WHOLESALE_PLUGIN_DIR, true ); // phpcs:ignore WordPress.WP.EnqueuedResourceParameters.MissingVersion
+        wp_set_script_translations( ScriptName::PAGE_SETTINGS, 'yay-wholesale', YAY_WHOLESALE_PLUGIN_DIR . 'languages' );
+    }
 }
