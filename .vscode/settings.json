@@ -1,11 +1,12 @@
 {
   "editor.formatOnSave": true,
   "editor.defaultFormatter": "esbenp.prettier-vscode",
-
+  "phpSniffer.executablesFolder": "tools/vendor/squizlabs/php_codesniffer/bin",
   "[php]": {
     "editor.defaultFormatter": "wongjn.php-sniffer"
   },
   "phpSniffer.autoDetect": true,
+
 
   "intelephense.stubs": [
     "apache",

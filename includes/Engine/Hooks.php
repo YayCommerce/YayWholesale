@@ -6,10 +6,12 @@ use Yay_Wholesale\Utils\SingletonTrait;
 
 defined( 'ABSPATH' ) || exit;
 
+/**
+ * Hooks Class
+ */
 class Hooks {
-	use SingletonTrait;
+    use SingletonTrait;
 
-	public function __construct() {
-
-	}
+    public function __construct() {
+    }
 }

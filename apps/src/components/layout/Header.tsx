@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useState } from 'react';
 import { CircleNotchIcon } from '@phosphor-icons/react';
+import { __ } from '@wordpress/i18n';
 import { useMatch, useNavigate } from 'react-router-dom';
 
-import { __, cn } from '@/lib/utils';
+import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import DashboardIcon from '@/components/icons/DashboardIcon';
 import RequestIcon from '@/components/icons/RequestIcon';
