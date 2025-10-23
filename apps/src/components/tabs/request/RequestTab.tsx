@@ -1,6 +1,5 @@
 import { TabsContent } from '@radix-ui/react-tabs';
-
-import { __ } from '@/lib/utils';
+import { __ } from '@wordpress/i18n';
 
 export default function RequestTab() {
   return (
