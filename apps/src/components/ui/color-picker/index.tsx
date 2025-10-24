@@ -45,8 +45,6 @@ export function ColorPicker({
 
   const [copied, setCopied] = useState(false);
 
-  const contentRef = useRef<HTMLDivElement>(null);
-
   const handleOpenAutoFocus = (event: Event) => {
     // Check if displayColor matches any of the predefined palette colors
     const isColorInPalette = colors.some((color) => color.color === displayColor);
@@ -57,9 +55,8 @@ export function ColorPicker({
 
       // Use setTimeout to ensure the DOM is fully rendered
       setTimeout(() => {
-        if (!contentRef.current) return;
         // find the selected color button
-        const selected = contentRef.current.querySelector<HTMLButtonElement>(
+        const selected = document.querySelector<HTMLButtonElement>(
           '.components-circular-option-picker__option[aria-checked="true"]',
         );
         if (selected) {
@@ -130,7 +127,6 @@ export function ColorPicker({
         align="start"
         sideOffset={5}
         onOpenAutoFocus={handleOpenAutoFocus}
-        ref={contentRef}
       >
         <div className="flex flex-col gap-2">
           <div className="px-2">

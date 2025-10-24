@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { CircleNotchIcon } from '@phosphor-icons/react';
+import { useIsMutating } from '@tanstack/react-query';
 import { __ } from '@wordpress/i18n';
 import { useMatch, useNavigate } from 'react-router-dom';
 
@@ -33,7 +34,7 @@ export default function Header() {
   const navigate = useNavigate();
   const scrolled = useScrolled();
   const isSettingRoute = useMatch({ path: '/settings/*' });
-  const [isLoading, setIsLoading] = useState(false);
+  const isSavingSettings = useIsMutating({ mutationKey: ['settings'] }) > 0;
 
   const handleNavClick = useCallback((to: string) => navigate(to), [navigate]);
 
@@ -80,11 +81,17 @@ export default function Header() {
 
       {/* Save button (Settings only) */}
       {isSettingRoute && (
-        <Button type="submit" disabled={isLoading} className="relative cursor-pointer">
-          {!isLoading ? (
-            <span>{__('Save Changes')}</span>
-          ) : (
-            <span className="absolute inset-0 flex items-center justify-center">
+        <Button
+          type="submit"
+          form="settings-form"
+          disabled={isSavingSettings}
+          className="relative cursor-pointer"
+        >
+          <span className={isSavingSettings ? 'opacity-0' : 'opacity-100'}>
+            {__('Save Changes')}
+          </span>
+          {isSavingSettings && (
+            <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
               <CircleNotchIcon className="animate-spin" />
             </span>
           )}

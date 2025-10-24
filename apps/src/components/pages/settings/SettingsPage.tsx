@@ -4,16 +4,19 @@ import { __ } from '@wordpress/i18n';
 import { useForm } from 'react-hook-form';
 import { Link, useParams } from 'react-router-dom';
 
-import { cn } from '@/lib/utils';
+import { useSaveSettingsMutation } from '@/lib/queries/settings';
+import { SettingsFormData, settingsFormSchema } from '@/lib/schema';
+import { cn, getSettings } from '@/lib/utils';
 import { Card, CardContent } from '@/components/ui/card';
 import { FormProvider } from '@/components/ui/form';
+import { Toaster } from '@/components/ui/sonner';
 import { showToast } from '@/components/custom/showToast';
 
 import DesignTab from './tabs/DesignTab';
 import DisplayTab from './tabs/DisplayTab';
 import EmailsTab from './tabs/EmailsTab';
 import GeneralTab from './tabs/GeneralTab';
-import RegistrationFieldsTab from './tabs/RegistrationFieldsTab';
+import RegistrationFieldsTab from './tabs/registration-fields/RegistrationFieldsTab';
 import RegistrationTab from './tabs/RegistrationTab';
 
 const tabs = [
@@ -28,29 +31,25 @@ const tabs = [
   { path: 'emails', label: 'Emails', component: <EmailsTab /> },
   { path: 'design', label: 'Design', component: <DesignTab /> },
 ];
+
 export default function SettingsPage() {
   const { subMenu } = useParams();
-  const [isLoading, setIsLoading] = useState(false);
 
-  const form = useForm<any>({
-    // resolver: zodResolver({} as any),
-    // defaultValues: {},
+  const form = useForm<SettingsFormData>({
+    resolver: zodResolver(settingsFormSchema),
+    defaultValues: getSettings(),
   });
 
-  async function onSubmit(data: any) {
-    try {
-      setIsLoading(true);
-      // Handle settings submission here
-      showToast.success(__('Settings saved!'));
-    } catch (error) {
-      showToast.error(__('Oops! Something went wrong!'));
-    } finally {
-      setIsLoading(false);
-    }
+  const saveMutation = useSaveSettingsMutation();
+
+  async function onSubmit(data: SettingsFormData) {
+    console.log('data', data);
+    await saveMutation.mutateAsync(data);
   }
 
   return (
     <FormProvider {...form}>
+      <Toaster />
       <form id="settings-form" onSubmit={form.handleSubmit(onSubmit)}>
         <div className="mx-auto mt-[84px] max-w-7xl space-y-6 px-6">
           <div className="flex w-full gap-8">

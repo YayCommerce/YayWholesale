@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
-import { markReviewed } from '@/lib/queries';
-import { cn } from '@/lib/utils';
 import { __ } from '@wordpress/i18n';
+
+import { markReviewed } from '@/lib/queries/mark-reviewed';
+import { cn } from '@/lib/utils';
 
 export default function Footer({
   currentMenu,

@@ -116,10 +116,10 @@ class Settings {
             [
                 'admin_url'  => admin_url( 'admin.php?page=wc-settings' ),
                 'plugin_url' => YAY_WHOLESALE_PLUGIN_URL,
-                'nonce'      => wp_create_nonce( 'yay-wholesale-nonce' ),
                 'rest_url'   => esc_url_raw( rest_url() ),
                 'rest_nonce' => wp_create_nonce( 'wp_rest' ),
                 'rest_base'  => 'yay-wholesale/v1',
+                'settings'   => Helper::get_settings(),
                 'reviewed'   => get_option( 'yay_wholesale_reviewed', false ),
             ]
         );

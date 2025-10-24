@@ -1,6 +1,9 @@
 import { useState } from 'react';
+import { __ } from '@wordpress/i18n';
+import { useFormContext } from 'react-hook-form';
 
-import { Label } from '@/components/ui/label';
+import { SettingsFormData } from '@/lib/schema';
+import { FormControl, FormField, FormItem, FormLabel } from '@/components/ui/form';
 import {
   Select,
   SelectContent,
@@ -11,61 +14,90 @@ import {
 import { Switch } from '@/components/ui/switch';
 
 export default function GeneralTab() {
-  const [showWholesalePrice, setShowWholesalePrice] = useState(false);
-  const [disableCoupon, setDisableCoupon] = useState(false);
-  const [disableTax, setDisableTax] = useState(false);
-
+  const { control, watch } = useFormContext<SettingsFormData>();
   return (
     <div className="space-y-6">
       {/* Default role for new user */}
-      <div className="space-y-2.5">
-        <Label htmlFor="default-role" className="text-base-secondary text-xs font-medium">
-          Default role for new user
-        </Label>
-        <Select>
-          <SelectTrigger id="default-role" className="w-full">
-            <SelectValue placeholder="Select a option" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="wholesale">Wholesale User</SelectItem>
-            <SelectItem value="regular">Regular User</SelectItem>
-            <SelectItem value="guest">Guest</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
+      <FormField
+        control={control}
+        name={`general.default_role`}
+        render={({ field }) => (
+          <FormItem className="w-full">
+            <FormLabel className="space-y-2.5 text-xs font-medium">
+              {__('Default role for new user')}
+            </FormLabel>
+            <FormControl>
+              <Select defaultValue={field.value} onValueChange={field.onChange}>
+                <SelectTrigger className="w-[160px] text-sm font-normal">
+                  <SelectValue placeholder="Select a option" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="wholesale">{__('Wholesale User')}</SelectItem>
+                  <SelectItem value="regular">{__('Regular User')}</SelectItem>
+                  <SelectItem value="guest">{__('Guest')}</SelectItem>
+                </SelectContent>
+              </Select>
+            </FormControl>
+          </FormItem>
+        )}
+      />
 
-      <div className="base-base-border flex items-center justify-between rounded-md border p-4">
-        <div>
-          <h2 className="text-base-secondary text-sm font-normal">
-            Show Wholesale Price to non-wholesale users
-          </h2>
-          <p className="text-base-muted-foreground mt-1 text-xs font-normal">
-            If enable, wholesale price will display for all users.
-          </p>
-        </div>
-        <Switch size="md" checked={showWholesalePrice} onCheckedChange={setShowWholesalePrice} />
-      </div>
+      <FormField
+        control={control}
+        name={`general.show_wholesale_price`}
+        render={({ field }) => (
+          <div className="base-base-border flex items-center justify-between rounded-md border p-4">
+            <div>
+              <h2 className="text-base-secondary text-sm font-normal">
+                Show Wholesale Price to non-wholesale users
+              </h2>
+              <p className="text-base-muted-foreground mt-1 text-xs font-normal">
+                If enable, wholesale price will display for all users.
+              </p>
+            </div>
+            <Switch
+              size="md"
+              id="show-wholesale-price"
+              checked={field.value}
+              onCheckedChange={(checked) => field.onChange(checked)}
+            />
+          </div>
+        )}
+      />
 
-      <div className="base-base-border flex items-center justify-between rounded-lg border p-4">
-        <div>
-          <h2 className="text-base-secondary text-sm font-normal">Disable coupon</h2>
-          <p className="text-base-muted-foreground mt-1 text-xs font-normal">
-            Hide coupon field for wholesale users.
-          </p>
-        </div>
-        <Switch size="md" checked={disableCoupon} onCheckedChange={setDisableCoupon} />
-      </div>
+      <FormField
+        control={control}
+        name={`general.disable_coupon`}
+        render={({ field }) => (
+          <div className="base-base-border flex items-center justify-between rounded-lg border p-4">
+            <div>
+              <h2 className="text-base-secondary text-sm font-normal">Disable coupon</h2>
+              <p className="text-base-muted-foreground mt-1 text-xs font-normal">
+                Hide coupon field for wholesale users.
+              </p>
+            </div>
+            <Switch size="md" checked={field.value} onCheckedChange={field.onChange} />
+          </div>
+        )}
+      />
 
       {/* Disable tax */}
-      <div className="base-base-border flex items-center justify-between rounded-md border p-4">
-        <div>
-          <h2 className="text-base-secondary text-sm font-normal">Disable tax</h2>
-          <p className="text-base-muted-foreground mt-1 text-xs font-normal">
-            Don't charge tax for wholesale users.
-          </p>
-        </div>
-        <Switch size="md" checked={disableTax} onCheckedChange={setDisableTax} />
-      </div>
+
+      <FormField
+        control={control}
+        name={`general.disable_tax`}
+        render={({ field }) => (
+          <div className="base-base-border flex items-center justify-between rounded-md border p-4">
+            <div>
+              <h2 className="text-base-secondary text-sm font-normal">Disable tax</h2>
+              <p className="text-base-muted-foreground mt-1 text-xs font-normal">
+                Don't charge tax for wholesale users.
+              </p>
+            </div>
+            <Switch size="md" checked={field.value} onCheckedChange={field.onChange} />
+          </div>
+        )}
+      />
     </div>
   );
 }
