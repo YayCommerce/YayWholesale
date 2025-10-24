@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { __ } from '@wordpress/i18n';
 
 import { api } from '@/lib/api';
-import type { SettingsFormData } from '@/lib/schema';
+import type { SettingsFormData } from '@/lib/schema/settings';
 import { showToast } from '@/components/custom/showToast';
 
 export async function postSettings(data: SettingsFormData) {

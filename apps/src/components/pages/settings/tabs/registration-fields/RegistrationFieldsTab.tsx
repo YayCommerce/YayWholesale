@@ -14,7 +14,7 @@ import { Plus } from 'lucide-react';
 import { useFieldArray, useFormContext } from 'react-hook-form';
 import { v4 as uuidv4 } from 'uuid';
 
-import type { SettingsFormData } from '@/lib/schema';
+import type { SettingsFormData } from '@/lib/schema/settings';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { FormField } from '@/components/ui/form';

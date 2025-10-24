@@ -120,6 +120,7 @@ class Settings {
                 'rest_nonce' => wp_create_nonce( 'wp_rest' ),
                 'rest_base'  => 'yay-wholesale/v1',
                 'settings'   => Helper::get_settings(),
+                'roles'      => get_option( 'yay_wholesale_roles', [] ),
                 'reviewed'   => get_option( 'yay_wholesale_reviewed', false ),
             ]
         );

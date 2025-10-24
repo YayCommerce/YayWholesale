@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { __ } from '@wordpress/i18n';
 import { useFormContext } from 'react-hook-form';
 
-import { SettingsFormData } from '@/lib/schema';
+import { SettingsFormData } from '@/lib/schema/settings';
 import { FormControl, FormField, FormItem, FormLabel } from '@/components/ui/form';
 import {
   Select,

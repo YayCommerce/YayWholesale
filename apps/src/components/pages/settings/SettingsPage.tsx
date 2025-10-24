@@ -5,12 +5,11 @@ import { useForm } from 'react-hook-form';
 import { Link, useParams } from 'react-router-dom';
 
 import { useSaveSettingsMutation } from '@/lib/queries/settings';
-import { SettingsFormData, settingsFormSchema } from '@/lib/schema';
+import { SettingsFormData, settingsFormSchema } from '@/lib/schema/settings';
 import { cn, getSettings } from '@/lib/utils';
 import { Card, CardContent } from '@/components/ui/card';
 import { FormProvider } from '@/components/ui/form';
 import { Toaster } from '@/components/ui/sonner';
-import { showToast } from '@/components/custom/showToast';
 
 import DesignTab from './tabs/DesignTab';
 import DisplayTab from './tabs/DisplayTab';
