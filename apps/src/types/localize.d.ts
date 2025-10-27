@@ -7,7 +7,7 @@ declare global {
       rest_nonce: string;
       rest_base: string;
       reviewed: boolean;
-      roles: RolesListFormData[];
+      roles: RoleFormValues[];
       settings: SettingsFormData;
     };
     wp: AnyObject;

@@ -1,10 +1,18 @@
 import { useMemo, useState } from 'react';
+import {
+  createColumnHelper,
+  flexRender,
+  getCoreRowModel,
+  getFilteredRowModel,
+  getPaginationRowModel,
+  useReactTable,
+} from '@tanstack/react-table';
 import { __ } from '@wordpress/i18n';
 import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Plus, Search } from 'lucide-react';
-import { useFormContext } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 
-import { RolesListFormData } from '@/lib/schema/roles';
+import { useDeleteRoleMutation, useRolesQuery } from '@/lib/queries/roles';
+import { RolesListValues } from '@/lib/schema/roles';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -17,80 +25,144 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
 import DeleteIcon from '@/components/icons/DeleteIcon';
 import EditIcon from '@/components/icons/SettingsIcon';
 
-export default function RolesList() {
-  const navigate = useNavigate();
-  const { watch } = useFormContext<RolesListFormData>();
-  const data = watch('roles') || [];
-  console.log(data);
-  const [search, setSearch] = useState('');
-  const [pageSize, setPageSize] = useState(10);
-  const [pageIndex, setPageIndex] = useState(0);
-  const [selectedRows, setSelectedRows] = useState<Set<number>>(new Set());
+// Hook to handle row selection logic
+function useRowSelection(rows: RolesListValues[]) {
+  const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set());
 
-  const filteredData = useMemo(
-    () =>
-      data?.filter(
-        (item) =>
-          item?.name?.toLowerCase().includes(search.toLowerCase()) ||
-          item?.description?.toLowerCase().includes(search.toLowerCase()),
-      ),
-    [search, data],
-  );
-
-  const totalPages = Math.ceil(filteredData.length / pageSize);
-  const paginatedData = filteredData.slice(pageIndex * pageSize, (pageIndex + 1) * pageSize);
-
-  const goToPage = (index: number) => {
-    setPageIndex(Math.max(0, Math.min(index, totalPages - 1)));
+  const toggleRow = (id: string) => {
+    const newSet = new Set(selectedRows);
+    if (newSet.has(id)) newSet.delete(id);
+    else newSet.add(id);
+    setSelectedRows(newSet);
   };
 
   const toggleAllRows = () => {
-    if (selectedRows.size === paginatedData.length) {
-      setSelectedRows(new Set());
-    } else {
-      setSelectedRows(new Set(paginatedData.map((row) => row.id)));
-    }
+    const allSelected = rows.every((row) => selectedRows.has(row.id));
+    setSelectedRows(allSelected ? new Set() : new Set(rows.map((row) => row.id)));
   };
 
-  const toggleRow = (id: number) => {
-    const newSelected = new Set(selectedRows);
-    if (newSelected.has(id)) {
-      newSelected.delete(id);
-    } else {
-      newSelected.add(id);
-    }
-    setSelectedRows(newSelected);
-  };
+  return { selectedRows, toggleRow, toggleAllRows };
+}
 
-  const isAllSelected = paginatedData.length > 0 && selectedRows.size === paginatedData.length;
+export default function RolesList() {
+  const navigate = useNavigate();
+  const { data } = useRolesQuery();
+  const roles = useMemo(() => (data ? [...data].reverse() : []), [data]);
+
+  const [search, setSearch] = useState('');
+  const filteredData = useMemo(
+    () =>
+      roles.filter(
+        (role) =>
+          role.name.toLowerCase().includes(search.toLowerCase()) ||
+          (role.description?.toLowerCase().includes(search.toLowerCase()) ?? false),
+      ),
+    [roles, search],
+  );
+
+  const { selectedRows, toggleRow, toggleAllRows } = useRowSelection(filteredData);
+
+  const columnHelper = createColumnHelper<RolesListValues>();
+
+  const columns = useMemo(
+    () => [
+      columnHelper.display({
+        id: 'select',
+        header: () => (
+          <Checkbox
+            checked={filteredData.length > 0 && filteredData.every((r) => selectedRows.has(r.id))}
+            onCheckedChange={toggleAllRows}
+          />
+        ),
+        cell: ({ row }) => (
+          <Checkbox
+            checked={selectedRows.has(row.original.id)}
+            onCheckedChange={() => toggleRow(row.original.id)}
+          />
+        ),
+        size: 40,
+      }),
+      columnHelper.accessor('name', { header: 'Name' }),
+      columnHelper.accessor('description', { header: 'Description' }),
+      columnHelper.accessor('count', {
+        header: 'Count',
+        cell: (info) => <div className="text-center">{info.getValue()}</div>,
+      }),
+      columnHelper.accessor('discount', {
+        header: 'Discount',
+        cell: (info) => <div className="text-center">{info.getValue()}</div>,
+      }),
+      columnHelper.accessor('minOrderQuantity', {
+        header: 'Min Order Quantity',
+        cell: (info) => <div className="text-center">{info.getValue()}</div>,
+      }),
+      columnHelper.accessor('minOrderAmount', {
+        header: 'Min Order Amount',
+        cell: (info) => <div className="text-center">{info.getValue()}</div>,
+      }),
+      columnHelper.accessor('status', {
+        header: 'Status',
+        cell: (info) => <Switch size="md" checked={info.getValue()} />,
+      }),
+      columnHelper.display({
+        id: 'actions',
+        header: '',
+        cell: ({ row }) => {
+          const { mutate: deleteRoleById, isPending: isDeletingRolePending } =
+            useDeleteRoleMutation(row.original.id);
+          const handleDelete = (id: string) => {
+            if (!window.confirm(__('Are you sure you want to delete this role?'))) return;
+            deleteRoleById();
+          };
+          return (
+            <div className="flex justify-center gap-2">
+              <Button
+                size="icon"
+                variant="ghost"
+                onClick={() => navigate(`/roles/edit/${row.original.id}`)}
+              >
+                <EditIcon className="size-4" />
+              </Button>
+              <Button
+                size="icon"
+                variant="ghost"
+                onClick={() => handleDelete(row.original.id)}
+                disabled={isDeletingRolePending}
+              >
+                <DeleteIcon className="size-4" />
+              </Button>
+            </div>
+          );
+        },
+        size: 80,
+      }),
+    ],
+    [selectedRows, filteredData, navigate],
+  );
+
+  const table = useReactTable({
+    data: filteredData,
+    columns,
+    getCoreRowModel: getCoreRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+  });
 
   return (
     <Card className="gap-4 rounded-lg p-6 shadow-sm">
       {/* Header */}
       <div className="flex flex-nowrap items-center justify-between gap-3">
         <h1 className="text-2xl font-bold text-[#000000]">{__('Roles')}</h1>
-
         <div className="flex flex-nowrap items-center gap-4">
-          {data.length > 10 && (
+          {roles.length > 10 && (
             <div className="relative flex-none">
               <Input
                 placeholder={__('Search')}
                 value={search}
-                onChange={(e) => {
-                  setSearch(e.target.value);
-                  setPageIndex(0);
-                }}
+                onChange={(e) => setSearch(e.target.value)}
                 className="border-input w-80 rounded-sm border bg-white pr-9 text-sm font-normal"
               />
               <InputSuffix className="absolute top-1/2 right-3 -translate-y-1/2 bg-transparent px-0">
@@ -98,7 +170,6 @@ export default function RolesList() {
               </InputSuffix>
             </div>
           )}
-
           <Button
             variant="outline"
             className="border-primary text-primary hover:bg-primary/10 h-[34px] gap-2 rounded-sm px-4 text-sm font-medium"
@@ -112,90 +183,57 @@ export default function RolesList() {
 
       {/* Table */}
       <div className="mt-4 overflow-hidden rounded-lg border border-gray-200">
-        <Table>
-          <TableHeader className="bg-[#FAFAFA]">
-            <TableRow>
-              <TableHead className="w-12 text-center">
-                <Checkbox checked={isAllSelected} onCheckedChange={toggleAllRows} />
-              </TableHead>
-              <TableHead className="text-left">Name</TableHead>
-              <TableHead className="text-left">Description</TableHead>
-              <TableHead className="text-center">Count</TableHead>
-              <TableHead className="text-center">Discount</TableHead>
-              <TableHead className="text-center">Min Order Quantity</TableHead>
-              <TableHead className="text-center">Min Order Amount</TableHead>
-              <TableHead className="text-center">Status</TableHead>
-              <TableHead className="text-center"></TableHead>
-            </TableRow>
-          </TableHeader>
-
-          <TableBody>
-            {paginatedData.length ? (
-              paginatedData.map((row) => (
-                <TableRow key={row.id}>
-                  <TableCell className="text-center">
-                    <Checkbox
-                      checked={selectedRows.has(row.id)}
-                      onCheckedChange={() => toggleRow(row.id)}
-                    />
-                  </TableCell>
-                  <TableCell className="text-left">{row.name}</TableCell>
-                  <TableCell className="text-left">{row.description}</TableCell>
-                  <TableCell className="text-center">{row.count}</TableCell>
-                  <TableCell className="text-center">{row.discount}</TableCell>
-                  <TableCell className="text-center">{row.minOrderQuantity}</TableCell>
-                  <TableCell className="text-center">{row.minOrderAmount}</TableCell>
-                  <TableCell className="text-center">
-                    <Switch size="md" checked={row.status} />
-                  </TableCell>
-                  <TableCell className="text-center">
-                    <div className="flex justify-center gap-2">
-                      <Button
-                        size="icon"
-                        variant="ghost"
-                        onClick={() => navigate(`/roles/edit/${row.id}`)}
-                        className="text-base-foreground hover:text-base-muted-foreground h-8 w-8 bg-transparent hover:bg-transparent"
-                      >
-                        <EditIcon className="size-4" />
-                      </Button>
-                      <Button
-                        size="icon"
-                        variant="ghost"
-                        className="text-base-foreground hover:text-base-muted-foreground h-8 w-8 bg-transparent hover:bg-transparent"
-                      >
-                        <DeleteIcon className="size-4" />
-                      </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
+        <table className="min-w-full divide-y divide-gray-200">
+          <thead className="bg-[#FAFAFA]">
+            {table.getHeaderGroups().map((headerGroup) => (
+              <tr key={headerGroup.id}>
+                {headerGroup.headers.map((header) => (
+                  <th
+                    key={header.id}
+                    className="px-3 py-2 text-left text-sm font-medium text-gray-500"
+                  >
+                    {flexRender(header.column.columnDef.header, header.getContext())}
+                  </th>
+                ))}
+              </tr>
+            ))}
+          </thead>
+          <tbody className="divide-y divide-gray-200">
+            {table.getRowModel().rows.length > 0 ? (
+              table.getRowModel().rows.map((row) => (
+                <tr key={row.id} className="hover:bg-gray-50">
+                  {row.getVisibleCells().map((cell) => (
+                    <td key={cell.id} className="px-3 py-2 text-sm text-gray-700">
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                    </td>
+                  ))}
+                </tr>
               ))
             ) : (
-              <TableRow>
-                <TableCell colSpan={9} className="h-24 text-center text-gray-500">
+              <tr>
+                <td colSpan={columns.length} className="h-24 text-center text-gray-500">
                   {__('No roles found.')}
-                </TableCell>
-              </TableRow>
+                </td>
+              </tr>
             )}
-          </TableBody>
-        </Table>
+          </tbody>
+        </table>
       </div>
 
       {/* Footer */}
-      {selectedRows.size > 0 && (
+      {filteredData.length > 0 && (
         <div className="flex flex-col items-center justify-between gap-3 pt-4 sm:flex-row">
           <p className="text-sm text-gray-500">
             {selectedRows.size} {__('of')} {filteredData.length} {__('row(s) selected.')}
           </p>
-
           <div className="flex items-center gap-4">
-            {/* Rows per page */}
-            <div className="flex items-center gap-2 text-sm text-gray-700">
+            <div className="flex items-center gap-2 text-sm">
               {__('Rows per page')}
               <Select
-                value={pageSize.toString()}
+                value={table.getState().pagination.pageSize.toString()}
                 onValueChange={(v) => {
-                  setPageSize(Number(v));
-                  setPageIndex(0);
+                  table.setPageSize(Number(v));
+                  table.setPageIndex(0);
                 }}
               >
                 <SelectTrigger className="h-8 w-[70px] border-gray-300">
@@ -210,51 +248,43 @@ export default function RolesList() {
                 </SelectContent>
               </Select>
             </div>
-
-            {/* Pagination */}
-            <div className="flex items-center gap-2">
-              <span className="text-sm text-gray-700">
-                {__('Page')} {pageIndex + 1} {__('of')} {totalPages}
+            <div className="gap- flex items-center gap-2">
+              <span className="mr-6 ml-4 text-sm text-[#171719]">
+                {__('Page')} {table.getState().pagination.pageIndex + 1} {__('of')}{' '}
+                {table.getPageCount()}
               </span>
-
-              <div className="flex items-center gap-1">
-                <Button
-                  variant="outline"
-                  size="icon"
-                  className="h-8 w-8 rounded-md border border-gray-300 text-gray-600 hover:bg-gray-50"
-                  onClick={() => goToPage(0)}
-                  disabled={pageIndex === 0}
-                >
-                  <ChevronsLeft className="size-4" />
-                </Button>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  className="h-8 w-8 rounded-md border border-gray-300 text-gray-600 hover:bg-gray-50"
-                  onClick={() => goToPage(pageIndex - 1)}
-                  disabled={pageIndex === 0}
-                >
-                  <ChevronLeft className="size-4" />
-                </Button>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  className="h-8 w-8 rounded-md border border-gray-300 text-gray-600 hover:bg-gray-50"
-                  onClick={() => goToPage(pageIndex + 1)}
-                  disabled={pageIndex + 1 >= totalPages}
-                >
-                  <ChevronRight className="size-4" />
-                </Button>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  className="h-8 w-8 rounded-md border border-gray-300 text-gray-600 hover:bg-gray-50"
-                  onClick={() => goToPage(totalPages - 1)}
-                  disabled={pageIndex + 1 >= totalPages}
-                >
-                  <ChevronsRight className="size-4" />
-                </Button>
-              </div>
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => table.setPageIndex(0)}
+                disabled={!table.getCanPreviousPage()}
+              >
+                <ChevronsLeft className="size-4" />
+              </Button>
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => table.previousPage()}
+                disabled={!table.getCanPreviousPage()}
+              >
+                <ChevronLeft className="size-4" />
+              </Button>
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => table.nextPage()}
+                disabled={!table.getCanNextPage()}
+              >
+                <ChevronRight className="size-4" />
+              </Button>
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => table.setPageIndex(table.getPageCount() - 1)}
+                disabled={!table.getCanNextPage()}
+              >
+                <ChevronsRight className="size-4" />
+              </Button>
             </div>
           </div>
         </div>
