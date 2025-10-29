@@ -42,7 +42,6 @@ export default function SettingsPage() {
   const saveMutation = useSaveSettingsMutation();
 
   async function onSubmit(data: SettingsFormData) {
-    console.log('data', data);
     await saveMutation.mutateAsync(data);
   }
 

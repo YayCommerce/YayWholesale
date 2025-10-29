@@ -1,8 +1,8 @@
 <?php
-namespace Yay_Wholesale\Engine\BEPages;
+namespace Yay_Wholesale\Engine\Admin;
 
 use Yay_Wholesale\Utils\SingletonTrait;
-use Yay_Wholesale\Helpers\Helper;
+use Yay_Wholesale\Helpers\SettingsHelper;
 use Yay_Wholesale\Engine\Register\ScriptName;
 
 
@@ -15,9 +15,6 @@ class Settings {
 
     protected function __construct() {
         add_filter( 'admin_body_class', [ $this, 'admin_body_class' ] );
-
-        // Register Custom Post Type
-        add_action( 'init', [ $this, 'register_post_type' ] );
 
         add_action( 'admin_menu', [ $this, 'admin_menu' ], YAY_WHOLESALE_MENU_PRIORITY );
 
@@ -33,41 +30,6 @@ class Settings {
             $classes .= ' yay-ui';
         }
         return $classes;
-    }
-
-    public function register_post_type() {
-        $labels                  = [
-            'name'          => __( 'Wholesale Manage', 'yay-wholesale' ),
-            'singular_name' => __( 'Wholesale Manage', 'yay-wholesale' ),
-        ];
-        $yay_wholesale_post_type = Helper::YAY_WHOLESALE_REQUEST_POST_TYPE;
-        $args                    = [
-            'labels'            => $labels,
-            'description'       => __( 'Wholesale Manage', 'yay-wholesale' ),
-            'public'            => false,
-            'show_ui'           => false,
-            'has_archive'       => true,
-            'show_in_admin_bar' => false,
-            'show_in_rest'      => true,
-            'show_in_menu'      => false,
-            'query_var'         => $yay_wholesale_post_type,
-            'supports'          => [
-                'title',
-                'thumbnail',
-            ],
-            'capabilities'      => [
-                'edit_post'          => 'manage_options',
-                'read_post'          => 'manage_options',
-                'delete_post'        => 'manage_options',
-                'edit_posts'         => 'manage_options',
-                'edit_others_posts'  => 'manage_options',
-                'delete_posts'       => 'manage_options',
-                'publish_posts'      => 'manage_options',
-                'read_private_posts' => 'manage_options',
-            ],
-        ];
-
-        register_post_type( $yay_wholesale_post_type, $args );
     }
 
     public function add_action_links( $links ) {
@@ -114,14 +76,22 @@ class Settings {
             ScriptName::PAGE_SETTINGS,
             'yayWholesale',
             [
-                'admin_url'  => admin_url( 'admin.php?page=wc-settings' ),
-                'plugin_url' => YAY_WHOLESALE_PLUGIN_URL,
-                'rest_url'   => esc_url_raw( rest_url() ),
-                'rest_nonce' => wp_create_nonce( 'wp_rest' ),
-                'rest_base'  => 'yay-wholesale/v1',
-                'settings'   => Helper::get_settings(),
-                'roles'      => get_option( 'yay_wholesale_roles', [] ),
-                'reviewed'   => get_option( 'yay_wholesale_reviewed', false ),
+                'users_url'     => esc_url_raw( admin_url( 'users.php' ) ),
+                'plugin_url'    => YAY_WHOLESALE_PLUGIN_URL,
+                'rest_url'      => esc_url_raw( rest_url() ),
+                'rest_nonce'    => wp_create_nonce( 'wp_rest' ),
+                'rest_base'     => 'yay-wholesale/v1',
+                'currency_data' => [
+                    'currency'     => get_woocommerce_currency(),
+                    'symbol'       => get_woocommerce_currency_symbol(),
+                    'position'     => get_option( 'woocommerce_currency_pos' ),
+                    'thousand_sep' => get_option( 'woocommerce_price_thousand_sep' ),
+                    'decimal_sep'  => get_option( 'woocommerce_price_decimal_sep' ),
+                    'num_decimals' => intval( get_option( 'woocommerce_price_num_decimals' ) ),
+                ],
+                'settings'      => SettingsHelper::get_default_settings(),
+                'roles'         => get_option( 'yay_wholesale_roles', [] ),
+                'reviewed'      => get_option( 'yay_wholesale_reviewed', false ),
             ]
         );
 

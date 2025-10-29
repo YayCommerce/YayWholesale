@@ -2,12 +2,11 @@
 namespace Yay_Wholesale\Helpers;
 
 /**
- * Main Helper Class
+ * Settings Helper Class
  */
-class Helper {
-    public const YAY_WHOLESALE_REQUEST_POST_TYPE = 'yay-whs-request';
+class SettingsHelper {
 
-    public static function get_settings() {
+    public static function get_default_settings() {
         $data = [
             'general'             => [
                 'default_role'         => 'wholesale',

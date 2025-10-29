@@ -17,6 +17,8 @@ class Initialize {
         \Yay_Wholesale\Engine\Hooks::get_instance();
         \Yay_Wholesale\Engine\RestAPI::get_instance();
         \Yay_Wholesale\Engine\Register\RegisterFacade::get_instance();
-        \Yay_Wholesale\Engine\BEPages\Settings::get_instance();
+        \Yay_Wholesale\Engine\Admin\Settings::get_instance();
+        \Yay_Wholesale\Engine\Frontend\Frontend::get_instance();
+        \Yay_Wholesale\Engine\Frontend\Pricing::get_instance();
     }
 }

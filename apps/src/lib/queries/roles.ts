@@ -3,16 +3,18 @@ import { __ } from '@wordpress/i18n';
 import { useNavigate } from 'react-router-dom';
 
 import {
+  bulkUpdateRoleStatus,
   deleteManyRoles,
   deleteRole,
   fetchRole,
   fetchRoles,
   postRole,
   updateRole,
+  updateRoleStatus,
 } from '@/lib/api/roles.api';
 import { showToast } from '@/components/custom/showToast';
 
-import { RoleFormValues } from '../schema/roles';
+import { RoleFormValues, RolesListValues } from '../schema/roles';
 
 const QUERY_KEY = ['roles'];
 
@@ -29,8 +31,7 @@ export function useRolesQuery() {
  * @param roleId - ID of the Role
  * @returns Query to fetch Role data
  */
-export function useRoleQuery(roleId: string | null) {
-  console.log('roleId', roleId);
+export function useRoleQuery(roleId: number | null) {
   return useQuery({
     queryKey: ['role', roleId],
     queryFn: async () => {
@@ -50,46 +51,46 @@ export function useAddRoleMutation() {
   const navigate = useNavigate();
   return useMutation({
     mutationFn: postRole,
-    onSuccess: () => {
+    onSuccess: (response) => {
+      showToast.success(response.message);
       queryClient.invalidateQueries({ queryKey: QUERY_KEY });
-      showToast.success(__('Role created successfully!'));
       navigate('/roles');
     },
     onError: (error: Error) => {
-      showToast.error(__(`Failed to add role: ${error.message}`));
+      showToast.error(error.message);
     },
   });
 }
 
 // Mutation: update role
-export function useUpdateRoleMutation(roleId: string) {
+export function useUpdateRoleMutation(roleId: number) {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   return useMutation({
     mutationFn: (data: RoleFormValues) => updateRole(data, roleId),
-    onSuccess: () => {
-      showToast.success(__('Role updated successfully!'));
+    onSuccess: (response) => {
+      showToast.success(response.message);
       queryClient.invalidateQueries({ queryKey: ['role', roleId] });
       queryClient.invalidateQueries({ queryKey: QUERY_KEY });
       navigate('/roles');
     },
     onError: (error: Error) => {
-      showToast.error(__(`Failed to update role: ${error.message}`));
+      showToast.error(error.message);
     },
   });
 }
 
 // Mutation: delete role
-export function useDeleteRoleMutation(roleId: string) {
+export function useDeleteRoleMutation(roleId: number) {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: () => deleteRole(roleId),
-    onSuccess: () => {
-      showToast.success(__('Role deleted successfully!'));
+    onSuccess: (response) => {
+      showToast.success(response.message);
       queryClient.invalidateQueries({ queryKey: QUERY_KEY });
     },
     onError: (error: Error) => {
-      showToast.error(__(`Failed to delete role: ${error.message}`));
+      showToast.error(error.message);
     },
   });
 }
@@ -99,12 +100,44 @@ export function useDeleteManyRolesMutation() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: deleteManyRoles,
-    onSuccess: () => {
-      showToast.success(__('Selected roles deleted!'));
+    onSuccess: (response) => {
+      showToast.success(response.message);
       queryClient.invalidateQueries({ queryKey: QUERY_KEY });
     },
     onError: (error: Error) => {
-      showToast.error(__(`Failed to delete selected roles: ${error.message}`));
+      showToast.error(error.message);
+    },
+  });
+}
+
+export function useUpdateRoleStatusMutation(roleId: number) {
+  const queryClient = useQueryClient();
+  const navigate = useNavigate();
+  return useMutation({
+    mutationFn: (status: boolean) => updateRoleStatus(roleId, status),
+    onSuccess: (response) => {
+      showToast.success(response.message);
+      queryClient.invalidateQueries({ queryKey: ['role', roleId] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEY });
+      navigate('/roles');
+    },
+    onError: (error: Error) => {
+      showToast.error(error.message);
+    },
+  });
+}
+
+export function useBulkUpdateRoleStatusMutation() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ ids, status }: { ids: number[]; status: boolean }) =>
+      bulkUpdateRoleStatus(ids, status),
+    onSuccess: (response) => {
+      showToast.success(response.message);
+      queryClient.invalidateQueries({ queryKey: QUERY_KEY });
+    },
+    onError: (error: Error) => {
+      showToast.error(error.message);
     },
   });
 }

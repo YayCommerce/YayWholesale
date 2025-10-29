@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { X } from 'lucide-react';
 import { FormProvider, useForm } from 'react-hook-form';
@@ -27,29 +28,28 @@ import { Textarea } from '@/components/ui/textarea';
 export const DEFAULT_ROLE = {
   name: '',
   description: '',
-  discount: 0,
-  minOrderQuantity: 0,
-  minOrderAmount: 0.0,
+  discount: undefined,
+  minOrderQuantity: undefined,
+  minOrderAmount: undefined,
   applyToSalePrice: false,
   status: true,
-  count: 0,
 };
 
 export default function RoleForm() {
+  const params = useParams();
   const isAddingRole = useMatch({ path: '/roles/new' }) !== null;
-  const editRoleId = useParams().roleId;
+  const editRoleId = params.roleId ? Number(params.roleId) : 0;
 
   const navigate = useNavigate();
 
   const { mutate: addRole, isPending: isAddingRolePending } = useAddRoleMutation();
-  const { mutate: updateRole, isPending: isUpdatingRolePending } = useUpdateRoleMutation(
-    editRoleId ?? '',
-  );
+  const { mutate: updateRole, isPending: isUpdatingRolePending } =
+    useUpdateRoleMutation(editRoleId);
 
   // Use the custom hook to fetch role data and handle loading and error states
-  const { data } = useRoleQuery(editRoleId ?? null);
+  const { data, isLoading: isLoadingRole, isError: isErrorRole } = useRoleQuery(editRoleId);
 
-  const isSheetOpen = isAddingRole || editRoleId !== undefined;
+  const isSheetOpen = isAddingRole || editRoleId !== 0;
 
   const form = useForm<RoleFormValues>({
     resolver: zodResolver(isAddingRole ? createRoleSchema : roleSchema),
@@ -63,15 +63,10 @@ export default function RoleForm() {
   };
 
   function onSubmit(data: RoleFormValues): void {
-    const roleData = {
-      ...data,
-      id: isAddingRole ? crypto.randomUUID() : editRoleId,
-    };
-
     if (isAddingRole) {
-      addRole(roleData);
+      addRole(data);
     } else {
-      updateRole(roleData);
+      updateRole(data);
     }
   }
 
@@ -101,6 +96,11 @@ export default function RoleForm() {
             side="right"
             className="top-[32px] h-[calc(100%-32px)] w-full gap-0 overflow-x-auto pt-0 md:min-w-[490px]"
           >
+            {(isLoadingRole || isErrorRole) && (
+              <div className="absolute inset-0 z-50 flex items-center justify-center bg-white/70">
+                <Spinner className="text-muted-foreground size-6 animate-spin" />
+              </div>
+            )}
             <SheetHeader className="border-border border-b p-5">
               <div className="flex items-start justify-between">
                 <div>
@@ -171,7 +171,7 @@ export default function RoleForm() {
                     </FormLabel>
                     <FormControl>
                       <InputNumberRoot
-                        value={field.value ?? 0}
+                        value={field.value}
                         onValueChange={(value) => field.onChange(value)}
                         min={0}
                         max={100}
@@ -198,7 +198,7 @@ export default function RoleForm() {
                     </FormLabel>
                     <FormControl>
                       <InputNumberRoot
-                        value={field.value ?? 0}
+                        value={field.value}
                         onValueChange={(value) => field.onChange(value)}
                         min={0}
                       >
@@ -224,7 +224,7 @@ export default function RoleForm() {
                     </FormLabel>
                     <FormControl>
                       <InputNumberRoot
-                        value={field.value ?? 0}
+                        value={field.value}
                         onValueChange={(value) => field.onChange(value)}
                         min={0}
                         decimalScale={2}
