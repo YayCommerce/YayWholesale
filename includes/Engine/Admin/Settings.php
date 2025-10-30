@@ -89,7 +89,7 @@ class Settings {
                     'decimal_sep'  => get_option( 'woocommerce_price_decimal_sep' ),
                     'num_decimals' => intval( get_option( 'woocommerce_price_num_decimals' ) ),
                 ],
-                'settings'      => SettingsHelper::get_default_settings(),
+                'settings'      => SettingsHelper::get_settings(),
                 'roles'         => get_option( 'yay_wholesale_roles', [] ),
                 'reviewed'      => get_option( 'yay_wholesale_reviewed', false ),
             ]

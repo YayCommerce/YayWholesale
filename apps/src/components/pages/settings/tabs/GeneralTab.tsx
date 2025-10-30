@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useEffect } from 'react';
 import { __ } from '@wordpress/i18n';
 import { useFormContext } from 'react-hook-form';
 
+import { useRolesQuery } from '@/lib/queries/roles';
 import { SettingsFormData } from '@/lib/schema/settings';
 import { FormControl, FormField, FormItem, FormLabel } from '@/components/ui/form';
 import {
@@ -14,7 +15,19 @@ import {
 import { Switch } from '@/components/ui/switch';
 
 export default function GeneralTab() {
-  const { control, watch } = useFormContext<SettingsFormData>();
+  const { control } = useFormContext<SettingsFormData>();
+  const { data: roles, refetch } = useRolesQuery();
+
+  useEffect(() => {
+    refetch(); // ensure data is always fresh when entering the tab
+  }, []);
+
+  const rolesList =
+    roles?.map((role) => ({
+      slug: role.slug,
+      name: role.name,
+    })) ?? [];
+
   return (
     <div className="space-y-6">
       {/* Default role for new user */}
@@ -29,12 +42,14 @@ export default function GeneralTab() {
             <FormControl>
               <Select defaultValue={field.value} onValueChange={field.onChange}>
                 <SelectTrigger className="w-[160px] text-sm font-normal">
-                  <SelectValue placeholder="Select a option" />
+                  <SelectValue placeholder={__('Select a role')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="wholesale">{__('Wholesale User')}</SelectItem>
-                  <SelectItem value="regular">{__('Regular User')}</SelectItem>
-                  <SelectItem value="guest">{__('Guest')}</SelectItem>
+                  {rolesList.map((role) => (
+                    <SelectItem key={role.slug} value={role.slug}>
+                      {role.name}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </FormControl>

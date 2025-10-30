@@ -6,13 +6,14 @@ namespace Yay_Wholesale\Helpers;
  */
 class SettingsHelper {
 
-    public static function get_default_settings() {
+    public static function get_settings() {
+
         $data = [
             'general'             => [
-                'default_role'         => 'wholesale',
+                'default_role'         => '',
                 'show_wholesale_price' => false,
-                'disable_coupon'       => true,
-                'disable_tax'          => true,
+                'disable_coupon'       => false,
+                'disable_tax'          => false,
             ],
             'display'             => [
                 'price_format'          => 'retail-and-wholesale',

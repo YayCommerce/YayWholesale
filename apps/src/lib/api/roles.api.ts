@@ -8,7 +8,7 @@ import type { RoleFormValues, RolesListValues } from '@/lib/schema/roles';
 export async function fetchRoles() {
   const response = await api.get('roles');
   const result = await handleResponse<RolesListValues[]>(response, __('Failed to fetch roles'));
-  return result.data;
+  return result.data ?? [];
 }
 
 // get role by id

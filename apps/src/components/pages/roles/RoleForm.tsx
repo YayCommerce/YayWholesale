@@ -227,8 +227,7 @@ export default function RoleForm() {
                         value={field.value}
                         onValueChange={(value) => field.onChange(value)}
                         min={0}
-                        decimalScale={2}
-                        fixedDecimalScale={true}
+                        decimalScale={window.yayWholesale.currency_data.num_decimals ?? 2}
                       >
                         <InputNumberInput
                           placeholder={__('e.g. 200.00 (min total value required per order)')}

@@ -5,6 +5,25 @@ namespace Yay_Wholesale\Helpers;
  * Roles Helper Class
  */
 class RolesHelper {
+    public static function is_wholesale_user(): array|null {
+        if ( ! is_user_logged_in() ) {
+            return null;
+        }
+
+        $roles          = get_option( 'yay_wholesale_roles', [] );
+        $user           = wp_get_current_user();
+        $user_role_slug = self::get_user_wholesale_role( $user, $roles );
+        if ( ! $user_role_slug ) {
+            return null;
+        }
+
+        $role = self::get_role_by_slug( $roles, $user_role_slug );
+        if ( ! $role || ! isset( $role['status'] ) || ! $role['status'] ) {
+            return null;
+        }
+
+        return $role;
+    }
 
     /**
      * Generate a unique role slug.
