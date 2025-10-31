@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { __ } from '@wordpress/i18n';
 import { useFormContext } from 'react-hook-form';
 
@@ -16,17 +16,17 @@ import { Switch } from '@/components/ui/switch';
 
 export default function GeneralTab() {
   const { control } = useFormContext<SettingsFormData>();
-  const { data: roles, refetch } = useRolesQuery();
+  const { roles } = window.yayWholesale;
+  const rolesList = useMemo(() => {
+    return (
+      roles?.map((role) => ({
+        slug: role.slug,
+        name: role.name,
+      })) ?? []
+    );
+  }, [roles]);
 
-  useEffect(() => {
-    refetch(); // ensure data is always fresh when entering the tab
-  }, []);
-
-  const rolesList =
-    roles?.map((role) => ({
-      slug: role.slug,
-      name: role.name,
-    })) ?? [];
+  const roleSlugs = useMemo(() => new Set(rolesList.map((r) => r.slug)), [rolesList]);
 
   return (
     <div className="space-y-6">
@@ -40,7 +40,10 @@ export default function GeneralTab() {
               {__('Default role for new user')}
             </FormLabel>
             <FormControl>
-              <Select defaultValue={field.value} onValueChange={field.onChange}>
+              <Select
+                value={field.value && roleSlugs.has(field.value) ? field.value : ''}
+                onValueChange={field.onChange}
+              >
                 <SelectTrigger className="w-[160px] text-sm font-normal">
                   <SelectValue placeholder={__('Select a role')} />
                 </SelectTrigger>

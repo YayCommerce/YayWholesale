@@ -43,6 +43,7 @@ export default function SettingsPage() {
 
   async function onSubmit(data: SettingsFormData) {
     await saveMutation.mutateAsync(data);
+    window.yayWholesale.settings = data;
   }
 
   return (

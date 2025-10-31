@@ -37,7 +37,10 @@ export default function DisplayTab() {
                     <SelectItem value="retail-and-wholesale">
                       {__('Show retail and wholesale prices')}
                     </SelectItem>
-                    <SelectItem value="wholesale">{__('Show only wholesale prices')}</SelectItem>
+                    <SelectItem value="wholesale-only">
+                      {__('Show only wholesale prices')}
+                    </SelectItem>
+                    <SelectItem value="retail-only">{__('Show only retail prices')}</SelectItem>
                   </SelectContent>
                 </Select>
               </FormControl>

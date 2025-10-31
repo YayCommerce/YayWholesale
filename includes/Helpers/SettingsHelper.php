@@ -6,7 +6,12 @@ namespace Yay_Wholesale\Helpers;
  */
 class SettingsHelper {
 
-    public static function get_settings() {
+    /**
+     * Get the settings
+     *
+     * @return array The settings.
+     */
+    public static function get_settings(): array {
 
         $data = [
             'general'             => [
