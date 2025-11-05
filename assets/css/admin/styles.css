@@ -1,0 +1,13 @@
+.yay-wholesale-badge{
+    display: inline-flex;
+    padding: 3px 10px;
+    border-radius: 4px;
+}
+.yay-wholesale-badge.yay-wholesale-user{
+    background: #c8d7e1;
+    color: #003d66;
+}
+.yay-wholesale-badge.yay-retail-user{
+    background: #e1c8d7;
+    color: #66003d;
+}

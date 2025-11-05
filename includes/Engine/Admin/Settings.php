@@ -66,11 +66,18 @@ class Settings {
 
     public function admin_enqueue_scripts( $hook_suffix ) {
 
-        $allow_hook_suffixes = [ 'yaycommerce_page_yay_wholesale' ];
+        $allow_hook_suffixes = [ 'yaycommerce_page_yay_wholesale', 'woocommerce_page_wc-orders', 'woocommerce_page_shop_order' ];
 
         if ( ! in_array( $hook_suffix, $allow_hook_suffixes ) ) {
             return;
         }
+
+        wp_enqueue_style(
+            'yay-wholesale-admin-styles',
+            YAY_WHOLESALE_PLUGIN_URL . 'assets/css/admin/styles.css',
+            [],
+            YAY_WHOLESALE_VERSION
+        );
 
         wp_localize_script(
             ScriptName::PAGE_SETTINGS,

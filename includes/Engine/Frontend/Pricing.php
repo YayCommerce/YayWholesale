@@ -246,7 +246,8 @@ class Pricing {
         $sale       = (float) $product->get_sale_price( 'edit' );
         $discounted = $this->apply_wholesale_discount( $sale > 0 ? $sale : $regular, $product, true );
 
-        $html  = '<span class="yay-retail-price">Retail: ';
+        // $html  = '<span class="yay-retail-price">Retail: ';
+        $html  = '<span class="yay-retail-price">';
         $html .= ( $sale > 0 && $sale < $regular )
             ? '<del>' . wc_price( $regular ) . '</del> <ins>' . wc_price( $sale ) . '</ins>'
             : wc_price( $regular );
