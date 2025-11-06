@@ -46,6 +46,7 @@
     "cmdk": "^1.1.1",
     "dialog": "link:@/registry/new-york-v4/ui/dialog",
     "ky": "^1.8.1",
+    "lodash": "^4.17.21",
     "lucide-react": "^0.503.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",

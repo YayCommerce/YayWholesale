@@ -1,21 +1,24 @@
 <?php
 namespace Yay_Wholesale\Helpers;
 
+use WP_Query;
+use WpOrg\Requests\Response;
+
 /**
  * Settings Helper Class
  */
 class RequestsHelper {
-    private static $yay_wholesale_request_post_type    = 'yay-whs-request';
-    private static $yay_wholesale_request_meta_name    = 'yay-whs-request-meta';
-    private static $yay_wholesale_request_display_name = 'yay-whs-request-display-name';
-    public const REJECTED                              = 'rejected';
-    public const PENDING                               = 'pending';
-    public const APPROVED                              = 'approved';
+    private const REQUEST_POST_TYPE    = 'yay-whs-request';
+    private const REQUEST_META_NAME    = 'yay-whs-request-meta';
+    private const REQUEST_DISPLAY_NAME = 'yay-whs-request-display-name';
+    public const REJECTED              = 'rejected';
+    public const PENDING               = 'pending';
+    public const APPROVED              = 'approved';
 
     protected function __construct() {}
 
     public static function get_post_type(): string {
-        return self::$yay_wholesale_request_post_type;
+        return self::REQUEST_POST_TYPE;
     }
 
     /**
@@ -65,9 +68,9 @@ class RequestsHelper {
                 $form_data['avatar'] = get_avatar_url( $user_id );
             }
 
-            update_post_meta( $new_request_id, self::$yay_wholesale_request_meta_name, $form_data );
+            update_post_meta( $new_request_id, self::REQUEST_META_NAME, $form_data );
 
-            update_post_meta( $new_request_id, self::$yay_wholesale_request_display_name, $display_name );
+            update_post_meta( $new_request_id, self::REQUEST_DISPLAY_NAME, $display_name );
         }
     }
 
@@ -77,9 +80,9 @@ class RequestsHelper {
      * @param string $filter_key The search keyword .
      * @param int    $page The pagination page.
      * @param int    $per_page The number of items per page.
-     * @return \WP_Post[] A list of Wholesale requests.
+     * @return array A paginated list of Wholesale requests.
      */
-    public static function get_ywhs_request_post( string $filter_key, int $page, int $per_page ): array {
+    public static function get_paginated_request_post( string $filter_key, int $page, int $per_page ): array {
         $args = [
             'post_type'              => self::get_post_type(),
             'update_post_meta_cache' => true,
@@ -95,7 +98,7 @@ class RequestsHelper {
         if ( isset( $filter_key ) ) {
             $args['meta_query'] = [
                 [
-                    'key'     => self::$yay_wholesale_request_display_name,
+                    'key'     => self::REQUEST_DISPLAY_NAME,
                     'value'   => $filter_key,
                     'compare' => 'LIKE',
                     'type'    => 'CHAR',
@@ -103,9 +106,20 @@ class RequestsHelper {
             ];
         }
 
-        $datas = get_posts( $args );
+        $query       = new WP_Query( $args );
+        $data        = $query->posts;
+        $total_pages = $query->max_num_pages;
+        $first_page  = $total_pages > 0 ? 1 : 0;
 
-        return $datas;
+        $response = [
+            'curPage'   => $page,
+            'firstPage' => $first_page,
+            'lastPage'  => $total_pages,
+            'canNext'   => $page < $total_pages,
+            'canPre'    => $page > $first_page,
+            'data_list' => self::clean_request_data( $data ),
+        ];
+        return $response;
     }
 
     /**
@@ -114,15 +128,15 @@ class RequestsHelper {
      * @param \WP_Post[] $data_list The raw data of wholesale requests .
      * @return array A list of Wholesale requests cleaned.
      */
-    public static function clean_ywhs_request_data( $data_list ): array {
+    public static function clean_request_data( $data_list ): array {
         $cleaned = [];
         foreach ( $data_list as $data ) {
             $tmp = [
                 'id' => $data->ID,
             ];
 
-            $display_name = get_post_meta( $data->ID, self::$yay_wholesale_request_display_name, true );
-            $post_meta    = get_post_meta( $data->ID, self::$yay_wholesale_request_meta_name, true );
+            $display_name = get_post_meta( $data->ID, self::REQUEST_DISPLAY_NAME, true );
+            $post_meta    = get_post_meta( $data->ID, self::REQUEST_META_NAME, true );
 
             $datetime = strtotime( $data->post_date );
             $date     = gmdate( 'M j Y, g:i a', $datetime );

@@ -11,6 +11,13 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import {
   Table,
   TableBody,
   TableCell,
@@ -23,16 +30,18 @@ import { RequestColumn } from './RequestsColumn';
 
 export default function RequestList() {
   const [search, setSearch] = useState('');
+  const [perPage, setPerPage] = useState(1);
+  const [page, setPage] = useState(10);
   const clientQuery = useQueryClient();
   const {
-    data = [],
+    data,
     isLoading: isLoadingRequests,
     isFetching: isFetchingRequests,
-  } = useRequestsQuery(search);
+  } = useRequestsQuery(search, page, perPage);
   const columns = RequestColumn;
 
   const table = useReactTable({
-    data,
+    data: data?.data_list ?? [],
     columns,
     getCoreRowModel: getCoreRowModel(),
   });
@@ -41,13 +50,25 @@ export default function RequestList() {
 
   const debouncedSearch = useMemo(() => {
     return debounce(() => {
-      clientQuery.invalidateQueries({ queryKey: ['requests'] }); // trigger refetch
-    }, 1000);
-  }, [search]);
+      clientQuery.invalidateQueries({ queryKey: ['requests'] });
+    }, 500);
+  }, [clientQuery]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearch(e.target.value);
+    setPage(1);
     debouncedSearch();
+  };
+
+  const goToPage = async (targetPage: number) => {
+    await setPage(targetPage ?? 0);
+    clientQuery.invalidateQueries({ queryKey: ['requests'] });
+  };
+
+  const perPageChange = async (value: string) => {
+    await setPerPage(parseInt(value));
+    await setPage(1);
+    clientQuery.invalidateQueries({ queryKey: ['requests'] });
   };
 
   return (
@@ -55,7 +76,7 @@ export default function RequestList() {
       <Card className="gap-3 p-4">
         {/* Header */}
         <div className="mb-4 flex items-center justify-between">
-          <h1 className="text-xl font-semibold">Wholesaler Requests</h1>
+          <h1 className="text-xl font-semibold">{__('Wholesaler Requests', 'yay-wholesale')}</h1>
           <Input placeholder="Search" value={search} onChange={handleChange} className="w-60" />
         </div>
 
@@ -104,54 +125,68 @@ export default function RequestList() {
         </div>
 
         {/* Footer */}
-        <div className="flex flex-col items-center justify-between gap-3 sm:flex-row">
-          <p className="text-muted-foreground text-sm">
-            {selectedCount} of {data.length} row(s) selected.
-          </p>
+        {!isFetchingRequests && data != undefined && data.data_list.length > 0 && (
+          <div className="flex flex-col items-center justify-between gap-3 sm:flex-row">
+            <p className="text-muted-foreground text-sm">
+              {selectedCount} of {data?.data_list.length} row(s) selected.
+            </p>
 
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-[#171719]">
-              Rows per page: {table.getState().pagination.pageSize}
-            </span>
-            <div className="flex items-center gap-1">
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => table.setPageIndex(0)}
-                disabled={!table.getCanPreviousPage()}
-              >
-                <ChevronsLeft />
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => table.previousPage()}
-                disabled={!table.getCanPreviousPage()}
-              >
-                <ChevronLeft />
-              </Button>
-              <span className="text-sm">
-                Page {table.getState().pagination.pageIndex + 1} of {table.getPageCount()}
-              </span>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => table.nextPage()}
-                disabled={!table.getCanNextPage()}
-              >
-                <ChevronRight />
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => table.setPageIndex(table.getPageCount() - 1)}
-                disabled={!table.getCanNextPage()}
-              >
-                <ChevronsRight />
-              </Button>
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-[#171719]">Rows per page:</span>
+              <Select value={`${perPage}`} onValueChange={(value) => perPageChange(value)}>
+                <SelectTrigger size="sm" className="w-20" id="rows-per-page">
+                  <SelectValue placeholder={perPage} />
+                </SelectTrigger>
+                <SelectContent side="top">
+                  {[1, 2, 5, 10, 20, 50, 100].map((pageSize) => (
+                    <SelectItem key={pageSize} value={`${pageSize}`}>
+                      {pageSize}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+
+              <div className="flex items-center gap-1">
+                <span className="mx-5 text-sm">
+                  Page {page} of {data?.lastPage ?? 0}
+                </span>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() => goToPage(data.firstPage)}
+                  disabled={data?.curPage === data?.firstPage}
+                >
+                  <ChevronsLeft />
+                </Button>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() => goToPage(page - 1)}
+                  disabled={!data?.canPre}
+                >
+                  <ChevronLeft />
+                </Button>
+
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() => goToPage(page + 1)}
+                  disabled={!data?.canNext}
+                >
+                  <ChevronRight />
+                </Button>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() => goToPage(data.lastPage)}
+                  disabled={data?.curPage === data?.lastPage}
+                >
+                  <ChevronsRight />
+                </Button>
+              </div>
             </div>
           </div>
-        </div>
+        )}
       </Card>
     </div>
   );

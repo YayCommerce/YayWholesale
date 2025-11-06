@@ -32,7 +32,7 @@ class RequestRestController extends BaseRestController {
                 ],
                 [
                     'methods'             => 'GET',
-                    'callback'            => [ $this, 'get_ywhs_request_list' ],
+                    'callback'            => [ $this, 'get_request_list' ],
                     'permission_Callback' => '__return_true',
                 ],
             ]
@@ -48,7 +48,7 @@ class RequestRestController extends BaseRestController {
         return $this->success( [], __( 'Request Saved', 'yay-wholesale' ) );
     }
 
-    public function get_ywhs_request_list( WP_REST_Request $request ): WP_REST_Response {
+    public function get_request_list( WP_REST_Request $request ): WP_REST_Response {
         $page     = $request['page'];
         $per_page = $request['per_page'];
         $filter   = $request['kw'];
@@ -65,9 +65,8 @@ class RequestRestController extends BaseRestController {
             $filter = '';
         }
 
-        $raw_data = RequestsHelper::get_ywhs_request_post( $filter, $page, $per_page );
-        $data     = RequestsHelper::clean_ywhs_request_data( $raw_data );
+        $response = RequestsHelper::get_paginated_request_post( $filter, $page, $per_page );
 
-        return $this->success( $data, __( 'Fetched successfully', 'yay-wholesale' ) );
+        return $this->success( $response, __( 'Fetched successfully', 'yay-wholesale' ) );
     }
 }
