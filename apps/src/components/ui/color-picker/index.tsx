@@ -1,91 +1,178 @@
-import { useEffect, useRef } from 'react';
+import './color-picker.css';
+
+import { useEffect, useRef, useState } from 'react';
+import { CheckIcon, CopySimpleIcon } from '@phosphor-icons/react';
+import {
+  ColorPalette,
+  __experimentalInputControl as InputControl,
+  Button as WPButton,
+  ColorPicker as WPColorPicker,
+} from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
 
 import { cn } from '@/lib/utils';
-import { focusVariants } from '@/components/ui/variants/focus.variants';
+import { Button } from '@/components/ui/button';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 
 interface ColorPickerProps {
-  id: number | string;
-  value: string;
+  value?: string;
   defaultColor?: string;
-  palettes?: boolean | string[];
-  width?: number;
+  onChangeColor?: (color: string) => void;
   className?: string;
-  onChangeColor: (color: string) => void;
+  disabled?: boolean;
 }
 
-declare const jQuery: any;
-
-const ColorPicker: React.FC<ColorPickerProps> = ({
-  id,
+export function ColorPicker({
   value,
   defaultColor = '#ffffff',
-  palettes = true,
-  width = 250,
-  className,
   onChangeColor,
-  ...props
-}) => {
-  const inputRef = useRef<HTMLInputElement | null>(null);
-  const initPicker = useRef(false);
+  className,
+  disabled = false,
+}: ColorPickerProps) {
+  const colors = [
+    { name: 'Black', color: '#181818' },
+    { name: 'White', color: '#F5F5F5' },
+    { name: 'Red', color: '#E7210A' },
+    { name: 'Orange', color: '#F54A00' },
+    { name: 'Green', color: '#5EA500' },
+    { name: 'Blue', color: '#165CFB' },
+    { name: 'Yellow', color: '#FDC700' },
+  ];
 
-  useEffect(() => {
-    if (
-      typeof jQuery === 'undefined' ||
-      !jQuery.fn.wpColorPicker ||
-      !inputRef.current ||
-      initPicker.current === true
-    ) {
-      return;
+  const displayColor = value || defaultColor;
+  const initialDefaultColor = useRef(defaultColor);
+  const inputValue = displayColor.replace(/^#/, '').slice(0, 6);
+
+  const [copied, setCopied] = useState(false);
+
+  const handleOpenAutoFocus = (event: Event) => {
+    // Check if displayColor matches any of the predefined palette colors
+    const isColorInPalette = colors.some((color) => color.color === displayColor);
+
+    if (isColorInPalette) {
+      // Prevent default focus behavior only if we want to focus a palette color
+      event.preventDefault();
+
+      // Use setTimeout to ensure the DOM is fully rendered
+      setTimeout(() => {
+        // find the selected color button
+        const selected = document.querySelector<HTMLButtonElement>(
+          '.components-circular-option-picker__option[aria-checked="true"]',
+        );
+        if (selected) {
+          selected.focus();
+        }
+      }, 0);
     }
+    // If displayColor is not in palette, let Radix handle default focus behavior
+  };
 
-    initPicker.current = true;
+  const handleChange = (newColor?: string) => {
+    if (!newColor) return;
+    const normalized = newColor.startsWith('#') ? newColor : `#${newColor}`;
+    const trimmed = normalized.replace(/^#/, '').slice(0, 6);
+    const finalColor = `#${trimmed}`;
+    onChangeColor?.(finalColor);
+  };
 
-    jQuery(inputRef.current).wpColorPicker({
-      change: (_event: any, ui: { color: { toString: () => string } }) => {
-        onChangeColor(ui.color.toString());
-      },
-      palettes,
-      width,
-      result: (color: string) => {
-        onChangeColor(color);
-      },
-    });
+  const handleInputChange = (nextValue?: string) => {
+    const raw = nextValue ?? '';
+    const truncated = raw.slice(0, 6);
+    const candidate = `#${truncated}`;
+    const isValidHex = /^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/.test(candidate);
 
-    return () => {
-      if (inputRef.current && jQuery(inputRef.current).data('wpWpColorPicker')) {
-        jQuery(inputRef.current).wpColorPicker('destroy');
-      }
-    };
-  }, []);
-
-  useEffect(() => {
-    if (inputRef.current && value !== jQuery(inputRef.current).val()) {
-      jQuery(inputRef.current).val(value);
+    if (isValidHex) {
+      onChangeColor?.(candidate);
+    } else {
+      onChangeColor?.('#000000');
     }
-  }, [value]);
+  };
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(displayColor);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error('Failed to copy!', err);
+    }
+  };
+
+  const handleClear = () => {
+    const reset = initialDefaultColor.current;
+    onChangeColor?.(reset);
+  };
 
   return (
-    <div
-      className={cn(
-        focusVariants(),
-        'yay-color-picker-wrap',
-        '[&_.wp-color-result]:!border-input [&_.wp-color-result]:!m-0 [&_.wp-color-result]:!h-9 [&_.wp-color-result]:!overflow-hidden [&_.wp-color-result]:!rounded-md [&_.wp-color-result-text]:!py-[3px]',
-        '[&_.wp-picker-input-wrap]:animate-in [&_.wp-picker-input-wrap]:!absolute [&_.wp-picker-input-wrap]:!z-999 [&_.wp-picker-input-wrap]:!m-0 [&_.wp-picker-input-wrap]:!mt-2 [&_.wp-picker-input-wrap]:!ml-0 [&_.wp-picker-input-wrap]:!block [&_.wp-picker-input-wrap]:!w-[250px] [&_.wp-picker-input-wrap]:!rounded-t-none [&_.wp-picker-input-wrap]:!border-t-0 [&_.wp-picker-input-wrap]:!bg-white [&_.wp-picker-input-wrap]:!p-2 [&_.wp-picker-input-wrap]:!shadow-sm [&_.wp-picker-input-wrap.hidden]:!hidden',
-        '[&_.wp-picker-holder]:animate-in [&_.wp-picker-holder]:!absolute [&_.wp-picker-holder]:!z-999 [&_.wp-picker-holder]:!mt-[47px] [&_.wp-picker-holder]:!ml-0 [&_.wp-picker-holder]:!w-[250px] [&_.wp-picker-holder]:!shadow-sm',
-        '[&_.iris-picker]:!border-0',
-        className,
-      )}
-    >
-      <input
-        id={`YayColorPicker_${id}`}
-        ref={inputRef}
-        type="text"
-        defaultValue={value}
-        data-default-color={defaultColor}
-        {...props}
-      />
-    </div>
-  );
-};
+    <Popover>
+      <PopoverTrigger asChild>
+        <Button
+          variant="outline"
+          disabled={disabled}
+          className={cn(
+            'h-8.5 w-[110px] cursor-pointer justify-start rounded-sm p-1 hover:bg-[#F9F9F9]',
+            className,
+          )}
+        >
+          <span
+            className="h-6.5 w-6.5 rounded-[4px] border"
+            style={{ backgroundColor: displayColor }}
+          />
+          <span className="text-start font-normal">{displayColor}</span>
+        </Button>
+      </PopoverTrigger>
 
-export { ColorPicker };
+      <PopoverContent
+        className="w-fit min-w-[200px] px-1 py-3"
+        align="start"
+        sideOffset={5}
+        onOpenAutoFocus={handleOpenAutoFocus}
+      >
+        <div className="flex flex-col gap-2">
+          <div className="px-2">
+            <ColorPalette
+              colors={colors}
+              value={displayColor}
+              onChange={(newColor = '#000000') => handleChange(newColor)}
+              disableCustomColors={true}
+              clearable={false}
+              className="yay-wp-color-palette"
+            />
+          </div>
+
+          <WPColorPicker
+            className="yay-wp-color-picker"
+            color={displayColor}
+            onChange={handleChange}
+            enableAlpha={false}
+            defaultValue={defaultColor}
+            copyFormat="hex"
+          />
+
+          <div className="flex items-center justify-between gap-3 px-3">
+            <div className="flex items-center gap-2">
+              <InputControl
+                __next40pxDefaultSize
+                prefix={<span className="ml-3">#</span>}
+                value={inputValue}
+                onChange={handleInputChange}
+                className="yay-wp-color-input"
+              />
+              <WPButton onClick={handleCopy}>
+                {copied ? <CheckIcon size={24} /> : <CopySimpleIcon size={24} />}
+              </WPButton>
+            </div>
+            <Button
+              className="w-fit cursor-pointer"
+              variant="outline"
+              type="button"
+              onClick={handleClear}
+            >
+              {__('Reset')}
+            </Button>
+          </div>
+        </div>
+      </PopoverContent>
+    </Popover>
+  );
+}

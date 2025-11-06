@@ -1,53 +1,71 @@
 <?php
 namespace Yay_Wholesale\Helpers;
 
-use Yay_Wholesale\Utils\SingletonTrait;
-
+/**
+ * Main Helper Class
+ */
 class Helper {
+    public const YAY_WHOLESALE_REQUEST_POST_TYPE = 'yay-whs-request';
 
-	use SingletonTrait;
+    public static function get_settings() {
+        $data = [
+            'general'             => [
+                'default_role'         => 'wholesale',
+                'show_wholesale_price' => false,
+                'disable_coupon'       => true,
+                'disable_tax'          => true,
+            ],
+            'display'             => [
+                'price_format'          => 'retail-and-wholesale',
+                'wholesale_price_label' => 'Wholesale price',
+                'wholesale_price_color' => '#333333',
+            ],
+            'registration'        => [
+                'moderate'                        => true,
+                'wholesale_registration_page'     => '',
+                'submit_button_label'             => 'Register now',
+                'successful_registration_message' => 'Thank you for registering. Your account begin reviewing. Please wait to be approved.',
+            ],
+            'registration_fields' => [
+                'useDefaultForm' => false,
+                'fields'         => [
+                    [
+                        'id'          => uniqid( 'field_' ),
+                        'label'       => 'First Name',
+                        'type'        => 'text',
+                        'placeholder' => 'Enter First Name',
+                        'columnWidth' => '50%',
+                        'deletable'   => true,
+                    ],
+                    [
+                        'id'          => uniqid( 'field_' ),
+                        'label'       => 'Last Name',
+                        'type'        => 'text',
+                        'placeholder' => 'Enter Last Name',
+                        'columnWidth' => '50%',
+                        'deletable'   => true,
+                    ],
+                    [
+                        'id'          => uniqid( 'field_' ),
+                        'label'       => 'Email Address',
+                        'type'        => 'email',
+                        'placeholder' => 'Enter Email Address',
+                        'columnWidth' => '100%',
+                        'deletable'   => false,
+                    ],
+                    [
+                        'id'          => uniqid( 'field_' ),
+                        'label'       => 'Message',
+                        'type'        => 'textarea',
+                        'placeholder' => 'Enter Message',
+                        'columnWidth' => '100%',
+                        'deletable'   => true,
+                    ],
+                ],
+            ],
 
-	private static $YAY_WHOLESALE_POST_TYPE = 'yay-wholesale-manage';
+        ];
 
-	protected function __construct() {}
-
-	public static function get_post_type() {
-		return self::$YAY_WHOLESALE_POST_TYPE;
-	}
-
-	public static function get_instance_classes( $namespace_parts = array(), $classes = array() ) {
-		foreach ( $classes as $class ) {
-			$namespace_parts[] = $class;
-			$full_class_name   = implode( '\\', $namespace_parts );
-			if ( class_exists( $full_class_name ) ) {
-				$full_class_name::get_instance();
-			}
-			array_pop( $namespace_parts );
-		}
-	}
-
-	public static function engine_classes() {
-		$classes = array(
-			'Hooks',
-			'RestAPI',
-		);
-
-		return $classes;
-	}
-
-	public static function register_classes() {
-		$classes = array(
-			'RegisterFacade',
-		);
-
-		return $classes;
-	}
-
-	public static function backend_classes() {
-		$classes = array(
-			'Settings',
-		);
-
-		return $classes;
-	}
+        return get_option( 'yay_wholesale_settings', $data );
+    }
 }

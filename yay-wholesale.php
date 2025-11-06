@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Plugin Name:       YayWholesale Pro
  * Plugin URI:        https://yaycommerce.com/
@@ -22,82 +21,85 @@ namespace Yay_Wholesale;
 defined( 'ABSPATH' ) || exit;
 
 if ( function_exists( 'Yay_Wholesale\\plugin_init' ) ) {
-	require_once plugin_dir_path( __FILE__ ) . 'includes/Fallback.php';
-	add_action(
-		'admin_init',
-		function () {
-			deactivate_plugins( plugin_basename( __FILE__ ) );
-		}
-	);
+    require_once plugin_dir_path( __FILE__ ) . 'includes/Fallback.php';
+    add_action(
+        'admin_init',
+        function () {
+            deactivate_plugins( plugin_basename( __FILE__ ) );
+        }
+    );
 }
 
 
 if ( ! defined( 'YAY_WHOLESALE_FILE' ) ) {
-	define( 'YAY_WHOLESALE_FILE', __FILE__ );
+    define( 'YAY_WHOLESALE_FILE', __FILE__ );
 }
 
 if ( ! defined( 'YAY_WHOLESALE_VERSION' ) ) {
-	define( 'YAY_WHOLESALE_VERSION', '1.0.0' );
+    define( 'YAY_WHOLESALE_VERSION', '1.0.0' );
 }
 
 if ( ! defined( 'YAY_WHOLESALE_PLUGIN_URL' ) ) {
-	define( 'YAY_WHOLESALE_PLUGIN_URL', plugin_dir_url( YAY_WHOLESALE_FILE ) );
+    define( 'YAY_WHOLESALE_PLUGIN_URL', plugin_dir_url( YAY_WHOLESALE_FILE ) );
 }
 
 if ( ! defined( 'YAY_WHOLESALE_PLUGIN_DIR' ) ) {
-	define( 'YAY_WHOLESALE_PLUGIN_DIR', plugin_dir_path( YAY_WHOLESALE_FILE ) );
+    define( 'YAY_WHOLESALE_PLUGIN_DIR', plugin_dir_path( YAY_WHOLESALE_FILE ) );
 }
 
 if ( ! defined( 'YAY_WHOLESALE_BASE_NAME' ) ) {
-	define( 'YAY_WHOLESALE_BASE_NAME', plugin_basename( YAY_WHOLESALE_FILE ) );
+    define( 'YAY_WHOLESALE_BASE_NAME', plugin_basename( YAY_WHOLESALE_FILE ) );
 }
 
 define( 'YAY_WHOLESALE_IS_DEVELOPMENT', true );
 
 spl_autoload_register(
-	function ( $class ) {
-		$prefix   = __NAMESPACE__; // project-specific namespace prefix
-		$base_dir = __DIR__ . '/includes'; // base directory for the namespace prefix
+    function ( $class ) {
+        $prefix = __NAMESPACE__;
+        // project-specific namespace prefix
+        $base_dir = __DIR__ . '/includes';
+        // base directory for the namespace prefix
 
-		$len = strlen( $prefix );
-		if ( strncmp( $prefix, $class, $len ) !== 0 ) { // does the class use the namespace prefix?
-			return; // no, move to the next registered autoloader
-		}
+        $len = strlen( $prefix );
+        if ( strncmp( $prefix, $class, $len ) !== 0 ) {
+            // does the class use the namespace prefix?
+            return;
+            // no, move to the next registered autoloader
+        }
 
-		$relative_class_name = substr( $class, $len );
+        $relative_class_name = substr( $class, $len );
 
-		// replace the namespace prefix with the base directory, replace namespace
-		// separators with directory separators in the relative class name, append
-		// with .php
-		$file = $base_dir . str_replace( '\\', '/', $relative_class_name ) . '.php';
+        // replace the namespace prefix with the base directory, replace namespace
+        // separators with directory separators in the relative class name, append
+        // with .php
+        $file = $base_dir . str_replace( '\\', '/', $relative_class_name ) . '.php';
 
-		if ( file_exists( $file ) ) {
-			require $file;
-		}
-	}
+        if ( file_exists( $file ) ) {
+            require $file;
+        }
+    }
 );
 
 
 if ( ! function_exists( 'Yay_Wholesale\\plugin_init' ) ) {
-	function plugin_init() {
+    function plugin_init() {
 
-		\Yay_Wholesale\YayCommerceMenu\RegisterMenu::get_instance();
-		if ( ! function_exists( 'WC' ) ) {
-			add_action( 'admin_notices', [ \Yay_Wholesale\Engine\ActDeact::class, 'install_yaywholesale_admin_notice' ] );
-			return;
-		}
+        \Yay_Wholesale\YayCommerceMenu\RegisterMenu::get_instance();
+        if ( ! function_exists( 'WC' ) ) {
+            add_action( 'admin_notices', [ \Yay_Wholesale\Engine\ActDeact::class, 'install_yaywholesale_admin_notice' ] );
+            return;
+        }
 
-		add_action( 'before_woocommerce_init', [ \Yay_Wholesale\Engine\ActDeact::class, 'before_woocommerce_init' ] );
+        add_action( 'before_woocommerce_init', [ \Yay_Wholesale\Engine\ActDeact::class, 'before_woocommerce_init' ] );
 
-		Initialize::get_instance();
-		I18n::loadPluginTextdomain();
-
-	}
+        Initialize::get_instance();
+        I18n::load_plugin_textdomain();
+    }
 }
 
 if ( ! wp_installing() ) {
-	add_action( 'plugins_loaded', 'Yay_Wholesale\\plugin_init' );
+    add_action( 'plugins_loaded', 'Yay_Wholesale\\plugin_init' );
 }
 
-register_activation_hook( YAY_WHOLESALE_FILE, array( \Yay_Wholesale\Engine\ActDeact::class, 'activate' ) );
-register_deactivation_hook( YAY_WHOLESALE_FILE, array( \Yay_Wholesale\Engine\ActDeact::class, 'deactivate' ) );
+register_activation_hook( YAY_WHOLESALE_FILE, [ \Yay_Wholesale\Engine\ActDeact::class, 'activate' ] );
+register_deactivation_hook( YAY_WHOLESALE_FILE, [ \Yay_Wholesale\Engine\ActDeact::class, 'deactivate' ] );
