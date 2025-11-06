@@ -41,4 +41,8 @@ abstract class BaseRestController {
     protected function get_json_params( WP_REST_Request $request ): array {
         return (array) $request->get_json_params();
     }
+
+    protected function get_form_data( WP_REST_Request $request ): array {
+        return (array) $request->get_body_params();
+    }
 }

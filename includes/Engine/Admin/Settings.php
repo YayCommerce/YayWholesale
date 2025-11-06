@@ -4,7 +4,7 @@ namespace Yay_Wholesale\Engine\Admin;
 use Yay_Wholesale\Utils\SingletonTrait;
 use Yay_Wholesale\Helpers\SettingsHelper;
 use Yay_Wholesale\Engine\Register\ScriptName;
-
+use Yay_Wholesale\Helpers\RequestsHelper;
 
 defined( 'ABSPATH' ) || exit;
 /**
@@ -15,6 +15,9 @@ class Settings {
 
     protected function __construct() {
         add_filter( 'admin_body_class', [ $this, 'admin_body_class' ] );
+
+        // Register Custom Post Type
+        add_action( 'init', [ $this, 'register_ywhs_request_post_type' ] );
 
         add_action( 'admin_menu', [ $this, 'admin_menu' ], YAY_WHOLESALE_MENU_PRIORITY );
 
@@ -30,6 +33,41 @@ class Settings {
             $classes .= ' yay-ui';
         }
         return $classes;
+    }
+
+    public function register_ywhs_request_post_type() {
+        $labels                  = [
+            'name'          => __( 'Wholesale Manage', 'yay-wholesale' ),
+            'singular_name' => __( 'Wholesale Manage', 'yay-wholesale' ),
+        ];
+        $yay_wholesale_post_type = RequestsHelper::get_post_type();
+        $args                    = [
+            'labels'            => $labels,
+            'description'       => __( 'Wholesale Manage', 'yay-wholesale' ),
+            'public'            => false,
+            'show_ui'           => false,
+            'has_archive'       => true,
+            'show_in_admin_bar' => false,
+            'show_in_rest'      => true,
+            'show_in_menu'      => false,
+            'query_var'         => $yay_wholesale_post_type,
+            'supports'          => [
+                'title',
+                'thumbnail',
+            ],
+            'capabilities'      => [
+                'edit_post'          => 'manage_options',
+                'read_post'          => 'manage_options',
+                'delete_post'        => 'manage_options',
+                'edit_posts'         => 'manage_options',
+                'edit_others_posts'  => 'manage_options',
+                'delete_posts'       => 'manage_options',
+                'publish_posts'      => 'manage_options',
+                'read_private_posts' => 'manage_options',
+            ],
+        ];
+
+        register_post_type( $yay_wholesale_post_type, $args );
     }
 
     public function add_action_links( $links ) {

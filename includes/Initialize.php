@@ -22,5 +22,6 @@ class Initialize {
         \Yay_Wholesale\Engine\Frontend\Pricing::get_instance();
         \Yay_Wholesale\Engine\Frontend\Coupon::get_instance();
         \Yay_Wholesale\Engine\Frontend\Tax::get_instance();
+        \Yay_Wholesale\Engine\Frontend\RequestForm::get_instance();
     }
 }
