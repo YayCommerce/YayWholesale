@@ -1,5 +1,5 @@
 import { __ } from '@wordpress/i18n';
-import { Ban, CheckCircle2, RotateCcw } from 'lucide-react';
+import { CheckCircle2, CircleSlash, Clock4 } from 'lucide-react';
 
 import { RequestStatusValues } from '@/lib/schema/requests';
 import { Badge } from '@/components/ui/badge';
@@ -17,13 +17,13 @@ export function StatusBadge({ status }: StatusBadgeProps) {
       textColor: 'text-gray-900',
     },
     pending: {
-      icon: <RotateCcw className="min-h-4 min-w-4" color="gray" strokeWidth={2} />,
+      icon: <Clock4 className="min-h-4 min-w-4" color="gray" strokeWidth={2} />,
       text: __('Pending', 'yay-wholesale'),
       border: 'border-gray-200',
       textColor: 'text-gray-900',
     },
     rejected: {
-      icon: <Ban className="min-h-4 min-w-4" color="red" strokeWidth={2} />,
+      icon: <CircleSlash className="min-h-4 min-w-4" color="red" strokeWidth={2} />,
       text: __('Rejected', 'yay-wholesale'),
       border: 'border-gray-200',
       textColor: 'text-gray-900',

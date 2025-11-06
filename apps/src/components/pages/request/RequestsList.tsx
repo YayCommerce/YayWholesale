@@ -30,8 +30,8 @@ import { RequestColumn } from './RequestsColumn';
 
 export default function RequestList() {
   const [search, setSearch] = useState('');
-  const [perPage, setPerPage] = useState(1);
-  const [page, setPage] = useState(10);
+  const [perPage, setPerPage] = useState(10);
+  const [page, setPage] = useState(1);
   const clientQuery = useQueryClient();
   const {
     data,
