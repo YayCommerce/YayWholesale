@@ -64,7 +64,7 @@ class SettingsHelper {
                         'type'        => 'textarea',
                         'placeholder' => 'Enter Message',
                         'columnWidth' => '100%',
-                        'deletable'   => true,
+                        'deletable'   => false,
                     ],
                 ],
             ],

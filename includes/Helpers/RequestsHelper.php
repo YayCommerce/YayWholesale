@@ -11,6 +11,7 @@ class RequestsHelper {
     private const REQUEST_POST_TYPE    = 'yay-whs-request';
     private const REQUEST_META_NAME    = 'yay-whs-request-meta';
     private const REQUEST_DISPLAY_NAME = 'yay-whs-request-display-name';
+    private const REQUEST_META_SETTING = 'yay-whs-request-meta-setting';
     public const REJECTED              = 'rejected';
     public const PENDING               = 'pending';
     public const APPROVED              = 'approved';
@@ -60,18 +61,46 @@ class RequestsHelper {
         );
 
         if ( $new_request_id ) {
-            $form_data['avatar']  = '';
-            $form_data['user_id'] = $user_id;
-            $form_data['status']  = self::PENDING;
+            $form_data['avatar'] = '';
+            $form_data['status'] = self::PENDING;
 
             if ( $user_id > 0 ) {
                 $form_data['avatar'] = get_avatar_url( $user_id );
             }
 
+            $general_setting = SettingsHelper::get_settings();
+            $setting         = [
+                'email_field'   => '',
+                'message_field' => '',
+                'custom_fields' => [],
+            ];
+
+            foreach ( $general_setting['registration_fields']['fields'] as $gsetting ) {
+                $key = self::label_to_input_name( $gsetting['label'] );
+                if ( array_key_exists( $key, $form_data ) ) {
+                    if ( 'email' === $gsetting['type'] && ! $gsetting['deletable'] ) {
+                        $setting['email_field'] = $key;
+                    }
+
+                    if ( 'textarea' === $gsetting['type'] && ! $gsetting['deletable'] ) {
+                        $setting['message_field'] = $key;
+                    }
+
+                    if ( $gsetting['deletable'] ) {
+                        $setting['custom_fields'][ $key ] = [
+                            'label' => $gsetting['label'],
+                            'type'  => $gsetting['type'],
+                        ];
+                    }
+                }
+            }
+
             update_post_meta( $new_request_id, self::REQUEST_META_NAME, $form_data );
 
             update_post_meta( $new_request_id, self::REQUEST_DISPLAY_NAME, $display_name );
-        }
+
+            update_post_meta( $new_request_id, self::REQUEST_META_SETTING, $setting );
+        }//end if
     }
 
     /**
@@ -107,9 +136,14 @@ class RequestsHelper {
         }
 
         $query       = new WP_Query( $args );
-        $data        = $query->posts;
+        $data_list   = $query->posts;
         $total_pages = $query->max_num_pages;
         $first_page  = $total_pages > 0 ? 1 : 0;
+
+        $cleaned = [];
+        foreach ( $data_list as $data ) {
+            array_push( $cleaned, self::clean_request_data( $data, false ) );
+        }
 
         $response = [
             'curPage'   => $page,
@@ -117,44 +151,130 @@ class RequestsHelper {
             'lastPage'  => $total_pages,
             'canNext'   => $page < $total_pages,
             'canPre'    => $page > $first_page,
-            'data_list' => self::clean_request_data( $data ),
+            'data_list' => $cleaned,
         ];
         return $response;
     }
 
     /**
-     * Clean the wholesale requests.
+     * Clean the wholesale request.
      *
-     * @param \WP_Post[] $data_list The raw data of wholesale requests .
-     * @return array A list of Wholesale requests cleaned.
+     * @param \WP_Post $data The raw data of wholesale request .
+     * @param bool     $is_extra_fields The Flag to determine to get extra fields .
+     * @return array A  Wholesale requests cleaned.
      */
-    public static function clean_request_data( $data_list ): array {
-        $cleaned = [];
-        foreach ( $data_list as $data ) {
-            $tmp = [
-                'id' => $data->ID,
-            ];
+    public static function clean_request_data( \WP_Post $data, bool $is_extra_fields ): array {
+        $cleaned = [
+            'id'     => $data->ID,
+            'fields' => [],
+        ];
 
-            $display_name = get_post_meta( $data->ID, self::REQUEST_DISPLAY_NAME, true );
-            $post_meta    = get_post_meta( $data->ID, self::REQUEST_META_NAME, true );
+        $display_name = get_post_meta( $data->ID, self::REQUEST_DISPLAY_NAME, true );
+        $post_meta    = get_post_meta( $data->ID, self::REQUEST_META_NAME, true );
+        $meta_setting = get_post_meta( $data->ID, self::REQUEST_META_SETTING, true );
 
-            $datetime = strtotime( $data->post_date );
-            $date     = gmdate( 'M j Y, g:i a', $datetime );
+        $cleaned = array_merge(
+            $cleaned,
+            [
+                'name'    => $display_name,
+                'email'   => $post_meta[ $meta_setting['email_field'] ],
+                'message' => $post_meta[ $meta_setting['message_field'] ],
+                'status'  => $post_meta['status'],
+                'date'    => $data->post_date ,
+                'avatar'  => $post_meta['avatar'],
+            ]
+        );
 
-            $tmp = array_merge(
-                $tmp,
-                [
-                    'name'   => $display_name,
-                    'email'  => $post_meta['email_address'],
-                    'status' => $post_meta['status'],
-                    'date'   => $date,
-                    'avatar' => $post_meta['avatar'],
-                ]
-            );
-
-            array_push( $cleaned, $tmp );
-        }//end foreach
+        if ( $is_extra_fields ) {
+            $exclude = [ $meta_setting['email_field'] ];
+            foreach ( $post_meta as $key => $val ) {
+                if ( ! in_array( $key, $exclude, true ) && isset( $meta_setting['custom_fields'][ $key ] ) ) {
+                    $tmp                 = [
+                        'label' => $meta_setting['custom_fields'][ $key ]['label'],
+                        'value' => $val,
+                    ];
+                    $cleaned['fields'][] = $tmp;
+                }
+            }
+        }
 
         return $cleaned;
+    }
+
+    /**
+     * Get the wholesale request by ID.
+     *
+     * @param int $id The id of wholesale request .
+     * @return array A Wholesale requests cleaned.
+     */
+    public static function get_request_by_id( int $id ): array {
+        $request = get_post( $id );
+        if ( ! isset( $request ) ) {
+            return [];
+        }
+        $cleaned = self::clean_request_data( $request, true );
+
+        return $cleaned;
+    }
+
+    /**
+     * Return a input name from an input label.
+     *
+     * @param string $label Input label.
+     * @return string input name.
+     */
+    public static function label_to_input_name( string $label ): string {
+        $tmp_arr = explode( ' ', strtolower( $label ) );
+        return implode( '_', $tmp_arr );
+    }
+
+    /**
+     * Update a wholesaler request by ID
+     *
+     * @param int   $request_id The target request ID .
+     * @param array $args The key-value arguments.
+     * @return bool A wholesale updated status.
+     */
+    public static function update_whs_request( int $request_id, array $args ): bool {
+        $request = get_post( $request_id );
+
+        if ( ! isset( $request ) ) {
+            return false;
+        }
+
+        $display_name = get_post_meta( $request_id, self::REQUEST_DISPLAY_NAME, true );
+        $post_meta    = get_post_meta( $request_id, self::REQUEST_META_NAME, true );
+
+        // Save display name
+        if ( $display_name !== $args['name'] ) {
+            $display_name = $args['name'];
+            update_post_meta( $request_id, self::REQUEST_DISPLAY_NAME, $display_name );
+        }
+
+        // Save post date
+        if ( $request->post_date !== $args['date'] ) {
+            wp_update_post(
+                [
+                    'ID'        => $request_id,
+                    'post_date' => $args['date'],
+                ]
+            );
+        }
+
+        // Save meta data
+        $exclude        = [ 'name', 'date' ];
+        $is_update_meta = false;
+        foreach ( $args as $key => $val ) {
+            if ( ! array_key_exists( $key, $exclude ) && $val !== $post_meta[ $key ] ) {
+                $is_update_meta    = true;
+                $post_meta[ $key ] = $val;
+            }
+        }
+
+        if ( $is_update_meta ) {
+            update_post_meta( $request_id, self::REQUEST_META_NAME, $post_meta );
+        }
+
+        return true;
     }
 }

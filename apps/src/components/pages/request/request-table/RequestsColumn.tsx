@@ -1,14 +1,22 @@
 import { ColumnDef } from '@tanstack/react-table';
 import { Settings, Trash2 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
-import { RequestListValues } from '@/lib/schema/requests';
+import { RequestFormValues } from '@/lib/schema/requests';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 
-import { StatusBadge } from './StatusBadge';
+import { parseWPDate, parseWPTime } from '../../common.helper';
+import { StatusBadge } from '../StatusBadge';
 
-function AvatarCell({ name, email, avatar }: Pick<RequestListValues, 'name' | 'email' | 'avatar'>) {
+function AvatarCell({
+  id,
+  name,
+  email,
+  avatar,
+}: Pick<RequestFormValues, 'id' | 'name' | 'email' | 'avatar'>) {
+  const navigate = useNavigate();
   return (
     <div className="flex items-center gap-3">
       <Avatar className="h-8 w-8">
@@ -16,14 +24,19 @@ function AvatarCell({ name, email, avatar }: Pick<RequestListValues, 'name' | 'e
         <AvatarFallback>{name.charAt(0)}</AvatarFallback>
       </Avatar>
       <div>
-        <p className="leading-none font-medium">{name}</p>
+        <p
+          className="cursor-pointer leading-none font-medium hover:underline"
+          onClick={() => navigate(`/request/edit/${id}`)}
+        >
+          {name}
+        </p>
         <p className="text-muted-foreground text-xs">{email}</p>
       </div>
     </div>
   );
 }
 
-export const RequestColumn: ColumnDef<RequestListValues>[] = [
+export const RequestsColumn: ColumnDef<RequestFormValues>[] = [
   {
     id: 'select',
     header: ({ table }) => (
@@ -47,8 +60,8 @@ export const RequestColumn: ColumnDef<RequestListValues>[] = [
     accessorKey: 'name',
     header: 'Name',
     cell: ({ row }) => {
-      const { name, email, avatar } = row.original;
-      return <AvatarCell name={name} email={email} avatar={avatar} />;
+      const { id, name, email, avatar } = row.original;
+      return <AvatarCell id={id} name={name} email={email} avatar={avatar} />;
     },
   },
   // { accessorKey: 'role', header: 'Role' },
@@ -57,7 +70,13 @@ export const RequestColumn: ColumnDef<RequestListValues>[] = [
     header: 'Status',
     cell: ({ row }) => <StatusBadge status={row.original.status} />,
   },
-  { accessorKey: 'date', header: 'Registration Date' },
+  {
+    accessorKey: 'date',
+    header: 'Registration Date',
+    cell: ({ row }) => {
+      return parseWPDate(row.original.date) + ' ' + parseWPTime(row.original.date);
+    },
+  },
   {
     id: 'actions',
     header: '',

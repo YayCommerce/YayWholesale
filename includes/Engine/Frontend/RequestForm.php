@@ -2,6 +2,7 @@
 
 namespace Yay_Wholesale\Engine\Frontend;
 
+use Yay_Wholesale\Helpers\RequestsHelper;
 use Yay_Wholesale\Helpers\SettingsHelper;
 use Yay_Wholesale\Utils\SingletonTrait;
 
@@ -76,13 +77,13 @@ class RequestForm {
                                 id="<?php echo esc_html( $field['id'] ); ?>" 
                                 type="<?php echo esc_html( $field['type'] ); ?>" 
                                 placeholder="<?php echo esc_html( $field['placeholder'] ); ?>"
-                                name="<?php echo esc_html( $this->label_to_input_name( $field['label'] ) ); ?>" 
+                                name="<?php echo esc_html( RequestsHelper::label_to_input_name( $field['label'] ) ); ?>" 
                                 />
                         <?php else : ?>
                             <textarea 
                                 id="<?php echo esc_html( $field['id'] ); ?>" 
                                 placeholder="<?php echo esc_html( $field['placeholder'] ); ?>" 
-                                name="<?php echo esc_html( $this->label_to_input_name( $field['label'] ) ); ?>" 
+                                name="<?php echo esc_html( RequestsHelper::label_to_input_name( $field['label'] ) ); ?>" 
                                 ></textarea>
                         <?php endif ?>
                         <div id="<?php echo esc_html( $field['id'] ); ?>_error" class="input-error"><?php echo esc_html( __( 'Please fill in ', 'yay-wholesale' ) . $field['label'] ); ?></div>
@@ -98,16 +99,5 @@ class RequestForm {
         </div>
         <?php
         return ob_get_clean();
-    }
-
-    /**
-     * Return a inputinput name from an input label.
-     *
-     * @param string $label Input label.
-     * @return string input name.
-     */
-    protected function label_to_input_name( string $label ): string {
-        $tmp_arr = explode( ' ', strtolower( $label ) );
-        return implode( '_', $tmp_arr );
     }
 }

@@ -5,7 +5,7 @@ import RolesPage from '@/components/pages/roles/RolesPage';
 
 import AppLayout from './AppLayout';
 import NotFoundPage from './components/pages/404';
-import RequestPage from './components/pages/request/RequestPage';
+import RequestsPage from './components/pages/request/RequestsPage';
 import SettingsPage from './components/pages/settings/SettingsPage';
 
 export function getManagerRouter() {
@@ -25,7 +25,16 @@ export function getManagerRouter() {
         },
         {
           path: 'request',
-          element: <RequestPage />,
+          children: [
+            {
+              index: true,
+              element: <RequestsPage />,
+            },
+            {
+              path: 'edit/:requestId',
+              element: <RequestsPage />,
+            },
+          ],
         },
         {
           path: 'roles',

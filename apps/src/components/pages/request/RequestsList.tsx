@@ -4,12 +4,13 @@ import { flexRender, getCoreRowModel, useReactTable } from '@tanstack/react-tabl
 import { Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { debounce } from 'lodash';
-import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Search } from 'lucide-react';
 
 import { useRequestsQuery } from '@/lib/queries/requests';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group';
 import {
   Select,
   SelectContent,
@@ -26,9 +27,9 @@ import {
   TableRow,
 } from '@/components/ui/table';
 
-import { RequestColumn } from './RequestsColumn';
+import { RequestsColumn } from './request-table/RequestsColumn';
 
-export default function RequestList() {
+export default function RequestsList() {
   const [search, setSearch] = useState('');
   const [perPage, setPerPage] = useState(10);
   const [page, setPage] = useState(1);
@@ -38,7 +39,7 @@ export default function RequestList() {
     isLoading: isLoadingRequests,
     isFetching: isFetchingRequests,
   } = useRequestsQuery(search, page, perPage);
-  const columns = RequestColumn;
+  const columns = RequestsColumn;
 
   const table = useReactTable({
     data: data?.data_list ?? [],
@@ -77,7 +78,12 @@ export default function RequestList() {
         {/* Header */}
         <div className="mb-4 flex items-center justify-between">
           <h1 className="text-xl font-semibold">{__('Wholesaler Requests', 'yay-wholesale')}</h1>
-          <Input placeholder="Search" value={search} onChange={handleChange} className="w-60" />
+          <InputGroup className="w-60">
+            <InputGroupInput placeholder="Search" value={search} onChange={handleChange} />
+            <InputGroupAddon align="inline-end">
+              <Search />
+            </InputGroupAddon>
+          </InputGroup>
         </div>
 
         {/* Table */}

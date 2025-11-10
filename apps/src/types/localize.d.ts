@@ -17,6 +17,8 @@ declare global {
         decimal_sep: string;
         num_decimals: number;
       };
+      day_format: string;
+      time_format: string;
     };
     wp: AnyObject;
   }

@@ -37,6 +37,23 @@ class RequestRestController extends BaseRestController {
                 ],
             ]
         );
+
+        register_rest_route(
+            $this->namespace,
+            '/' . $this->rest_base . '/(?P<requestId>\d+)',
+            [
+                [
+                    'methods'             => 'GET',
+                    'callback'            => [ $this, 'get_request_by_id' ],
+                    'permission_callback' => '__return_true',
+                ],
+                [
+                    'methods'             => 'PUT',
+                    'callback'            => [ $this, 'update_request_by_id' ],
+                    'permission_callback' => '__return_true',
+                ],
+            ]
+        );
     }
 
     public function regist_request( WP_REST_Request $request ): WP_REST_Response {
@@ -68,5 +85,27 @@ class RequestRestController extends BaseRestController {
         $response = RequestsHelper::get_paginated_request_post( $filter, $page, $per_page );
 
         return $this->success( $response, __( 'Fetched successfully', 'yay-wholesale' ) );
+    }
+
+    public function get_request_by_id( WP_REST_Request $request ): WP_REST_Response {
+        $id      = (int) $request->get_param( 'requestId' );
+        $request = RequestsHelper::get_request_by_id( $id );
+
+        if ( empty( $request ) ) {
+            return $this->error( __( 'Request not found', 'yay-wholesale' ), 404 );
+        }
+
+        return $this->success( $request );
+    }
+
+    public function update_request_by_id( WP_REST_Request $request ): WP_REST_Response {
+        $id        = (int) $request->get_param( 'requestId' );
+        $form_data = $this->get_json_params( $request );
+
+        $result = RequestsHelper::update_whs_request( $id, $form_data );
+        if ( ! $result ) {
+            return $this->error( __( 'Cannot save the request', 'yay-wholesale' ), 404 );
+        }
+        return $this->success( [], __( 'Request has been updated successfully', 'yay-wholesale' ) );
     }
 }

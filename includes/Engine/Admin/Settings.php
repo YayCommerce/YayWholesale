@@ -130,6 +130,8 @@ class Settings {
                 'settings'      => SettingsHelper::get_settings(),
                 'roles'         => get_option( 'yay_wholesale_roles', [] ),
                 'reviewed'      => get_option( 'yay_wholesale_reviewed', false ),
+                'day_format'    => get_option( 'date_format' ),
+                'time_format'   => get_option( 'time_format' ),
             ]
         );
 
