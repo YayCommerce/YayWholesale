@@ -233,7 +233,7 @@ class RequestsHelper {
      *
      * @param int   $request_id The target request ID .
      * @param array $args The key-value arguments.
-     * @return bool A wholesale updated status.
+     * @return bool A wholesale request updated status.
      */
     public static function update_whs_request( int $request_id, array $args ): bool {
         $request = get_post( $request_id );
@@ -289,6 +289,12 @@ class RequestsHelper {
         return true;
     }
 
+    /**
+     * Delete a wholesaler request by ID
+     *
+     * @param int $request_id The target request ID .
+     * @return bool A wholesale request deleted status.
+     */
     public static function delete_whs_request( int $request_id ): bool {
         $request = get_post( $request_id );
 
@@ -300,12 +306,11 @@ class RequestsHelper {
         $is_rollback = false;
 
         foreach ( $meta as $key => $val ) {
-            $result = delete_post_meta( $request_id, $key );
+            $backup[ $key ] = get_post_meta( $request_id, $key, true );
+            $result         = delete_post_meta( $request_id, $key );
             if ( ! $result ) {
                 $is_rollback = true;
                 break;
-            } else {
-                $backup[ $key ] = $val;
             }
         }
 
@@ -327,6 +332,6 @@ class RequestsHelper {
             return false;
         }
 
-        return true;
+            return true;
     }
 }
