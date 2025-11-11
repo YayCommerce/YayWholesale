@@ -24,6 +24,7 @@ import {
 } from '@/components/ui/sheet';
 import { Textarea } from '@/components/ui/textarea';
 
+import { parseWPDate, parseWPTime } from '../common.helper';
 import RegistrationDateField from './request-form-fields/RegistrationDateField';
 import StatusRadioField from './request-form-fields/StatusRadioField';
 
@@ -189,14 +190,27 @@ export default function RequestsForm() {
               />
 
               <dl className="divide-y divide-black/10">
-                {fields.map((field, index) => (
-                  <div key={index} className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-                    <dt className="text-base-secondary text-xs font-medium">{field.label}</dt>
-                    <dd className="mt-1 text-sm/6 text-gray-400 sm:col-span-2 sm:mt-0">
-                      {field.value}
-                    </dd>
-                  </div>
-                ))}
+                {fields.map((field, index) => {
+                  const handleDataByType = (value: string) => {
+                    if (field.type.toLowerCase() == 'date') {
+                      return parseWPDate(value);
+                    }
+
+                    if (field.type.toLowerCase() == 'time') {
+                      return parseWPTime(value);
+                    }
+
+                    return value;
+                  };
+                  return (
+                    <div key={index} className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+                      <dt className="text-base-secondary text-xs font-medium">{field.label}</dt>
+                      <dd className="mt-1 text-sm/6 text-gray-400 sm:col-span-2 sm:mt-0">
+                        {handleDataByType(field.value)}
+                      </dd>
+                    </div>
+                  );
+                })}
               </dl>
 
               <StatusRadioField />

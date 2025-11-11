@@ -192,6 +192,7 @@ class RequestsHelper {
                     $tmp                 = [
                         'label' => $meta_setting['custom_fields'][ $key ]['label'],
                         'value' => $val,
+                        'type'  => $meta_setting['custom_fields'][ $key ]['type'],
                     ];
                     $cleaned['fields'][] = $tmp;
                 }

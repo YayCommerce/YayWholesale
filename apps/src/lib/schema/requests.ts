@@ -5,6 +5,7 @@ const RequestStatusSchema = z.enum(['approved', 'pending', 'rejected']);
 const RequestFieldsSchema = z.object({
   label: z.string(),
   value: z.string(),
+  type: z.string(),
 });
 
 export const RequestSchema = z.object({
