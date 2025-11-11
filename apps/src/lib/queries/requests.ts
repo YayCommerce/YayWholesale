@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 
 import { showToast } from '@/components/custom/showToast';
 
-import { fetchRequest, fetchRequests, updateRequest } from '../api/requests.api';
+import { deleteRequest, fetchRequest, fetchRequests, updateRequest } from '../api/requests.api';
 import { RequestFormValues } from '../schema/requests';
 
 const QUERY_KEY = ['requests'];
@@ -43,6 +43,22 @@ export function useUpdateRequestMutation(requestId: number) {
       queryClient.invalidateQueries({ queryKey: ['request', requestId] });
       queryClient.invalidateQueries({ queryKey: QUERY_KEY });
       navigate('/request');
+    },
+    onError: (error: Error) => {
+      showToast.error(error.message);
+    },
+  });
+}
+
+//Mutation: delete request
+export function useDeleteRequestMutation(requestId: number) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: () => deleteRequest(requestId),
+    onSuccess: (response) => {
+      showToast.success(response.message);
+      queryClient.invalidateQueries({ queryKey: ['request', requestId] });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEY });
     },
     onError: (error: Error) => {
       showToast.error(error.message);

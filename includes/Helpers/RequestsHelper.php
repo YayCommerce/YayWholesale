@@ -23,7 +23,7 @@ class RequestsHelper {
     }
 
     /**
-     * Inser new Wholesale request.
+     * Insert new Wholesale request.
      *
      * @param int   $user_id The sender account ID .
      * @param array $form_data The form data in request.
@@ -209,7 +209,7 @@ class RequestsHelper {
      */
     public static function get_request_by_id( int $id ): array {
         $request = get_post( $id );
-        if ( ! isset( $request ) ) {
+        if ( ! isset( $request ) || self::get_post_type() !== $request->post_type ) {
             return [];
         }
         $cleaned = self::clean_request_data( $request, true );
@@ -238,27 +238,35 @@ class RequestsHelper {
     public static function update_whs_request( int $request_id, array $args ): bool {
         $request = get_post( $request_id );
 
-        if ( ! isset( $request ) ) {
+        if ( ! isset( $request ) || self::get_post_type() !== $request->post_type ) {
             return false;
         }
 
+        $result       = true;
         $display_name = get_post_meta( $request_id, self::REQUEST_DISPLAY_NAME, true );
         $post_meta    = get_post_meta( $request_id, self::REQUEST_META_NAME, true );
 
         // Save display name
         if ( $display_name !== $args['name'] ) {
             $display_name = $args['name'];
-            update_post_meta( $request_id, self::REQUEST_DISPLAY_NAME, $display_name );
+            $result       = update_post_meta( $request_id, self::REQUEST_DISPLAY_NAME, $display_name );
+            if ( ! $result ) {
+                return false;
+            }
         }
 
         // Save post date
         if ( $request->post_date !== $args['date'] ) {
-            wp_update_post(
+            $result = wp_update_post(
                 [
                     'ID'        => $request_id,
                     'post_date' => $args['date'],
                 ]
             );
+
+            if ( is_wp_error( $result ) ) {
+                return false;
+            }
         }
 
         // Save meta data
@@ -272,7 +280,51 @@ class RequestsHelper {
         }
 
         if ( $is_update_meta ) {
-            update_post_meta( $request_id, self::REQUEST_META_NAME, $post_meta );
+            $result = update_post_meta( $request_id, self::REQUEST_META_NAME, $post_meta );
+            if ( ! $result ) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public static function delete_whs_request( int $request_id ): bool {
+        $request = get_post( $request_id );
+
+        if ( ! isset( $request ) || self::get_post_type() !== $request->post_type ) {
+            return false;
+        }
+        $meta        = get_post_meta( $request_id );
+        $backup      = [];
+        $is_rollback = false;
+
+        foreach ( $meta as $key => $val ) {
+            $result = delete_post_meta( $request_id, $key );
+            if ( ! $result ) {
+                $is_rollback = true;
+                break;
+            } else {
+                $backup[ $key ] = $val;
+            }
+        }
+
+        if ( $is_rollback ) {
+            foreach ( $backup as $key => $val ) {
+                update_post_meta( $request_id, $key, $val );
+            }
+            return false;
+        }
+
+        wp_cache_delete( $request_id, 'post-meta' );
+
+        $result = wp_delete_post( $request_id );
+
+        if ( ! $result ) {
+            foreach ( $backup as $key => $val ) {
+                update_post_meta( $request_id, $key, $val );
+            }
+            return false;
         }
 
         return true;

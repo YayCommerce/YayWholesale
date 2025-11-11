@@ -43,3 +43,12 @@ export async function updateRequest(data: RequestFormValues, requestId: number) 
   );
   return result;
 }
+
+export async function deleteRequest(requestId: number) {
+  const response = await api.delete(`requests/${requestId}`);
+  const result = await handleResponse<RequestFormValues>(
+    response,
+    __('Failed to delete request', 'yay-wholesale'),
+  );
+  return result;
+}

@@ -1,11 +1,25 @@
+import { useContext, useState } from 'react';
 import { ColumnDef } from '@tanstack/react-table';
+import { __ } from '@wordpress/i18n';
 import { Settings, Trash2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
+import { useDeleteRequestMutation } from '@/lib/queries/requests';
 import { RequestFormValues } from '@/lib/schema/requests';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
+import { WholeSaleToolTip } from '@/components/custom/WholeSaleToolTip';
 
 import { parseWPDate, parseWPTime } from '../../common.helper';
 import { StatusBadge } from '../StatusBadge';
@@ -80,15 +94,69 @@ export const RequestsColumn: ColumnDef<RequestFormValues>[] = [
   {
     id: 'actions',
     header: '',
-    cell: () => (
-      <div className="flex justify-end gap-2">
-        <Button size="icon" variant="ghost" className="h-8 w-8 text-gray-500 hover:text-gray-800">
-          <Settings className="h-4 w-4" />
-        </Button>
-        <Button size="icon" variant="ghost" className="h-8 w-8 text-gray-500 hover:text-red-600">
-          <Trash2 className="h-4 w-4" />
-        </Button>
-      </div>
-    ),
+    cell: ({ row }) => {
+      const { mutate: deleteRequest, isPending: isDeletingRequestPending } =
+        useDeleteRequestMutation(row.original.id);
+      const navigate = useNavigate();
+
+      const [openDialog, setOpenDialog] = useState(false);
+
+      return (
+        <AlertDialog open={openDialog} onOpenChange={setOpenDialog}>
+          <div className="flex justify-end gap-2">
+            <WholeSaleToolTip
+              trigger={
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  className="hover:text-primary text-base-muted-foreground h-8 w-8 transition hover:bg-[#FFFFFF] hover:shadow-xs"
+                  onClick={() => navigate(`/request/edit/${row.original.id}`)}
+                >
+                  <Settings className="h-4 w-4" />
+                </Button>
+              }
+              content={<span>{__('Edit request')}</span>}
+            />
+
+            <WholeSaleToolTip
+              trigger={
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  className="hover:text-destructive text-base-muted-foreground h-8 w-8 hover:bg-[#FFFFFF] hover:shadow-xs"
+                  onClick={() => setOpenDialog(true)}
+                  disabled={isDeletingRequestPending}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              }
+              content={<span>{__('Delete request')}</span>}
+            />
+          </div>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>
+                {__('Are you sure you want to delete this request?', 'yay-wholesale')}
+              </AlertDialogTitle>
+              <AlertDialogDescription>
+                {__(
+                  'This action cannot be undone. This will permanently delete this request and remove data from servers',
+                  'yay-wholesale',
+                )}
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction
+                className="bg-destructive hover:bg-[#6e0303]"
+                onClick={() => deleteRequest()}
+              >
+                Continue
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      );
+    },
   },
 ];

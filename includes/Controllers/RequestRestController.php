@@ -52,6 +52,11 @@ class RequestRestController extends BaseRestController {
                     'callback'            => [ $this, 'update_request_by_id' ],
                     'permission_callback' => '__return_true',
                 ],
+                [
+                    'methods'             => 'DELETE',
+                    'callback'            => [ $this, 'delete_request_by_id' ],
+                    'permission_callback' => '__return_true',
+                ],
             ]
         );
     }
@@ -107,5 +112,15 @@ class RequestRestController extends BaseRestController {
             return $this->error( __( 'Cannot save the request', 'yay-wholesale' ), 404 );
         }
         return $this->success( [], __( 'Request has been updated successfully', 'yay-wholesale' ) );
+    }
+
+    public function delete_request_by_id( WP_REST_Request $request ): WP_REST_Response {
+        $id     = (int) $request->get_param( 'requestId' );
+        $result = RequestsHelper::delete_whs_request( $id );
+
+        if ( ! $result ) {
+            return $this->error( __( 'Cannot delete the request', 'yay-wholesale' ), 404 );
+        }
+        return $this->success( [], __( 'Request has been deleted successfully', 'yay-wholesale' ) );
     }
 }
