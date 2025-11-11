@@ -82,7 +82,7 @@ export default function RequestsForm() {
     <FormProvider {...form}>
       <Toaster />
       <form
-        id="request-form"
+        id="ywhs-request-form"
         onSubmit={form.handleSubmit(onSubmit, onError)}
         className="flex h-full flex-col"
       >
@@ -211,7 +211,7 @@ export default function RequestsForm() {
                 </SheetClose>
                 <Button
                   type="submit"
-                  form="request-form"
+                  form="ywhs-request-form"
                   className="w-fit"
                   disabled={isUpdatingRequestPending}
                 >

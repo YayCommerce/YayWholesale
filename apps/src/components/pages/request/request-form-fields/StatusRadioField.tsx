@@ -31,7 +31,7 @@ export default function StatusRadioField() {
                 const { icon, text } = status[1];
                 return (
                   <Label
-                    htmlFor={text}
+                    htmlFor={`ywhs-${text}`}
                     key={text}
                     className={cn(
                       'bg-muted text-base-muted-foreground inline-flex h-[26px] items-center gap-2 rounded-full p-2 py-4 text-sm font-semibold',
@@ -39,7 +39,7 @@ export default function StatusRadioField() {
                     )}
                   >
                     <RadioGroupItem
-                      id={`${text}`}
+                      id={`ywhs-${text}`}
                       value={status[0]}
                       className="sr-only after:absolute after:inset-0"
                       aria-label={`size-radio-${text}`}
