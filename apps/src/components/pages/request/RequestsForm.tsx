@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
@@ -6,10 +5,9 @@ import { X } from 'lucide-react';
 import { FormProvider, useFieldArray, useForm } from 'react-hook-form';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useUpdateEffect } from 'react-use';
-import { Toaster } from 'sonner';
 
 import { useRequestQuery, useUpdateRequestMutation } from '@/lib/queries/requests';
-import { RequestFormValues, RequestSchema } from '@/lib/schema/requests';
+import { RequestFormValues, requestSchema } from '@/lib/schema/requests';
 import { Button } from '@/components/ui/button';
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
@@ -26,7 +24,7 @@ import { Textarea } from '@/components/ui/textarea';
 
 import { parseWPDate, parseWPTime } from '../common.helper';
 import RegistrationDateField from './request-form-fields/RegistrationDateField';
-import StatusRadioField from './request-form-fields/StatusRadioField';
+import StatusSegmentedField from './request-form-fields/StatusSegmentedField';
 
 export const DEFAULT_REQUEST: RequestFormValues = {
   id: -1,
@@ -56,7 +54,7 @@ export default function RequestsForm() {
     useUpdateRequestMutation(editRequestId);
 
   const form = useForm<RequestFormValues>({
-    resolver: zodResolver(RequestSchema),
+    resolver: zodResolver(requestSchema),
     defaultValues: data ?? DEFAULT_REQUEST,
   });
 
@@ -81,7 +79,6 @@ export default function RequestsForm() {
 
   return (
     <FormProvider {...form}>
-      <Toaster />
       <form
         id="ywhs-request-form"
         onSubmit={form.handleSubmit(onSubmit, onError)}
@@ -213,7 +210,7 @@ export default function RequestsForm() {
                 })}
               </dl>
 
-              <StatusRadioField />
+              <StatusSegmentedField />
             </div>
 
             <SheetFooter>

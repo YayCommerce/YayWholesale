@@ -148,7 +148,7 @@ export const RequestsColumn: ColumnDef<RequestFormValues>[] = [
             <AlertDialogFooter>
               <AlertDialogCancel>Cancel</AlertDialogCancel>
               <AlertDialogAction
-                className="bg-destructive hover:bg-[#6e0303]"
+                className="bg-destructive hover:bg-destructive-foreground"
                 onClick={() => deleteRequest()}
               >
                 Continue

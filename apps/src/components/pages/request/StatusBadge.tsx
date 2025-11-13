@@ -1,59 +1,56 @@
 import { __ } from '@wordpress/i18n';
 import { CheckCircle2, CircleSlash, Clock4 } from 'lucide-react';
 
-import { RequestStatusValues } from '@/lib/schema/requests';
+import { RequestFormValues } from '@/lib/schema/requests';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 
 interface StatusBadgeProps {
-  status: RequestStatusValues;
+  status: RequestFormValues['status'];
 }
 export const statusMap = {
   approved: {
     icon: (isSmallIcon: boolean) => (
       <CheckCircle2
-        className={cn('min-h-4 min-w-4', isSmallIcon ? 'h-4 w-4' : '')}
-        color="green"
+        className={cn('text-success min-h-4 min-w-4', isSmallIcon ? 'h-4 w-4' : '')}
         strokeWidth={2}
       />
     ),
     text: __('Approved', 'yay-wholesale'),
-    border: 'border-gray-200',
-    textColor: 'text-gray-900',
+    border: 'border-muted',
+    textColor: 'text-foreground',
   },
   pending: {
     icon: (isSmallIcon: boolean) => (
       <Clock4
-        className={cn('min-h-4 min-w-4', isSmallIcon ? 'h-4 w-4' : '')}
-        color="gray"
+        className={cn('text-muted-foreground min-h-4 min-w-4', isSmallIcon ? 'h-4 w-4' : '')}
         strokeWidth={2}
       />
     ),
     text: __('Pending', 'yay-wholesale'),
-    border: 'border-gray-200',
-    textColor: 'text-gray-900',
+    border: 'border-muted',
+    textColor: 'text-foreground',
   },
   rejected: {
     icon: (isSmallIcon: boolean) => (
       <CircleSlash
-        className={cn('min-h-4 min-w-4', isSmallIcon ? 'h-4 w-4' : '')}
-        color="red"
+        className={cn('text-destructive min-h-4 min-w-4', isSmallIcon ? 'h-4 w-4' : '')}
         strokeWidth={2}
       />
     ),
     text: __('Rejected', 'yay-wholesale'),
-    border: 'border-gray-200',
-    textColor: 'text-gray-900',
+    border: 'border-muted',
+    textColor: 'text-foreground',
   },
 };
 
 export function StatusBadge({ status }: StatusBadgeProps) {
-  const { icon, text, border, textColor } = statusMap[status];
+  const { icon, text, textColor } = statusMap[status];
 
   return (
     <Badge
       variant="outline"
-      className={`inline-flex h-[26px] items-center gap-2 rounded-md border ${border} bg-white text-sm font-semibold shadow-sm ${textColor} py-4`}
+      className={cn('h-[26px] gap-2 rounded-md border text-sm font-semibold shadow-sm', textColor)}
     >
       {icon(false)}
       <span>{text}</span>

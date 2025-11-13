@@ -14,7 +14,6 @@ defined( 'ABSPATH' ) || exit;
 class RequestForm {
     use SingletonTrait;
 
-    private $settings;
     protected $shortcode_name = 'ywhs_request_form';
 
     protected function __construct() {
@@ -39,11 +38,9 @@ class RequestForm {
      * @return string Form ouput.
      */
     public function ywhs_request_form_shortcode( array $attr = [] ): string {
-        $this->settings = SettingsHelper::get_settings();
-
         $attr = shortcode_atts(
             [
-                'title' => 'Request Registration',
+                'title' => __( 'Request Registration', 'yay-wholesale' ),
             ],
             $attr,
             $this->shortcode_name
@@ -60,13 +57,14 @@ class RequestForm {
      * @return string Form HTML ouput.
      */
     protected function ywhs_request_form_html( array $attr = [] ): string {
+        $settings = SettingsHelper::get_settings();
         ob_start();
         ?>
         <div>
             <h4><?php echo esc_html( $attr['title'] ); ?></h4>
             <form id="ywhs_request_form">
                 <?php
-                foreach ( $this->settings['registration_fields']['fields'] as $field ) :
+                foreach ( $settings['registration_fields']['fields'] as $field ) :
                     ?>
                     <div <?php echo esc_html( $field['columnWidth'] ) === '50%' ? 'class="ywhs_half"' : 'class="ywhs_full"'; ?> >
                         <label for="<?php echo esc_html( $field['id'] ); ?>" >
@@ -92,10 +90,10 @@ class RequestForm {
                 endforeach;
                 ?>
 
-                <button type="submit" ><?php echo esc_html( $this->settings['registration']['submit_button_label'] ); ?></button>
+                <button type="submit" ><?php echo esc_html( $settings['registration']['submit_button_label'] ); ?></button>
             </form>
 
-            <h3 id="ywhs_success_notice"><?php echo esc_html( $this->settings['registration']['successful_registration_message'] ); ?></h3>
+            <h3 id="ywhs_success_notice"><?php echo esc_html( $settings['registration']['successful_registration_message'] ); ?></h3>
         </div>
         <?php
         return ob_get_clean();

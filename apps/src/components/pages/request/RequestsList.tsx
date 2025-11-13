@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { flexRender, getCoreRowModel, useReactTable } from '@tanstack/react-table';
+import { flexRender, getCoreRowModel, PaginationState, useReactTable } from '@tanstack/react-table';
 import { Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { debounce } from 'lodash';
@@ -31,45 +31,52 @@ import { RequestsColumn } from './request-table/RequestsColumn';
 
 export default function RequestsList() {
   const [search, setSearch] = useState('');
-  const [perPage, setPerPage] = useState(10);
-  const [page, setPage] = useState(1);
+  const [pagination, setPagination] = useState<PaginationState>({
+    pageIndex: 0,
+    pageSize: 10,
+  });
+  const [debounceSearchKey, setDebounceKey] = useState('');
   const clientQuery = useQueryClient();
+
+  const debouncedSearch = useMemo(() => {
+    return debounce((value) => {
+      setDebounceKey(value);
+    }, 500);
+  }, [clientQuery]);
+
   const {
     data,
     isLoading: isLoadingRequests,
     isFetching: isFetchingRequests,
-  } = useRequestsQuery(search, page, perPage);
+  } = useRequestsQuery(debounceSearchKey, pagination);
+
   const columns = RequestsColumn;
+  const defaultData = useMemo(() => [], []);
 
   const table = useReactTable({
-    data: data?.data_list ?? [],
+    data: data?.data ?? defaultData,
     columns,
+    state: {
+      pagination,
+    },
     getCoreRowModel: getCoreRowModel(),
+    onPaginationChange: setPagination,
+    manualPagination: true,
+    pageCount: data?.totalPage ?? 0,
+    rowCount: data?.data.length ?? 0,
   });
 
   const selectedCount = table.getFilteredSelectedRowModel().rows.length;
 
-  const debouncedSearch = useMemo(() => {
-    return debounce(() => {
-      clientQuery.invalidateQueries({ queryKey: ['requests'] });
-    }, 500);
-  }, [clientQuery]);
-
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearch(e.target.value);
-    setPage(1);
-    debouncedSearch();
-  };
-
-  const goToPage = async (targetPage: number) => {
-    await setPage(targetPage ?? 0);
-    clientQuery.invalidateQueries({ queryKey: ['requests'] });
+    table.setPageIndex(0);
+    debouncedSearch(e.target.value);
   };
 
   const perPageChange = async (value: string) => {
-    await setPerPage(parseInt(value));
-    await setPage(1);
-    clientQuery.invalidateQueries({ queryKey: ['requests'] });
+    table.setPageSize(parseInt(value));
+    table.setPageIndex(0);
   };
 
   return (
@@ -131,17 +138,20 @@ export default function RequestsList() {
         </div>
 
         {/* Footer */}
-        {!isFetchingRequests && data != undefined && data.data_list.length > 0 && (
+        {!isFetchingRequests && data != undefined && data.data.length > 0 && (
           <div className="flex flex-col items-center justify-between gap-3 sm:flex-row">
             <p className="text-muted-foreground text-sm">
-              {selectedCount} of {data?.data_list.length} row(s) selected.
+              {selectedCount} of {data?.data.length} row(s) selected.
             </p>
 
             <div className="flex items-center gap-2">
               <span className="text-sm text-[#171719]">Rows per page:</span>
-              <Select value={`${perPage}`} onValueChange={(value) => perPageChange(value)}>
+              <Select
+                value={`${pagination.pageSize}`}
+                onValueChange={(value) => perPageChange(value)}
+              >
                 <SelectTrigger size="sm" className="w-20" id="rows-per-page">
-                  <SelectValue placeholder={perPage} />
+                  <SelectValue placeholder={pagination.pageSize} />
                 </SelectTrigger>
                 <SelectContent side="top">
                   {[1, 2, 5, 10, 20, 50, 100].map((pageSize) => (
@@ -154,21 +164,21 @@ export default function RequestsList() {
 
               <div className="flex items-center gap-1">
                 <span className="mx-5 text-sm">
-                  Page {page} of {data?.lastPage ?? 0}
+                  Page {pagination.pageIndex + 1} of {data?.totalPage ?? 0}
                 </span>
                 <Button
                   variant="outline"
                   size="icon"
-                  onClick={() => goToPage(data.firstPage)}
-                  disabled={data?.curPage === data?.firstPage}
+                  onClick={() => table.setPageIndex(0)}
+                  disabled={!table.getCanPreviousPage()}
                 >
                   <ChevronsLeft />
                 </Button>
                 <Button
                   variant="outline"
                   size="icon"
-                  onClick={() => goToPage(page - 1)}
-                  disabled={!data?.canPre}
+                  onClick={() => table.previousPage()}
+                  disabled={!table.getCanPreviousPage()}
                 >
                   <ChevronLeft />
                 </Button>
@@ -176,16 +186,16 @@ export default function RequestsList() {
                 <Button
                   variant="outline"
                   size="icon"
-                  onClick={() => goToPage(page + 1)}
-                  disabled={!data?.canNext}
+                  onClick={() => table.nextPage()}
+                  disabled={!table.getCanNextPage()}
                 >
                   <ChevronRight />
                 </Button>
                 <Button
                   variant="outline"
                   size="icon"
-                  onClick={() => goToPage(data.lastPage)}
-                  disabled={data?.curPage === data?.lastPage}
+                  onClick={() => table.setPageIndex((data?.totalPage ?? 1) - 1)}
+                  disabled={!table.getCanNextPage()}
                 >
                   <ChevronsRight />
                 </Button>

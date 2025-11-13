@@ -3,20 +3,15 @@ import { __ } from '@wordpress/i18n';
 import { PaginatedRequestListValues, RequestFormValues } from '../schema/requests';
 import { api, handleResponse } from './base';
 
-// get all requests
-export async function fetchRequests(kw: string, page: number, perPage: number) {
-  var isStart = true;
-  var url = 'requests';
-  if (kw) {
-    url += isStart ? '?' : '&';
-    url += 'kw=' + kw;
-    isStart = false;
-  }
+export async function fetchRequests(keyword: string, page: number, perPage: number) {
+  const url = 'requests';
+  const searchParams = new URLSearchParams({
+    kw: keyword,
+    page: String(page),
+    per_page: String(perPage),
+  });
 
-  url += isStart ? '?' : '&';
-  url += `page=${page}&per_page=${perPage}`;
-
-  const response = await api.get(url);
+  const response = await api.get(`${url}?${searchParams.toString()}`);
   const result = await handleResponse<PaginatedRequestListValues>(
     response,
     __('Failed to fetch requests', 'yay-wholesale'),
@@ -24,8 +19,7 @@ export async function fetchRequests(kw: string, page: number, perPage: number) {
   return result.data ?? {};
 }
 
-// get request by id
-export async function fetchRequest(requestId: number) {
+export async function fetchRequestById(requestId: number) {
   const response = await api.get(`requests/${requestId}`);
   const result = await handleResponse<RequestFormValues>(
     response,
@@ -34,8 +28,7 @@ export async function fetchRequest(requestId: number) {
   return result.data;
 }
 
-// update request
-export async function updateRequest(data: RequestFormValues, requestId: number) {
+export async function updateRequestById(data: RequestFormValues, requestId: number) {
   const response = await api.put(`requests/${requestId}`, { json: data });
   const result = await handleResponse<RequestFormValues>(
     response,
@@ -44,7 +37,7 @@ export async function updateRequest(data: RequestFormValues, requestId: number) 
   return result;
 }
 
-export async function deleteRequest(requestId: number) {
+export async function deleteRequestById(requestId: number) {
   const response = await api.delete(`requests/${requestId}`);
   const result = await handleResponse<RequestFormValues>(
     response,

@@ -1,23 +1,32 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 
 import { showToast } from '@/components/custom/showToast';
 
-import { deleteRequest, fetchRequest, fetchRequests, updateRequest } from '../api/requests.api';
+import {
+  deleteRequestById,
+  fetchRequestById,
+  fetchRequests,
+  updateRequestById,
+} from '../api/requests.api';
 import { RequestFormValues } from '../schema/requests';
 
-const QUERY_KEY = ['requests'];
-
-// Query all request
-export function useRequestsQuery(kw: string, page: number, perPage: number) {
+export function useRequestsQuery(
+  keyword: string,
+  pagination: {
+    pageIndex: number;
+    pageSize: number;
+  },
+) {
   return useQuery({
-    queryKey: QUERY_KEY,
-    queryFn: async () => fetchRequests(kw, page, perPage),
-    refetchOnMount: 'always',
+    queryKey: ['requests', { keyword, pagination }],
+    queryFn: async () => {
+      return fetchRequests(keyword, pagination.pageIndex + 1, pagination.pageSize);
+    },
+    placeholderData: keepPreviousData,
   });
 }
 
-// Query request
 export function useRequestQuery(requestId: number | null) {
   return useQuery({
     queryKey: ['request', requestId],
@@ -25,23 +34,23 @@ export function useRequestQuery(requestId: number | null) {
       if (!requestId) {
         throw new Error('No Request ID provided');
       }
-      const response = await fetchRequest(requestId);
+      const response = await fetchRequestById(requestId);
       return response;
     },
     enabled: !!requestId,
   });
 }
 
-// Mutation: update request
 export function useUpdateRequestMutation(requestId: number) {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   return useMutation({
-    mutationFn: (data: RequestFormValues) => updateRequest(data, requestId),
+    mutationKey: ['updateRequest', requestId],
+    mutationFn: (data: RequestFormValues) => updateRequestById(data, requestId),
     onSuccess: (response) => {
       showToast.success(response.message);
-      queryClient.invalidateQueries({ queryKey: ['request', requestId] });
-      queryClient.invalidateQueries({ queryKey: QUERY_KEY });
+      // queryClient.invalidateQueries({ queryKey: ['request', requestId] });
+      // queryClient.invalidateQueries({ queryKey: ['requests'] });
       navigate('/request');
     },
     onError: (error: Error) => {
@@ -50,15 +59,15 @@ export function useUpdateRequestMutation(requestId: number) {
   });
 }
 
-//Mutation: delete request
 export function useDeleteRequestMutation(requestId: number) {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: () => deleteRequest(requestId),
+    mutationKey: ['deleteRequest', requestId],
+    mutationFn: () => deleteRequestById(requestId),
     onSuccess: (response) => {
       showToast.success(response.message);
-      queryClient.invalidateQueries({ queryKey: ['request', requestId] });
-      queryClient.invalidateQueries({ queryKey: QUERY_KEY });
+      // queryClient.invalidateQueries({ queryKey: ['request', requestId] });
+      // queryClient.invalidateQueries({ queryKey: ['request'] });
     },
     onError: (error: Error) => {
       showToast.error(error.message);

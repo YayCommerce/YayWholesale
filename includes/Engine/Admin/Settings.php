@@ -40,7 +40,7 @@ class Settings {
             'name'          => __( 'Wholesale Manage', 'yay-wholesale' ),
             'singular_name' => __( 'Wholesale Manage', 'yay-wholesale' ),
         ];
-        $yay_wholesale_post_type = RequestsHelper::get_post_type();
+        $yay_wholesale_post_type = RequestsHelper::REQUEST_POST_TYPE;
         $args                    = [
             'labels'            => $labels,
             'description'       => __( 'Wholesale Manage', 'yay-wholesale' ),

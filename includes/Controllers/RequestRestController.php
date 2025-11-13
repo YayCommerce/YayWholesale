@@ -1,6 +1,7 @@
 <?php
 namespace Yay_Wholesale\Controllers;
 
+use WP_Error;
 use Yay_Wholesale\Utils\SingletonTrait;
 use WP_REST_Request;
 use WP_REST_Response;
@@ -14,58 +15,64 @@ defined( 'ABSPATH' ) || exit;
 class RequestRestController extends BaseRestController {
     use SingletonTrait;
 
-    protected string $rest_base = 'requests';
-
     protected function __construct() {
         $this->init_hooks();
+    }
+
+    public function request_permission_callback() {
+        if ( ! current_user_can( 'edit_posts' ) ) {
+            return new WP_Error( 'rest_forbidden', esc_html__( 'Forbidden.', 'yay-wholesale' ), [ 'status' => 401 ] );
+        }
+
+        return true;
     }
 
     protected function init_hooks(): void {
         register_rest_route(
             $this->namespace,
-            '/' . $this->rest_base,
+            '/requests',
             [
                 [
                     'methods'             => 'POST',
-                    'callback'            => [ $this, 'regist_request' ],
+                    'callback'            => [ $this, 'register_request' ],
                     'permission_callback' => '__return_true',
                 ],
                 [
                     'methods'             => 'GET',
                     'callback'            => [ $this, 'get_request_list' ],
-                    'permission_Callback' => '__return_true',
+                    'permission_callback' => [ $this,'request_permission_callback' ],
                 ],
             ]
         );
 
         register_rest_route(
             $this->namespace,
-            '/' . $this->rest_base . '/(?P<requestId>\d+)',
+            '/requests/(?P<request_id>\d+)',
             [
                 [
                     'methods'             => 'GET',
                     'callback'            => [ $this, 'get_request_by_id' ],
-                    'permission_callback' => '__return_true',
+                    'permission_callback' => [ $this,'request_permission_callback' ],
                 ],
                 [
                     'methods'             => 'PUT',
                     'callback'            => [ $this, 'update_request_by_id' ],
-                    'permission_callback' => '__return_true',
+                    'permission_callback' => [ $this,'request_permission_callback' ],
                 ],
                 [
                     'methods'             => 'DELETE',
                     'callback'            => [ $this, 'delete_request_by_id' ],
-                    'permission_callback' => '__return_true',
+                    'permission_callback' => [ $this,'request_permission_callback' ],
                 ],
             ]
         );
     }
 
-    public function regist_request( WP_REST_Request $request ): WP_REST_Response {
-        $params  = $this->get_form_data( $request );
-        $current = get_current_user_id();
+    public function register_request( WP_REST_Request $request ): WP_REST_Response {
+        $params       = $this->get_form_data( $request );
+        $current_user = get_current_user_id();
 
-        RequestsHelper::insert_whs_request( $current, $params );
+        RequestsHelper::insert_whs_request( $current_user, $params );
 
         return $this->success( [], __( 'Request Saved', 'yay-wholesale' ) );
     }
@@ -73,7 +80,7 @@ class RequestRestController extends BaseRestController {
     public function get_request_list( WP_REST_Request $request ): WP_REST_Response {
         $page     = $request['page'];
         $per_page = $request['per_page'];
-        $filter   = $request['kw'];
+        $keyword  = $request['kw'];
 
         if ( ! isset( $page ) ) {
             $page = 1;
@@ -83,17 +90,17 @@ class RequestRestController extends BaseRestController {
             $per_page = 10;
         }
 
-        if ( ! isset( $filter ) ) {
-            $filter = '';
+        if ( ! isset( $keyword ) ) {
+            $keyword = '';
         }
 
-        $response = RequestsHelper::get_paginated_request_post( $filter, $page, $per_page );
+        $response = RequestsHelper::get_paginated_request_post( $keyword, $page, $per_page );
 
         return $this->success( $response, __( 'Fetched successfully', 'yay-wholesale' ) );
     }
 
     public function get_request_by_id( WP_REST_Request $request ): WP_REST_Response {
-        $id      = (int) $request->get_param( 'requestId' );
+        $id      = (int) $request->get_param( 'request_id' );
         $request = RequestsHelper::get_request_by_id( $id );
 
         if ( empty( $request ) ) {
@@ -104,7 +111,7 @@ class RequestRestController extends BaseRestController {
     }
 
     public function update_request_by_id( WP_REST_Request $request ): WP_REST_Response {
-        $id        = (int) $request->get_param( 'requestId' );
+        $id        = (int) $request->get_param( 'request_id' );
         $form_data = $this->get_json_params( $request );
 
         $result = RequestsHelper::update_whs_request( $id, $form_data );
@@ -115,7 +122,7 @@ class RequestRestController extends BaseRestController {
     }
 
     public function delete_request_by_id( WP_REST_Request $request ): WP_REST_Response {
-        $id     = (int) $request->get_param( 'requestId' );
+        $id     = (int) $request->get_param( 'request_id' );
         $result = RequestsHelper::delete_whs_request( $id );
 
         if ( ! $result ) {

@@ -18,7 +18,7 @@ class Frontend {
         $dep           = [ 'jquery' ];
         $script_handle = 'yay-wholesale-scripts';
 
-        wp_enqueue_script( $script_handle, YAY_WHOLESALE_PLUGIN_URL . 'assets/js/script.js', $dep, YAY_WHOLESALE_VERSION, false );
+        wp_enqueue_script( $script_handle, YAY_WHOLESALE_PLUGIN_URL . 'assets/js/request-form-script.js', $dep, YAY_WHOLESALE_VERSION, false );
         wp_enqueue_style( 'yay-wholesale-styles', YAY_WHOLESALE_PLUGIN_URL . 'assets/css/styles.css', [], YAY_WHOLESALE_VERSION );
 
         wp_localize_script(

@@ -8,19 +8,17 @@ use WpOrg\Requests\Response;
  * Settings Helper Class
  */
 class RequestsHelper {
-    private const REQUEST_POST_TYPE    = 'yay-whs-request';
-    private const REQUEST_META_NAME    = 'yay-whs-request-meta';
-    private const REQUEST_DISPLAY_NAME = 'yay-whs-request-display-name';
-    private const REQUEST_META_SETTING = 'yay-whs-request-meta-setting';
-    public const REJECTED              = 'rejected';
-    public const PENDING               = 'pending';
-    public const APPROVED              = 'approved';
+    public const REQUEST_POST_TYPE         = 'yay-whs-request';
+    public const REQUEST_META_DATA         = 'yay-whs-request-data';
+    public const REQUEST_META_DISPLAY_NAME = 'yay-whs-request-display-name';
+    public const REQUEST_META_EMAIL        = 'yay-whs-request-email';
+    public const REQUEST_META_STATUS       = 'yay-whs-request-status';
+    public const REQUEST_META_MESSAGE      = 'yay-whs-request-message';
+    public const REJECTED                  = 'rejected';
+    public const PENDING                   = 'pending';
+    public const APPROVED                  = 'approved';
 
     protected function __construct() {}
-
-    public static function get_post_type(): string {
-        return self::REQUEST_POST_TYPE;
-    }
 
     /**
      * Insert new Wholesale request.
@@ -56,50 +54,45 @@ class RequestsHelper {
                 'post_content' => 'Yay Wholesale Request',
                 'post_status'  => 'publish',
                 'post_author'  => $user_id,
-                'post_type'    => self::get_post_type(),
+                'post_type'    => self::REQUEST_POST_TYPE,
             ]
         );
 
         if ( $new_request_id ) {
-            $form_data['avatar'] = '';
-            $form_data['status'] = self::PENDING;
+            $data = [
+                'avatar' => '',
+            ];
 
             if ( $user_id > 0 ) {
-                $form_data['avatar'] = get_avatar_url( $user_id );
+                $data['avatar'] = get_avatar_url( $user_id );
             }
 
             $general_setting = SettingsHelper::get_settings();
-            $setting         = [
-                'email_field'   => '',
-                'message_field' => '',
-                'custom_fields' => [],
-            ];
 
             foreach ( $general_setting['registration_fields']['fields'] as $gsetting ) {
                 $key = self::label_to_input_name( $gsetting['label'] );
                 if ( array_key_exists( $key, $form_data ) ) {
                     if ( 'email' === $gsetting['type'] && ! $gsetting['deletable'] ) {
-                        $setting['email_field'] = $key;
+                        update_post_meta( $new_request_id, self::REQUEST_META_EMAIL, $form_data[ $key ] );
                     }
 
                     if ( 'textarea' === $gsetting['type'] && ! $gsetting['deletable'] ) {
-                        $setting['message_field'] = $key;
+                        update_post_meta( $new_request_id, self::REQUEST_META_MESSAGE, $form_data[ $key ] );
                     }
 
                     if ( $gsetting['deletable'] ) {
-                        $setting['custom_fields'][ $key ] = [
-                            'label' => $gsetting['label'],
+                        $data[ $gsetting['label'] ] = [
                             'type'  => $gsetting['type'],
+                            'value' => $form_data[ $key ],
                         ];
                     }
                 }
             }
+            update_post_meta( $new_request_id, self::REQUEST_META_DATA, $data );
 
-            update_post_meta( $new_request_id, self::REQUEST_META_NAME, $form_data );
+            update_post_meta( $new_request_id, self::REQUEST_META_DISPLAY_NAME, $display_name );
 
-            update_post_meta( $new_request_id, self::REQUEST_DISPLAY_NAME, $display_name );
-
-            update_post_meta( $new_request_id, self::REQUEST_META_SETTING, $setting );
+            update_post_meta( $new_request_id, self::REQUEST_META_STATUS, self::PENDING );
         }//end if
     }
 
@@ -113,7 +106,7 @@ class RequestsHelper {
      */
     public static function get_paginated_request_post( string $filter_key, int $page, int $per_page ): array {
         $args = [
-            'post_type'              => self::get_post_type(),
+            'post_type'              => self::REQUEST_POST_TYPE,
             'update_post_meta_cache' => true,
         ];
 
@@ -127,7 +120,7 @@ class RequestsHelper {
         if ( isset( $filter_key ) ) {
             $args['meta_query'] = [
                 [
-                    'key'     => self::REQUEST_DISPLAY_NAME,
+                    'key'     => self::REQUEST_META_DISPLAY_NAME,
                     'value'   => $filter_key,
                     'compare' => 'LIKE',
                     'type'    => 'CHAR',
@@ -138,7 +131,6 @@ class RequestsHelper {
         $query       = new WP_Query( $args );
         $data_list   = $query->posts;
         $total_pages = $query->max_num_pages;
-        $first_page  = $total_pages > 0 ? 1 : 0;
 
         $cleaned = [];
         foreach ( $data_list as $data ) {
@@ -146,12 +138,9 @@ class RequestsHelper {
         }
 
         $response = [
-            'curPage'   => $page,
-            'firstPage' => $first_page,
-            'lastPage'  => $total_pages,
-            'canNext'   => $page < $total_pages,
-            'canPre'    => $page > $first_page,
-            'data_list' => $cleaned,
+            'currentPage' => $page,
+            'totalPage'   => $total_pages,
+            'data'        => $cleaned,
         ];
         return $response;
     }
@@ -164,38 +153,32 @@ class RequestsHelper {
      * @return array A  Wholesale requests cleaned.
      */
     public static function clean_request_data( \WP_Post $data, bool $is_extra_fields ): array {
+        $display_name = get_post_meta( $data->ID, self::REQUEST_META_DISPLAY_NAME, true );
+        $post_meta    = get_post_meta( $data->ID, self::REQUEST_META_DATA, true );
+        $email        = get_post_meta( $data->ID, self::REQUEST_META_EMAIL, true );
+        $message      = get_post_meta( $data->ID, self::REQUEST_META_MESSAGE, true );
+        $status       = get_post_meta( $data->ID, self::REQUEST_META_STATUS, true );
+
         $cleaned = [
-            'id'     => $data->ID,
-            'fields' => [],
+            'id'      => $data->ID,
+            'fields'  => [],
+            'name'    => $display_name,
+            'email'   => $email,
+            'message' => $message,
+            'status'  => $status,
+            'date'    => $data->post_date,
+            'avatar'  => $post_meta['avatar'],
         ];
 
-        $display_name = get_post_meta( $data->ID, self::REQUEST_DISPLAY_NAME, true );
-        $post_meta    = get_post_meta( $data->ID, self::REQUEST_META_NAME, true );
-        $meta_setting = get_post_meta( $data->ID, self::REQUEST_META_SETTING, true );
-
-        $cleaned = array_merge(
-            $cleaned,
-            [
-                'name'    => $display_name,
-                'email'   => $post_meta[ $meta_setting['email_field'] ],
-                'message' => $post_meta[ $meta_setting['message_field'] ],
-                'status'  => $post_meta['status'],
-                'date'    => $data->post_date ,
-                'avatar'  => $post_meta['avatar'],
-            ]
-        );
-
         if ( $is_extra_fields ) {
-            $exclude = [ $meta_setting['email_field'] ];
-            foreach ( $post_meta as $key => $val ) {
-                if ( ! in_array( $key, $exclude, true ) && isset( $meta_setting['custom_fields'][ $key ] ) ) {
-                    $tmp                 = [
-                        'label' => $meta_setting['custom_fields'][ $key ]['label'],
-                        'value' => $val,
-                        'type'  => $meta_setting['custom_fields'][ $key ]['type'],
-                    ];
-                    $cleaned['fields'][] = $tmp;
-                }
+            unset( $post_meta['avatar'] );
+            foreach ( $post_meta as $key => $field ) {
+                $tmp                 = [
+                    'label' => $key,
+                    'value' => $field['value'],
+                    'type'  => $field['type'],
+                ];
+                $cleaned['fields'][] = $tmp;
             }
         }
 
@@ -210,7 +193,7 @@ class RequestsHelper {
      */
     public static function get_request_by_id( int $id ): array {
         $request = get_post( $id );
-        if ( ! isset( $request ) || self::get_post_type() !== $request->post_type ) {
+        if ( ! isset( $request ) || self::REQUEST_POST_TYPE !== $request->post_type ) {
             return [];
         }
         $cleaned = self::clean_request_data( $request, true );
@@ -239,18 +222,20 @@ class RequestsHelper {
     public static function update_whs_request( int $request_id, array $args ): bool {
         $request = get_post( $request_id );
 
-        if ( ! isset( $request ) || self::get_post_type() !== $request->post_type ) {
+        if ( ! isset( $request ) || self::REQUEST_POST_TYPE !== $request->post_type ) {
             return false;
         }
 
         $result       = true;
-        $display_name = get_post_meta( $request_id, self::REQUEST_DISPLAY_NAME, true );
-        $post_meta    = get_post_meta( $request_id, self::REQUEST_META_NAME, true );
+        $display_name = get_post_meta( $request_id, self::REQUEST_META_DISPLAY_NAME, true );
+        $email        = get_post_meta( $request_id, self::REQUEST_META_EMAIL, true );
+        $message      = get_post_meta( $request_id, self::REQUEST_META_MESSAGE, true );
+        $status       = get_post_meta( $request_id, self::REQUEST_META_STATUS, true );
 
         // Save display name
         if ( $display_name !== $args['name'] ) {
             $display_name = $args['name'];
-            $result       = update_post_meta( $request_id, self::REQUEST_DISPLAY_NAME, $display_name );
+            $result       = update_post_meta( $request_id, self::REQUEST_META_DISPLAY_NAME, $display_name );
             if ( ! $result ) {
                 return false;
             }
@@ -270,18 +255,28 @@ class RequestsHelper {
             }
         }
 
-        // Save meta data
-        $exclude        = [ 'name', 'date' ];
-        $is_update_meta = false;
-        foreach ( $args as $key => $val ) {
-            if ( ! array_key_exists( $key, $exclude ) && $val !== $post_meta[ $key ] ) {
-                $is_update_meta    = true;
-                $post_meta[ $key ] = $val;
+        // Save email
+        if ( $email !== $args['email'] ) {
+            $email  = $args['email'];
+            $result = update_post_meta( $request_id, self::REQUEST_META_EMAIL, $email );
+            if ( ! $result ) {
+                return false;
             }
         }
 
-        if ( $is_update_meta ) {
-            $result = update_post_meta( $request_id, self::REQUEST_META_NAME, $post_meta );
+        // Save message
+        if ( $message !== $args['message'] ) {
+            $message = $args['message'];
+            $result  = update_post_meta( $request_id, self::REQUEST_META_MESSAGE, $message );
+            if ( ! $result ) {
+                return false;
+            }
+        }
+
+        // Save status
+        if ( $status !== $args['status'] ) {
+            $status = $args['status'];
+            $result = update_post_meta( $request_id, self::REQUEST_META_STATUS, $status );
             if ( ! $result ) {
                 return false;
             }
@@ -299,7 +294,7 @@ class RequestsHelper {
     public static function delete_whs_request( int $request_id ): bool {
         $request = get_post( $request_id );
 
-        if ( ! isset( $request ) || self::get_post_type() !== $request->post_type ) {
+        if ( ! isset( $request ) || self::REQUEST_POST_TYPE !== $request->post_type ) {
             return false;
         }
         $meta        = get_post_meta( $request_id );

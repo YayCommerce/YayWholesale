@@ -9,7 +9,7 @@ jQuery(document).ready(() => {
 
         let isError = false
         for(var i = 0; i<inputs.length; i++){
-            if (!jQuery(inputs[i]).val()) {
+            if (!jQuery(inputs[i]).val().trim()) {
                 let id = jQuery(inputs[i]).attr("id");
                 jQuery(`#${id}_error`).show();
                 if (!isError) {
@@ -44,7 +44,7 @@ jQuery(document).ready(() => {
         })
     });
 
-    jQuery("#ywhs_request_form input").on("change", function(e) {
+    jQuery("#ywhs_request_form input").on("focus", function(e) {
         jQuery(this).siblings(".input-error").hide();
     })
 }) 
