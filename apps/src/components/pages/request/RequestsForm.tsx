@@ -1,4 +1,6 @@
+import { useContext, useEffect, useMemo } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useQueryClient } from '@tanstack/react-query';
 import { Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { X } from 'lucide-react';
@@ -6,8 +8,12 @@ import { FormProvider, useFieldArray, useForm } from 'react-hook-form';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useUpdateEffect } from 'react-use';
 
-import { useRequestQuery, useUpdateRequestMutation } from '@/lib/queries/requests';
-import { RequestFormValues, requestSchema } from '@/lib/schema/requests';
+import { useUpdateRequestMutation } from '@/lib/queries/requests';
+import {
+  PaginatedRequestListValues,
+  RequestFormValues,
+  requestSchema,
+} from '@/lib/schema/requests';
 import { Button } from '@/components/ui/button';
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
@@ -21,10 +27,12 @@ import {
   SheetTitle,
 } from '@/components/ui/sheet';
 import { Textarea } from '@/components/ui/textarea';
+import { showToast } from '@/components/custom/showToast';
 
 import { parseWPDate, parseWPTime } from '../common.helper';
-import RegistrationDateField from './request-form-fields/RegistrationDateField';
-import StatusSegmentedField from './request-form-fields/StatusSegmentedField';
+import RegistrationDateField from './requests-form-fields/RegistrationDateField';
+import StatusSegmentedField from './requests-form-fields/StatusSegmentedField';
+import RequestsContext from './RequestsContext';
 
 export const DEFAULT_REQUEST: RequestFormValues = {
   id: -1,
@@ -44,11 +52,16 @@ export default function RequestsForm() {
   const navigate = useNavigate();
   const isOpen = editRequestId !== 0;
 
-  const {
-    data,
-    isLoading: isLoadingRequest,
-    isError: isErrorRequest,
-  } = useRequestQuery(editRequestId);
+  const clientQuery = useQueryClient();
+  const { keyword, pagination, isLoadedList } = useContext(RequestsContext);
+
+  const data = useMemo(() => {
+    const list: PaginatedRequestListValues | undefined = clientQuery.getQueryData([
+      'requests',
+      { keyword, pagination },
+    ]);
+    return list?.data.find((r) => r.id === editRequestId);
+  }, [isLoadedList, editRequestId]);
 
   const { mutate: updateRequest, isPending: isUpdatingRequestPending } =
     useUpdateRequestMutation(editRequestId);
@@ -64,7 +77,6 @@ export default function RequestsForm() {
   });
 
   function onSubmit(data: RequestFormValues) {
-    console.log(data);
     updateRequest(data);
   }
 
@@ -74,8 +86,15 @@ export default function RequestsForm() {
   };
 
   useUpdateEffect(() => {
-    if (data) form.reset(data);
-  }, [data]);
+    if (data) {
+      form.reset(data);
+    } else if (editRequestId) {
+      showToast.error(
+        __('Invalid access. Can not find request in the current list', 'yay-wholesale'),
+      );
+      navigate('/request');
+    }
+  }, [data, editRequestId]);
 
   return (
     <FormProvider {...form}>
@@ -94,7 +113,7 @@ export default function RequestsForm() {
             side="right"
             className="top-[32px] h-[calc(100%-32px)] w-full gap-0 pt-0 md:min-w-[490px]"
           >
-            {(isLoadingRequest || isErrorRequest) && (
+            {!isLoadedList && (
               <div className="absolute inset-0 z-50 flex items-center justify-center bg-white/70">
                 <Spinner className="text-muted-foreground size-6 animate-spin" />
               </div>
@@ -103,7 +122,7 @@ export default function RequestsForm() {
               <div className="flex items-start justify-between">
                 <div>
                   <SheetTitle className="text-[18px] font-semibold text-[#151619]">
-                    {form.watch('name')}
+                    {form.getValues('name')}
                   </SheetTitle>
                   <SheetDescription className="text-base-muted-foreground mt-[4px] text-sm leading-[20px] font-normal">
                     {__(

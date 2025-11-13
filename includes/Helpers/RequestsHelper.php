@@ -134,7 +134,7 @@ class RequestsHelper {
 
         $cleaned = [];
         foreach ( $data_list as $data ) {
-            array_push( $cleaned, self::clean_request_data( $data, false ) );
+            array_push( $cleaned, self::clean_request_data( $data, true ) );
         }
 
         $response = [

@@ -1,10 +1,11 @@
-import { useMemo, useState } from 'react';
+import { useContext, useMemo, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { flexRender, getCoreRowModel, PaginationState, useReactTable } from '@tanstack/react-table';
 import { Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { debounce } from 'lodash';
 import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Search } from 'lucide-react';
+import { useUpdateEffect } from 'react-use';
 
 import { useRequestsQuery } from '@/lib/queries/requests';
 import { Button } from '@/components/ui/button';
@@ -27,20 +28,18 @@ import {
   TableRow,
 } from '@/components/ui/table';
 
-import { RequestsColumn } from './request-table/RequestsColumn';
+import { RequestsColumn } from './requests-table/RequestsColumn';
+import RequestsContext from './RequestsContext';
 
 export default function RequestsList() {
+  const { keyword, setKeyword, pagination, setPagination, setLoadedList } =
+    useContext(RequestsContext);
   const [search, setSearch] = useState('');
-  const [pagination, setPagination] = useState<PaginationState>({
-    pageIndex: 0,
-    pageSize: 10,
-  });
-  const [debounceSearchKey, setDebounceKey] = useState('');
   const clientQuery = useQueryClient();
 
   const debouncedSearch = useMemo(() => {
     return debounce((value) => {
-      setDebounceKey(value);
+      setKeyword(value);
     }, 500);
   }, [clientQuery]);
 
@@ -48,7 +47,7 @@ export default function RequestsList() {
     data,
     isLoading: isLoadingRequests,
     isFetching: isFetchingRequests,
-  } = useRequestsQuery(debounceSearchKey, pagination);
+  } = useRequestsQuery(keyword, pagination);
 
   const columns = RequestsColumn;
   const defaultData = useMemo(() => [], []);
@@ -78,6 +77,10 @@ export default function RequestsList() {
     table.setPageSize(parseInt(value));
     table.setPageIndex(0);
   };
+
+  useUpdateEffect(() => {
+    if (data) setLoadedList(true);
+  }, [data]);
 
   return (
     <div className="mx-auto mt-[84px] max-w-7xl space-y-6 px-6">

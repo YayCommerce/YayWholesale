@@ -1,4 +1,4 @@
-import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 
 import { showToast } from '@/components/custom/showToast';
@@ -23,7 +23,6 @@ export function useRequestsQuery(
     queryFn: async () => {
       return fetchRequests(keyword, pagination.pageIndex + 1, pagination.pageSize);
     },
-    placeholderData: keepPreviousData,
   });
 }
 
@@ -49,8 +48,8 @@ export function useUpdateRequestMutation(requestId: number) {
     mutationFn: (data: RequestFormValues) => updateRequestById(data, requestId),
     onSuccess: (response) => {
       showToast.success(response.message);
-      // queryClient.invalidateQueries({ queryKey: ['request', requestId] });
-      // queryClient.invalidateQueries({ queryKey: ['requests'] });
+      queryClient.invalidateQueries({ queryKey: ['request', requestId] });
+      queryClient.invalidateQueries({ queryKey: ['requests'] });
       navigate('/request');
     },
     onError: (error: Error) => {
@@ -66,8 +65,8 @@ export function useDeleteRequestMutation(requestId: number) {
     mutationFn: () => deleteRequestById(requestId),
     onSuccess: (response) => {
       showToast.success(response.message);
-      // queryClient.invalidateQueries({ queryKey: ['request', requestId] });
-      // queryClient.invalidateQueries({ queryKey: ['request'] });
+      queryClient.invalidateQueries({ queryKey: ['request', requestId] });
+      queryClient.invalidateQueries({ queryKey: ['request'] });
     },
     onError: (error: Error) => {
       showToast.error(error.message);

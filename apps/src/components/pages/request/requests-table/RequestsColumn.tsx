@@ -1,7 +1,7 @@
-import { useContext, useState } from 'react';
+import { useState } from 'react';
 import { ColumnDef } from '@tanstack/react-table';
 import { __ } from '@wordpress/i18n';
-import { Settings, Trash2 } from 'lucide-react';
+import { Trash2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 import { useDeleteRequestMutation } from '@/lib/queries/requests';
@@ -20,6 +20,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { WholeSaleToolTip } from '@/components/custom/WholeSaleToolTip';
+import SettingsIcon from '@/components/icons/SettingsIcon';
 
 import { parseWPDate, parseWPTime } from '../../common.helper';
 import { StatusBadge } from '../StatusBadge';
@@ -109,13 +110,13 @@ export const RequestsColumn: ColumnDef<RequestFormValues>[] = [
                 <Button
                   size="icon"
                   variant="ghost"
-                  className="hover:text-primary text-base-muted-foreground h-8 w-8 transition hover:bg-[#FFFFFF] hover:shadow-xs"
+                  className="hover:text-primary text-base-muted-foreground h-8 w-8 transition hover:bg-white hover:shadow-xs"
                   onClick={() => navigate(`/request/edit/${row.original.id}`)}
                 >
-                  <Settings className="h-4 w-4" />
+                  <SettingsIcon className="h-4 w-4" />
                 </Button>
               }
-              content={<span>{__('Edit request')}</span>}
+              content={<span>{__('Edit request', 'yay-wholesale')}</span>}
             />
 
             <WholeSaleToolTip
@@ -123,7 +124,7 @@ export const RequestsColumn: ColumnDef<RequestFormValues>[] = [
                 <Button
                   size="icon"
                   variant="ghost"
-                  className="hover:text-destructive text-base-muted-foreground h-8 w-8 hover:bg-[#FFFFFF] hover:shadow-xs"
+                  className="hover:text-destructive text-base-muted-foreground h-8 w-8 hover:bg-white hover:shadow-xs"
                   onClick={() => setOpenDialog(true)}
                   disabled={isDeletingRequestPending}
                 >

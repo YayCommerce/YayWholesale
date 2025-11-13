@@ -1,14 +1,11 @@
-import { RadioGroupItem } from '@radix-ui/react-radio-group';
 import { __ } from '@wordpress/i18n';
 import { useFormContext } from 'react-hook-form';
 
-import { cn } from '@/lib/utils';
 import { FormField, FormItem, FormLabel } from '@/components/ui/form';
-import { Label } from '@/components/ui/label';
-import { RadioGroup } from '@/components/ui/radio-group';
 import { Segmented, SegmentedItem } from '@/components/ui/segmented';
+import RequestsStatusIcon from '@/components/icons/RequestStatusIcon';
 
-import { statusMap } from '../StatusBadge';
+import requestsStatusMap from '../requests-table/RequestsStatusMap';
 
 export default function StatusSegmentedField() {
   const form = useFormContext();
@@ -18,6 +15,9 @@ export default function StatusSegmentedField() {
       control={form.control}
       name="status"
       render={({ field, fieldState: { error } }) => {
+        const handleSegmentChange = (val: string) => {
+          if (val !== '') field.onChange(val);
+        };
         return (
           <FormItem className="w-full gap-2.5">
             <FormLabel className="text-base-secondary text-xs font-medium">
@@ -25,14 +25,14 @@ export default function StatusSegmentedField() {
             </FormLabel>
             <Segmented
               className="bg-muted flex w-fit gap-0 rounded-full p-1"
-              defaultValue={field.value}
-              onValueChange={(e) => field.onChange(e)}
+              value={field.value}
+              onValueChange={(e) => handleSegmentChange(e)}
             >
-              {Object.entries(statusMap).map((status) => {
-                const { icon, text } = status[1];
+              {Object.entries(requestsStatusMap).map((status) => {
+                const { text } = status[1];
                 return (
                   <SegmentedItem key={text} value={status[0]} className="rounded-full">
-                    {icon(true)}
+                    <RequestsStatusIcon status={status[0]} className="h-4 w-4" strokeWidth={2} />
                     <span>{text}</span>
                   </SegmentedItem>
                 );
