@@ -99,6 +99,7 @@ export const RequestsColumn: ColumnDef<RequestFormValues>[] = [
       const { mutate: deleteRequest, isPending: isDeletingRequestPending } =
         useDeleteRequestMutation(row.original.id);
       const navigate = useNavigate();
+      const queryClient = useQueryClient();
 
       const [openDialog, setOpenDialog] = useState(false);
 
@@ -111,7 +112,10 @@ export const RequestsColumn: ColumnDef<RequestFormValues>[] = [
                   size="icon"
                   variant="ghost"
                   className="hover:text-primary text-base-muted-foreground h-8 w-8 transition hover:bg-white hover:shadow-xs"
-                  onClick={() => navigate(`/request/edit/${row.original.id}`)}
+                  onClick={() => {
+                    queryClient.setQueryData(['request', row.original.id], row.original);
+                    navigate(`/request/edit/${row.original.id}`);
+                  }}
                 >
                   <SettingsIcon className="h-4 w-4" />
                 </Button>
