@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 
 import { showToast } from '@/components/custom/showToast';
@@ -23,6 +23,7 @@ export function useRequestsQuery(
     queryFn: async () => {
       return fetchRequests(keyword, pagination.pageIndex + 1, pagination.pageSize);
     },
+    placeholderData: keepPreviousData,
   });
 }
 

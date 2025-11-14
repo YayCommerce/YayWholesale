@@ -49,6 +49,8 @@ export default function RegistrationFieldsTab() {
       placeholder: '',
       columnWidth: '50%',
       deletable: true,
+      isDefault: false,
+      isRequired: false,
     });
   };
 

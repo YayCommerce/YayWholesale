@@ -41,6 +41,8 @@ class SettingsHelper {
                         'placeholder' => 'Enter First Name',
                         'columnWidth' => '50%',
                         'deletable'   => true,
+                        'isDefault'   => true,
+                        'isRequired'  => false,
                     ],
                     [
                         'id'          => uniqid( 'field_' ),
@@ -49,6 +51,8 @@ class SettingsHelper {
                         'placeholder' => 'Enter Last Name',
                         'columnWidth' => '50%',
                         'deletable'   => true,
+                        'isDefault'   => true,
+                        'isRequired'  => false,
                     ],
                     [
                         'id'          => uniqid( 'field_' ),
@@ -57,6 +61,8 @@ class SettingsHelper {
                         'placeholder' => 'Enter Email Address',
                         'columnWidth' => '100%',
                         'deletable'   => false,
+                        'isDefault'   => true,
+                        'isRequired'  => true,
                     ],
                     [
                         'id'          => uniqid( 'field_' ),
@@ -65,6 +71,8 @@ class SettingsHelper {
                         'placeholder' => 'Enter Message',
                         'columnWidth' => '100%',
                         'deletable'   => false,
+                        'isDefault'   => true,
+                        'isRequired'  => true,
                     ],
                 ],
             ],

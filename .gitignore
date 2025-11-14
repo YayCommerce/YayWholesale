@@ -1,5 +1,5 @@
 /vendor/
-apps/node_modules
+apps/admin/node_modules
 /assets/dist/*
 /release/dest/*
 /release/*.zip

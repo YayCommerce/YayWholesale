@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { queryOptions, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { __ } from '@wordpress/i18n';
 import { useNavigate } from 'react-router-dom';
 
@@ -18,13 +18,26 @@ import { RoleFormValues, RolesListValues } from '../schema/roles';
 
 const QUERY_KEY = ['roles'];
 
-// Query all roles
-export function useRolesQuery() {
-  return useQuery({
-    queryKey: QUERY_KEY,
-    queryFn: fetchRoles,
+function rolesOptions() {
+  return queryOptions({
+    queryKey: ['roles'],
+    queryFn: () => fetchRoles(),
+    staleTime: 15 * 60 * 1000,
   });
 }
+
+// Query all roles
+export function useRolesQuery() {
+  return useQuery(rolesOptions());
+}
+
+// function useActiveRolesQuery() {
+//   return useQuery({...rolesOptions(), select: roles => roles.filter(r => r.status === '')});
+// }
+
+// function useRoleQuery(id) {
+//   return useQuery({...rolesOptions(), select: roles => roles.filter(r => r.id === '')});
+// }
 
 /**
  * Query to fetch Role by ID

@@ -108,7 +108,7 @@ export default function RequestsList() {
               ))}
             </TableHeader>
             <TableBody>
-              {isLoadingRequests || isFetchingRequests ? (
+              {isLoadingRequests ? (
                 <TableRow>
                   <TableCell colSpan={columns.length} className="h-32 text-center align-middle">
                     <div className="flex items-center justify-center gap-2 text-gray-500">

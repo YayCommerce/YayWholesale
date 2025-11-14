@@ -57,15 +57,18 @@ class RequestForm {
      * @return string Form HTML ouput.
      */
     protected function ywhs_request_form_html( array $attr = [] ): string {
-        $settings = SettingsHelper::get_settings();
+        $settings            = SettingsHelper::get_settings();
+        $is_use_default_form = $settings['registration_fields']['useDefaultForm'];
         ob_start();
         ?>
         <div>
             <h4><?php echo esc_html( $attr['title'] ); ?></h4>
             <form id="ywhs_request_form">
+                <div id="ywhs_form_fields_container">
                 <?php
                 foreach ( $settings['registration_fields']['fields'] as $field ) :
                     ?>
+                    <?php if ( $field['isDefault'] || ! $is_use_default_form ) : ?>
                     <div <?php echo esc_html( $field['columnWidth'] ) === '50%' ? 'class="ywhs_half"' : 'class="ywhs_full"'; ?> >
                         <label for="<?php echo esc_html( $field['id'] ); ?>" >
                             <?php echo esc_html( $field['label'] ); ?>
@@ -76,26 +79,32 @@ class RequestForm {
                                 type="<?php echo esc_html( $field['type'] ); ?>" 
                                 placeholder="<?php echo esc_html( $field['placeholder'] ); ?>"
                                 name="<?php echo esc_html( RequestsHelper::label_to_input_name( $field['label'] ) ); ?>" 
+                                <?php echo( $field['isRequired'] ? 'required' : '' ); ?>
                                 />
                         <?php else : ?>
                             <textarea 
                                 id="<?php echo esc_html( $field['id'] ); ?>" 
                                 placeholder="<?php echo esc_html( $field['placeholder'] ); ?>" 
                                 name="<?php echo esc_html( RequestsHelper::label_to_input_name( $field['label'] ) ); ?>" 
+                                <?php echo( $field['isRequired'] ? 'required' : '' ); ?>
                                 ></textarea>
                         <?php endif ?>
                         <div id="<?php echo esc_html( $field['id'] ); ?>_error" class="input-error"><?php echo esc_html( __( 'Please fill in ', 'yay-wholesale' ) . $field['label'] ); ?></div>
                     </div>
+                        <?php
+                    endif
+                    ?>
                     <?php
-                endforeach;
+                    endforeach;
                 ?>
+                </div>
 
                 <button type="submit" ><?php echo esc_html( $settings['registration']['submit_button_label'] ); ?></button>
             </form>
 
             <h3 id="ywhs_success_notice"><?php echo esc_html( $settings['registration']['successful_registration_message'] ); ?></h3>
         </div>
-        <?php
-        return ob_get_clean();
+                    <?php
+                    return ob_get_clean();
     }
 }

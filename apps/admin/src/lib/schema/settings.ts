@@ -7,6 +7,8 @@ const fieldSchema = z.object({
   placeholder: z.string(),
   columnWidth: z.string(),
   deletable: z.boolean(),
+  isDefault: z.boolean(),
+  isRequired: z.boolean(),
 });
 
 export const settingsFormSchema = z.object({
