@@ -4,7 +4,7 @@ import { __ } from '@wordpress/i18n';
 import { GripVertical, Trash2 } from 'lucide-react';
 import { useFormContext } from 'react-hook-form';
 
-import { SettingsFormData } from '@/lib/schema';
+import { SettingsFormData } from '@/lib/schema/settings';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { FormControl, FormField, FormItem, FormLabel } from '@/components/ui/form';

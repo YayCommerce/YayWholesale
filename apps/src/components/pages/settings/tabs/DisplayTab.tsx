@@ -1,7 +1,7 @@
 import { __ } from '@wordpress/i18n';
 import { useFormContext } from 'react-hook-form';
 
-import { SettingsFormData } from '@/lib/schema';
+import { SettingsFormData } from '@/lib/schema/settings';
 import { ColorPicker } from '@/components/ui/color-picker';
 import { FormControl, FormField, FormItem, FormLabel } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
@@ -37,7 +37,10 @@ export default function DisplayTab() {
                     <SelectItem value="retail-and-wholesale">
                       {__('Show retail and wholesale prices')}
                     </SelectItem>
-                    <SelectItem value="wholesale">{__('Show only wholesale prices')}</SelectItem>
+                    <SelectItem value="wholesale-only">
+                      {__('Show only wholesale prices')}
+                    </SelectItem>
+                    <SelectItem value="retail-only">{__('Show only retail prices')}</SelectItem>
                   </SelectContent>
                 </Select>
               </FormControl>

@@ -1,4 +1,5 @@
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { Toaster } from 'sonner';
 
 import Footer from '@/components/layout/Footer';
 import Header from '@/components/layout/Header';
@@ -12,6 +13,7 @@ export default function AppLayout() {
       <Header />
 
       <main>
+        <Toaster />
         <Outlet />
       </main>
 

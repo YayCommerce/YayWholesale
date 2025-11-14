@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useEffect, useMemo } from 'react';
 import { __ } from '@wordpress/i18n';
 import { useFormContext } from 'react-hook-form';
 
-import { SettingsFormData } from '@/lib/schema';
+import { useRolesQuery } from '@/lib/queries/roles';
+import { SettingsFormData } from '@/lib/schema/settings';
 import { FormControl, FormField, FormItem, FormLabel } from '@/components/ui/form';
 import {
   Select,
@@ -14,7 +15,19 @@ import {
 import { Switch } from '@/components/ui/switch';
 
 export default function GeneralTab() {
-  const { control, watch } = useFormContext<SettingsFormData>();
+  const { control } = useFormContext<SettingsFormData>();
+  const { roles } = window.yayWholesale;
+  const rolesList = useMemo(() => {
+    return (
+      roles?.map((role) => ({
+        slug: role.slug,
+        name: role.name,
+      })) ?? []
+    );
+  }, [roles]);
+
+  const roleSlugs = useMemo(() => new Set(rolesList.map((r) => r.slug)), [rolesList]);
+
   return (
     <div className="space-y-6">
       {/* Default role for new user */}
@@ -27,14 +40,19 @@ export default function GeneralTab() {
               {__('Default role for new user')}
             </FormLabel>
             <FormControl>
-              <Select defaultValue={field.value} onValueChange={field.onChange}>
+              <Select
+                value={field.value && roleSlugs.has(field.value) ? field.value : ''}
+                onValueChange={field.onChange}
+              >
                 <SelectTrigger className="w-[160px] text-sm font-normal">
-                  <SelectValue placeholder="Select a option" />
+                  <SelectValue placeholder={__('Select a role')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="wholesale">{__('Wholesale User')}</SelectItem>
-                  <SelectItem value="regular">{__('Regular User')}</SelectItem>
-                  <SelectItem value="guest">{__('Guest')}</SelectItem>
+                  {rolesList.map((role) => (
+                    <SelectItem key={role.slug} value={role.slug}>
+                      {role.name}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </FormControl>

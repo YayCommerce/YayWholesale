@@ -1,3 +1,4 @@
+import { __ } from '@wordpress/i18n';
 import ky, { Options, ResponsePromise } from 'ky';
 
 const YayWholesaleConfig = window?.yayWholesale || {};
@@ -132,3 +133,32 @@ export const wordpressApi = createApi('wp/v2');
 
 export const api = yayWholesaleApi;
 export { HTTPError } from 'ky';
+
+/**
+ * Handles API response parsing and error handling
+ * @param response - Response object from fetch request
+ * @param defaultMessage - Default message to show if no message in response
+ * @returns Parsed response data with success, message and data fields
+ * @throws Error if response is not ok
+ */
+export interface ApiResponse<T> {
+  success: boolean;
+  message: string;
+  data: T;
+}
+
+export async function handleResponse<T>(
+  response: Response,
+  errorMessage: string,
+): Promise<ApiResponse<T>> {
+  if (!response.ok) {
+    throw new Error(__(errorMessage));
+  }
+
+  const result = await response.json();
+  if (!result.success) {
+    throw new Error(__(result.message || errorMessage));
+  }
+
+  return result;
+}

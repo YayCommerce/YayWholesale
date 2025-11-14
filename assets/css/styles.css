@@ -1,0 +1,37 @@
+.price del.yay-wholesale-price-range, .price ins.yay-wholesale-price-range {
+    display: block
+}
+
+#ywhs_request_form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+#ywhs_request_form > div {
+    display: flex;
+    flex-direction: column;
+}
+
+.ywhs_half {
+    flex: 0 0 calc(50% - 10px);
+}
+
+.ywhs_full {
+    flex: 0 0 calc(100% - 10px);
+}
+
+#ywhs_request_form textarea {
+    resize: none;
+    font-family: sans-serif;
+}
+
+#ywhs_request_form .input-error {
+    color: red;
+    font-size: 13px;
+    display: none;
+}
+
+#ywhs_success_notice {
+    display: none;
+}

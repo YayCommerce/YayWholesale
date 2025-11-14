@@ -1,14 +1,9 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { __ } from '@wordpress/i18n';
 
-import { api } from '@/lib/api';
-import type { SettingsFormData } from '@/lib/schema';
+import { postSettings } from '@/lib/api/settings.api';
+import type { SettingsFormData } from '@/lib/schema/settings';
 import { showToast } from '@/components/custom/showToast';
-
-export async function postSettings(data: SettingsFormData) {
-  const response = await api.post('settings', { json: data });
-  return response.json();
-}
 
 export function useSaveSettingsMutation() {
   const queryClient = useQueryClient();

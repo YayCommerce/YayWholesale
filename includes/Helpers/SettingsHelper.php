@@ -2,18 +2,23 @@
 namespace Yay_Wholesale\Helpers;
 
 /**
- * Main Helper Class
+ * Settings Helper Class
  */
-class Helper {
-    public const YAY_WHOLESALE_REQUEST_POST_TYPE = 'yay-whs-request';
+class SettingsHelper {
 
-    public static function get_settings() {
+    /**
+     * Get the settings
+     *
+     * @return array The settings.
+     */
+    public static function get_settings(): array {
+
         $data = [
             'general'             => [
-                'default_role'         => 'wholesale',
+                'default_role'         => '',
                 'show_wholesale_price' => false,
-                'disable_coupon'       => true,
-                'disable_tax'          => true,
+                'disable_coupon'       => false,
+                'disable_tax'          => false,
             ],
             'display'             => [
                 'price_format'          => 'retail-and-wholesale',
@@ -59,7 +64,7 @@ class Helper {
                         'type'        => 'textarea',
                         'placeholder' => 'Enter Message',
                         'columnWidth' => '100%',
-                        'deletable'   => true,
+                        'deletable'   => false,
                     ],
                 ],
             ],

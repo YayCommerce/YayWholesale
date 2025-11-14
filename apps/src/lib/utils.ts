@@ -1,7 +1,7 @@
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
-import { SettingsFormData } from './schema';
+import { SettingsFormData } from './schema/settings';
 
 export const isPro = true;
 export const isLite = !isPro;
