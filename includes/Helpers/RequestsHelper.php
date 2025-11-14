@@ -59,13 +59,6 @@ class RequestsHelper {
         );
 
         if ( $new_request_id ) {
-            $data = [
-                'avatar' => '',
-            ];
-
-            if ( $user_id > 0 ) {
-                $data['avatar'] = get_avatar_url( $user_id );
-            }
 
             $general_setting = SettingsHelper::get_settings();
 
@@ -167,11 +160,10 @@ class RequestsHelper {
             'message' => $message,
             'status'  => $status,
             'date'    => $data->post_date,
-            'avatar'  => $post_meta['avatar'],
+            'avatar'  => $data->post_author > 0 ? get_avatar_url( $data->post_author ) : '',
         ];
 
         if ( $is_extra_fields ) {
-            unset( $post_meta['avatar'] );
             foreach ( $post_meta as $key => $field ) {
                 $tmp                 = [
                     'label' => $key,

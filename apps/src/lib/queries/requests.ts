@@ -48,7 +48,9 @@ export function useUpdateRequestMutation(requestId: number) {
     onSuccess: (response) => {
       showToast.success(response.message);
       queryClient.invalidateQueries({ queryKey: ['request', requestId] });
-      queryClient.invalidateQueries({ queryKey: ['requests'] });
+      if (!queryClient.isFetching({ queryKey: ['requests'] })) {
+        queryClient.invalidateQueries({ queryKey: ['requests'] });
+      }
     },
     onError: (error: Error) => {
       showToast.error(error.message);
@@ -64,7 +66,9 @@ export function useDeleteRequestMutation(requestId: number) {
     onSuccess: (response) => {
       showToast.success(response.message);
       queryClient.invalidateQueries({ queryKey: ['request', requestId] });
-      queryClient.invalidateQueries({ queryKey: ['requests'] });
+      if (!queryClient.isFetching({ queryKey: ['requests'] })) {
+        queryClient.invalidateQueries({ queryKey: ['requests'] });
+      }
     },
     onError: (error: Error) => {
       showToast.error(error.message);
