@@ -20,7 +20,7 @@ class RequestRestController extends BaseRestController {
     }
 
     public function request_permission_callback() {
-        if ( ! current_user_can( 'edit_posts' ) ) {
+        if ( ! current_user_can( 'edit_posts' ) || ! current_user_can( 'manage_woocommerce' ) ) {
             return new WP_Error( 'rest_forbidden', esc_html__( 'Forbidden.', 'yay-wholesale' ), [ 'status' => 401 ] );
         }
 

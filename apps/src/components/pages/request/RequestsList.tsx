@@ -1,4 +1,4 @@
-import { useContext, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { flexRender, getCoreRowModel, PaginationState, useReactTable } from '@tanstack/react-table';
 import { Spinner } from '@wordpress/components';
@@ -10,7 +10,6 @@ import { useUpdateEffect } from 'react-use';
 import { useRequestsQuery } from '@/lib/queries/requests';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
 import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group';
 import {
   Select,
@@ -29,11 +28,13 @@ import {
 } from '@/components/ui/table';
 
 import { RequestsColumn } from './requests-table/RequestsColumn';
-import RequestsContext from './RequestsContext';
 
 export default function RequestsList() {
-  const { keyword, setKeyword, pagination, setPagination, setLoadedList } =
-    useContext(RequestsContext);
+  const [keyword, setKeyword] = useState('');
+  const [pagination, setPagination] = useState<PaginationState>({
+    pageIndex: 0,
+    pageSize: 10,
+  });
   const [search, setSearch] = useState('');
   const clientQuery = useQueryClient();
 
@@ -67,20 +68,16 @@ export default function RequestsList() {
 
   const selectedCount = table.getFilteredSelectedRowModel().rows.length;
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChangeSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearch(e.target.value);
     table.setPageIndex(0);
     debouncedSearch(e.target.value);
   };
 
-  const perPageChange = async (value: string) => {
+  const handleChangePerPage = async (value: string) => {
     table.setPageSize(parseInt(value));
     table.setPageIndex(0);
   };
-
-  useUpdateEffect(() => {
-    if (data) setLoadedList(true);
-  }, [data]);
 
   return (
     <div className="mx-auto mt-[84px] max-w-7xl space-y-6 px-6">
@@ -89,7 +86,7 @@ export default function RequestsList() {
         <div className="mb-4 flex items-center justify-between">
           <h1 className="text-xl font-semibold">{__('Wholesaler Requests', 'yay-wholesale')}</h1>
           <InputGroup className="w-60">
-            <InputGroupInput placeholder="Search" value={search} onChange={handleChange} />
+            <InputGroupInput placeholder="Search" value={search} onChange={handleChangeSearch} />
             <InputGroupAddon align="inline-end">
               <Search />
             </InputGroupAddon>
@@ -151,7 +148,7 @@ export default function RequestsList() {
               <span className="text-sm text-[#171719]">Rows per page:</span>
               <Select
                 value={`${pagination.pageSize}`}
-                onValueChange={(value) => perPageChange(value)}
+                onValueChange={(value) => handleChangePerPage(value)}
               >
                 <SelectTrigger size="sm" className="w-20" id="rows-per-page">
                   <SelectValue placeholder={pagination.pageSize} />

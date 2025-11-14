@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { ColumnDef } from '@tanstack/react-table';
 import { __ } from '@wordpress/i18n';
 import { Trash2 } from 'lucide-react';
@@ -25,13 +26,10 @@ import SettingsIcon from '@/components/icons/SettingsIcon';
 import { parseWPDate, parseWPTime } from '../../common.helper';
 import { StatusBadge } from '../StatusBadge';
 
-function AvatarCell({
-  id,
-  name,
-  email,
-  avatar,
-}: Pick<RequestFormValues, 'id' | 'name' | 'email' | 'avatar'>) {
+function AvatarCell({ rowData }: { rowData: RequestFormValues }) {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const { avatar, name, id, email } = rowData;
   return (
     <div className="flex items-center gap-3">
       <Avatar className="h-8 w-8">
@@ -41,7 +39,10 @@ function AvatarCell({
       <div>
         <p
           className="cursor-pointer leading-none font-medium hover:underline"
-          onClick={() => navigate(`/request/edit/${id}`)}
+          onClick={() => {
+            queryClient.setQueryData(['request', id], rowData);
+            navigate(`/request/edit/${id}`);
+          }}
         >
           {name}
         </p>
@@ -75,8 +76,7 @@ export const RequestsColumn: ColumnDef<RequestFormValues>[] = [
     accessorKey: 'name',
     header: 'Name',
     cell: ({ row }) => {
-      const { id, name, email, avatar } = row.original;
-      return <AvatarCell id={id} name={name} email={email} avatar={avatar} />;
+      return <AvatarCell rowData={row.original} />;
     },
   },
   // { accessorKey: 'role', header: 'Role' },
@@ -131,7 +131,7 @@ export const RequestsColumn: ColumnDef<RequestFormValues>[] = [
                   <Trash2 className="h-4 w-4" />
                 </Button>
               }
-              content={<span>{__('Delete request')}</span>}
+              content={<span>{__('Delete request', 'yay-wholesale')}</span>}
             />
           </div>
           <AlertDialogContent>
@@ -149,7 +149,7 @@ export const RequestsColumn: ColumnDef<RequestFormValues>[] = [
             <AlertDialogFooter>
               <AlertDialogCancel>Cancel</AlertDialogCancel>
               <AlertDialogAction
-                className="bg-destructive hover:bg-destructive-foreground"
+                className="bg-destructive text-destructive-foreground hover:bg-destructive/80"
                 onClick={() => deleteRequest()}
               >
                 Continue

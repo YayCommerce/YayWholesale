@@ -42,15 +42,13 @@ export function useRequestQuery(requestId: number | null) {
 
 export function useUpdateRequestMutation(requestId: number) {
   const queryClient = useQueryClient();
-  const navigate = useNavigate();
   return useMutation({
-    mutationKey: ['updateRequest', requestId],
+    mutationKey: ['request', requestId, 'update'],
     mutationFn: (data: RequestFormValues) => updateRequestById(data, requestId),
     onSuccess: (response) => {
       showToast.success(response.message);
       queryClient.invalidateQueries({ queryKey: ['request', requestId] });
       queryClient.invalidateQueries({ queryKey: ['requests'] });
-      navigate('/request');
     },
     onError: (error: Error) => {
       showToast.error(error.message);
@@ -61,12 +59,12 @@ export function useUpdateRequestMutation(requestId: number) {
 export function useDeleteRequestMutation(requestId: number) {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationKey: ['deleteRequest', requestId],
+    mutationKey: ['request', requestId, 'delete'],
     mutationFn: () => deleteRequestById(requestId),
     onSuccess: (response) => {
       showToast.success(response.message);
       queryClient.invalidateQueries({ queryKey: ['request', requestId] });
-      queryClient.invalidateQueries({ queryKey: ['request'] });
+      queryClient.invalidateQueries({ queryKey: ['requests'] });
     },
     onError: (error: Error) => {
       showToast.error(error.message);
