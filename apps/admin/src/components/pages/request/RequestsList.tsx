@@ -5,7 +5,6 @@ import { Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { debounce } from 'lodash';
 import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Search } from 'lucide-react';
-import { useUpdateEffect } from 'react-use';
 
 import { useRequestsQuery } from '@/lib/queries/requests';
 import { Button } from '@/components/ui/button';
@@ -14,7 +13,9 @@ import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/in
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
+  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
@@ -28,6 +29,7 @@ import {
 } from '@/components/ui/table';
 
 import { RequestsColumn } from './requests-table/RequestsColumn';
+import requestsStatusMap from './requests-table/RequestsStatusMap';
 
 export default function RequestsList() {
   const [keyword, setKeyword] = useState('');
@@ -36,6 +38,7 @@ export default function RequestsList() {
     pageSize: 10,
   });
   const [search, setSearch] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
   const clientQuery = useQueryClient();
 
   const debouncedSearch = useMemo(() => {
@@ -48,7 +51,7 @@ export default function RequestsList() {
     data,
     isLoading: isLoadingRequests,
     isFetching: isFetchingRequests,
-  } = useRequestsQuery(keyword, pagination);
+  } = useRequestsQuery(keyword, pagination, statusFilter);
 
   const columns = RequestsColumn;
   const defaultData = useMemo(() => [], []);
@@ -85,12 +88,33 @@ export default function RequestsList() {
         {/* Header */}
         <div className="mb-4 flex items-center justify-between">
           <h1 className="text-xl font-semibold">{__('Wholesaler Requests', 'yay-wholesale')}</h1>
-          <InputGroup className="w-60">
-            <InputGroupInput placeholder="Search" value={search} onChange={handleChangeSearch} />
-            <InputGroupAddon align="inline-end">
-              <Search />
-            </InputGroupAddon>
-          </InputGroup>
+          <div className="flex gap-2">
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <SelectTrigger className="w-40">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  <SelectLabel>{__('Status Filter', 'yay-wholesale')}</SelectLabel>
+                  <SelectItem value="all">{__('All', 'yay-wholesale')}</SelectItem>
+                  {Object.entries(requestsStatusMap).map((status) => {
+                    const { icon, text } = status[1];
+                    return (
+                      <SelectItem value={status[0]}>
+                        {icon} {text}
+                      </SelectItem>
+                    );
+                  })}
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+            <InputGroup className="w-60">
+              <InputGroupInput placeholder="Search" value={search} onChange={handleChangeSearch} />
+              <InputGroupAddon align="inline-end">
+                <Search />
+              </InputGroupAddon>
+            </InputGroup>
+          </div>
         </div>
 
         {/* Table */}
@@ -138,7 +162,7 @@ export default function RequestsList() {
         </div>
 
         {/* Footer */}
-        {!isFetchingRequests && data != undefined && data.data.length > 0 && (
+        {data != undefined && data.data.length > 0 && (
           <div className="flex flex-col items-center justify-between gap-3 sm:flex-row">
             <p className="text-muted-foreground text-sm">
               {selectedCount} of {data?.data.length} row(s) selected.
@@ -154,7 +178,7 @@ export default function RequestsList() {
                   <SelectValue placeholder={pagination.pageSize} />
                 </SelectTrigger>
                 <SelectContent side="top">
-                  {[1, 2, 5, 10, 20, 50, 100].map((pageSize) => (
+                  {[10, 50, 100, 200].map((pageSize) => (
                     <SelectItem key={pageSize} value={`${pageSize}`}>
                       {pageSize}
                     </SelectItem>

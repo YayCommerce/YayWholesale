@@ -1,11 +1,14 @@
 <?php
 namespace Yay_Wholesale\Controllers;
 
+use Automattic\Jetpack\Status\Request;
+use Exception;
 use WP_Error;
 use Yay_Wholesale\Utils\SingletonTrait;
 use WP_REST_Request;
 use WP_REST_Response;
 use Yay_Wholesale\Helpers\RequestsHelper;
+use Yay_Wholesale\Helpers\SettingsHelper;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -66,6 +69,18 @@ class RequestRestController extends BaseRestController {
                 ],
             ]
         );
+
+        register_rest_route(
+            $this->namespace,
+            '/requests/(?P<request_id>\d+)/status',
+            [
+                [
+                    'methods'             => 'PUT',
+                    'callback'            => [ $this, 'update_request_status_by_id' ],
+                    'permission_callback' => [ $this,'request_permission_callback' ],
+                ],
+            ]
+        );
     }
 
     public function register_request( WP_REST_Request $request ): WP_REST_Response {
@@ -81,6 +96,7 @@ class RequestRestController extends BaseRestController {
         $page     = $request['page'];
         $per_page = $request['per_page'];
         $keyword  = $request['kw'];
+        $status   = $request['status'];
 
         if ( ! isset( $page ) ) {
             $page = 1;
@@ -94,7 +110,11 @@ class RequestRestController extends BaseRestController {
             $keyword = '';
         }
 
-        $response = RequestsHelper::get_paginated_request_post( $keyword, $page, $per_page );
+        if ( ! isset( $status ) ) {
+            $status = RequestsHelper::ALL;
+        }
+
+        $response = RequestsHelper::get_paginated_request_post( $keyword, $status, $page, $per_page );
 
         return $this->success( $response, __( 'Fetched successfully', 'yay-wholesale' ) );
     }
@@ -129,5 +149,49 @@ class RequestRestController extends BaseRestController {
             return $this->error( __( 'Cannot delete the request', 'yay-wholesale' ), 404 );
         }
         return $this->success( [], __( 'Request has been deleted successfully', 'yay-wholesale' ) );
+    }
+
+    public function update_request_status_by_id( WP_REST_Request $request ): WP_REST_Response {
+        $id        = (int) $request->get_param( 'request_id' );
+        $json_data = $request->get_json_params();
+
+        if ( RequestsHelper::APPROVED === $json_data['status'] ) {
+            $role_slug = '';
+            if ( ! array_key_exists( 'role_id', $json_data ) || $json_data['role_id'] < 0 ) {
+                $settings  = SettingsHelper::get_settings();
+                $role_slug = $settings['general']['default_role'];
+                if ( empty( $role_slug ) ) {
+                    return $this->error( __( 'Cannot find the default role', 'yay-wholesale' ), 404 );
+                }
+            } else {
+                $roles = get_option( 'yay_wholesale_roles', [] );
+
+                $role = array_values( array_filter( $roles, fn( $r ) => (int) ( $r['id'] ?? 0 ) === $json_data['role_id'] ) )[0] ?? null;
+                if ( ! isset( $role ) ) {
+                    return $this->error( __( 'Cannot find the specified role', 'yay-wholesale' ), 404 );
+                }
+                $role_slug = $role['slug'];
+            }
+
+            try {
+                RequestsHelper::add_role_to_ywhs_request_author( $id, $role_slug );
+            } catch ( Exception $e ) {
+                return $this->error( $e->getMessage(), 404 );
+            }
+
+            if ( ! RequestsHelper::update_whs_request( $id, [ 'status' => $json_data['status'] ] ) ) {
+                return $this->error( __( 'Role has been added to the request author, but cannot change the status', 'yay-wholesale' ), 404 );
+            }
+        } elseif ( RequestsHelper::REJECTED === $json_data['status'] ) {
+            RequestsHelper::remove_role_from_ywhs_request_author( $id );
+
+            if ( ! RequestsHelper::update_whs_request( $id, [ 'status' => $json_data['status'] ] ) ) {
+                return $this->error( __( 'Role has been removed from the request author, but cannot change the status', 'yay-wholesale' ), 404 );
+            }
+        } else {
+                return $this->error( __( 'You just can approve/reject this request', 'yay-wholesale' ), 404 );
+        }//end if
+
+        return $this->success( [], __( 'Request status has been updated successfully', 'yay-wholesale' ) );
     }
 }

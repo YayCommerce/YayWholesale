@@ -101,7 +101,7 @@ export function FieldRow({
                       content={
                         <div className="flex items-center gap-2">
                           <Info className="mt-6/7 h-3.5 w-3.5" />
-                          {__('Required Field')}
+                          {__('Field is required')}
                         </div>
                       }
                     />
@@ -122,7 +122,7 @@ export function FieldRow({
                         content={
                           <div className="flex items-center gap-2">
                             <Info className="mt-6/7 h-3.5 w-3.5" />
-                            {__('Hidden Field')}
+                            {__('Field is hidden')}
                           </div>
                         }
                       />
@@ -243,7 +243,7 @@ export function FieldRow({
               name={`registration_fields.fields.${index}.isRequired`}
               render={({ field }) => (
                 <DropdownMenuCheckboxItem checked={field.value} onCheckedChange={field.onChange}>
-                  {__('Set as Required', 'yay-wholesale')}
+                  {__('Set As Required', 'yay-wholesale')}
                 </DropdownMenuCheckboxItem>
               )}
             />

@@ -24,7 +24,7 @@ import { WholeSaleToolTip } from '@/components/custom/WholeSaleToolTip';
 import SettingsIcon from '@/components/icons/SettingsIcon';
 
 import { parseWPDate, parseWPTime } from '../../common.helper';
-import { StatusBadge } from '../StatusBadge';
+import RequestsStatusColumn from './RequestsStatusColumn';
 
 function AvatarCell({ rowData }: { rowData: RequestFormValues }) {
   const navigate = useNavigate();
@@ -83,7 +83,9 @@ export const RequestsColumn: ColumnDef<RequestFormValues>[] = [
   {
     accessorKey: 'status',
     header: 'Status',
-    cell: ({ row }) => <StatusBadge status={row.original.status} />,
+    cell: ({ row }) => (
+      <RequestsStatusColumn requestId={row.original.id} defaultValue={row.original.status} />
+    ),
   },
   {
     accessorKey: 'date',

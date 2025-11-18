@@ -11,6 +11,12 @@ export async function fetchRoles() {
   return result.data ?? [];
 }
 
+export async function fetchActiveRoles() {
+  const response = await api.get('roles?active=true');
+  const result = await handleResponse<RolesListValues[]>(response, __('Failed to fetch roles'));
+  return result.data ?? [];
+}
+
 // get role by id
 export async function fetchRole(roleId: number) {
   const response = await api.get(`roles/${roleId}`);

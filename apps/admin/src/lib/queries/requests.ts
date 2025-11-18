@@ -8,6 +8,7 @@ import {
   fetchRequestById,
   fetchRequests,
   updateRequestById,
+  updateRequestStatusById,
 } from '../api/requests.api';
 import { RequestFormValues } from '../schema/requests';
 
@@ -17,11 +18,12 @@ export function useRequestsQuery(
     pageIndex: number;
     pageSize: number;
   },
+  status: string,
 ) {
   return useQuery({
-    queryKey: ['requests', { keyword, pagination }],
+    queryKey: ['requests', { keyword, pagination, status }],
     queryFn: async () => {
-      return fetchRequests(keyword, pagination.pageIndex + 1, pagination.pageSize);
+      return fetchRequests(keyword, pagination.pageIndex + 1, pagination.pageSize, status);
     },
     placeholderData: keepPreviousData,
   });
@@ -64,6 +66,26 @@ export function useDeleteRequestMutation(requestId: number) {
   return useMutation({
     mutationKey: ['request', requestId, 'delete'],
     mutationFn: () => deleteRequestById(requestId),
+    onSuccess: (response) => {
+      showToast.success(response.message);
+      queryClient.invalidateQueries({ queryKey: ['request', requestId] });
+      if (!queryClient.isFetching({ queryKey: ['requests'] })) {
+        queryClient.invalidateQueries({ queryKey: ['requests'] });
+      }
+    },
+    onError: (error: Error) => {
+      showToast.error(error.message);
+    },
+  });
+}
+
+export function useUpdateStatusMutation(requestId: number) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationKey: ['request', requestId, 'update-status'],
+    mutationFn: ({ status, roleId }: { status: RequestFormValues['status']; roleId: number }) =>
+      updateRequestStatusById(requestId, status, roleId),
     onSuccess: (response) => {
       showToast.success(response.message);
       queryClient.invalidateQueries({ queryKey: ['request', requestId] });

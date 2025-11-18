@@ -6,6 +6,7 @@ import {
   bulkUpdateRoleStatus,
   deleteManyRoles,
   deleteRole,
+  fetchActiveRoles,
   fetchRole,
   fetchRoles,
   postRole,
@@ -29,6 +30,13 @@ function rolesOptions() {
 // Query all roles
 export function useRolesQuery() {
   return useQuery(rolesOptions());
+}
+
+export function useActiveRolesQuery() {
+  return useQuery({
+    queryKey: ['roles', { active: true }],
+    queryFn: () => fetchActiveRoles(),
+  });
 }
 
 // function useActiveRolesQuery() {
