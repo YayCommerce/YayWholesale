@@ -79,7 +79,7 @@ export function useDeleteRequestMutation(requestId: number) {
   });
 }
 
-export function useUpdateStatusMutation(requestId: number) {
+export function useUpdateRequestStatusMutation(requestId: number) {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -91,6 +91,9 @@ export function useUpdateStatusMutation(requestId: number) {
       queryClient.invalidateQueries({ queryKey: ['request', requestId] });
       if (!queryClient.isFetching({ queryKey: ['requests'] })) {
         queryClient.invalidateQueries({ queryKey: ['requests'] });
+      }
+      if (!queryClient.isFetching({ queryKey: ['roles'] })) {
+        queryClient.invalidateQueries({ queryKey: ['roles'] });
       }
     },
     onError: (error: Error) => {

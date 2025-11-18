@@ -153,12 +153,12 @@ export const RequestsColumn: ColumnDef<RequestFormValues>[] = [
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogCancel>{__('Cancel', 'yay-wholesale')}</AlertDialogCancel>
               <AlertDialogAction
                 className="bg-destructive text-destructive-foreground hover:bg-destructive/80"
                 onClick={() => deleteRequest()}
               >
-                Continue
+                {__('Continue', 'yay-wholesale')}
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>

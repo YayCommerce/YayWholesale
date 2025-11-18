@@ -156,17 +156,23 @@ class RequestRestController extends BaseRestController {
         $json_data = $request->get_json_params();
 
         if ( RequestsHelper::APPROVED === $json_data['status'] ) {
-            $role_slug = '';
+            $role_slug    = '';
+            $roles        = get_option( 'yay_wholesale_roles', [] );
+            $active_roles = array_values( array_filter( $roles, fn( $r ) => $r['status'] ) );
+
             if ( ! array_key_exists( 'role_id', $json_data ) || $json_data['role_id'] < 0 ) {
                 $settings  = SettingsHelper::get_settings();
                 $role_slug = $settings['general']['default_role'];
                 if ( empty( $role_slug ) ) {
                     return $this->error( __( 'Cannot find the default role', 'yay-wholesale' ), 404 );
                 }
-            } else {
-                $roles = get_option( 'yay_wholesale_roles', [] );
 
-                $role = array_values( array_filter( $roles, fn( $r ) => (int) ( $r['id'] ?? 0 ) === $json_data['role_id'] ) )[0] ?? null;
+                $role = array_values( array_filter( $active_roles, fn( $r ) => $r['slug'] === $role_slug ) )[0] ?? null;
+                if ( ! isset( $role ) ) {
+                    return $this->error( __( 'The default role is inactive, please set the default active or change the default role to continue', 'yay-wholesale' ), 404 );
+                }
+            } else {
+                $role = array_values( array_filter( $active_roles, fn( $r ) => (int) ( $r['id'] ?? 0 ) === $json_data['role_id'] ) )[0] ?? null;
                 if ( ! isset( $role ) ) {
                     return $this->error( __( 'Cannot find the specified role', 'yay-wholesale' ), 404 );
                 }

@@ -4,7 +4,7 @@ import { __ } from '@wordpress/i18n';
 import { ChevronDown } from 'lucide-react';
 import { useUpdateEffect } from 'react-use';
 
-import { useUpdateStatusMutation } from '@/lib/queries/requests';
+import { useUpdateRequestStatusMutation } from '@/lib/queries/requests';
 import { useActiveRolesQuery, useRolesQuery } from '@/lib/queries/roles';
 import { RequestFormValues } from '@/lib/schema/requests';
 import { Button } from '@/components/ui/button';
@@ -38,7 +38,7 @@ export default function RequestsStatusColumn({
 
   const { data: roles } = useActiveRolesQuery();
   const queryClient = useQueryClient();
-  const updateStatusMutation = useUpdateStatusMutation(requestId);
+  const updateStatusMutation = useUpdateRequestStatusMutation(requestId);
 
   const handleStatusChange = (key: string, role: number = -1) => {
     const statusKey = key as RequestFormValues['status'];
