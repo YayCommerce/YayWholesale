@@ -126,7 +126,7 @@ export default function RequestsForm() {
 
         <div className="grid gap-5 overflow-auto p-5">
           <dl className="divide-y divide-black/10">
-            <div className="px-2 py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+            <div className="px-2 py-2 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
               <dt className="text-base-secondary text-xs font-medium">
                 {__('Name', 'yay-wholesale')}
               </dt>
@@ -135,7 +135,7 @@ export default function RequestsForm() {
               </dd>
             </div>
 
-            <div className="px-2 py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+            <div className="px-2 py-2 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
               <dt className="text-base-secondary text-xs font-medium">
                 {__('Email', 'yay-wholesale')}
               </dt>
@@ -144,7 +144,7 @@ export default function RequestsForm() {
               </dd>
             </div>
 
-            <div className="px-2 py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+            <div className="px-2 py-2 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
               <dt className="text-base-secondary text-xs font-medium">
                 {__('Registration Date', 'yay-wholesale')}
               </dt>
@@ -154,7 +154,7 @@ export default function RequestsForm() {
               </dd>
             </div>
 
-            <div className="px-2 py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+            <div className="px-2 py-2 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
               <dt className="text-base-secondary text-xs font-medium">
                 {__('Message', 'yay-wholesale')}
               </dt>
@@ -176,7 +176,7 @@ export default function RequestsForm() {
                 return value;
               };
               return (
-                <div key={index} className="px-2 py-4 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+                <div key={index} className="px-2 py-2 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
                   <dt className="text-base-secondary text-xs font-medium">{field.label}</dt>
                   <dd className="mt-1 text-sm/6 text-gray-400 sm:col-span-2 sm:mt-0">
                     {handleDataByType(field.value)}

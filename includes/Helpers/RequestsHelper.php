@@ -353,7 +353,7 @@ class RequestsHelper {
      * @param string $role_slug The target role slug .
      * @return void
      */
-    public static function add_role_to_ywhs_request_author( int $request_id, string $role_slug ) {
+    public static function add_role_to_ywhs_request_author( int $request_id, string $role_slug ): void {
         $request = get_post( $request_id );
 
         if ( $request->post_author < 1 ) {

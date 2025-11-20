@@ -1,12 +1,37 @@
 import { useMemo, useState } from 'react';
+import { CaretUpDownIcon, MinusIcon } from '@phosphor-icons/react';
 import { useQueryClient } from '@tanstack/react-query';
 import { flexRender, getCoreRowModel, PaginationState, useReactTable } from '@tanstack/react-table';
 import { Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { debounce } from 'lodash';
-import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Search } from 'lucide-react';
+import {
+  ChevronLeft,
+  ChevronRight,
+  ChevronsLeft,
+  ChevronsRight,
+  PlusIcon,
+  Search,
+  Trash2,
+} from 'lucide-react';
 
-import { useRequestsQuery } from '@/lib/queries/requests';
+import {
+  useBulkDeleteRequestMutation,
+  useBulkUpdateRequestStatusMutation,
+  useRequestsQuery,
+} from '@/lib/queries/requests';
+import { useActiveRolesQuery } from '@/lib/queries/roles';
+import { RequestFormValues } from '@/lib/schema/requests';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group';
@@ -19,6 +44,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { ActionItem, SelectActionButton } from '@/components/ui/select-action-button';
+import { Separator } from '@/components/ui/separator';
 import {
   Table,
   TableBody,
@@ -27,6 +54,13 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import {
+  TableToast,
+  TableToastClose,
+  TableToaster,
+  TableToastTitle,
+} from '@/components/ui/table-toast';
+import RequestsStatusIcon from '@/components/icons/RequestStatusIcon';
 
 import { RequestsColumn } from './requests-table/RequestsColumn';
 import requestsStatusMap from './requests-table/RequestsStatusMap';
@@ -39,6 +73,7 @@ export default function RequestsList() {
   });
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
+  const [openBulkDeleteDialog, setOpenDeleteDialog] = useState(false);
   const clientQuery = useQueryClient();
 
   const debouncedSearch = useMemo(() => {
@@ -52,6 +87,8 @@ export default function RequestsList() {
     isLoading: isLoadingRequests,
     isFetching: isFetchingRequests,
   } = useRequestsQuery(keyword, pagination, statusFilter);
+
+  const { data: activeRoles } = useActiveRolesQuery();
 
   const columns = RequestsColumn;
   const defaultData = useMemo(() => [], []);
@@ -70,6 +107,12 @@ export default function RequestsList() {
   });
 
   const selectedCount = table.getFilteredSelectedRowModel().rows.length;
+  const selectedRowsIds = useMemo(
+    () => Array.from(table.getSelectedRowModel().rows, (row) => row.original.id),
+    [selectedCount],
+  );
+  const useBulkUpdateMutation = useBulkUpdateRequestStatusMutation(selectedRowsIds);
+  const useBulkDeleteMutation = useBulkDeleteRequestMutation(selectedRowsIds);
 
   const handleChangeSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearch(e.target.value);
@@ -81,6 +124,42 @@ export default function RequestsList() {
     table.setPageSize(parseInt(value));
     table.setPageIndex(0);
   };
+
+  const handleBulkStatusChange = async (status: RequestFormValues['status'], roleId?: number) => {
+    if (!roleId) {
+      roleId = -1;
+    }
+    await useBulkUpdateMutation.mutateAsync({ status, roleId });
+    table.resetRowSelection();
+  };
+
+  const handleBulkDelete = async () => {
+    await useBulkDeleteMutation.mutateAsync();
+    table.resetRowSelection();
+  };
+
+  const bulkActionButtonItems: ActionItem[] = useMemo(
+    () => [
+      {
+        icon: <RequestsStatusIcon status="approved" />,
+        title: __('Approve'),
+        type: 'menu',
+        children: activeRoles?.map((role) => ({
+          icon: <RequestsStatusIcon status="approved" />,
+          title: __('Approve to %ROLE%').replace('%ROLE%', role.name),
+          onClick: () => handleBulkStatusChange('approved', role.id),
+        })),
+        onClick: () => handleBulkStatusChange('approved'),
+      },
+      {
+        icon: <RequestsStatusIcon status="rejected" />,
+        title: __('Reject'),
+        type: 'button',
+        onClick: () => handleBulkStatusChange('rejected'),
+      },
+    ],
+    [activeRoles],
+  );
 
   return (
     <div className="mx-auto mt-[84px] max-w-7xl space-y-6 px-6">
@@ -163,10 +242,61 @@ export default function RequestsList() {
 
         {/* Footer */}
         {data != undefined && data.data.length > 0 && (
-          <div className="flex flex-col items-center justify-between gap-3 sm:flex-row">
-            <p className="text-muted-foreground text-sm">
-              {selectedCount} of {data?.data.length} row(s) selected.
-            </p>
+          <div className="flex flex-col items-center justify-end gap-3 sm:flex-row">
+            <TableToaster className="left-2/3 md:left-2/7">
+              <TableToast
+                open={selectedCount > 0}
+                onOpenChange={(open) => {
+                  if (!open) {
+                    table.resetRowSelection();
+                  }
+                }}
+              >
+                <TableToastClose onClick={() => table.resetRowSelection()} />
+                <TableToastTitle>
+                  {__('%RC% selected').replace('%RC%', selectedCount.toString())}
+                </TableToastTitle>
+                <Separator orientation="vertical" className="ml-2 h-5!" />
+                <SelectActionButton
+                  title="Status"
+                  icon={<CaretUpDownIcon size={12} weight="bold" />}
+                  items={bulkActionButtonItems}
+                />
+                <Separator orientation="vertical" className="h-5!" />
+                <AlertDialog open={openBulkDeleteDialog} onOpenChange={setOpenDeleteDialog}>
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    className="hover:text-destructive text-base-muted-foreground h-8 w-8 hover:shadow-xs"
+                    onClick={() => setOpenDeleteDialog(true)}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>
+                        {__('Are you sure you want to bulk delete requests?', 'yay-wholesale')}
+                      </AlertDialogTitle>
+                      <AlertDialogDescription>
+                        {__(
+                          'This action cannot be undone. This will permanently delete these request and remove data from servers',
+                          'yay-wholesale',
+                        )}
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>{__('Cancel', 'yay-wholesale')}</AlertDialogCancel>
+                      <AlertDialogAction
+                        className="bg-destructive text-destructive-foreground hover:bg-destructive/80"
+                        onClick={() => handleBulkDelete()}
+                      >
+                        {__('Continue', 'yay-wholesale')}
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              </TableToast>
+            </TableToaster>
 
             <div className="flex items-center gap-2">
               <span className="text-sm text-[#171719]">Rows per page:</span>

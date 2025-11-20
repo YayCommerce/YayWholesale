@@ -67,3 +67,31 @@ export async function updateRequestStatusById(
 
   return result;
 }
+
+export async function bulkUpdateRequestStatus(
+  requestIds: number[],
+  status: RequestFormValues['status'],
+  roleId: number,
+) {
+  let data = { ids: requestIds, status, role_id: roleId };
+
+  const response = await api.put('requests/bulk-status', { json: data });
+  const result = await handleResponse<RequestFormValues>(
+    response,
+    __('Failed to update request status', 'yay-wholesale'),
+  );
+
+  return result;
+}
+
+export async function bulkDeleteRequest(requestIds: number[]) {
+  let data = { ids: requestIds };
+
+  const response = await api.delete('requests/bulk-delete', { json: data });
+  const result = await handleResponse<RequestFormValues>(
+    response,
+    __('Failed to update request status', 'yay-wholesale'),
+  );
+
+  return result;
+}

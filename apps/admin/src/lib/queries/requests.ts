@@ -4,6 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import { showToast } from '@/components/custom/showToast';
 
 import {
+  bulkDeleteRequest,
+  bulkUpdateRequestStatus,
   deleteRequestById,
   fetchRequestById,
   fetchRequests,
@@ -81,7 +83,6 @@ export function useDeleteRequestMutation(requestId: number) {
 
 export function useUpdateRequestStatusMutation(requestId: number) {
   const queryClient = useQueryClient();
-
   return useMutation({
     mutationKey: ['request', requestId, 'update-status'],
     mutationFn: ({ status, roleId }: { status: RequestFormValues['status']; roleId: number }) =>
@@ -94,6 +95,44 @@ export function useUpdateRequestStatusMutation(requestId: number) {
       }
       if (!queryClient.isFetching({ queryKey: ['roles'] })) {
         queryClient.invalidateQueries({ queryKey: ['roles'] });
+      }
+    },
+    onError: (error: Error) => {
+      showToast.error(error.message);
+    },
+  });
+}
+
+export function useBulkUpdateRequestStatusMutation(ids: number[]) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationKey: ['requests', ids, 'bulk-update-status'],
+    mutationFn: ({ status, roleId }: { status: RequestFormValues['status']; roleId: number }) =>
+      bulkUpdateRequestStatus(ids, status, roleId),
+    onSuccess: (response) => {
+      showToast.success(response.message);
+      if (!queryClient.isFetching({ queryKey: ['requests'] })) {
+        queryClient.invalidateQueries({ queryKey: ['requests'] });
+      }
+      if (!queryClient.isFetching({ queryKey: ['roles'] })) {
+        queryClient.invalidateQueries({ queryKey: ['roles'] });
+      }
+    },
+    onError: (error: Error) => {
+      showToast.error(error.message);
+    },
+  });
+}
+
+export function useBulkDeleteRequestMutation(ids: number[]) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationKey: ['requests', ids, 'bulk-delete'],
+    mutationFn: () => bulkDeleteRequest(ids),
+    onSuccess: (response) => {
+      showToast.success(response.message);
+      if (!queryClient.isFetching({ queryKey: ['requests'] })) {
+        queryClient.invalidateQueries({ queryKey: ['requests'] });
       }
     },
     onError: (error: Error) => {
