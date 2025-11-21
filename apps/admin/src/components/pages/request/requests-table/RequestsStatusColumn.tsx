@@ -49,24 +49,6 @@ export default function RequestsStatusColumn({
     setStatus(defaultValue);
   }, [defaultValue]);
 
-  const isMutatingBulkUpdateStatus = useMemo(() => {
-    return () =>
-      queryClient.isMutating({
-        predicate: (mutation) => {
-          const key = mutation.options.mutationKey;
-          if (!key) return false;
-
-          const [main, ids, type] = key;
-
-          return (
-            main === 'requests' &&
-            type === 'bulk-update-status' &&
-            Array.isArray(ids) &&
-            ids.includes(requestId)
-          );
-        },
-      });
-  }, [queryClient]);
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -75,7 +57,7 @@ export default function RequestsStatusColumn({
           className="flex w-40 items-center justify-between font-normal"
           disabled={
             updateStatusMutation.isPending ||
-            isMutatingBulkUpdateStatus() > 0 ||
+            queryClient.isMutating({ mutationKey: ['requests'] }) > 0 ||
             queryClient.isFetching({ queryKey: ['requests'] }) > 0
           }
         >

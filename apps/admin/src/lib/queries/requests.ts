@@ -106,7 +106,7 @@ export function useUpdateRequestStatusMutation(requestId: number) {
 export function useBulkUpdateRequestStatusMutation(ids: number[]) {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationKey: ['requests', ids, 'bulk-update-status'],
+    mutationKey: ['requests', 'bulk-update-status'],
     mutationFn: ({ status, roleId }: { status: RequestFormValues['status']; roleId: number }) =>
       bulkUpdateRequestStatus(ids, status, roleId),
     onSuccess: (response) => {
@@ -127,7 +127,7 @@ export function useBulkUpdateRequestStatusMutation(ids: number[]) {
 export function useBulkDeleteRequestMutation(ids: number[]) {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationKey: ['requests', ids, 'bulk-delete'],
+    mutationKey: ['requests', 'bulk-delete'],
     mutationFn: () => bulkDeleteRequest(ids),
     onSuccess: (response) => {
       showToast.success(response.message);
