@@ -27,4 +27,9 @@ jQuery(document).ready(() => {
             }
         })
     });
+
+    jQuery("#ywhs_form_fields_container textarea").on("input", function() {
+        this.style.height = 'auto';
+        this.style.height = this.scrollHeight + 'px';
+    })
 }) 
