@@ -26,6 +26,8 @@ class Settings {
         add_filter( 'plugin_row_meta', [ $this, 'add_document_support_links' ], 10, 2 );
 
         add_action( 'admin_enqueue_scripts', [ $this, 'admin_enqueue_scripts' ] );
+
+        add_action( 'init', [ $this,'create_block_request_form_block_block_init' ] );
     }
 
     public function admin_body_class( $classes ) {
@@ -137,5 +139,28 @@ class Settings {
 
         wp_enqueue_script( ScriptName::PAGE_SETTINGS );
         wp_enqueue_style( ScriptName::STYLE_SETTINGS );
+    }
+
+    public function create_block_request_form_block_block_init() {
+        $base_dir      = YAY_WHOLESALE_PLUGIN_DIR . 'assets/dist/blocks/request-form-block/';
+        $manifest_file = $base_dir . 'blocks-manifest.php';
+
+        // Make sure the manifest exists
+        if ( ! file_exists( $manifest_file ) ) {
+            return;
+        }
+
+        // Load the manifest array
+        $manifest_data = require $manifest_file;
+
+        // Loop through each block type in the manifest
+        foreach ( array_keys( $manifest_data ) as $block_type ) {
+            $block_dir = $base_dir . $block_type;
+
+            // Only register if block.json exists
+            if ( file_exists( $block_dir . '/block.json' ) ) {
+                \register_block_type_from_metadata( $block_dir );
+            }
+        }
     }
 }
