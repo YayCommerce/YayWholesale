@@ -42,7 +42,6 @@ export default function RequestsStatusColumn({
 
   const handleStatusChange = (key: string, role: number = -1) => {
     const statusKey = key as RequestFormValues['status'];
-    console.log(role);
     updateStatusMutation.mutate({ status: statusKey, roleId: role });
   };
 
@@ -58,8 +57,6 @@ export default function RequestsStatusColumn({
           if (!key) return false;
 
           const [main, ids, type] = key;
-
-          console.log(key, requestId);
 
           return (
             main === 'requests' &&
