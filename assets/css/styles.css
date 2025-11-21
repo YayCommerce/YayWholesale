@@ -2,13 +2,13 @@
     display: block
 }
 
-#ywhs_request_form {
+#ywhs_form_fields_container {
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
 }
 
-#ywhs_request_form > div {
+#ywhs_form_fields_container > div {
     display: flex;
     flex-direction: column;
 }
@@ -21,12 +21,12 @@
     flex: 0 0 calc(100% - 10px);
 }
 
-#ywhs_request_form textarea {
+#ywhs_form_fields_container textarea {
     resize: none;
     font-family: sans-serif;
 }
 
-#ywhs_request_form .input-error {
+#ywhs_form_fields_container .input-error {
     color: red;
     font-size: 13px;
     display: none;

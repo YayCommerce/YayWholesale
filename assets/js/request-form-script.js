@@ -5,22 +5,6 @@ jQuery(document).ready(() => {
         var formData = jQuery(this).serialize();
         var yayWholesale = window.yayWholesale;
 
-        var inputs = jQuery("#ywhs_request_form input");
-
-        let isError = false
-        for(var i = 0; i<inputs.length; i++){
-            if (!jQuery(inputs[i]).val().trim()) {
-                let id = jQuery(inputs[i]).attr("id");
-                jQuery(`#${id}_error`).show();
-                if (!isError) {
-                    jQuery(inputs[i]).trigger("focus");
-                    isError = true;
-                }
-            }
-        }
-
-        if (isError) return;
-
         jQuery("#ywhs_request_form button[type='submit']").attr("disabled", "disabled");
 
         jQuery.ajax({
@@ -39,12 +23,8 @@ jQuery(document).ready(() => {
             },
             error: (jqXHR, textStatus, errorThrown) => {
                 alert("Failed");
-                jQuery("#ywhs_request_form button[type='submit']").attr("disabled", "");
+                jQuery("#ywhs_request_form button[type='submit']").removeAttr("disabled");
             }
         })
     });
-
-    jQuery("#ywhs_request_form input").on("focus", function(e) {
-        jQuery(this).siblings(".input-error").hide();
-    })
 }) 

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { ColumnDef } from '@tanstack/react-table';
 import { __ } from '@wordpress/i18n';
@@ -24,7 +24,7 @@ import { WholeSaleToolTip } from '@/components/custom/WholeSaleToolTip';
 import SettingsIcon from '@/components/icons/SettingsIcon';
 
 import { parseWPDate, parseWPTime } from '../../common.helper';
-import { StatusBadge } from '../StatusBadge';
+import RequestsStatusColumn from './RequestsStatusColumn';
 
 function AvatarCell({ rowData }: { rowData: RequestFormValues }) {
   const navigate = useNavigate();
@@ -83,7 +83,9 @@ export const RequestsColumn: ColumnDef<RequestFormValues>[] = [
   {
     accessorKey: 'status',
     header: 'Status',
-    cell: ({ row }) => <StatusBadge status={row.original.status} />,
+    cell: ({ row }) => (
+      <RequestsStatusColumn requestId={row.original.id} defaultValue={row.original.status} />
+    ),
   },
   {
     accessorKey: 'date',
@@ -102,6 +104,25 @@ export const RequestsColumn: ColumnDef<RequestFormValues>[] = [
       const queryClient = useQueryClient();
 
       const [openDialog, setOpenDialog] = useState(false);
+
+      const isMutatingBulkDelete = useMemo(() => {
+        return () =>
+          queryClient.isMutating({
+            predicate: (mutation) => {
+              const key = mutation.options.mutationKey;
+              if (!key) return false;
+
+              const [main, ids, type] = key;
+
+              return (
+                main === 'requests' &&
+                type === 'bulk-delete' &&
+                Array.isArray(ids) &&
+                ids.includes(row.original.id)
+              );
+            },
+          });
+      }, [queryClient]);
 
       return (
         <AlertDialog open={openDialog} onOpenChange={setOpenDialog}>
@@ -130,7 +151,7 @@ export const RequestsColumn: ColumnDef<RequestFormValues>[] = [
                   variant="ghost"
                   className="hover:text-destructive text-base-muted-foreground h-8 w-8 hover:bg-white hover:shadow-xs"
                   onClick={() => setOpenDialog(true)}
-                  disabled={isDeletingRequestPending}
+                  disabled={isDeletingRequestPending || isMutatingBulkDelete() > 0}
                 >
                   <Trash2 className="h-4 w-4" />
                 </Button>
@@ -151,12 +172,12 @@ export const RequestsColumn: ColumnDef<RequestFormValues>[] = [
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogCancel>{__('Cancel', 'yay-wholesale')}</AlertDialogCancel>
               <AlertDialogAction
                 className="bg-destructive text-destructive-foreground hover:bg-destructive/80"
                 onClick={() => deleteRequest()}
               >
-                Continue
+                {__('Continue', 'yay-wholesale')}
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>

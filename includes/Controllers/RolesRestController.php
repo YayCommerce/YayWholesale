@@ -86,8 +86,14 @@ class RolesRestController extends BaseRestController {
         );
     }
 
-    public function get_roles(): WP_REST_Response {
+    public function get_roles( WP_REST_Request $request ): WP_REST_Response {
         $roles = get_option( 'yay_wholesale_roles', [] );
+
+        $active_filter = $request->get_param( 'active' );
+
+        if ( isset( $active_filter ) ) {
+            $roles = array_values( array_filter( $roles, fn( $r ) => $r['status'] === (bool) $active_filter ) );
+        }
 
         foreach ( $roles as &$role ) {
             $slug          = $role['slug'] ?? sanitize_title( $role['name'] );

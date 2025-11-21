@@ -1,7 +1,9 @@
 <?php
 namespace Yay_Wholesale\Helpers;
 
+use Exception;
 use WP_Query;
+use WP_User;
 use WpOrg\Requests\Response;
 
 /**
@@ -17,6 +19,7 @@ class RequestsHelper {
     public const REJECTED                  = 'rejected';
     public const PENDING                   = 'pending';
     public const APPROVED                  = 'approved';
+    public const ALL                       = 'all';
 
     protected function __construct() {}
 
@@ -93,14 +96,18 @@ class RequestsHelper {
      * Get a list of Wholesale requests.
      *
      * @param string $filter_key The search keyword .
+     * @param string $status The filtered status .
      * @param int    $page The pagination page.
      * @param int    $per_page The number of items per page.
      * @return array A paginated list of Wholesale requests.
      */
-    public static function get_paginated_request_post( string $filter_key, int $page, int $per_page ): array {
+    public static function get_paginated_request_post( string $filter_key, string $status, int $page, int $per_page ): array {
         $args = [
             'post_type'              => self::REQUEST_POST_TYPE,
             'update_post_meta_cache' => true,
+            'meta_query'             => [
+                'relation' => 'AND',
+            ],
         ];
 
         if ( ! isset( $page ) || ! isset( $per_page ) ) {
@@ -111,13 +118,29 @@ class RequestsHelper {
         }
 
         if ( isset( $filter_key ) ) {
-            $args['meta_query'] = [
+            $args['meta_query'][] = [
+                'relation' => 'OR',
                 [
                     'key'     => self::REQUEST_META_DISPLAY_NAME,
                     'value'   => $filter_key,
                     'compare' => 'LIKE',
                     'type'    => 'CHAR',
                 ],
+                [
+                    'key'     => self::REQUEST_META_EMAIL,
+                    'value'   => $filter_key,
+                    'compare' => 'LIKE',
+                    'type'    => 'CHAR',
+                ],
+            ];
+        }
+
+        if ( isset( $status ) && self::ALL !== $status ) {
+            $args['meta_query'][] = [
+                'key'     => self::REQUEST_META_STATUS,
+                'value'   => $status,
+                'compare' => '=',
+                'type'    => 'CHAR',
             ];
         }
 
@@ -225,7 +248,7 @@ class RequestsHelper {
         $status       = get_post_meta( $request_id, self::REQUEST_META_STATUS, true );
 
         // Save display name
-        if ( $display_name !== $args['name'] ) {
+        if ( array_key_exists( 'name', $args ) && $display_name !== $args['name'] ) {
             $display_name = $args['name'];
             $result       = update_post_meta( $request_id, self::REQUEST_META_DISPLAY_NAME, $display_name );
             if ( ! $result ) {
@@ -234,7 +257,7 @@ class RequestsHelper {
         }
 
         // Save post date
-        if ( $request->post_date !== $args['date'] ) {
+        if ( array_key_exists( 'date', $args ) && $request->post_date !== $args['date'] ) {
             $result = wp_update_post(
                 [
                     'ID'        => $request_id,
@@ -248,7 +271,7 @@ class RequestsHelper {
         }
 
         // Save email
-        if ( $email !== $args['email'] ) {
+        if ( array_key_exists( 'email', $args ) && $email !== $args['email'] ) {
             $email  = $args['email'];
             $result = update_post_meta( $request_id, self::REQUEST_META_EMAIL, $email );
             if ( ! $result ) {
@@ -257,7 +280,7 @@ class RequestsHelper {
         }
 
         // Save message
-        if ( $message !== $args['message'] ) {
+        if ( array_key_exists( 'message', $args ) && $message !== $args['message'] ) {
             $message = $args['message'];
             $result  = update_post_meta( $request_id, self::REQUEST_META_MESSAGE, $message );
             if ( ! $result ) {
@@ -266,7 +289,7 @@ class RequestsHelper {
         }
 
         // Save status
-        if ( $status !== $args['status'] ) {
+        if ( array_key_exists( 'status', $args ) && $status !== $args['status'] ) {
             $status = $args['status'];
             $result = update_post_meta( $request_id, self::REQUEST_META_STATUS, $status );
             if ( ! $result ) {
@@ -321,5 +344,73 @@ class RequestsHelper {
         }
 
             return true;
+    }
+
+    /**
+     * Set role to the the author of request
+     *
+     * @param int    $request_id The target request ID .
+     * @param string $role_slug The target role slug .
+     * @return void
+     */
+    public static function add_role_to_ywhs_request_author( int $request_id, string $role_slug ): void {
+        $request = get_post( $request_id );
+
+        if ( $request->post_author < 1 ) {
+            $display_name = get_post_meta( $request_id, self::REQUEST_META_DISPLAY_NAME, true );
+            $post_meta    = get_post_meta( $request_id, self::REQUEST_META_DATA, true );
+            $email        = get_post_meta( $request_id, self::REQUEST_META_EMAIL, true );
+            $password     = '123456';
+            // $password = wp_generate_password( 12, true, true );
+
+            $request_user = wp_insert_user(
+                [
+                    'user_login'   => sanitize_key( $display_name ),
+                    'user_pass'    => $password,
+                    'display_name' => $display_name,
+                    'first_name'   => $post_meta['First Name'] ?? '',
+                    'last_name'    => $post_meta['Last Name'] ?? '',
+                    'user_email'   => $email,
+                    'role'         => $role_slug,
+                ]
+            );
+
+            if ( is_wp_error( $request_user ) ) {
+                throw new Exception( $request_user->get_error_message() );
+            }
+
+            $result = wp_update_post(
+                [
+                    'ID'          => $request_id,
+                    'post_author' => $request_user,
+                ]
+            );
+
+            if ( is_wp_error( $result ) ) {
+                throw new Exception( $result->get_error_message() );
+            }
+        } else {
+            $current_user = new WP_User( $request->post_author );
+
+            RolesHelper::remove_ywhs_role_from_user( $current_user );
+
+            $current_user->add_role( $role_slug );
+
+        }//end if
+    }
+
+    /**
+     * Remove role from the the author of request
+     *
+     * @param int $request_id The target request ID.
+     * @return void
+     */
+    public static function remove_role_from_ywhs_request_author( int $request_id ): void {
+        $request = get_post( $request_id );
+
+        if ( $request->post_author > 0 ) {
+            $current_user = new WP_User( $request->post_author );
+            RolesHelper::remove_ywhs_role_from_user( $current_user );
+        }
     }
 }

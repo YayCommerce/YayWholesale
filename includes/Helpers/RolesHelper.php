@@ -92,4 +92,20 @@ class RolesHelper {
 
         return null;
     }
+
+    /**
+     * Delete all the yay-wholesale's roles from the user.
+     *
+     * @param \WP_User $user The user object.
+     * @return void
+     */
+    public static function remove_ywhs_role_from_user( \WP_User $user ): void {
+        $role_slugs = array_column( get_option( 'yay_wholesale_roles', [] ), 'slug' );
+
+        foreach ( $role_slugs as $ywhs_role ) {
+            if ( in_array( $ywhs_role, $user->roles, true ) ) {
+                $user->remove_role( $ywhs_role );
+            }
+        }
+    }
 }

@@ -1,15 +1,27 @@
+import { useMemo } from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { __ } from '@wordpress/i18n';
-import { GripVertical, Trash2 } from 'lucide-react';
+import { Ellipsis, EyeOff, GripVertical, Info, Trash2 } from 'lucide-react';
 import { useFormContext } from 'react-hook-form';
 
 import { SettingsFormData } from '@/lib/schema/settings';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuShortcut,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { FormControl, FormField, FormItem, FormLabel } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { InputGroup, InputGroupInput } from '@/components/ui/input-group';
 import {
   Select,
   SelectContent,
@@ -18,6 +30,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
+import { WholeSaleToolTip } from '@/components/custom/WholeSaleToolTip';
 
 export function FieldRow({
   field,
@@ -30,7 +43,7 @@ export function FieldRow({
   update: (index: number, value: any) => void;
   remove: (index: number) => void;
 }) {
-  const { control } = useFormContext<SettingsFormData>();
+  const { control, watch } = useFormContext<SettingsFormData>();
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: field.id,
   });
@@ -39,6 +52,15 @@ export function FieldRow({
     transition,
     opacity: isDragging ? 0.6 : 1,
   };
+
+  const isUseDefaultForm = watch('registration_fields.useDefaultForm');
+  const isRequired = watch(`registration_fields.fields.${index}.isRequired`);
+
+  const isHidden: boolean = useMemo(
+    () => !field.isDefault && isUseDefaultForm,
+    [field, isUseDefaultForm],
+  );
+  const isDefault: boolean = useMemo(() => field.isDefault, [field]);
 
   return (
     <div
@@ -73,14 +95,39 @@ export function FieldRow({
               <FormItem className="w-full">
                 <FormLabel className="text-base-secondary space-y-2.5 text-xs font-medium">
                   Label
+                  {isRequired && (
+                    <WholeSaleToolTip
+                      trigger={<div className="text-destructive">*</div>}
+                      content={
+                        <div className="flex items-center gap-2">
+                          <Info className="mt-6/7 h-3.5 w-3.5" />
+                          {__('Field is required')}
+                        </div>
+                      }
+                    />
+                  )}
                 </FormLabel>
                 <FormControl>
-                  <Input
-                    placeholder="Enter field label"
-                    defaultValue={field.value}
-                    onChange={field.onChange}
-                    className="bg-background h-9 w-full"
-                  />
+                  <InputGroup>
+                    <InputGroupInput
+                      placeholder="Enter field label"
+                      defaultValue={field.value}
+                      onChange={field.onChange}
+                      className="h-9 w-full"
+                      disabled={isHidden}
+                    />
+                    {isHidden && (
+                      <WholeSaleToolTip
+                        trigger={<EyeOff className="text-muted-foreground mx-2 h-3 w-3" />}
+                        content={
+                          <div className="flex items-center gap-2">
+                            <Info className="mt-6/7 h-3.5 w-3.5" />
+                            {__('Field is hidden')}
+                          </div>
+                        }
+                      />
+                    )}
+                  </InputGroup>
                 </FormControl>
               </FormItem>
             )}
@@ -98,8 +145,12 @@ export function FieldRow({
                   Type
                 </FormLabel>
                 <FormControl>
-                  <Select defaultValue={field.value} onValueChange={field.onChange}>
-                    <SelectTrigger className="bg-background h-9 w-full rounded-sm text-sm font-normal">
+                  <Select
+                    defaultValue={field.value}
+                    onValueChange={field.onChange}
+                    disabled={isDefault || isHidden}
+                  >
+                    <SelectTrigger className="bg-background h-9 w-full rounded-sm text-sm font-normal disabled:cursor-default">
                       <SelectValue placeholder="Select an option" />
                     </SelectTrigger>
                     <SelectContent>
@@ -134,6 +185,7 @@ export function FieldRow({
                     defaultValue={field.value}
                     onChange={field.onChange}
                     className="bg-background h-9 w-full"
+                    disabled={isHidden}
                   />
                 </FormControl>
               </FormItem>
@@ -160,6 +212,7 @@ export function FieldRow({
                       console.log('val', val);
                       if (val) field.onChange(val);
                     }}
+                    disabled={isHidden}
                   >
                     <ToggleGroupItem className="size-xs" value="50%">
                       50%
@@ -177,23 +230,40 @@ export function FieldRow({
 
       {/* Delete w-[50px]  */}
       <div className="flex shrink-0 items-center justify-center">
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => {
-            if (field.deletable) {
-              remove(index);
-            }
-          }}
-          className={cn(
-            'h-9 w-9',
-            field.deletable
-              ? 'hover:bg-destructive/10 hover:text-destructive bg-muted/50 text-base-muted-foreground'
-              : 'text-muted-foreground cursor-not-allowed opacity-40 hover:bg-transparent',
-          )}
-        >
-          <Trash2 className="h-6 w-6" />
-        </Button>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" size="icon" disabled={isHidden}>
+              <Ellipsis />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="w-56" align="end">
+            <DropdownMenuLabel>{__('Action', 'yay-wholesale')}</DropdownMenuLabel>
+            <FormField
+              control={control}
+              name={`registration_fields.fields.${index}.isRequired`}
+              render={({ field }) => (
+                <DropdownMenuCheckboxItem checked={field.value} onCheckedChange={field.onChange}>
+                  {__('Set As Required', 'yay-wholesale')}
+                </DropdownMenuCheckboxItem>
+              )}
+            />
+            <DropdownMenuSeparator />
+            <DropdownMenuGroup>
+              <DropdownMenuItem
+                variant="destructive"
+                onClick={() => {
+                  if (field.deletable) {
+                    remove(index);
+                  }
+                }}
+                disabled={field.isDefault || !field.deletable}
+              >
+                <Trash2 />
+                Delete
+              </DropdownMenuItem>
+            </DropdownMenuGroup>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
     </div>
   );
