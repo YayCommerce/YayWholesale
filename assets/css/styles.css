@@ -24,14 +24,23 @@
 #ywhs_form_fields_container textarea {
     resize: none;
     font-family: sans-serif;
-}
-
-#ywhs_form_fields_container .input-error {
-    color: red;
-    font-size: 13px;
-    display: none;
+    min-height: 50px;
+    overflow: hidden;
 }
 
 #ywhs_success_notice {
     display: none;
+}
+
+#ywhs_form_fields_container label {
+    font-size: small;
+    margin: 5px 0px;
+    display: flex;
+    gap: 3px;
+}
+
+#ywhs_form_fields_container input, 
+#ywhs_form_fields_container textarea {
+    padding: 5px;
+    font-size: small;
 }

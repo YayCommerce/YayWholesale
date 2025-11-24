@@ -72,6 +72,13 @@ class RequestForm {
                     <div <?php echo esc_html( $field['columnWidth'] ) === '50%' ? 'class="ywhs_half"' : 'class="ywhs_full"'; ?> >
                         <label for="<?php echo esc_html( $field['id'] ); ?>" >
                             <?php echo esc_html( $field['label'] ); ?>
+                            <div style="color: red">
+                            <?php
+                            if ( $field['isRequired'] ) {
+                                echo '*';
+                            }
+                            ?>
+                            </div>
                         </label>
                         <?php if ( esc_html( $field['type'] ) !== 'textarea' ) : ?>
                             <input 
@@ -89,7 +96,6 @@ class RequestForm {
                                 <?php echo( $field['isRequired'] ? 'required' : '' ); ?>
                                 ></textarea>
                         <?php endif ?>
-                        <div id="<?php echo esc_html( $field['id'] ); ?>_error" class="input-error"><?php echo esc_html( __( 'Please fill in ', 'yay-wholesale' ) . $field['label'] ); ?></div>
                     </div>
                         <?php
                     endif

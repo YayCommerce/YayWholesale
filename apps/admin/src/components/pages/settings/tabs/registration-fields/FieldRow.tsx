@@ -209,7 +209,6 @@ export function FieldRow({
                     type="single"
                     value={field.value}
                     onValueChange={(val) => {
-                      console.log('val', val);
                       if (val) field.onChange(val);
                     }}
                     disabled={isHidden}

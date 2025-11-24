@@ -44,7 +44,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { ActionItem, SelectActionButton } from '@/components/ui/select-action-button';
+import {
+  ActionButton,
+  ActionMenuButton,
+  SelectActionButton,
+} from '@/components/ui/select-action-button';
 import { Separator } from '@/components/ui/separator';
 import {
   Table,
@@ -138,29 +142,6 @@ export default function RequestsList() {
     table.resetRowSelection();
   };
 
-  const bulkActionButtonItems: ActionItem[] = useMemo(
-    () => [
-      {
-        icon: <RequestsStatusIcon status="approved" />,
-        title: __('Approve'),
-        type: 'menu',
-        children: activeRoles?.map((role) => ({
-          icon: <RequestsStatusIcon status="approved" />,
-          title: __('Approve to %ROLE%').replace('%ROLE%', role.name),
-          onClick: () => handleBulkStatusChange('approved', role.id),
-        })),
-        onClick: () => handleBulkStatusChange('approved'),
-      },
-      {
-        icon: <RequestsStatusIcon status="rejected" />,
-        title: __('Reject'),
-        type: 'button',
-        onClick: () => handleBulkStatusChange('rejected'),
-      },
-    ],
-    [activeRoles],
-  );
-
   return (
     <div className="mx-auto mt-[84px] max-w-7xl space-y-6 px-6">
       <Card className="gap-3 p-4">
@@ -242,7 +223,7 @@ export default function RequestsList() {
 
         {/* Footer */}
         {data != undefined && data.data.length > 0 && (
-          <div className="flex flex-col items-center justify-end gap-3 sm:flex-row">
+          <div className="relative flex flex-col items-center justify-end gap-3 sm:flex-row">
             <TableToaster className="left-2/3 md:left-2/7">
               <TableToast
                 open={selectedCount > 0}
@@ -260,8 +241,26 @@ export default function RequestsList() {
                 <SelectActionButton
                   title="Status"
                   icon={<CaretUpDownIcon size={12} weight="bold" />}
-                  items={bulkActionButtonItems}
-                />
+                >
+                  <ActionMenuButton
+                    icon={<RequestsStatusIcon status="approved" />}
+                    title={__('Approve')}
+                    onClick={() => handleBulkStatusChange('approved')}
+                  >
+                    {activeRoles?.map((role) => (
+                      <ActionButton
+                        icon={<RequestsStatusIcon status="approved" />}
+                        title={__('Approve to %ROLE%').replace('%ROLE%', role.name)}
+                        onClick={() => handleBulkStatusChange('approved', role.id)}
+                      />
+                    ))}
+                  </ActionMenuButton>
+                  <ActionButton
+                    icon={<RequestsStatusIcon status="rejected" />}
+                    title={__('Reject')}
+                    onClick={() => handleBulkStatusChange('rejected')}
+                  />
+                </SelectActionButton>
                 <Separator orientation="vertical" className="h-5!" />
                 <AlertDialog open={openBulkDeleteDialog} onOpenChange={setOpenDeleteDialog}>
                   <Button

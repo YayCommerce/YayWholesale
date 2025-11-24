@@ -105,25 +105,6 @@ export const RequestsColumn: ColumnDef<RequestFormValues>[] = [
 
       const [openDialog, setOpenDialog] = useState(false);
 
-      const isMutatingBulkDelete = useMemo(() => {
-        return () =>
-          queryClient.isMutating({
-            predicate: (mutation) => {
-              const key = mutation.options.mutationKey;
-              if (!key) return false;
-
-              const [main, ids, type] = key;
-
-              return (
-                main === 'requests' &&
-                type === 'bulk-delete' &&
-                Array.isArray(ids) &&
-                ids.includes(row.original.id)
-              );
-            },
-          });
-      }, [queryClient]);
-
       return (
         <AlertDialog open={openDialog} onOpenChange={setOpenDialog}>
           <div className="flex justify-end gap-2">
@@ -151,7 +132,10 @@ export const RequestsColumn: ColumnDef<RequestFormValues>[] = [
                   variant="ghost"
                   className="hover:text-destructive text-base-muted-foreground h-8 w-8 hover:bg-white hover:shadow-xs"
                   onClick={() => setOpenDialog(true)}
-                  disabled={isDeletingRequestPending || isMutatingBulkDelete() > 0}
+                  disabled={
+                    isDeletingRequestPending ||
+                    queryClient.isMutating({ mutationKey: ['requests'] }) > 0
+                  }
                 >
                   <Trash2 className="h-4 w-4" />
                 </Button>
