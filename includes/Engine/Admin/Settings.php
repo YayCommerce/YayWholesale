@@ -145,19 +145,15 @@ class Settings {
         $base_dir      = YAY_WHOLESALE_PLUGIN_DIR . 'assets/dist/blocks/request-form-block/';
         $manifest_file = $base_dir . 'blocks-manifest.php';
 
-        // Make sure the manifest exists
         if ( ! file_exists( $manifest_file ) ) {
             return;
         }
 
-        // Load the manifest array
         $manifest_data = require $manifest_file;
 
-        // Loop through each block type in the manifest
         foreach ( array_keys( $manifest_data ) as $block_type ) {
             $block_dir = $base_dir . $block_type;
 
-            // Only register if block.json exists
             if ( file_exists( $block_dir . '/block.json' ) ) {
                 \register_block_type_from_metadata( $block_dir );
             }

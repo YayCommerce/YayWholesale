@@ -1,41 +1,48 @@
-/**
- * Retrieves the translation of text.
- *
- * @see https://developer.wordpress.org/block-editor/reference-guides/packages/packages-i18n/
- */
 import { __ } from '@wordpress/i18n';
-
-/**
- * React hook that is used to mark the block wrapper element.
- * It provides all the necessary props like the class name.
- *
- * @see https://developer.wordpress.org/block-editor/reference-guides/packages/packages-block-editor/#useblockprops
- */
-import { useBlockProps } from '@wordpress/block-editor';
-
-/**
- * Lets webpack process CSS, SASS or SCSS files referenced in JavaScript files.
- * Those files can contain any CSS code that gets applied to the editor.
- *
- * @see https://www.npmjs.com/package/@wordpress/scripts#using-css
- */
+import { useBlockProps, RichText, BlockControls, AlignmentToolbar } from '@wordpress/block-editor';
 import './editor.scss';
 
-/**
- * The edit function describes the structure of your block in the context of the
- * editor. This represents what the editor will render when the block is used.
- *
- * @see https://developer.wordpress.org/block-editor/reference-guides/block-api/block-edit-save/#edit
- *
- * @return {Element} Element to render.
- */
-export default function Edit() {
-	return (
-		<p { ...useBlockProps() }>
-			{ __(
-				'Request Form Block – hello from the editor!',
-				'request-form-block'
-			) }
-		</p>
-	);
+export default function Edit({ attributes, setAttributes }) {
+    const { formTitle, titleAlign } = attributes;
+
+    return (
+        <div {...useBlockProps()}>
+            <div className='ywhs_request_form_block'>
+                <BlockControls>
+                    <AlignmentToolbar
+                        value={titleAlign}
+                        onChange={(newAlign) => setAttributes({ titleAlign: newAlign })}
+                    />
+                </BlockControls>
+                <RichText
+                    tagName="p"
+                    value={formTitle}
+                    onChange={(newContent) => setAttributes({ formTitle: newContent })}
+                    placeholder={__("Write your form title here...", "yay-wholesale")}
+                    style={{textAlign: titleAlign}}
+                />
+                <div className='ywhs_skeleton_container'>
+                    <div className='ywhs_skeleton_half'>
+                        <div className='ywhs_skeleton ywhs_skeleton_label'></div>
+                        <div className='ywhs_skeleton'></div>
+                    </div>
+                    <div className='ywhs_skeleton_half'>
+                        <div className='ywhs_skeleton ywhs_skeleton_label'></div>
+                        <div className='ywhs_skeleton '></div>
+                    </div>
+                    <div className='ywhs_skeleton_full'>
+                        <div className='ywhs_skeleton ywhs_skeleton_label'></div>
+                        <div className='ywhs_skeleton '></div>
+                    </div>
+                    <div className='ywhs_skeleton_full'>
+                        <div className='ywhs_skeleton ywhs_skeleton_label'></div>
+                        <div className='ywhs_skeleton ywhs_skeleton_textarea'></div>
+                    </div>
+                    <div className='ywhs_skeleton_half'>
+                        <div className='ywhs_skeleton ywhs_skeleton_button'></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
 }

@@ -8,16 +8,21 @@
 	"description": "A block displaying yay-wholesale request registration form ",
 	"example": {},
 	"supports": {
-		"color": {
-            "background": false,
-            "text": true
-        },
-        "html": false,
-        "typography": {
-            "fontSize": true
-        }
+        "html": false
+	},
+	"attributes": {
+		"formTitle": {
+			"type": "string",
+			"default": "FORM TITLE"
+		},
+		"titleAlign": {
+			"type": "string",
+        	"default": "left"
+		}
 	},
 	"textdomain": "yay-wholesale",
 	"editorScript": "file:./index.js",
-	"render": "file:./render.php"
+	"render": "file:./render.php",
+	"style": "file:./style-index.css",
+  	"editorStyle": "file:./index.css"
 }
