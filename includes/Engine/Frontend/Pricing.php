@@ -120,7 +120,7 @@ class Pricing {
     }
 
     /**
-     * Calvulate the price after applying the wholesale discount
+     * Calculate the price after applying the wholesale discount
      *
      * @param float       $price The price.
      * @param array       $role The wholesale role.
@@ -418,6 +418,12 @@ class Pricing {
         }
     }
 
+    /**
+     * Set the order data discounted when the admin recalculates orders
+     *
+     * @param bool      $and_taxes the taxes included flag.
+     * @param \WC_Order $order The cart object.
+     */
     public function admin_recalculate_order( $and_taxes, \WC_Order $order ) {
         $customer_id       = $order->get_customer_id();
         $is_wholesale_user = RolesHelper::is_wholesale_user( $customer_id );
