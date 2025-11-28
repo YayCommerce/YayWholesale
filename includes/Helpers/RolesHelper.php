@@ -5,13 +5,13 @@ namespace Yay_Wholesale\Helpers;
  * Roles Helper Class
  */
 class RolesHelper {
-    public static function is_wholesale_user(): array|null {
+    public static function is_wholesale_user( int $user_id = 0 ): array|null {
         if ( ! is_user_logged_in() ) {
             return null;
         }
 
         $roles          = get_option( 'yay_wholesale_roles', [] );
-        $user           = wp_get_current_user();
+        $user           = $user_id > 0 ? get_user_by( 'ID', $user_id ) : wp_get_current_user();
         $user_role_slug = self::get_user_wholesale_role( $user, $roles );
         if ( ! $user_role_slug ) {
             return null;
