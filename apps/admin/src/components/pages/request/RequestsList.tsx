@@ -179,11 +179,11 @@ export default function RequestsList() {
       {/* Table */}
       <div
         className={cn(
-          'overflow-hidden rounded-lg border border-gray-200',
+          'overflow-hidden rounded-lg border',
           isFetchingRequests && 'relative opacity-50',
         )}
       >
-        <Table className="min-w-full divide-y divide-gray-200">
+        <Table className="min-w-full divide-y">
           <TableHeader className="text-base-foreground h-[46px] bg-[#FAFAFA]">
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
@@ -204,11 +204,11 @@ export default function RequestsList() {
               </TableRow>
             ))}
           </TableHeader>
-          <TableBody className="divide-y divide-gray-200">
+          <TableBody className="divide-y">
             {isLoadingRequests ? (
               <TableRow>
                 <TableCell colSpan={columns.length} className="h-32 text-center align-middle">
-                  <div className="flex items-center justify-center gap-2 text-gray-500">
+                  <div className="flex items-center justify-center gap-2">
                     <Spinner className="text-muted-foreground size-6 animate-spin" />
                   </div>
                 </TableCell>
