@@ -15,8 +15,6 @@ defined( 'ABSPATH' ) || exit;
 class RolesRestController extends BaseRestController {
     use SingletonTrait;
 
-    protected string $rest_base = 'roles';
-
     protected function __construct() {
         $this->init_hooks();
     }
@@ -25,17 +23,17 @@ class RolesRestController extends BaseRestController {
         // GET /roles, POST /roles
         register_rest_route(
             $this->namespace,
-            '/' . $this->rest_base,
+            '/roles',
             [
                 [
                     'methods'             => 'GET',
                     'callback'            => [ $this, 'get_roles' ],
-                    'permission_callback' => '__return_true',
+                    'permission_callback' => [ $this, 'roles_permission_callback' ],
                 ],
                 [
                     'methods'             => 'POST',
                     'callback'            => [ $this, 'create_role' ],
-                    'permission_callback' => '__return_true',
+                    'permission_callback' => [ $this, 'roles_permission_callback' ],
                 ],
             ]
         );
@@ -43,49 +41,68 @@ class RolesRestController extends BaseRestController {
         // Bulk delete
         register_rest_route(
             $this->namespace,
-            '/' . $this->rest_base . '/bulk',
+            '/roles/bulk',
             [
                 'methods'             => 'DELETE',
                 'callback'            => [ $this, 'delete_roles_bulk' ],
-                'permission_callback' => '__return_true',
+                'permission_callback' => [ $this, 'roles_permission_callback' ],
             ]
         );
 
         // Bulk status update
         register_rest_route(
             $this->namespace,
-            '/' . $this->rest_base . '/bulk-status',
+            '/roles/bulk-status',
             [
                 'methods'             => 'PUT',
                 'callback'            => [ $this, 'bulk_update_role_status' ],
-                'permission_callback' => '__return_true',
+                'permission_callback' => [ $this, 'roles_permission_callback' ],
             ]
         );
 
         // Single role
         register_rest_route(
             $this->namespace,
-            '/' . $this->rest_base . '/(?P<roleId>\d+)',
+            '/roles/(?P<roleId>\d+)',
             [
                 [
                     'methods'             => 'GET',
                     'callback'            => [ $this, 'get_role' ],
-                    'permission_callback' => '__return_true',
+                    'permission_callback' => [ $this, 'roles_permission_callback' ],
                 ],
                 [
                     'methods'             => 'PUT',
                     'callback'            => [ $this, 'update_role' ],
-                    'permission_callback' => '__return_true',
+                    'permission_callback' => [ $this, 'roles_permission_callback' ],
                 ],
                 [
                     'methods'             => 'DELETE',
                     'callback'            => [ $this, 'delete_role' ],
-                    'permission_callback' => '__return_true',
+                    'permission_callback' => [ $this, 'roles_permission_callback' ],
                 ],
             ]
         );
     }
 
+    /**
+     * Check if the user has the necessary permissions to access the roles endpoints.
+     *
+     * @return bool|WP_Error True if the user has the necessary permissions, otherwise a WP_Error object.
+     */
+    public function roles_permission_callback() {
+        if ( ! current_user_can( 'manage_options' ) || ! current_user_can( 'manage_woocommerce' ) ) {
+            return new \WP_Error( 'rest_forbidden', esc_html__( 'Forbidden.', 'yay-wholesale' ), [ 'status' => 401 ] );
+        }
+
+        return true;
+    }
+
+    /**
+     * Get the list of roles.
+     *
+     * @param WP_REST_Request $request The request object.
+     * @return WP_REST_Response The response object.
+     */
     public function get_roles( WP_REST_Request $request ): WP_REST_Response {
         $roles = get_option( 'yay_wholesale_roles', [] );
 
@@ -114,6 +131,12 @@ class RolesRestController extends BaseRestController {
         return $this->success( $roles );
     }
 
+    /**
+     * Get a role by ID.
+     *
+     * @param WP_REST_Request $request The request object.
+     * @return WP_REST_Response The response object.
+     */
     public function get_role( WP_REST_Request $request ): WP_REST_Response {
         $id    = (int) $request->get_param( 'roleId' );
         $roles = get_option( 'yay_wholesale_roles', [] );
@@ -127,6 +150,12 @@ class RolesRestController extends BaseRestController {
         return $this->success( $role );
     }
 
+    /**
+     * Create a new role.
+     *
+     * @param WP_REST_Request $request The request object.
+     * @return WP_REST_Response The response object.
+     */
     public function create_role( WP_REST_Request $request ): WP_REST_Response {
         $params    = $this->get_json_params( $request );
         $role_name = sanitize_text_field( $params['name'] ?? '' );
@@ -156,6 +185,12 @@ class RolesRestController extends BaseRestController {
         return $this->success( $new_role, __( 'Role created successfully', 'yay-wholesale' ) );
     }
 
+    /**
+     * Update a role.
+     *
+     * @param WP_REST_Request $request The request object.
+     * @return WP_REST_Response The response object.
+     */
     public function update_role( WP_REST_Request $request ): WP_REST_Response {
         $params  = $this->get_json_params( $request );
         $role_id = (int) $request->get_param( 'roleId' );
@@ -172,6 +207,12 @@ class RolesRestController extends BaseRestController {
         return $this->success( $params, __( 'Role updated successfully', 'yay-wholesale' ) );
     }
 
+    /**
+     * Delete a role.
+     *
+     * @param WP_REST_Request $request The request object.
+     * @return WP_REST_Response The response object.
+     */
     public function delete_role( WP_REST_Request $request ): WP_REST_Response {
         $role_id = (int) $request->get_param( 'roleId' );
         $roles   = get_option( 'yay_wholesale_roles', [] );
@@ -192,6 +233,12 @@ class RolesRestController extends BaseRestController {
         return $this->success( $roles, __( 'Role deleted successfully', 'yay-wholesale' ) );
     }
 
+    /**
+     * Delete multiple roles.
+     *
+     * @param WP_REST_Request $request The request object.
+     * @return WP_REST_Response The response object.
+     */
     public function delete_roles_bulk( WP_REST_Request $request ): WP_REST_Response {
         $ids   = array_map( 'intval', (array) $request->get_param( 'ids' ) );
         $roles = get_option( 'yay_wholesale_roles', [] );
@@ -212,6 +259,12 @@ class RolesRestController extends BaseRestController {
         return $this->success( $roles, __( 'Roles deleted successfully', 'yay-wholesale' ) );
     }
 
+    /**
+     * Bulk update the status of multiple roles.
+     *
+     * @param WP_REST_Request $request The request object.
+     * @return WP_REST_Response The response object.
+     */
     public function bulk_update_role_status( WP_REST_Request $request ): WP_REST_Response {
         $params = $this->get_json_params( $request );
         $ids    = $params['ids'] ?? [];

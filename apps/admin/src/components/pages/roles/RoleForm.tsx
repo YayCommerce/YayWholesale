@@ -80,7 +80,6 @@ export default function RoleForm() {
 
   return (
     <FormProvider {...form}>
-      <Toaster />
       <form
         id="role-form"
         onSubmit={form.handleSubmit(onSubmit, onError)}

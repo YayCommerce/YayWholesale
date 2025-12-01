@@ -4,7 +4,6 @@ namespace Yay_Wholesale\Helpers;
 use Exception;
 use WP_Query;
 use WP_User;
-use WpOrg\Requests\Response;
 
 /**
  * Settings Helper Class

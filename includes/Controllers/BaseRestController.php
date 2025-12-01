@@ -14,7 +14,6 @@ defined( 'ABSPATH' ) || exit;
 abstract class BaseRestController {
 
     protected string $namespace = 'yay-wholesale/v1';
-    protected string $rest_base = '';
 
     protected function success( array $data = [], string $message = '' ): WP_REST_Response {
         return rest_ensure_response(
@@ -28,6 +27,13 @@ abstract class BaseRestController {
         );
     }
 
+    /**
+     * Return an error response.
+     *
+     * @param string $message The error message.
+     * @param int    $status The HTTP status code.
+     * @return WP_REST_Response The response object.
+     */
     protected function error( string $message, int $status = 400 ): WP_REST_Response {
         return rest_ensure_response(
             [
@@ -38,10 +44,22 @@ abstract class BaseRestController {
         );
     }
 
+    /**
+     * Get the JSON parameters from the request.
+     *
+     * @param WP_REST_Request $request The request object.
+     * @return array The JSON parameters.
+     */
     protected function get_json_params( WP_REST_Request $request ): array {
         return (array) $request->get_json_params();
     }
 
+    /**
+     * Get the form data from the request.
+     *
+     * @param WP_REST_Request $request The request object.
+     * @return array The form data.
+     */
     protected function get_form_data( WP_REST_Request $request ): array {
         return (array) $request->get_body_params();
     }

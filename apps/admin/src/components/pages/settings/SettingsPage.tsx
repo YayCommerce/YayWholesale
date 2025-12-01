@@ -48,7 +48,6 @@ export default function SettingsPage() {
 
   return (
     <FormProvider {...form}>
-      <Toaster />
       <form id="settings-form" onSubmit={form.handleSubmit(onSubmit)}>
         <div className="mx-auto mt-[84px] max-w-7xl space-y-6 px-6">
           <div className="flex w-full gap-8">

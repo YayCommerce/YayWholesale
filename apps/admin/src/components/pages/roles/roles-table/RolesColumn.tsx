@@ -1,0 +1,195 @@
+import { useEffect, useState } from 'react';
+import { ColumnDef } from '@tanstack/react-table';
+import { __ } from '@wordpress/i18n';
+import { Ellipsis } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+
+import { useDeleteRoleMutation, useUpdateRoleStatusMutation } from '@/lib/queries/roles';
+import { RolesListValues } from '@/lib/schema/roles';
+import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Switch } from '@/components/ui/switch';
+import { WholeSaleToolTip } from '@/components/custom/WholeSaleToolTip';
+import DeleteIcon from '@/components/icons/DeleteIcon';
+import EditIcon from '@/components/icons/SettingsIcon';
+
+import { formatWooPrice } from '../roles.helper';
+import RoleStatusSwitch from './RoleStatusSwitch';
+
+export const RolesColumn: ColumnDef<RolesListValues & { count: number }>[] = [
+  {
+    id: 'select',
+    header: ({ table }) => (
+      <div className="flex justify-center">
+        <Checkbox
+          className="size-4"
+          checked={table.getIsAllRowsSelected()}
+          onCheckedChange={(v) => table.toggleAllRowsSelected(!!v)}
+          aria-label="Select all"
+        />
+      </div>
+    ),
+    cell: ({ row }) => (
+      <div className="flex justify-center">
+        <Checkbox
+          className="size-4"
+          checked={row.getIsSelected()}
+          onCheckedChange={(v) => row.toggleSelected(!!v)}
+          aria-label="Select row"
+        />
+      </div>
+    ),
+    meta: { align: 'center', isCheckbox: true },
+    size: 36,
+    enableSorting: false,
+    enableHiding: false,
+  },
+  {
+    accessorKey: 'name',
+    header: 'Name',
+    cell: ({ row }) => {
+      const navigate = useNavigate();
+      return (
+        <div
+          onClick={() => navigate(`/roles/edit/${row.original.id}`)}
+          className="cursor-pointer hover:underline"
+        >
+          {row.original.name}
+        </div>
+      );
+    },
+    size: 150,
+  },
+  {
+    accessorKey: 'description',
+    header: 'Description',
+    size: 220,
+  },
+  {
+    accessorKey: 'count',
+    header: 'Count',
+    cell: (info) => {
+      const count = info.getValue() as number;
+      return (
+        <div
+          className={cn('text-center', count > 0 ? 'cursor-pointer hover:underline' : '')}
+          onClick={() => {
+            if (count > 0) {
+              window.open(
+                window.yayWholesale.users_url + '?role=' + info.row.original.slug,
+                '_blank',
+              );
+            }
+          }}
+        >
+          {count}
+        </div>
+      );
+    },
+    meta: { align: 'center' },
+    size: 80,
+  },
+  {
+    accessorKey: 'discount',
+    header: 'Discount',
+    cell: (info) => <div className="text-center">{info.getValue() as number}</div>,
+    meta: { align: 'center' },
+    size: 80,
+  },
+  {
+    accessorKey: 'minOrderQuantity',
+    header: () => (
+      <WholeSaleToolTip
+        trigger={
+          <div className="border-border inline-block border-b-2 border-dotted pb-px">MOQ</div>
+        }
+        content={<span>{__('Minimum order quantity')}</span>}
+      />
+    ),
+    cell: (info) => <div className="text-center">{info.getValue() as number}</div>,
+    meta: { align: 'center' },
+    size: 80,
+  },
+  {
+    accessorKey: 'minOrderAmount',
+    header: () => (
+      <WholeSaleToolTip
+        trigger={
+          <div className="border-border inline-block border-b-2 border-dotted pb-px">MOA</div>
+        }
+        content={<span>{__('Minimum order amount')}</span>}
+      />
+    ),
+    cell: (info) => (
+      <div
+        className="text-center"
+        dangerouslySetInnerHTML={{ __html: formatWooPrice(info.getValue() as number) }}
+      />
+    ),
+    meta: { align: 'center' },
+    size: 100,
+  },
+
+  {
+    accessorKey: 'status',
+    header: 'Status',
+    cell: ({ row }) => <RoleStatusSwitch id={row.original.id} status={row.original.status} />,
+    size: 80,
+  },
+  {
+    id: 'actions',
+    header: '',
+    cell: ({ row }) => {
+      const { mutate: deleteRoleById, isPending: isDeletingRolePending } = useDeleteRoleMutation(
+        row.original.id,
+      );
+      const handleDelete = (id: number) => {
+        if (!window.confirm(__('Are you sure you want to delete this role?'))) return;
+        deleteRoleById();
+      };
+      const navigate = useNavigate();
+      return (
+        <div className="relative flex justify-end">
+          <div className="group relative flex items-center">
+            <button type="button" className="rounded-md p-1 transition group-hover:hidden">
+              <Ellipsis className="text-base-secondary size-4" />
+            </button>
+
+            <div className="absolute top-1/2 right-0 hidden -translate-y-1/2 items-center gap-0 group-hover:flex">
+              <WholeSaleToolTip
+                trigger={
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    onClick={() => navigate(`/roles/edit/${row.original.id}`)}
+                    className="hover:text-primary text-base-muted-foreground transition hover:bg-[#FFFFFF] hover:shadow-xs"
+                  >
+                    <EditIcon className="size-4" />
+                  </Button>
+                }
+                content={<span>{__('Edit role')}</span>}
+              />
+
+              <WholeSaleToolTip
+                trigger={
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    onClick={() => handleDelete(row.original.id)}
+                    disabled={isDeletingRolePending}
+                    className="hover:text-destructive text-base-muted-foreground hover:bg-[#FFFFFF] hover:shadow-xs"
+                  >
+                    <DeleteIcon className="size-4" />
+                  </Button>
+                }
+                content={<span>{__('Delete role')}</span>}
+              />
+            </div>
+          </div>
+        </div>
+      );
+    },
+    size: 60,
+  },
+];

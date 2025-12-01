@@ -13,8 +13,6 @@ defined( 'ABSPATH' ) || exit;
 class SettingsRestController extends BaseRestController {
     use SingletonTrait;
 
-    protected string $rest_base = 'settings';
-
     protected function __construct() {
         $this->init_hooks();
     }
@@ -22,12 +20,12 @@ class SettingsRestController extends BaseRestController {
     protected function init_hooks(): void {
         register_rest_route(
             $this->namespace,
-            '/' . $this->rest_base,
+            '/settings',
             [
                 [
                     'methods'             => 'POST',
                     'callback'            => [ $this, 'manage_settings' ],
-                    'permission_callback' => '__return_true',
+                    'permission_callback' => [ $this, 'settings_permission_callback' ],
                 ],
             ]
         );
@@ -38,11 +36,30 @@ class SettingsRestController extends BaseRestController {
             [
                 'methods'             => 'POST',
                 'callback'            => [ $this, 'mark_reviewed' ],
-                'permission_callback' => '__return_true',
+                'permission_callback' => [ $this, 'settings_permission_callback' ],
             ]
         );
     }
 
+    /**
+     * Check if the user has the necessary permissions to access the settings endpoints.
+     *
+     * @return bool|WP_Error True if the user has the necessary permissions, otherwise a WP_Error object.
+     */
+    protected function settings_permission_callback() {
+        if ( ! current_user_can( 'manage_options' ) || ! current_user_can( 'manage_woocommerce' ) ) {
+            return new \WP_Error( 'rest_forbidden', esc_html__( 'Forbidden.', 'yay-wholesale' ), [ 'status' => 401 ] );
+        }
+
+        return true;
+    }
+
+    /**
+     * Manage the settings.
+     *
+     * @param WP_REST_Request $request The request object.
+     * @return WP_REST_Response The response object.
+     */
     public function manage_settings( WP_REST_Request $request ): WP_REST_Response {
         $params = $this->get_json_params( $request );
 
@@ -55,6 +72,11 @@ class SettingsRestController extends BaseRestController {
         return $this->success( [], __( 'Settings saved!', 'yay-wholesale' ) );
     }
 
+    /**
+     * Mark the plugin as reviewed.
+     *
+     * @return WP_REST_Response The response object.
+     */
     public function mark_reviewed(): WP_REST_Response {
         update_option( 'yay_wholesale_reviewed', true );
         return $this->success();

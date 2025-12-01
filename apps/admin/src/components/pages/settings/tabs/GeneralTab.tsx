@@ -2,7 +2,7 @@ import { useEffect, useMemo } from 'react';
 import { __ } from '@wordpress/i18n';
 import { useFormContext } from 'react-hook-form';
 
-import { useRolesQuery } from '@/lib/queries/roles';
+import { useActiveRolesQuery, useRolesQuery } from '@/lib/queries/roles';
 import { SettingsFormData } from '@/lib/schema/settings';
 import { FormControl, FormField, FormItem, FormLabel } from '@/components/ui/form';
 import {
@@ -16,15 +16,17 @@ import { Switch } from '@/components/ui/switch';
 
 export default function GeneralTab() {
   const { control } = useFormContext<SettingsFormData>();
-  const { roles } = window.yayWholesale;
+
+  const { data: activeRoles } = useActiveRolesQuery();
+
   const rolesList = useMemo(() => {
     return (
-      roles?.map((role) => ({
+      activeRoles?.map((role) => ({
         slug: role.slug,
         name: role.name,
       })) ?? []
     );
-  }, [roles]);
+  }, [activeRoles]);
 
   const roleSlugs = useMemo(() => new Set(rolesList.map((r) => r.slug)), [rolesList]);
 
