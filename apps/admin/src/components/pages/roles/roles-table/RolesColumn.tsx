@@ -69,15 +69,15 @@ export const RolesColumn: ColumnDef<RolesListValues & { count: number }>[] = [
   {
     accessorKey: 'count',
     header: 'Count',
-    cell: (info) => {
-      const count = info.getValue() as number;
+    cell: (column) => {
+      const count = column.row.original.count;
       return (
         <div
           className={cn('text-center', count > 0 ? 'cursor-pointer hover:underline' : '')}
           onClick={() => {
             if (count > 0) {
               window.open(
-                window.yayWholesale.users_url + '?role=' + info.row.original.slug,
+                window.yayWholesale.users_url + '?role=' + column.row.original.slug,
                 '_blank',
               );
             }
@@ -93,7 +93,7 @@ export const RolesColumn: ColumnDef<RolesListValues & { count: number }>[] = [
   {
     accessorKey: 'discount',
     header: 'Discount',
-    cell: (info) => <div className="text-center">{info.getValue() as number}</div>,
+    cell: (column) => <div className="text-center">{column.row.original.discount}%</div>,
     meta: { align: 'center' },
     size: 80,
   },
@@ -107,7 +107,7 @@ export const RolesColumn: ColumnDef<RolesListValues & { count: number }>[] = [
         content={<span>{__('Minimum order quantity')}</span>}
       />
     ),
-    cell: (info) => <div className="text-center">{info.getValue() as number}</div>,
+    cell: (column) => <div className="text-center">{column.row.original.minOrderQuantity}</div>,
     meta: { align: 'center' },
     size: 80,
   },
@@ -121,10 +121,10 @@ export const RolesColumn: ColumnDef<RolesListValues & { count: number }>[] = [
         content={<span>{__('Minimum order amount')}</span>}
       />
     ),
-    cell: (info) => (
+    cell: (column) => (
       <div
         className="text-center"
-        dangerouslySetInnerHTML={{ __html: formatWooPrice(info.getValue() as number) }}
+        dangerouslySetInnerHTML={{ __html: formatWooPrice(column.row.original.minOrderAmount) }}
       />
     ),
     meta: { align: 'center' },
