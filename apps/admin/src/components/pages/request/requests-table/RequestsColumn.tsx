@@ -57,6 +57,7 @@ export const RequestsColumn: ColumnDef<RequestFormValues>[] = [
     id: 'select',
     header: ({ table }) => (
       <Checkbox
+        className="size-4"
         checked={table.getIsAllPageRowsSelected()}
         onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
         aria-label="Select all"
@@ -64,6 +65,7 @@ export const RequestsColumn: ColumnDef<RequestFormValues>[] = [
     ),
     cell: ({ row }) => (
       <Checkbox
+        className="size-4"
         checked={row.getIsSelected()}
         onCheckedChange={(value) => row.toggleSelected(!!value)}
         aria-label="Select row"
