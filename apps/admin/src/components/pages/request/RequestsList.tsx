@@ -21,6 +21,7 @@ import {
 } from '@/lib/queries/requests';
 import { useActiveRolesQuery } from '@/lib/queries/roles';
 import { RequestFormValues } from '@/lib/schema/requests';
+import { cn } from '@/lib/utils';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -176,20 +177,34 @@ export default function RequestsList() {
       </div>
 
       {/* Table */}
-      <div className="rounded-md border">
-        <Table>
-          <TableHeader>
+      <div
+        className={cn(
+          'overflow-hidden rounded-lg border border-gray-200',
+          isFetchingRequests && 'relative opacity-50',
+        )}
+      >
+        <Table className="min-w-full divide-y divide-gray-200">
+          <TableHeader className="text-base-foreground h-[46px] bg-[#FAFAFA]">
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id}>
+                  <TableHead
+                    key={header.id}
+                    className={cn(
+                      'text-base-secondary py-2 text-sm font-medium',
+                      header.column.columnDef.meta?.align === 'center'
+                        ? 'text-center'
+                        : 'text-left',
+                      header.column.columnDef.meta?.isCheckbox ? 'w-[36px] pr-0 pl-2' : 'px-3',
+                    )}
+                  >
                     {flexRender(header.column.columnDef.header, header.getContext())}
                   </TableHead>
                 ))}
               </TableRow>
             ))}
           </TableHeader>
-          <TableBody>
+          <TableBody className="divide-y divide-gray-200">
             {isLoadingRequests ? (
               <TableRow>
                 <TableCell colSpan={columns.length} className="h-32 text-center align-middle">
@@ -218,7 +233,6 @@ export default function RequestsList() {
           </TableBody>
         </Table>
       </div>
-
       {/* Footer */}
       {data != undefined && data.data.length > 0 && (
         <div className="relative flex flex-col items-center justify-end gap-3 sm:flex-row">
