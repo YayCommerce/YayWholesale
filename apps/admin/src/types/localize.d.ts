@@ -1,7 +1,11 @@
 declare global {
   interface Window {
     yayWholesale: {
-      users_url: string;
+      user_urls: {
+        list: string;
+        add_new: string;
+        edit: string;
+      };
       plugin_url: string;
       rest_url: string;
       rest_nonce: string;

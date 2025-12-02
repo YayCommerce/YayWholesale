@@ -4,6 +4,7 @@ namespace Yay_Wholesale\Engine;
 use Yay_Wholesale\Controllers\RequestRestController;
 use Yay_Wholesale\Controllers\RolesRestController;
 use Yay_Wholesale\Controllers\SettingsRestController;
+use Yay_Wholesale\Controllers\WholeSalersController;
 use Yay_Wholesale\Utils\SingletonTrait;
 
 
@@ -25,5 +26,6 @@ class RestAPI {
         SettingsRestController::get_instance();
         RolesRestController::get_instance();
         RequestRestController::get_instance();
+        WholeSalersController::get_instance();
     }
 }

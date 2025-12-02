@@ -116,7 +116,26 @@ class Settings {
             ScriptName::PAGE_SETTINGS,
             'yayWholesale',
             [
-                'users_url'     => esc_url_raw( admin_url( 'users.php' ) ),
+                'user_urls'     => [
+                    'list'    => esc_url_raw( admin_url( 'users.php' ) ),
+                    'add_new' => esc_url_raw(
+                        add_query_arg(
+                            [
+                                'wholesaler' => 'yay_wholesale',
+                                '_wpnonce'   => wp_create_nonce( 'yay-wholesale-create-user' ),
+                            ],
+                            admin_url( 'user-new.php' )
+                        )
+                    ),
+                    'edit'    => esc_url_raw(
+                        add_query_arg(
+                            [
+                                'user_id' => '%USER_ID%',
+                            ],
+                            admin_url( 'user-edit.php' )
+                        )
+                    ),
+                ],
                 'plugin_url'    => YAY_WHOLESALE_PLUGIN_URL,
                 'rest_url'      => esc_url_raw( rest_url() ),
                 'rest_nonce'    => wp_create_nonce( 'wp_rest' ),
