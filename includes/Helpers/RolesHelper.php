@@ -5,6 +5,13 @@ namespace Yay_Wholesale\Helpers;
  * Roles Helper Class
  */
 class RolesHelper {
+
+    /**
+     * Check if the user is a wholesale user.
+     *
+     * @param int $user_id The user ID.
+     * @return array|null The user role or null if not found.
+     */
     public static function is_wholesale_user( int $user_id = 0 ): array|null {
         if ( ! is_user_logged_in() ) {
             return null;

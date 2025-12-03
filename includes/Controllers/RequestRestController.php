@@ -1,7 +1,6 @@
 <?php
 namespace Yay_Wholesale\Controllers;
 
-use Automattic\Jetpack\Status\Request;
 use Exception;
 use WP_Error;
 use Yay_Wholesale\Utils\SingletonTrait;
@@ -22,6 +21,11 @@ class RequestRestController extends BaseRestController {
         $this->init_hooks();
     }
 
+    /**
+     * Check if the user has the necessary permissions to access the requests endpoints.
+     *
+     * @return bool|WP_Error True if the user has the necessary permissions, otherwise a WP_Error object.
+     */
     public function request_permission_callback() {
         if ( ! current_user_can( 'edit_posts' ) || ! current_user_can( 'manage_woocommerce' ) ) {
             return new WP_Error( 'rest_forbidden', esc_html__( 'Forbidden.', 'yay-wholesale' ), [ 'status' => 401 ] );
@@ -107,6 +111,12 @@ class RequestRestController extends BaseRestController {
         );
     }
 
+    /**
+     * Register a new wholesale request.
+     *
+     * @param WP_REST_Request $request The request object.
+     * @return WP_REST_Response The response object.
+     */
     public function register_request( WP_REST_Request $request ): WP_REST_Response {
         $params       = $this->get_form_data( $request );
         $current_user = get_current_user_id();
@@ -116,6 +126,12 @@ class RequestRestController extends BaseRestController {
         return $this->success( [], __( 'Request Saved', 'yay-wholesale' ) );
     }
 
+    /**
+     * Get the list of wholesale requests.
+     *
+     * @param WP_REST_Request $request The request object.
+     * @return WP_REST_Response The response object.
+     */
     public function get_request_list( WP_REST_Request $request ): WP_REST_Response {
         $page     = $request['page'];
         $per_page = $request['per_page'];
@@ -143,6 +159,12 @@ class RequestRestController extends BaseRestController {
         return $this->success( $response, __( 'Fetched successfully', 'yay-wholesale' ) );
     }
 
+    /**
+     * Get a wholesale request by ID.
+     *
+     * @param WP_REST_Request $request The request object.
+     * @return WP_REST_Response The response object.
+     */
     public function get_request_by_id( WP_REST_Request $request ): WP_REST_Response {
         $id      = (int) $request->get_param( 'request_id' );
         $request = RequestsHelper::get_request_by_id( $id );
@@ -154,6 +176,12 @@ class RequestRestController extends BaseRestController {
         return $this->success( $request );
     }
 
+    /**
+     * Update a wholesale request by ID.
+     *
+     * @param WP_REST_Request $request The request object.
+     * @return WP_REST_Response The response object.
+     */
     public function update_request_by_id( WP_REST_Request $request ): WP_REST_Response {
         $id        = (int) $request->get_param( 'request_id' );
         $form_data = $this->get_json_params( $request );
@@ -165,6 +193,12 @@ class RequestRestController extends BaseRestController {
         return $this->success( [], __( 'Request has been updated successfully', 'yay-wholesale' ) );
     }
 
+    /**
+     * Delete a wholesale request by ID.
+     *
+     * @param WP_REST_Request $request The request object.
+     * @return WP_REST_Response The response object.
+     */
     public function delete_request_by_id( WP_REST_Request $request ): WP_REST_Response {
         $id     = (int) $request->get_param( 'request_id' );
         $result = RequestsHelper::delete_whs_request( $id );
@@ -175,6 +209,12 @@ class RequestRestController extends BaseRestController {
         return $this->success( [], __( 'Request has been deleted successfully', 'yay-wholesale' ) );
     }
 
+    /**
+     * Update the status of a wholesale request by ID.
+     *
+     * @param WP_REST_Request $request The request object.
+     * @return WP_REST_Response The response object.
+     */
     public function update_request_status_by_id( WP_REST_Request $request ): WP_REST_Response {
         $id        = (int) $request->get_param( 'request_id' );
         $json_data = $this->get_json_params( $request );
@@ -225,6 +265,12 @@ class RequestRestController extends BaseRestController {
         return $this->success( [], __( 'Request status has been updated successfully', 'yay-wholesale' ) );
     }
 
+    /**
+     * Bulk update the status of multiple wholesale requests.
+     *
+     * @param WP_REST_Request $request The request object.
+     * @return WP_REST_Response The response object.
+     */
     public function bulk_update_request_status( WP_REST_Request $request ): WP_REST_Response {
         $params           = $this->get_json_params( $request );
         $ids              = $params['ids'] ?? [];
@@ -306,6 +352,12 @@ class RequestRestController extends BaseRestController {
         return $this->success( [], $message );
     }
 
+    /**
+     * Bulk delete multiple wholesale requests.
+     *
+     * @param WP_REST_Request $request The request object.
+     * @return WP_REST_Response The response object.
+     */
     public function bulk_delete_request( WP_REST_Request $request ): WP_REST_Response {
         $params  = $this->get_json_params( $request );
         $ids     = $params['ids'] ?? [];

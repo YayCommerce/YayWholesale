@@ -15,7 +15,7 @@ import {
 } from '@/lib/api/roles.api';
 import { showToast } from '@/components/custom/showToast';
 
-import { RoleFormValues, RolesListValues } from '../schema/roles';
+import { RoleFormValues } from '../schema/roles';
 
 const QUERY_KEY = ['roles'];
 
@@ -38,14 +38,6 @@ export function useActiveRolesQuery() {
     queryFn: () => fetchActiveRoles(),
   });
 }
-
-// function useActiveRolesQuery() {
-//   return useQuery({...rolesOptions(), select: roles => roles.filter(r => r.status === '')});
-// }
-
-// function useRoleQuery(id) {
-//   return useQuery({...rolesOptions(), select: roles => roles.filter(r => r.id === '')});
-// }
 
 /**
  * Query to fetch Role by ID
@@ -123,7 +115,9 @@ export function useDeleteManyRolesMutation() {
     mutationFn: deleteManyRoles,
     onSuccess: (response) => {
       showToast.success(response.message);
-      queryClient.invalidateQueries({ queryKey: QUERY_KEY });
+      if (!queryClient.isFetching({ queryKey: QUERY_KEY })) {
+        queryClient.invalidateQueries({ queryKey: QUERY_KEY });
+      }
     },
     onError: (error: Error) => {
       showToast.error(error.message);
@@ -155,7 +149,9 @@ export function useBulkUpdateRoleStatusMutation() {
       bulkUpdateRoleStatus(ids, status),
     onSuccess: (response) => {
       showToast.success(response.message);
-      queryClient.invalidateQueries({ queryKey: QUERY_KEY });
+      if (!queryClient.isFetching({ queryKey: QUERY_KEY })) {
+        queryClient.invalidateQueries({ queryKey: QUERY_KEY });
+      }
     },
     onError: (error: Error) => {
       showToast.error(error.message);
