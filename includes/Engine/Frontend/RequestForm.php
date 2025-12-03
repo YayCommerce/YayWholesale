@@ -18,6 +18,8 @@ class RequestForm {
 
     protected function __construct() {
         add_action( 'init', [ $this, 'add_shortcode_form' ] );
+
+        add_action( 'init', [ $this,'create_block_request_form_block_init' ] );
     }
 
     /**
@@ -112,5 +114,24 @@ class RequestForm {
         </div>
                     <?php
                     return ob_get_clean();
+    }
+
+    public function create_block_request_form_block_init() {
+        $base_dir      = YAY_WHOLESALE_PLUGIN_DIR . 'assets/dist/blocks/request-form-block/';
+        $manifest_file = $base_dir . 'blocks-manifest.php';
+
+        if ( ! file_exists( $manifest_file ) ) {
+            return;
+        }
+
+        $manifest_data = require $manifest_file;
+
+        foreach ( array_keys( $manifest_data ) as $block_type ) {
+            $block_dir = $base_dir . $block_type;
+
+            if ( file_exists( $block_dir . '/block.json' ) ) {
+                \register_block_type_from_metadata( $block_dir );
+            }
+        }
     }
 }

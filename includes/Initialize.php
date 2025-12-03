@@ -23,5 +23,7 @@ class Initialize {
         \Yay_Wholesale\Engine\Frontend\Coupon::get_instance();
         \Yay_Wholesale\Engine\Frontend\Tax::get_instance();
         \Yay_Wholesale\Engine\Frontend\RequestForm::get_instance();
+        \Yay_Wholesale\Engine\Admin\Orders::get_instance();
+        \Yay_Wholesale\Engine\Frontend\Requirement::get_instance();
     }
 }
