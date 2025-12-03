@@ -44,3 +44,43 @@
     padding: 5px;
     font-size: small;
 }
+
+#ywhs_request_form > button {
+    padding: 5px;
+}
+
+.ywhs_requirement_section {
+    scale: 90%;
+    box-shadow: 2px 4px 3px 3px rgb(171, 171, 171);
+    border-radius: 15px;
+    padding: 10px !important;
+    margin-bottom: 25px;
+    font-size: 1em;
+    background: white;
+}
+
+.ywhs_requirement_title {
+    font-weight: bold;
+}
+
+.ywhs_requirement_item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.9em;
+    margin-top: 5px;
+} 
+
+.ywhs_rbadge {
+    border-radius: 10px;
+    color: white;
+    padding: 0px 5px;
+}
+
+.ywhs_rb_qualified {
+    background-color: green;
+}
+
+.ywhs_rb_not_qualified {
+    background-color: red;
+}
