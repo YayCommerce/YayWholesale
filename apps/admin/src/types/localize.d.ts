@@ -13,6 +13,15 @@ declare global {
       reviewed: boolean;
       roles: RoleFormValues[];
       settings: SettingsFormData;
+      wholesale_emails: {
+        id: string;
+        status: boolean;
+        title: string;
+        description: string;
+        type: string;
+        recipients: string;
+        url: string;
+      }[];
       currency_data: {
         currency: string;
         symbol: string;

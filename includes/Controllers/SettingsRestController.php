@@ -46,7 +46,7 @@ class SettingsRestController extends BaseRestController {
      *
      * @return bool|WP_Error True if the user has the necessary permissions, otherwise a WP_Error object.
      */
-    protected function settings_permission_callback() {
+    public function settings_permission_callback() {
         if ( ! current_user_can( 'manage_options' ) || ! current_user_can( 'manage_woocommerce' ) ) {
             return new \WP_Error( 'rest_forbidden', esc_html__( 'Forbidden.', 'yay-wholesale' ), [ 'status' => 401 ] );
         }
