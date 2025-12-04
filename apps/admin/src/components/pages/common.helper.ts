@@ -1,6 +1,6 @@
 import dayjs from 'dayjs';
 
-export function parseWPDate(date: string) {
+export function parseWPDate(date: string | undefined) {
   var format = '';
 
   var arr = window.yayWholesale.day_format.split('');
@@ -44,7 +44,7 @@ export function parseWPDate(date: string) {
     }
   });
 
-  return dayjs(date).format(format);
+  return dayjs(date ?? null).format(format);
 }
 
 export function parseWPTime(date: string) {
@@ -84,4 +84,29 @@ export function parseWPTime(date: string) {
 
 export function parseWPTimeForInput(date: string) {
   return dayjs(date).format('HH:mm:ss');
+}
+
+export function parseWPCurrency(price: string | number) {
+  if (typeof price === 'string') {
+    price = parseInt(price);
+  }
+
+  const { symbol, position, thousand_sep, decimal_sep, num_decimals } =
+    window.yayWholesale.currency_data;
+
+  const formattedPrice = price
+    .toFixed(num_decimals)
+    .replace(/\B(?=(\d{3})+(?!\d))/g, thousand_sep)
+    .replace(/(\d+)\.(\d{2})$/, `$1${decimal_sep}$2`);
+
+  switch (position) {
+    case 'left':
+      return `${symbol}${formattedPrice}`;
+    case 'right':
+      return `${formattedPrice}${symbol}`;
+    case 'left_space':
+      return `${symbol} ${formattedPrice}`;
+    case 'right_space':
+      return `${formattedPrice} ${symbol}`;
+  }
 }

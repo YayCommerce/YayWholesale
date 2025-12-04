@@ -1,7 +1,10 @@
-import { useState } from 'react';
+import { useContext, useMemo } from 'react';
 import { ColumnDef, flexRender, getCoreRowModel, useReactTable } from '@tanstack/react-table';
+import { __ } from '@wordpress/i18n';
 import { Crown } from 'lucide-react';
 
+import { TopProductValue } from '@/lib/schema/reports';
+import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { ButtonGroup } from '@/components/ui/button-group';
 import { Card, CardContent } from '@/components/ui/card';
@@ -14,132 +17,79 @@ import {
   TableRow,
 } from '@/components/ui/table';
 
-type Product = {
-  no: string;
-  name: string;
-  items: number;
-  sales: string;
-  image: string;
-  crown?: boolean;
-};
+import { parseWPCurrency } from '../common.helper';
+import { dashboardContext } from './DashboardPage';
 
 export default function TopProducts() {
-  const [filter, setFilter] = useState<'3m' | '30d' | '7d'>('3m');
+  const { reportData } = useContext(dashboardContext);
 
-  const products: Product[] = [
-    {
-      no: '01',
-      name: 'Classic Cotton T-Shirt',
-      items: 50,
-      sales: '$10,000',
-      image: 'https://i.pravatar.cc/40?img=7',
-      crown: true,
-    },
-    {
-      no: '02',
-      name: 'Everyday Essential Tee',
-      items: 50,
-      sales: '$10,000',
-      image: 'https://i.pravatar.cc/40?img=7',
-      crown: true,
-    },
-    {
-      no: '03',
-      name: 'Premium Crewneck Tee',
-      items: 50,
-      sales: '$10,000',
-      image: 'https://i.pravatar.cc/40?img=7',
-      crown: true,
-    },
-    {
-      no: '04',
-      name: 'Relax Fit Cotton Tee',
-      items: 50,
-      sales: '$10,000',
-      image: 'https://i.pravatar.cc/40?img=7',
-    },
-    {
-      no: '05',
-      name: 'SoftTouch Basic Tee',
-      items: 50,
-      sales: '$10,000',
-      image: 'https://i.pravatar.cc/40?img=7',
-    },
-    {
-      no: '06',
-      name: 'Organic Cotton T-Shirt',
-      items: 50,
-      sales: '$10,000',
-      image: 'https://i.pravatar.cc/40?img=7',
-    },
-    {
-      no: '07',
-      name: 'EcoFlex Bamboo Tee',
-      items: 50,
-      sales: '$10,000',
-      image: 'https://i.pravatar.cc/40?img=7',
-    },
-    {
-      no: '08',
-      name: 'Recycled Fiber T-Shirt',
-      items: 50,
-      sales: '$10,000',
-      image: 'https://i.pravatar.cc/40?img=7',
-    },
-    {
-      no: '09',
-      name: 'EarthTone Natural Tee',
-      items: 50,
-      sales: '$10,000',
-      image: 'https://i.pravatar.cc/40?img=7',
-    },
-    {
-      no: '10',
-      name: 'GreenWear Everyday Tee',
-      items: 50,
-      sales: '$10,000',
-      image: 'https://i.pravatar.cc/40?img=7',
-    },
-  ];
-
-  const columns: ColumnDef<Product>[] = [
-    {
-      accessorKey: 'no',
-      header: 'No',
-      cell: ({ row }) => <span>{row.getValue('no')}</span>,
-    },
-    {
-      accessorKey: 'name',
-      header: 'Product',
-      cell: ({ row }) => {
-        const p = row.original;
-        return (
-          <div className="flex items-center gap-3">
-            <div className="h-8 w-8 overflow-hidden rounded-md border">
-              <img src={p.image} alt={p.name} className="h-full w-full object-cover" />
-            </div>
-            <div className="flex items-center gap-1">
-              <span className="text-[15px] font-medium text-[#18181B]">{p.name}</span>
-              {p.crown && <Crown fill="#F9BD09" size={14} className="ml-1 text-[#F9BD09]" />}
-            </div>
-          </div>
-        );
+  const columns: ColumnDef<TopProductValue>[] = useMemo(
+    () => [
+      {
+        id: 'no',
+        header: () => (
+          <span className="flex items-center justify-center font-medium text-gray-700">
+            {__('No', 'yay-wholesale')}
+          </span>
+        ),
+        cell: ({ row }) => (
+          <span className="flex items-center justify-center">
+            {reportData.topProducts.indexOf(row.original) + 1}
+          </span>
+        ),
       },
-    },
-    {
-      accessorKey: 'items',
-      header: 'Items Sold',
-      cell: ({ row }) => <span>{row.getValue('items')}</span>,
-    },
-    {
-      accessorKey: 'sales',
-      header: 'Net Sales',
-      cell: ({ row }) => <span className="font-medium text-gray-700">{row.getValue('sales')}</span>,
-    },
-  ];
+      {
+        accessorKey: 'name',
+        header: () => <span>{__('Product', 'yay-wholesale')}</span>,
+        cell: ({ row }) => {
+          const p = row.original;
+          return (
+            <div className="flex items-center gap-3">
+              <div className="h-8 w-8 overflow-hidden rounded-md border">
+                <img src={p.image} alt={p.name} className="h-full w-full object-cover" />
+              </div>
+              <div className="flex items-center gap-1">
+                <span className="overflow-hidden text-[15px] font-medium text-[#18181B]">
+                  {p.name}
+                </span>
+                {reportData.topProducts.indexOf(row.original) < 3 && (
+                  <Crown fill="#F9BD09" size={14} className="ml-1 text-[#F9BD09]" />
+                )}
+              </div>
+            </div>
+          );
+        },
+      },
+      {
+        accessorKey: 'orderCount',
+        header: () => (
+          <span className="flex items-center justify-center font-medium text-gray-700">
+            {__('Item Sold', 'yay-wholesale')}
+          </span>
+        ),
+        cell: ({ row }) => (
+          <span className="flex items-center justify-center">{row.original.orderCount}</span>
+        ),
+      },
+      {
+        accessorKey: 'netSale',
+        header: () => (
+          <span className="flex items-center justify-center font-medium text-gray-700">
+            {__('Net Sales', 'yay-wholesale')}
+          </span>
+        ),
+        cell: ({ row }) => (
+          <span className="flex items-center justify-center font-medium text-gray-700">
+            {parseWPCurrency(row.original.netSale)}
+          </span>
+        ),
+      },
+    ],
+    [reportData],
+  );
 
   const table = useReactTable({
-    data: products,
+    data: reportData.topProducts,
     columns,
     getCoreRowModel: getCoreRowModel(),
   });
@@ -150,50 +100,24 @@ export default function TopProducts() {
         {/* Header */}
         <div className="mb-3 flex items-center justify-between">
           <h3 className="font-semibold text-[#18181B]">Top Products</h3>
-          <ButtonGroup>
-            <Button
-              className={`text-sm font-medium ${
-                filter === '3m' ? 'bg-accent text-accent-foreground' : 'text-[#171719B2]'
-              }`}
-              variant="outline"
-              size="sm"
-              onClick={() => setFilter('3m')}
-            >
-              Last 3 month
-            </Button>
-            <Button
-              className={`text-sm font-medium ${
-                filter === '30d' ? 'bg-accent text-accent-foreground' : 'text-[#171719B2]'
-              }`}
-              variant="outline"
-              size="sm"
-              onClick={() => setFilter('30d')}
-            >
-              Last 30 days
-            </Button>
-            <Button
-              className={`text-sm font-medium ${
-                filter === '7d' ? 'bg-accent text-accent-foreground' : 'text-[#171719B2]'
-              }`}
-              variant="outline"
-              size="sm"
-              onClick={() => setFilter('7d')}
-            >
-              Last 7 days
-            </Button>
-          </ButtonGroup>
         </div>
 
         {/* DataTable */}
         <div className="rounded-md border bg-white">
-          <Table>
-            <TableHeader>
+          <Table className="min-w-full divide-y divide-gray-200">
+            <TableHeader className="text-base-foreground h-[46px] bg-[#FAFAFA]">
               {table.getHeaderGroups().map((headerGroup) => (
                 <TableRow key={headerGroup.id}>
                   {headerGroup.headers.map((header) => (
                     <TableHead
                       key={header.id}
-                      className="bg-[#F4F4F5] text-[13px] font-semibold text-[#18181B]"
+                      className={cn(
+                        'text-base-secondary bg-[#F4F4F5] py-2 text-sm font-medium',
+                        header.column.columnDef.meta?.align === 'center'
+                          ? 'text-center'
+                          : 'text-left',
+                        header.column.columnDef.meta?.isCheckbox ? 'w-[36px] pr-0 pl-2' : 'px-3',
+                      )}
                     >
                       {header.isPlaceholder
                         ? null
@@ -203,7 +127,7 @@ export default function TopProducts() {
                 </TableRow>
               ))}
             </TableHeader>
-            <TableBody>
+            <TableBody className="divide-y divide-gray-200">
               {table.getRowModel().rows?.length ? (
                 table.getRowModel().rows.map((row) => (
                   <TableRow key={row.id}>

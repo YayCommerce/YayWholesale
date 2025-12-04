@@ -123,7 +123,7 @@ class Settings {
                 'rest_base'     => 'yay-wholesale/v1',
                 'currency_data' => [
                     'currency'     => get_woocommerce_currency(),
-                    'symbol'       => get_woocommerce_currency_symbol(),
+                    'symbol'       => html_entity_decode( \get_woocommerce_currency_symbol(), ENT_COMPAT ),
                     'position'     => get_option( 'woocommerce_currency_pos' ),
                     'thousand_sep' => get_option( 'woocommerce_price_thousand_sep' ),
                     'decimal_sep'  => get_option( 'woocommerce_price_decimal_sep' ),
