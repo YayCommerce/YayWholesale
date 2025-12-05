@@ -4,6 +4,7 @@ namespace Yay_Wholesale\Engine\Frontend;
 use Yay_Wholesale\Utils\SingletonTrait;
 use Yay_Wholesale\Helpers\RolesHelper;
 use Yay_Wholesale\Helpers\SettingsHelper;
+use Yay_Wholesale\Helpers\PricingHelper;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -40,7 +41,7 @@ class Tax {
         }
 
         // If wholesale user + setting disable_tax = true => exempt tax.
-        if ( $this->disable_tax && Pricing::meets_discount_conditions( $is_wholesale ) ) {
+        if ( $this->disable_tax && PricingHelper::meets_discount_conditions( $is_wholesale ) ) {
             WC()->customer->set_is_vat_exempt( true );
         } else {
             WC()->customer->set_is_vat_exempt( false );
@@ -61,7 +62,7 @@ class Tax {
 
         $is_wholesale = RolesHelper::is_wholesale_user();
 
-        if ( $is_wholesale && $this->disable_tax && Pricing::meets_discount_conditions( $is_wholesale ) ) {
+        if ( $is_wholesale && $this->disable_tax && PricingHelper::meets_discount_conditions( $is_wholesale ) ) {
             return 'excl';
         }
 
@@ -82,7 +83,7 @@ class Tax {
 
         $is_wholesale = RolesHelper::is_wholesale_user();
 
-        if ( $is_wholesale && $this->disable_tax && Pricing::meets_discount_conditions( $is_wholesale ) ) {
+        if ( $is_wholesale && $this->disable_tax && PricingHelper::meets_discount_conditions( $is_wholesale ) ) {
             return [];
         }
 

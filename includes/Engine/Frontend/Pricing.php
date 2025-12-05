@@ -5,6 +5,7 @@ use WC_Tax;
 use Yay_Wholesale\Utils\SingletonTrait;
 use Yay_Wholesale\Helpers\RolesHelper;
 use Yay_Wholesale\Helpers\SettingsHelper;
+use Yay_Wholesale\Helpers\PricingHelper;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -35,112 +36,7 @@ class Pricing {
 
         add_action( 'woocommerce_before_calculate_totals', [ $this, 'before_caculate_totals' ], 999, 1 );
 
-        add_action( 'woocommerce_order_before_calculate_totals', [ $this, 'admin_recalculate_order' ], 999, 2 );
-    }
-
-    /**
-     * Get the effective role
-     *
-     * @param bool $allow_default Allow default role.
-     * @return array|null The effective role or null if not found.
-     */
-    protected function get_effective_role( bool $allow_default = false ): ?array {
-        $role = RolesHelper::is_wholesale_user();
-
-        if ( ! $role && $allow_default && ! empty( $this->settings['general']['default_role'] ) ) {
-            $roles = get_option( 'yay_wholesale_roles', [] );
-            $role  = RolesHelper::get_role_by_slug( $roles, $this->settings['general']['default_role'] );
-            if ( ! $role || empty( $role['status'] ) ) {
-                return null;
-            }
-        }
-        return $role;
-    }
-
-    /**
-     * Check if the cart conditions are met
-     *
-     * @param array $role The role array.
-     * @param int   $quantity The actual quantity (if not included, a quantity of cart items will be used).
-     * @param float $subtotal The actual subtotal (if not included, a subtotal of WC cart will be used).
-     * @return bool True if the cart conditions are met, false otherwise.
-     */
-    public static function meets_discount_conditions( array $role, int $quantity = -1, float $subtotal = -1 ): bool {
-        if ( ! class_exists( 'WC_Cart' ) || ! WC()->cart ) {
-            return true;
-        }
-
-        $qty   = $quantity >= 0 ? $quantity : WC()->cart->get_cart_contents_count();
-        $total = $subtotal >= 0 ? $subtotal : (float) WC()->cart->get_subtotal();
-        if ( $total <= 0 && $qty > 0 ) {
-            $total = (float) WC()->session->get( 'ywhs_cart_subtotal' );
-        }
-
-        $min_qty    = $role['minOrderQuantity'] ?? 0;
-        $min_amount = $role['minOrderAmount'] ?? 0;
-
-        if ( ( $min_qty > 0 && $qty < $min_qty ) || ( $min_amount > 0 && $total < $min_amount ) ) {
-            return false;
-        }
-
-        return true;
-    }
-
-    /**
-     * Apply the wholesale discount
-     *
-     * @param float       $price The price.
-     * @param \WC_Product $product The product object.
-     * @param bool        $is_preview Is preview.
-     * @return float The discounted price.
-     */
-    protected function apply_wholesale_discount( $price, \WC_Product $product, bool $is_preview = false ) {
-        $show_to_all = $this->settings['general']['show_wholesale_price'] ?? false;
-
-        $role = $this->get_effective_role( false );
-        if ( ! $role && $is_preview && $show_to_all ) {
-            $role = $this->get_effective_role( true );
-        }
-
-        if ( ! $role ) {
-            return $price;
-        }
-
-        $discount = isset( $role['discount'] ) ? ( (float) $role['discount'] / 100 ) : 0;
-        if ( $discount <= 0 ) {
-            return $price;
-        }
-
-        $is_actual_wholesale = (bool) $this->get_effective_role( false );
-        if ( $is_actual_wholesale && ! self::meets_discount_conditions( $role ) ) {
-            return $price;
-        }
-
-        return $this->calc_discounted_price( $price, $role, $product );
-    }
-
-    /**
-     * Calculate the price after applying the wholesale discount
-     *
-     * @param float       $price The price.
-     * @param array       $role The wholesale role.
-     * @param \WC_Product $product The product object.
-     * @return float The discounted price.
-     */
-    protected function calc_discounted_price( $price, array $role, \WC_Product $product ) {
-        $discount = isset( $role['discount'] ) ? ( (float) $role['discount'] / 100 ) : 0;
-        if ( $discount <= 0 ) {
-            return $price;
-        }
-
-        $apply_to_sale = $role['applyToSalePrice'] ?? false;
-        $regular       = (float) $product->get_regular_price( 'edit' );
-        $sale          = (float) $product->get_sale_price( 'edit' );
-
-        $base = ( $apply_to_sale && $sale > 0 ) ? $sale : $regular;
-        $new  = max( 0, $base * ( 1 - $discount ) );
-
-        return wc_format_decimal( $new, wc_get_price_decimals() );
+        add_action( 'woocommerce_checkout_order_processed', [ $this, 'add_custom_fields_for_wholesale_order' ], 999, 3 );
     }
 
     /**
@@ -151,7 +47,7 @@ class Pricing {
      * @return float The price.
      */
     public function get_price( $price, \WC_Product $product ) {
-        return $this->apply_wholesale_discount( $price, $product, false );
+        return PricingHelper::apply_wholesale_discount( $price, $product, false );
     }
 
     /**
@@ -162,7 +58,7 @@ class Pricing {
      * @return float The sale price.
      */
     public function get_sale_price( $price, \WC_Product $product ) {
-        return $this->apply_wholesale_discount( $price, $product, false );
+        return PricingHelper::apply_wholesale_discount( $price, $product, false );
     }
 
     /**
@@ -176,7 +72,7 @@ class Pricing {
         foreach ( $prices as $vid => $price ) {
             $variation = wc_get_product( $vid );
             if ( $variation ) {
-                $prices[ $vid ] = $this->apply_wholesale_discount( $price, $variation, false );
+                $prices[ $vid ] = PricingHelper::apply_wholesale_discount( $price, $variation, false );
             }
         }
         return $prices;
@@ -189,7 +85,7 @@ class Pricing {
      * @return array The variation prices hash.
      */
     public function variation_prices_hash( array $hash ): array {
-        $role = $this->get_effective_role();
+        $role = PricingHelper::get_effective_role();
         if ( $role ) {
             $hash[] = $role['slug'];
         }
@@ -209,7 +105,7 @@ class Pricing {
         $show_to_all  = $this->settings['general']['show_wholesale_price'] ?? false;
         $display_mode = $this->settings['display']['price_format'] ?? 'retail-and-wholesale';
         $is_logged_in = is_user_logged_in();
-        $role         = $this->get_effective_role( false );
+        $role         = PricingHelper::get_effective_role( false );
         $is_wholesale = ! empty( $role );
 
         // If not logged in and not showing to all, or logged in and not wholesale and not showing to all
@@ -258,7 +154,7 @@ class Pricing {
      * @return string The formatted HTML.
      */
     protected function format_wholesale_only_price_html( \WC_Product $product ): string {
-        $discount = $this->apply_wholesale_discount( $product->get_price( 'edit' ), $product, true );
+        $discount = PricingHelper::apply_wholesale_discount( $product->get_price( 'edit' ), $product, true );
         return $this->get_wholesale_label_html() . wc_price( $discount );
     }
 
@@ -271,7 +167,7 @@ class Pricing {
     protected function format_retail_and_wholesale_price_html( \WC_Product $product ): string {
         $regular    = (float) $product->get_regular_price( 'edit' );
         $sale       = (float) $product->get_sale_price( 'edit' );
-        $discounted = $this->apply_wholesale_discount( $sale > 0 ? $sale : $regular, $product, true );
+        $discounted = PricingHelper::apply_wholesale_discount( $sale > 0 ? $sale : $regular, $product, true );
 
         $html  = '<span class="yay-retail-price">Retail: ';
         $html .= ( $sale > 0 && $sale < $regular )
@@ -304,7 +200,7 @@ class Pricing {
             if ( ! $variation ) {
                 continue;
             }
-            $discounted[] = (float) $this->apply_wholesale_discount( (float) $price, $variation, true );
+            $discounted[] = (float) PricingHelper::apply_wholesale_discount( (float) $price, $variation, true );
         }
         return $discounted;
     }
@@ -396,40 +292,24 @@ class Pricing {
      * @param \WC_Cart $cart The cart object.
      */
     public function before_caculate_totals( \WC_Cart $cart ) {
-        $subtotal        = $cart->get_subtotal();
-        $is_cal_subtotal = $subtotal <= 0 && $cart->get_cart_contents_count() > 0;
-
-        // Calculate the subtotal (in this action, subtotal is not calculated)
-        if ( $is_cal_subtotal ) {
-            foreach ( $cart->get_cart() as $cart_item ) {
-                    $product   = wc_get_product( $cart_item['product_id'] );
-                    $subtotal += $product->get_price() * $cart_item['quantity'];
-            }
-
-            WC()->session->set( 'ywhs_cart_subtotal', $subtotal );
-        }
-
         // Set the discounted price of each product
         foreach ( $cart->get_cart() as $cart_item ) {
             $product   = wc_get_product( $cart_item['product_id'] );
-            $new_price = $this->apply_wholesale_discount( $product->get_price(), $product );
+            $new_price = PricingHelper::apply_wholesale_discount( $product->get_price(), $product );
 
             $cart_item['data']->set_price( $new_price );
         }
     }
 
-    /**
-     * Set the order data discounted when the admin recalculates orders
-     *
-     * @param bool      $and_taxes the taxes included flag.
-     * @param \WC_Order $order The cart object.
-     */
-    public function admin_recalculate_order( $and_taxes, \WC_Order $order ) {
+    public function add_custom_fields_for_wholesale_order( $order_id, $posted_data, $order ) {
+        if ( ! $order_id ) {
+            return;
+        }
+
+        remove_filter( 'woocommerce_product_get_price', [ $this, 'get_price' ], 99, 2 );
+
         $customer_id       = $order->get_customer_id();
         $is_wholesale_user = RolesHelper::is_wholesale_user( $customer_id );
-        $is_disabled_tax   = SettingsHelper::get_settings()['general']['disable_tax'] ?? false;
-        $is_removing_tax   = false;
-        $items             = [];
 
         $quantity = $order->get_item_count();
         $subtotal = 0;
@@ -441,59 +321,12 @@ class Pricing {
             $product   = $item->get_product();
             $subtotal += $product->get_price() * $item->get_quantity();
         }
-        $is_discounted = isset( $is_wholesale_user ) && self::meets_discount_conditions( $is_wholesale_user, $quantity, $subtotal );
+        $is_discounted = isset( $is_wholesale_user ) && PricingHelper::meets_discount_conditions( $is_wholesale_user, $quantity, $subtotal );
 
-        // Force tax exempted (default is the value of 'is_vat_exempt' in meta_data of order)
-        $is_force_tax_exempt = apply_filters( 'woocommerce_order_is_vat_exempt', 'yes' === $order->get_meta( 'is_vat_exempt' ), $order );
-
-        // Update the price of order items
-        foreach ( $order->get_items() as $item ) {
-            if ( ! $item instanceof \WC_Order_Item_Product ) {
-                continue;
-            }
-
-            $product   = $item->get_product();
-            $new_price = $product->get_price();
-
-            if ( $is_discounted ) {
-                $new_price = $this->calc_discounted_price( $new_price, $is_wholesale_user, $product );
-            }
-
-            $quantity = $item->get_quantity();
-            $item->set_subtotal( $new_price * $quantity );
-            $item->set_total( $new_price * $quantity );
-            $items[] = $item->get_name() . ' x ' . $quantity;
-
-            if ( ( $is_discounted && $is_disabled_tax ) ||
-                ( ! $is_discounted && $is_force_tax_exempt ) ) {
-                $item->set_taxes(
-                    [
-                        'total'    => [],
-                        'subtotal' => [],
-                    ]
-                );
-                $is_removing_tax = true;
-            } else {
-                $tax_rates = WC_Tax::get_rates( $item->get_tax_class() );
-                $taxes     = WC_Tax::calc_tax( $new_price * $quantity, $tax_rates, false );
-                $item->set_taxes(
-                    [
-                        'total'    => $taxes,
-                        'subtotal' => $taxes,
-                    ]
-                );
-            }//end if
-        }//end foreach
-
-        // Update taxes
-        $order->update_taxes();
-        if ( $is_removing_tax ) {
-            $order->remove_order_items( 'tax' );
+        if ( $is_discounted ) {
+            $order->update_meta_data( '_ywhs_wholesale_role', $is_wholesale_user['name'] );
         }
 
-        // update "Items" displaying in shipping items
-        foreach ( $order->get_items( 'shipping' ) as $shipping ) {
-            $shipping->update_meta_data( 'Items', implode( ', ', $items ) );
-        }
-    }//end admin_recalculate_order()
+        add_filter( 'woocommerce_product_get_price', [ $this, 'get_price' ], 99, 2 );
+    }
 }
