@@ -15,7 +15,7 @@ class RegisterProd {
 
     public function register_all_scripts() {
         $deps = [ 'react', 'react-dom', 'wp-hooks', 'wp-i18n' ];
-        wp_register_script( ScriptName::PAGE_SETTINGS, YAY_WHOLESALE_PLUGIN_URL . 'assets/dist/js/main.js', $deps, YAY_WHOLESALE_VERSION, true );
+        wp_register_script( ScriptName::PAGE_SETTINGS, YAY_WHOLESALE_PLUGIN_URL . 'assets/dist/admin/js/main.js', $deps, YAY_WHOLESALE_VERSION, true );
         wp_set_script_translations( ScriptName::PAGE_SETTINGS, 'yay-wholesale', YAY_WHOLESALE_PLUGIN_DIR . 'languages' );
     }
 }

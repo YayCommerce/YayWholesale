@@ -10,7 +10,7 @@
   "author": "Yay Commerce",
   "scripts": {
     "preinstall": "npx only-allow pnpm",
-    "build": "tsc --noEmit && vite build",
+    "build": "tsc --noEmit && vite build --outDir ../../../assets/dist/admin",
     "dev": "vite"
   },
   "dependencies": {
