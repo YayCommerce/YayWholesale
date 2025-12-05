@@ -1,9 +1,11 @@
 import { useContext, useMemo } from 'react';
 import { ColumnDef, flexRender, getCoreRowModel, useReactTable } from '@tanstack/react-table';
+import { Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { Crown } from 'lucide-react';
 
 import { TopWholesalerValue } from '@/lib/schema/reports';
+import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import {
@@ -18,7 +20,7 @@ import {
 import { dashboardContext } from './DashboardPage';
 
 export default function TopWholesaleCustomers() {
-  const { reportData } = useContext(dashboardContext);
+  const { reportData, isFetching, isLoading } = useContext(dashboardContext);
 
   const columns: ColumnDef<TopWholesalerValue>[] = useMemo(
     () => [
@@ -105,7 +107,9 @@ export default function TopWholesaleCustomers() {
         </div>
 
         {/* DataTable */}
-        <div className="overflow-hidden rounded-md border">
+        <div
+          className={cn('overflow-hidden rounded-md border', isFetching && 'relative opacity-50')}
+        >
           <Table className="min-w-full divide-y divide-gray-200">
             <TableHeader className="text-base-foreground h-[46px] bg-[#FAFAFA]">
               {table.getHeaderGroups().map((headerGroup) => (
@@ -121,7 +125,15 @@ export default function TopWholesaleCustomers() {
               ))}
             </TableHeader>
             <TableBody>
-              {table.getRowModel().rows?.length ? (
+              {isLoading ? (
+                <TableRow>
+                  <TableCell colSpan={columns.length} className="h-32 text-center align-middle">
+                    <div className="flex items-center justify-center gap-2">
+                      <Spinner className="text-muted-foreground size-6 animate-spin" />
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ) : table.getRowModel().rows?.length ? (
                 table.getRowModel().rows.map((row) => (
                   <TableRow key={row.id}>
                     {row.getVisibleCells().map((cell) => (

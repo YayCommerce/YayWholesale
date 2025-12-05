@@ -17,6 +17,8 @@ import TopWholesaleCustomers from './TopWholesaleCustomers';
 
 interface DashboardContextProp {
   reportData: DashboardReportsValue;
+  isFetching: boolean;
+  isLoading: boolean;
 }
 
 const defaultReport = {
@@ -31,6 +33,8 @@ const defaultReport = {
 };
 export const dashboardContext = createContext<DashboardContextProp>({
   reportData: defaultReport,
+  isFetching: true,
+  isLoading: true,
 });
 
 export default function DashboardPage() {
@@ -60,7 +64,7 @@ export default function DashboardPage() {
     defaultCompareRange,
   );
 
-  const { data } = useReportsQuery(dateRange, compareDateRange);
+  const { data, isFetching, isLoading } = useReportsQuery(dateRange, compareDateRange);
 
   const displayDateRange = useMemo(
     () =>
@@ -78,7 +82,9 @@ export default function DashboardPage() {
 
   return (
     <div className="mx-auto mt-[84px] max-w-7xl space-y-6 px-6">
-      <dashboardContext.Provider value={{ reportData: data ?? defaultReport }}>
+      <dashboardContext.Provider
+        value={{ reportData: data ?? defaultReport, isFetching, isLoading }}
+      >
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold">{__('Dashboard', 'yay-wholesale')}</h1>
           <div className="z-1 flex items-center space-x-2">

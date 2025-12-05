@@ -1,5 +1,6 @@
 import { useContext, useMemo } from 'react';
 import { ColumnDef, flexRender, getCoreRowModel, useReactTable } from '@tanstack/react-table';
+import { Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { Crown } from 'lucide-react';
 
@@ -21,7 +22,7 @@ import { parseWPCurrency } from '../common.helper';
 import { dashboardContext } from './DashboardPage';
 
 export default function TopProducts() {
-  const { reportData } = useContext(dashboardContext);
+  const { reportData, isFetching, isLoading } = useContext(dashboardContext);
 
   const columns: ColumnDef<TopProductValue>[] = useMemo(
     () => [
@@ -103,7 +104,12 @@ export default function TopProducts() {
         </div>
 
         {/* DataTable */}
-        <div className="overflow-hidden rounded-md border bg-white">
+        <div
+          className={cn(
+            'overflow-hidden rounded-md border bg-white',
+            isFetching && 'relative opacity-50',
+          )}
+        >
           <Table className="min-w-full divide-y divide-gray-200">
             <TableHeader className="text-base-foreground h-[46px] bg-[#FAFAFA]">
               {table.getHeaderGroups().map((headerGroup) => (
@@ -122,7 +128,15 @@ export default function TopProducts() {
               ))}
             </TableHeader>
             <TableBody className="divide-y divide-gray-200">
-              {table.getRowModel().rows?.length ? (
+              {isLoading ? (
+                <TableRow>
+                  <TableCell colSpan={columns.length} className="h-32 text-center align-middle">
+                    <div className="flex items-center justify-center gap-2">
+                      <Spinner className="text-muted-foreground size-6 animate-spin" />
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ) : table.getRowModel().rows?.length ? (
                 table.getRowModel().rows.map((row) => (
                   <TableRow key={row.id}>
                     {row.getVisibleCells().map((cell) => (

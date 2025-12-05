@@ -1,6 +1,8 @@
 import { useContext, useMemo } from 'react';
+import { Spinner } from '@wordpress/components';
 import { TrendingDown, TrendingUp } from 'lucide-react';
 
+import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -9,7 +11,7 @@ import { parseWPCurrency } from '../common.helper';
 import { dashboardContext } from './DashboardPage';
 
 export default function DashboardSummary() {
-  const { reportData } = useContext(dashboardContext);
+  const { reportData, isFetching, isLoading } = useContext(dashboardContext);
   const cards = useMemo(
     () => [
       {
@@ -45,7 +47,9 @@ export default function DashboardSummary() {
   );
 
   return (
-    <div className="grid gap-6 md:grid-cols-3">
+    <div
+      className={cn('grid gap-6 md:grid-cols-3', isFetching && !isLoading && 'relative opacity-50')}
+    >
       {cards.map((c, i) => (
         <Card key={i} className="mt-0 rounded-lg py-0 shadow-none">
           <CardContent className="p-5">
@@ -70,7 +74,13 @@ export default function DashboardSummary() {
               </Badge>
             </div>
             <p className="mt-2 text-[32px] font-semibold text-[#171719]">
-              {c.type === 'currency' ? parseWPCurrency(c.value) : c.value}
+              {isLoading ? (
+                <Spinner className="text-muted-foreground size-6 animate-spin" />
+              ) : c.type === 'currency' ? (
+                parseWPCurrency(c.value)
+              ) : (
+                c.value
+              )}
             </p>
             <p className="mt-1 text-sm text-[#A0A0A7]">{c.desc}</p>
             <Button variant="outline" size="sm" className="mt-3 text-xs font-medium text-[#171719]">
