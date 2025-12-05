@@ -16,6 +16,12 @@ import { HeaderNavMenuItem, HeaderNavMenuList } from '../ui/navmenu-header';
 const NAV_ITEMS = [
   { path: '/dashboard/*', to: '/dashboard', icon: DashboardIcon, label: 'Dashboard' },
   { path: '/request/*', to: '/request', icon: RequestIcon, label: 'Request' },
+  {
+    path: '/wholesalers-list/*',
+    to: '/wholesalers-list',
+    icon: RolesIcon,
+    label: 'Wholesalers List',
+  },
   { path: '/roles/*', to: '/roles', icon: RolesIcon, label: 'Roles' },
   { path: '/settings/*', to: '/settings', icon: SettingsIcon, label: 'Settings' },
 ];

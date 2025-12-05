@@ -88,6 +88,13 @@ class RequestsHelper {
             update_post_meta( $new_request_id, self::REQUEST_META_DISPLAY_NAME, $display_name );
 
             update_post_meta( $new_request_id, self::REQUEST_META_STATUS, self::PENDING );
+
+            // Trigger the email when a new wholesale account is registered.
+            do_action( 'yhs_new_account_registered', $new_request_id );
+
+            // Trigger the email when a new wholesale account is pending.
+            do_action( 'yhs_account_registration_pending', $new_request_id );
+
         }//end if
     }
 

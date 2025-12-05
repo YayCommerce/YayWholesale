@@ -116,12 +116,31 @@ class Settings {
             ScriptName::PAGE_SETTINGS,
             'yayWholesale',
             [
-                'users_url'     => esc_url_raw( admin_url( 'users.php' ) ),
-                'plugin_url'    => YAY_WHOLESALE_PLUGIN_URL,
-                'rest_url'      => esc_url_raw( rest_url() ),
-                'rest_nonce'    => wp_create_nonce( 'wp_rest' ),
-                'rest_base'     => 'yay-wholesale/v1',
-                'currency_data' => [
+                'user_urls'        => [
+                    'list'    => esc_url_raw( admin_url( 'users.php' ) ),
+                    'add_new' => esc_url_raw(
+                        add_query_arg(
+                            [
+                                'wholesaler' => 'yay_wholesale',
+                                '_wpnonce'   => wp_create_nonce( 'yay-wholesale-create-user' ),
+                            ],
+                            admin_url( 'user-new.php' )
+                        )
+                    ),
+                    'edit'    => esc_url_raw(
+                        add_query_arg(
+                            [
+                                'user_id' => '%USER_ID%',
+                            ],
+                            admin_url( 'user-edit.php' )
+                        )
+                    ),
+                ],
+                'plugin_url'       => YAY_WHOLESALE_PLUGIN_URL,
+                'rest_url'         => esc_url_raw( rest_url() ),
+                'rest_nonce'       => wp_create_nonce( 'wp_rest' ),
+                'rest_base'        => 'yay-wholesale/v1',
+                'currency_data'    => [
                     'currency'     => get_woocommerce_currency(),
                     'symbol'       => html_entity_decode( \get_woocommerce_currency_symbol(), ENT_COMPAT ),
                     'position'     => get_option( 'woocommerce_currency_pos' ),
@@ -129,11 +148,12 @@ class Settings {
                     'decimal_sep'  => get_option( 'woocommerce_price_decimal_sep' ),
                     'num_decimals' => intval( get_option( 'woocommerce_price_num_decimals' ) ),
                 ],
-                'settings'      => SettingsHelper::get_settings(),
-                'roles'         => get_option( 'yay_wholesale_roles', [] ),
-                'reviewed'      => get_option( 'yay_wholesale_reviewed', false ),
-                'day_format'    => get_option( 'date_format' ),
-                'time_format'   => get_option( 'time_format' ),
+                'settings'         => SettingsHelper::get_settings(),
+                'wholesale_emails' => SettingsHelper::get_email_templates(),
+                'roles'            => get_option( 'yay_wholesale_roles', [] ),
+                'reviewed'         => get_option( 'yay_wholesale_reviewed', false ),
+                'day_format'       => get_option( 'date_format' ),
+                'time_format'      => get_option( 'time_format' ),
             ]
         );
 

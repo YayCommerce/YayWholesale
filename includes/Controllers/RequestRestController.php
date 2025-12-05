@@ -252,14 +252,22 @@ class RequestRestController extends BaseRestController {
             if ( ! RequestsHelper::update_whs_request( $id, [ 'status' => $json_data['status'] ] ) ) {
                 return $this->error( __( 'Role has been added to the request author, but cannot change the status', 'yay-wholesale' ), 404 );
             }
+
+            // Trigger the email when a wholesale account is approved.
+            do_action( 'yhs_account_registration_approved', $id );
+
         } elseif ( RequestsHelper::REJECTED === $json_data['status'] ) {
             RequestsHelper::remove_role_from_ywhs_request_author( $id );
 
             if ( ! RequestsHelper::update_whs_request( $id, [ 'status' => $json_data['status'] ] ) ) {
                 return $this->error( __( 'Role has been removed from the request author, but cannot change the status', 'yay-wholesale' ), 404 );
             }
+
+            // Trigger the email when a wholesale account is rejected.
+            do_action( 'yhs_account_registration_rejected', $id );
+
         } else {
-                return $this->error( __( 'You just can approve/reject this request', 'yay-wholesale' ), 404 );
+            return $this->error( __( 'You just can approve/reject this request', 'yay-wholesale' ), 404 );
         }//end if
 
         return $this->success( [], __( 'Request status has been updated successfully', 'yay-wholesale' ) );

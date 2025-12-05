@@ -40,7 +40,7 @@ class RegisterFacade {
     public function register_all_assets() {
         wp_register_style(
             ScriptName::STYLE_SETTINGS,
-            YAY_WHOLESALE_PLUGIN_URL . 'assets/dist/style.css',
+            YAY_WHOLESALE_PLUGIN_URL . 'assets/dist/admin/style.css',
             [
                 'woocommerce_admin_styles',
                 'wp-components',

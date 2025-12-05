@@ -76,7 +76,7 @@ export const RolesColumn: ColumnDef<RolesListValues & { count: number }>[] = [
           onClick={() => {
             if (count > 0) {
               window.open(
-                window.yayWholesale.users_url + '?role=' + column.row.original.slug,
+                window.yayWholesale.user_urls.list + '?role=' + column.row.original.slug,
                 '_blank',
               );
             }
