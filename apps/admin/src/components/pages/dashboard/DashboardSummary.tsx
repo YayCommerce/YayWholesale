@@ -1,46 +1,52 @@
-import { useContext, useMemo } from 'react';
+import { useMemo } from 'react';
 import { Spinner } from '@wordpress/components';
 import { TrendingDown, TrendingUp } from 'lucide-react';
 
+import { useReportsQuery } from '@/lib/queries/reports';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 
 import { parseWPCurrency } from '../common.helper';
-import { dashboardContext } from './DashboardPage';
 
-export default function DashboardSummary() {
-  const { reportData, isFetching, isLoading } = useContext(dashboardContext);
+export default function DashboardSummary(props: {
+  reportQuery: ReturnType<typeof useReportsQuery>;
+}) {
+  const { data: reportData, isFetching, isLoading } = props.reportQuery;
   const cards = useMemo(
     () => [
       {
         title: 'Wholesalers',
-        value: reportData.wholesalersAmount,
-        percent: reportData.wholesalersIncreaseRate,
-        desc: 'Total Wholesalers Registed',
+        value: reportData?.wholesalersAmount ?? 0,
+        percent: reportData?.wholesalersIncreaseRate,
+        desc: 'Total Wholesalers',
         button: 'View all wholesalers',
         type: 'text',
         overPercent:
-          reportData.wholesalersIncreaseRate > 100 || reportData.wholesalersIncreaseRate < -100,
+          reportData &&
+          (reportData.wholesalersIncreaseRate > 100 || reportData.wholesalersIncreaseRate < -100),
       },
       {
         title: 'Wholesale Orders',
-        value: reportData.orderAmount,
-        percent: reportData.orderIncreaseRate,
+        value: reportData?.orderAmount ?? 0,
+        percent: reportData?.orderIncreaseRate ?? 0,
         desc: 'Total Orders',
         button: 'View all orders',
         type: 'text',
-        overPercent: reportData.orderIncreaseRate > 100 || reportData.orderIncreaseRate < -100,
+        overPercent:
+          reportData && (reportData.orderIncreaseRate > 100 || reportData.orderIncreaseRate < -100),
       },
       {
         title: 'Wholesale Revenue',
-        value: reportData.revenue,
-        percent: reportData.revenueIncreaseRate,
+        value: reportData?.revenue ?? 0,
+        percent: reportData?.revenueIncreaseRate ?? 0,
         desc: 'Total Revenue',
         button: 'View all revenue',
         type: 'currency',
-        overPercent: reportData.revenueIncreaseRate > 100 || reportData.revenueIncreaseRate < -100,
+        overPercent:
+          reportData &&
+          (reportData.revenueIncreaseRate > 100 || reportData.revenueIncreaseRate < -100),
       },
     ],
     [reportData],
@@ -56,13 +62,13 @@ export default function DashboardSummary() {
             <div className="flex items-center justify-between">
               <h3 className="text-base font-medium text-[#171719]">{c.title}</h3>
               <Badge variant="outline" className="rounded-md text-xs font-semibold">
-                {c.percent < 0 ? (
+                {c.percent && c.percent < 0 ? (
                   <TrendingDown size={10} className="text-destructive" />
                 ) : (
                   <TrendingUp size={10} className="text-success" />
                 )}
                 <p>
-                  {c.percent < 0 ? '' : '+'}
+                  {c.percent && c.percent < 0 ? '' : '+'}
                   {c.overPercent ? (
                     <>
                       100<sup className="text-[10px]">+</sup> %
