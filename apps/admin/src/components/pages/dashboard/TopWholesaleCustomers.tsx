@@ -1,10 +1,10 @@
-import { useState } from 'react';
+import { useContext, useMemo } from 'react';
 import { ColumnDef, flexRender, getCoreRowModel, useReactTable } from '@tanstack/react-table';
+import { __ } from '@wordpress/i18n';
 import { Crown } from 'lucide-react';
 
+import { TopWholesalerValue } from '@/lib/schema/reports';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { ButtonGroup } from '@/components/ui/button-group';
 import { Card, CardContent } from '@/components/ui/card';
 import {
   Table,
@@ -15,142 +15,83 @@ import {
   TableRow,
 } from '@/components/ui/table';
 
-type Customer = {
-  no: string;
-  name: string;
-  orders: number;
-  role: string;
-  avatar: string;
-  crown?: boolean;
-};
+import { dashboardContext } from './DashboardPage';
 
 export default function TopWholesaleCustomers() {
-  const [filter, setFilter] = useState('3m');
+  const { reportData } = useContext(dashboardContext);
 
-  const customers: Customer[] = [
-    {
-      no: '01',
-      name: 'Hannah Morgan',
-      orders: 50,
-      role: 'Diamond',
-      avatar: 'https://i.pravatar.cc/40?img=1',
-      crown: true,
-    },
-    {
-      no: '02',
-      name: 'Nathaniel Boyd',
-      orders: 40,
-      role: 'Gold',
-      avatar: 'https://i.pravatar.cc/40?img=2',
-      crown: true,
-    },
-    {
-      no: '03',
-      name: 'Iris Powell',
-      orders: 30,
-      role: 'Diamond',
-      avatar: 'https://i.pravatar.cc/40?img=3',
-      crown: true,
-    },
-    {
-      no: '04',
-      name: 'Fiona Ellis',
-      orders: 20,
-      role: 'Silver',
-      avatar: 'https://i.pravatar.cc/40?img=4',
-    },
-    {
-      no: '05',
-      name: 'Emily West',
-      orders: 10,
-      role: 'Diamond',
-      avatar: 'https://i.pravatar.cc/40?img=5',
-    },
-    {
-      no: '06',
-      name: 'Lucy Freeman',
-      orders: 50,
-      role: 'Diamond',
-      avatar: 'https://i.pravatar.cc/40?img=6',
-    },
-    {
-      no: '07',
-      name: 'Audrey Bennett',
-      orders: 50,
-      role: 'Gold',
-      avatar: 'https://i.pravatar.cc/40?img=7',
-    },
-    {
-      no: '08',
-      name: 'Dean Simmons',
-      orders: 50,
-      role: 'Diamond',
-      avatar: 'https://i.pravatar.cc/40?img=8',
-    },
-    {
-      no: '09',
-      name: 'Kate Richards',
-      orders: 50,
-      role: 'Gold',
-      avatar: 'https://i.pravatar.cc/40?img=9',
-    },
-    {
-      no: '10',
-      name: 'Emily Bell',
-      orders: 50,
-      role: 'Diamond',
-      avatar: 'https://i.pravatar.cc/40?img=10',
-    },
-  ];
-
-  const columns: ColumnDef<Customer>[] = [
-    {
-      accessorKey: 'no',
-      header: 'No',
-      cell: ({ row }) => <span>{row.getValue('no')}</span>,
-    },
-    {
-      accessorKey: 'name',
-      header: 'Customer',
-      cell: ({ row }) => {
-        const c = row.original;
-        return (
-          <div className="flex items-center gap-3">
-            <div className="h-8 w-8">
-              <img
-                src={c.avatar}
-                alt={c.name}
-                className="h-full w-full rounded-full object-cover"
-              />
-            </div>
-            <div className="flex items-center gap-1">
-              <span className="text-[15px] font-medium text-[#18181B]">{c.name}</span>
-              {c.crown && <Crown fill="#F9BD09" size={14} className="ml-1 text-[#F9BD09]" />}
-            </div>
-          </div>
-        );
+  const columns: ColumnDef<TopWholesalerValue>[] = useMemo(
+    () => [
+      {
+        id: 'no',
+        header: () => (
+          <span className="flex items-center justify-center font-medium text-gray-700">
+            {__('No', 'yay-wholesale')}
+          </span>
+        ),
+        cell: ({ row }) => (
+          <span className="flex justify-center">
+            {reportData.topWholesalers.indexOf(row.original) + 1}
+          </span>
+        ),
       },
-    },
-    {
-      accessorKey: 'orders',
-      header: 'Order number',
-    },
-    {
-      accessorKey: 'role',
-      header: 'Role',
-      cell: ({ row }) => {
-        const c = row.original;
-        return (
-          <Badge variant="ghost" className="rounded-md text-xs font-semibold">
-            {c.role}
-          </Badge>
-        );
+      {
+        accessorKey: 'name',
+        header: __('Customer', 'yay-wholesale'),
+        cell: ({ row }) => {
+          const c = row.original;
+          return (
+            <div className="flex items-center gap-3">
+              <div className="h-8 w-8">
+                <img
+                  src={c.avatar}
+                  alt={c.name}
+                  className="h-full w-full rounded-full object-cover"
+                />
+              </div>
+              <div className="flex items-center gap-1">
+                <span className="text-[15px] font-medium text-[#18181B]">{c.name}</span>
+                {reportData.topWholesalers.indexOf(row.original) < 3 && (
+                  <Crown fill="#F9BD09" size={14} className="ml-1 text-[#F9BD09]" />
+                )}
+              </div>
+            </div>
+          );
+        },
       },
-    },
-  ];
+      {
+        accessorKey: 'orderCount',
+        header: () => (
+          <span className="flex items-center justify-center font-medium text-gray-700">
+            {__('Orders', 'yay-wholesale')}
+          </span>
+        ),
+        cell: ({ row }) => <span className="flex justify-center">{row.original.orderCount}</span>,
+      },
+      {
+        accessorKey: 'role',
+        header: () => (
+          <span className="flex items-center justify-center font-medium text-gray-700">
+            {__('Role', 'yay-wholesale')}
+          </span>
+        ),
+        cell: ({ row }) => {
+          const c = row.original;
+          return (
+            <div className="flex justify-center">
+              <Badge variant="ghost" className="rounded-md text-xs font-semibold">
+                {c.role}
+              </Badge>
+            </div>
+          );
+        },
+      },
+    ],
+    [reportData],
+  );
 
   const table = useReactTable({
-    data: customers,
+    data: reportData.topWholesalers,
     columns,
     getCoreRowModel: getCoreRowModel(),
   });
@@ -161,44 +102,12 @@ export default function TopWholesaleCustomers() {
         {/* Header */}
         <div className="mb-3 flex items-center justify-between">
           <h3 className="font-semibold text-[#18181B]">Top Wholesale Customers</h3>
-          <ButtonGroup>
-            <Button
-              className={`text-sm font-medium ${
-                filter === '3m' ? 'bg-accent text-accent-foreground' : 'text-[#171719B2]'
-              }`}
-              variant="outline"
-              size="sm"
-              onClick={() => setFilter('3m')}
-            >
-              Last 3 months
-            </Button>
-            <Button
-              className={`text-sm font-medium ${
-                filter === '30d' ? 'bg-accent text-accent-foreground' : 'text-[#171719B2]'
-              }`}
-              variant="outline"
-              size="sm"
-              onClick={() => setFilter('30d')}
-            >
-              Last 30 days
-            </Button>
-            <Button
-              className={`text-sm font-medium ${
-                filter === '7d' ? 'bg-accent text-accent-foreground' : 'text-[#171719B2]'
-              }`}
-              variant="outline"
-              size="sm"
-              onClick={() => setFilter('7d')}
-            >
-              Last 7 days
-            </Button>
-          </ButtonGroup>
         </div>
 
         {/* DataTable */}
-        <div className="rounded-md border">
-          <Table>
-            <TableHeader>
+        <div className="overflow-hidden rounded-md border">
+          <Table className="min-w-full divide-y divide-gray-200">
+            <TableHeader className="text-base-foreground h-[46px] bg-[#FAFAFA]">
               {table.getHeaderGroups().map((headerGroup) => (
                 <TableRow key={headerGroup.id}>
                   {headerGroup.headers.map((header) => (
