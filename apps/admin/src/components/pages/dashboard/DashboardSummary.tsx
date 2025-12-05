@@ -1,5 +1,5 @@
 import { useContext, useMemo } from 'react';
-import { TrendingUp } from 'lucide-react';
+import { TrendingDown, TrendingUp } from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -19,7 +19,8 @@ export default function DashboardSummary() {
         desc: 'Total Wholesalers Registed',
         button: 'View all wholesalers',
         type: 'text',
-        overPercent: reportData.wholesalersIncreaseRate > 100,
+        overPercent:
+          reportData.wholesalersIncreaseRate > 100 || reportData.wholesalersIncreaseRate < -100,
       },
       {
         title: 'Wholesale Orders',
@@ -28,7 +29,7 @@ export default function DashboardSummary() {
         desc: 'Total Orders',
         button: 'View all orders',
         type: 'text',
-        overPercent: reportData.orderIncreaseRate > 100,
+        overPercent: reportData.orderIncreaseRate > 100 || reportData.orderIncreaseRate < -100,
       },
       {
         title: 'Wholesale Revenue',
@@ -37,7 +38,7 @@ export default function DashboardSummary() {
         desc: 'Total Revenue',
         button: 'View all revenue',
         type: 'currency',
-        overPercent: reportData.revenueIncreaseRate > 100,
+        overPercent: reportData.revenueIncreaseRate > 100 || reportData.revenueIncreaseRate < -100,
       },
     ],
     [reportData],
@@ -50,16 +51,22 @@ export default function DashboardSummary() {
           <CardContent className="p-5">
             <div className="flex items-center justify-between">
               <h3 className="text-base font-medium text-[#171719]">{c.title}</h3>
-
               <Badge variant="outline" className="rounded-md text-xs font-semibold">
-                <TrendingUp size={10} className="text-success" />{' '}
-                {c.overPercent ? (
-                  <p>
-                    + 100<sup className="text-[10px]">+</sup> %
-                  </p>
+                {c.percent < 0 ? (
+                  <TrendingDown size={10} className="text-destructive" />
                 ) : (
-                  <p>+ {c.percent} %</p>
+                  <TrendingUp size={10} className="text-success" />
                 )}
+                <p>
+                  {c.percent < 0 ? '' : '+'}
+                  {c.overPercent ? (
+                    <>
+                      100<sup className="text-[10px]">+</sup> %
+                    </>
+                  ) : (
+                    <>{c.percent}%</>
+                  )}
+                </p>
               </Badge>
             </div>
             <p className="mt-2 text-[32px] font-semibold text-[#171719]">

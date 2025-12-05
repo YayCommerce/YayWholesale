@@ -105,7 +105,7 @@ export default function TopWholesaleCustomers() {
         </div>
 
         {/* DataTable */}
-        <div className="rounded-md border">
+        <div className="overflow-hidden rounded-md border">
           <Table className="min-w-full divide-y divide-gray-200">
             <TableHeader className="text-base-foreground h-[46px] bg-[#FAFAFA]">
               {table.getHeaderGroups().map((headerGroup) => (

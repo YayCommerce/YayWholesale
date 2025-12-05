@@ -1,4 +1,5 @@
 import { createContext, useMemo, useState } from 'react';
+import { __ } from '@wordpress/i18n';
 import dayjs from 'dayjs';
 import { CalendarIcon } from 'lucide-react';
 import { DateRange } from 'react-day-picker';
@@ -39,8 +40,27 @@ export default function DashboardPage() {
   });
 
   const [previewDateRange, SetPreviewDateRange] = useState<DateRange | undefined>(dateRange);
+  const [openPopover, setOpenPopover] = useState(false);
 
-  const { data } = useReportsQuery(dateRange);
+  const defaultCompareRange = useMemo((): DateRange => {
+    const to = previewDateRange?.to?.getTime() ?? 1;
+    const from = previewDateRange?.from?.getTime() ?? 1;
+    const gap = (to - from) / (1000 * 60 * 60 * 24);
+    return {
+      from: dayjs(previewDateRange?.from)
+        .subtract(gap + 1, 'day')
+        .toDate(),
+      to: dayjs(previewDateRange?.to)
+        .subtract(gap + 1, 'day')
+        .toDate(),
+    };
+  }, [previewDateRange]);
+
+  const [compareDateRange, SetCompareDateRange] = useState<DateRange | undefined>(
+    defaultCompareRange,
+  );
+
+  const { data } = useReportsQuery(dateRange, compareDateRange);
 
   const displayDateRange = useMemo(
     () =>
@@ -52,15 +72,17 @@ export default function DashboardPage() {
 
   const saveChanges = () => {
     setDateRange(previewDateRange);
+    SetCompareDateRange(defaultCompareRange);
+    setOpenPopover(false);
   };
 
   return (
     <div className="mx-auto mt-[84px] max-w-7xl space-y-6 px-6">
       <dashboardContext.Provider value={{ reportData: data ?? defaultReport }}>
         <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold">Dashboard</h1>
+          <h1 className="text-2xl font-bold">{__('Dashboard', 'yay-wholesale')}</h1>
           <div className="z-1 flex items-center space-x-2">
-            <Popover>
+            <Popover open={openPopover} onOpenChange={setOpenPopover}>
               <PopoverTrigger asChild>
                 <Button
                   variant="outline"
@@ -80,7 +102,7 @@ export default function DashboardPage() {
                   disabled={{
                     after: new Date(),
                   }}
-                  className="hidden sm:block"
+                  className="hidden lg:block"
                 />
                 <Calendar
                   mode="range"
@@ -91,10 +113,10 @@ export default function DashboardPage() {
                   disabled={{
                     after: new Date(),
                   }}
-                  className="block sm:hidden"
+                  className="block lg:hidden"
                 />
                 <div className="mt-4 flex justify-end bg-white">
-                  <Button onClick={saveChanges}>Save Changes</Button>
+                  <Button onClick={saveChanges}>{__('Save Changes', 'yay-wholesale')}</Button>
                 </div>
               </PopoverContent>
             </Popover>

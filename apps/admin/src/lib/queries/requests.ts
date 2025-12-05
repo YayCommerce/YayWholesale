@@ -56,6 +56,9 @@ export function useUpdateRequestMutation(requestId: number) {
       if (!queryClient.isFetching({ queryKey: ['requests'] })) {
         queryClient.invalidateQueries({ queryKey: ['requests'] });
       }
+      if (!queryClient.isFetching({ queryKey: ['roles'] })) {
+        queryClient.invalidateQueries({ queryKey: ['roles'] });
+      }
     },
     onError: (error: Error) => {
       showToast.error(error.message);
@@ -73,6 +76,9 @@ export function useDeleteRequestMutation(requestId: number) {
       queryClient.invalidateQueries({ queryKey: ['request', requestId] });
       if (!queryClient.isFetching({ queryKey: ['requests'] })) {
         queryClient.invalidateQueries({ queryKey: ['requests'] });
+      }
+      if (!queryClient.isFetching({ queryKey: ['roles'] })) {
+        queryClient.invalidateQueries({ queryKey: ['roles'] });
       }
     },
     onError: (error: Error) => {
@@ -133,6 +139,9 @@ export function useBulkDeleteRequestMutation(ids: number[]) {
       showToast.success(response.message);
       if (!queryClient.isFetching({ queryKey: ['requests'] })) {
         queryClient.invalidateQueries({ queryKey: ['requests'] });
+      }
+      if (!queryClient.isFetching({ queryKey: ['roles'] })) {
+        queryClient.invalidateQueries({ queryKey: ['roles'] });
       }
     },
     onError: (error: Error) => {

@@ -48,8 +48,8 @@ export default function TopProducts() {
               <div className="h-8 w-8 overflow-hidden rounded-md border">
                 <img src={p.image} alt={p.name} className="h-full w-full object-cover" />
               </div>
-              <div className="flex items-center gap-1">
-                <span className="overflow-hidden text-[15px] font-medium text-[#18181B]">
+              <div className="flex w-40 items-center gap-1 md:w-15 md:flex-wrap lg:w-40 lg:flex-nowrap">
+                <span className="text-[15px] font-medium whitespace-normal text-[#18181B] md:text-[13px] lg:text-[15px]">
                   {p.name}
                 </span>
                 {reportData.topProducts.indexOf(row.original) < 3 && (
@@ -103,7 +103,7 @@ export default function TopProducts() {
         </div>
 
         {/* DataTable */}
-        <div className="rounded-md border bg-white">
+        <div className="overflow-hidden rounded-md border bg-white">
           <Table className="min-w-full divide-y divide-gray-200">
             <TableHeader className="text-base-foreground h-[46px] bg-[#FAFAFA]">
               {table.getHeaderGroups().map((headerGroup) => (
@@ -111,13 +111,7 @@ export default function TopProducts() {
                   {headerGroup.headers.map((header) => (
                     <TableHead
                       key={header.id}
-                      className={cn(
-                        'text-base-secondary bg-[#F4F4F5] py-2 text-sm font-medium',
-                        header.column.columnDef.meta?.align === 'center'
-                          ? 'text-center'
-                          : 'text-left',
-                        header.column.columnDef.meta?.isCheckbox ? 'w-[36px] pr-0 pl-2' : 'px-3',
-                      )}
+                      className="bg-[#F4F4F5] text-[13px] font-semibold text-[#18181B]"
                     >
                       {header.isPlaceholder
                         ? null
