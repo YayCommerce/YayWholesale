@@ -25,9 +25,9 @@ class ReportsRestController extends BaseRestController {
             '/reports',
             [
                 [
-                    'methods'  => 'GET',
-                    'callback' => [ $this, 'statistic_wholesalers' ],
-                    // 'permission_callback' => [ $this, 'reports_permission_callback' ],
+                    'methods'             => 'GET',
+                    'callback'            => [ $this, 'statistic_wholesalers' ],
+                    'permission_callback' => [ $this, 'reports_permission_callback' ],
                 ],
             ]
         );
