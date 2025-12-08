@@ -25,7 +25,9 @@ export default function TopProducts(props: { reportQuery: ReturnType<typeof useR
       <CardContent className="p-5">
         {/* Header */}
         <div className="mb-3 flex items-center justify-between">
-          <h3 className="font-semibold text-[#18181B]">Top Products</h3>
+          <h3 className="text-base-foreground font-semibold">
+            {__('Top Products', 'yay-wholesale')}
+          </h3>
         </div>
 
         {/* DataTable */}
@@ -35,28 +37,30 @@ export default function TopProducts(props: { reportQuery: ReturnType<typeof useR
             isFetching && 'relative opacity-50',
           )}
         >
-          <Table className="min-w-full divide-y divide-gray-200">
-            <TableHeader className="text-base-foreground h-[46px] bg-[#FAFAFA]">
-              <TableRow className="bg-[#F4F4F5] text-[13px] font-semibold text-[#18181B]">
-                <TableHead>
-                  <span className="flex items-center justify-center font-medium text-gray-700">
+          <Table className="divide-muted min-w-full divide-y">
+            <TableHeader className="text-base-foreground h-10 bg-[#FAFAFA]">
+              <TableRow className="text-base-foreground bg-muted text-[14px] font-semibold">
+                <TableHead className="text-base-foreground text-[14px]">
+                  <span className="flex items-center justify-center font-medium">
                     {__('No', 'yay-wholesale')}
                   </span>
                 </TableHead>
-                <TableHead>{__('Product', 'yay-wholesale')}</TableHead>
-                <TableHead>
-                  <span className="flex items-center justify-center font-medium text-gray-700">
+                <TableHead className="text-base-foreground text-[14px]">
+                  {__('Product', 'yay-wholesale')}
+                </TableHead>
+                <TableHead className="text-base-foreground text-[14px]">
+                  <span className="flex items-center justify-center font-medium">
                     {__('Item Sold', 'yay-wholesale')}
                   </span>
                 </TableHead>
-                <TableHead>
-                  <span className="flex items-center justify-center font-medium text-gray-700">
+                <TableHead className="text-base-foreground text-[14px]">
+                  <span className="flex items-center justify-center font-medium">
                     {__('Net Sales', 'yay-wholesale')}
                   </span>
                 </TableHead>
               </TableRow>
             </TableHeader>
-            <TableBody className="divide-y divide-gray-200">
+            <TableBody className="divide-muted divide-y">
               {isLoading ? (
                 <TableRow>
                   <TableCell colSpan={4} className="h-32 text-center align-middle">
@@ -68,12 +72,12 @@ export default function TopProducts(props: { reportQuery: ReturnType<typeof useR
               ) : reportData ? (
                 reportData.topProducts.map((data) => (
                   <TableRow>
-                    <TableCell className="py-3 text-[14px] text-[#18181B]">
+                    <TableCell className="text-base-foreground py-3 text-[14px]">
                       <span className="flex items-center justify-center">
                         {reportData.topProducts.indexOf(data) + 1}
                       </span>
                     </TableCell>
-                    <TableCell className="py-3 text-[14px] text-[#18181B]">
+                    <TableCell className="text-base-foreground py-3 text-[14px]">
                       <div className="flex items-center gap-3">
                         <div className="h-8 w-8 overflow-hidden rounded-md border">
                           <img
@@ -83,7 +87,7 @@ export default function TopProducts(props: { reportQuery: ReturnType<typeof useR
                           />
                         </div>
                         <div className="flex w-40 items-center gap-1 md:w-15 md:flex-wrap lg:w-40 lg:flex-nowrap">
-                          <span className="text-[15px] font-medium whitespace-normal text-[#18181B] md:text-[13px] lg:text-[15px]">
+                          <span className="text-base-foreground text-[14px] font-medium whitespace-normal md:text-[13px] lg:text-[14px]">
                             {data.name}
                           </span>
                           {reportData.topProducts.indexOf(data) < 3 && (
@@ -92,11 +96,11 @@ export default function TopProducts(props: { reportQuery: ReturnType<typeof useR
                         </div>
                       </div>
                     </TableCell>
-                    <TableCell className="py-3 text-[14px] text-[#18181B]">
+                    <TableCell className="text-base-foreground py-3 text-[14px]">
                       <span className="flex items-center justify-center">{data.orderCount}</span>
                     </TableCell>
-                    <TableCell className="py-3 text-[14px] text-[#18181B]">
-                      <span className="flex items-center justify-center font-medium text-gray-700">
+                    <TableCell className="text-base-foreground py-3 text-[14px]">
+                      <span className="flex items-center justify-center font-medium">
                         {parseWPCurrency(data.netSale)}
                       </span>
                     </TableCell>
