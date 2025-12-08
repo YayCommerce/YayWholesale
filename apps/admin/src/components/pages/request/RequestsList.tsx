@@ -5,14 +5,7 @@ import { flexRender, getCoreRowModel, PaginationState, useReactTable } from '@ta
 import { Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { debounce } from 'lodash';
-import {
-  ChevronLeft,
-  ChevronRight,
-  ChevronsLeft,
-  ChevronsRight,
-  Search,
-  Trash2,
-} from 'lucide-react';
+import { ChevronLeft, ChevronRight, Search, Trash2, XIcon } from 'lucide-react';
 
 import {
   useBulkDeleteRequestMutation,
@@ -32,8 +25,10 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import BulkActionBox from '@/components/ui/bulk-actions-box';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
 import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group';
 import {
   Select,
@@ -58,12 +53,6 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import {
-  TableToast,
-  TableToastClose,
-  TableToaster,
-  TableToastTitle,
-} from '@/components/ui/table-toast';
 import RequestsStatusIcon from '@/components/icons/RequestStatusIcon';
 
 import { RequestsColumn } from './requests-table/RequestsColumn';
@@ -235,132 +224,104 @@ export default function RequestsList() {
       </div>
       {/* Footer */}
       {data != undefined && data.data.length > 0 && (
-        <div className="relative flex flex-col items-center justify-end gap-3 sm:flex-row">
-          <TableToaster className="left-2/3 md:left-2/7">
-            <TableToast
-              open={selectedCount > 0}
-              onOpenChange={(open) => {
-                if (!open) {
-                  table.resetRowSelection();
-                }
-              }}
-            >
-              <TableToastClose onClick={() => table.resetRowSelection()} />
-              <TableToastTitle>
-                {__('%RC% selected').replace('%RC%', selectedCount.toString())}
-              </TableToastTitle>
-              <Separator orientation="vertical" className="ml-2 h-5!" />
-              <SelectActionButton title="Status" icon={<CaretUpDownIcon size={12} weight="bold" />}>
-                <ActionMenuButton
-                  icon={<RequestsStatusIcon status="approved" />}
-                  title={__('Approve')}
-                  onClick={() => handleBulkStatusChange('approved')}
-                >
-                  {activeRoles?.map((role) => (
-                    <ActionButton
-                      icon={<RequestsStatusIcon status="approved" />}
-                      title={__('Approve to %ROLE%').replace('%ROLE%', role.name)}
-                      onClick={() => handleBulkStatusChange('approved', role.id)}
-                    />
-                  ))}
-                </ActionMenuButton>
-                <ActionButton
-                  icon={<RequestsStatusIcon status="rejected" />}
-                  title={__('Reject')}
-                  onClick={() => handleBulkStatusChange('rejected')}
-                />
-              </SelectActionButton>
-              <Separator orientation="vertical" className="h-5!" />
-              <AlertDialog open={openBulkDeleteDialog} onOpenChange={setOpenDeleteDialog}>
-                <Button
-                  size="icon"
-                  variant="ghost"
-                  className="hover:text-destructive text-base-muted-foreground h-8 w-8 hover:shadow-xs"
-                  onClick={() => setOpenDeleteDialog(true)}
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>
-                      {__('Are you sure you want to bulk delete requests?', 'yay-wholesale')}
-                    </AlertDialogTitle>
-                    <AlertDialogDescription>
-                      {__(
-                        'This action cannot be undone. This will permanently delete these request and remove data from servers',
-                        'yay-wholesale',
-                      )}
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel>{__('Cancel', 'yay-wholesale')}</AlertDialogCancel>
-                    <AlertDialogAction
-                      className="bg-destructive text-destructive-foreground hover:bg-destructive/80"
-                      onClick={() => handleBulkDelete()}
-                    >
-                      {__('Continue', 'yay-wholesale')}
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
-            </TableToast>
-          </TableToaster>
-
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-[#171719]">Rows per page:</span>
-            <Select
-              value={`${pagination.pageSize}`}
-              onValueChange={(value) => handleChangePerPage(value)}
-            >
-              <SelectTrigger size="sm" className="w-20" id="rows-per-page">
-                <SelectValue placeholder={pagination.pageSize} />
-              </SelectTrigger>
-              <SelectContent side="top">
-                {[10, 50, 100, 200].map((pageSize) => (
-                  <SelectItem key={pageSize} value={`${pageSize}`}>
-                    {pageSize}
-                  </SelectItem>
+        <div className="relative flex flex-col items-center justify-between gap-3 sm:flex-row">
+          <BulkActionBox selectedCount={selectedCount} onResetRow={() => table.resetRowSelection()}>
+            <SelectActionButton title="Status" icon={<CaretUpDownIcon size={12} weight="bold" />}>
+              <ActionMenuButton
+                icon={<RequestsStatusIcon status="approved" />}
+                title={__('Approve')}
+                onClick={() => handleBulkStatusChange('approved')}
+              >
+                {activeRoles?.map((role) => (
+                  <ActionButton
+                    icon={<RequestsStatusIcon status="approved" />}
+                    title={__('Approve to %ROLE%').replace('%ROLE%', role.name)}
+                    onClick={() => handleBulkStatusChange('approved', role.id)}
+                  />
                 ))}
-              </SelectContent>
-            </Select>
+              </ActionMenuButton>
+              <ActionButton
+                icon={<RequestsStatusIcon status="rejected" />}
+                title={__('Reject')}
+                onClick={() => handleBulkStatusChange('rejected')}
+              />
+            </SelectActionButton>
+            <Separator orientation="vertical" className="h-5!" />
+            <AlertDialog open={openBulkDeleteDialog} onOpenChange={setOpenDeleteDialog}>
+              <Button
+                size="icon"
+                variant="ghost"
+                className="hover:text-destructive text-base-muted-foreground h-8 w-8 hover:shadow-xs"
+                onClick={() => setOpenDeleteDialog(true)}
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>
+                    {__('Are you sure you want to bulk delete requests?', 'yay-wholesale')}
+                  </AlertDialogTitle>
+                  <AlertDialogDescription>
+                    {__(
+                      'This action cannot be undone. This will permanently delete these request and remove data from servers',
+                      'yay-wholesale',
+                    )}
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>{__('Cancel', 'yay-wholesale')}</AlertDialogCancel>
+                  <AlertDialogAction
+                    className="bg-destructive text-destructive-foreground hover:bg-destructive/80"
+                    onClick={() => handleBulkDelete()}
+                  >
+                    {__('Continue', 'yay-wholesale')}
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </BulkActionBox>
+
+          <div className="flex items-center gap-4">
+            <span className="text-base-secondary text-sm font-normal">
+              Page {table.getState().pagination.pageIndex + 1} of {table.getPageCount()}
+            </span>
 
             <div className="flex items-center gap-1">
-              <span className="mx-5 text-sm">
-                Page {pagination.pageIndex + 1} of {data?.totalPage ?? 0}
-              </span>
               <Button
                 variant="outline"
                 size="icon"
-                onClick={() => table.setPageIndex(0)}
-                disabled={!table.getCanPreviousPage()}
-              >
-                <ChevronsLeft />
-              </Button>
-              <Button
-                variant="outline"
-                size="icon"
+                className="h-9 w-9 rounded-sm"
                 onClick={() => table.previousPage()}
                 disabled={!table.getCanPreviousPage()}
               >
-                <ChevronLeft />
+                <ChevronLeft className="h-4 w-4" />
               </Button>
-
               <Button
                 variant="outline"
                 size="icon"
+                className="h-9 w-9 rounded-sm"
                 onClick={() => table.nextPage()}
                 disabled={!table.getCanNextPage()}
               >
-                <ChevronRight />
+                <ChevronRight className="h-4 w-4" />
               </Button>
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={() => table.setPageIndex((data?.totalPage ?? 1) - 1)}
-                disabled={!table.getCanNextPage()}
-              >
-                <ChevronsRight />
-              </Button>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <span className="text-base-secondary text-sm font-normal">{__('Go to')}</span>
+              <Input
+                type="number"
+                min={1}
+                max={table.getPageCount()}
+                value={table.getState().pagination.pageIndex + 1}
+                onChange={(e) => {
+                  const page = e.target.value ? Number(e.target.value) - 1 : 0;
+                  if (page >= 0 && page < table.getPageCount()) {
+                    table.setPageIndex(page);
+                  }
+                }}
+                className="text-base-secondary h-9 w-15 rounded-sm text-sm font-normal"
+              />
             </div>
           </div>
         </div>

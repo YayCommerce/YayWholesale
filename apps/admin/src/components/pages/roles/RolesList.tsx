@@ -17,6 +17,7 @@ import {
   useRolesQuery,
 } from '@/lib/queries/roles';
 import { cn } from '@/lib/utils';
+import BulkActionBox from '@/components/ui/bulk-actions-box';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input, InputSuffix } from '@/components/ui/input';
@@ -209,64 +210,49 @@ export default function RolesList() {
       {filteredData.length > 0 && (
         <div className="flex h-[46px] items-center justify-between">
           {/* Left side - Bulk actions or empty */}
-          <div className="flex items-center gap-4">
-            {selectedCount > 1 &&
-              !isBulkUpdatingRoleStatusPending &&
-              !isDeletingManyRolesPending && (
-                <div className="border-border flex items-center gap-2 rounded-md border px-1.5 py-1 shadow-[0_1px_2px_0_#0000000D]">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="hover:text-foreground text-muted-foreground h-6 w-6 shrink-0 hover:bg-transparent"
-                    onClick={clearSelection}
-                    aria-label="Clear selection"
-                  >
-                    <XIcon className="size-4" />
-                  </Button>
-                  <span className="text-sm font-normal text-[#151619]">
-                    {selectedCount} {__('selected')}
-                  </span>
-                  <span className="h-5 w-px border-r border-solid border-[#F4F4F5]" aria-hidden />
-                  <Select
-                    value={selectValue}
-                    onValueChange={(newValue) => {
-                      const status = newValue === 'set-active';
-                      setSelectValue(newValue);
-                      bulkUpdateRoleStatus(
-                        { ids: selectedRowsIds, status },
-                        {
-                          onSuccess: () => {
-                            clearSelection();
-                            setSelectValue('');
-                          },
-                        },
-                      );
-                    }}
-                  >
-                    <SelectTrigger
-                      icon={<ChevronsUpDown className="size-4" />}
-                      className="data-[placeholder]:text-base-secondary h-8 w-[80px] gap-2 border-none bg-transparent px-0 text-sm font-normal shadow-none focus:ring-0 focus:ring-offset-0 focus-visible:shadow-none focus-visible:ring-0 focus-visible:ring-offset-0"
-                    >
-                      <SelectValue placeholder={__('Status')} />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="set-active">{__('Active')}</SelectItem>
-                      <SelectItem value="set-inactive">{__('Inactive')}</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <span className="h-5 w-px border-r border-solid border-[#F4F4F5]" aria-hidden />
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="hover:text-destructive text-base-muted-foreground h-6 w-6 shrink-0 hover:bg-transparent"
-                    onClick={handleBulkDelete}
-                    aria-label="Delete selected"
-                  >
-                    <DeleteIcon className="size-4" />
-                  </Button>
-                </div>
-              )}
-          </div>
+          <BulkActionBox
+            selectedCount={selectedCount}
+            onResetRow={() => table.resetRowSelection()}
+            isHidingCondition={!isBulkUpdatingRoleStatusPending && !isDeletingManyRolesPending}
+          >
+            <Select
+              value={selectValue}
+              onValueChange={(newValue) => {
+                const status = newValue === 'set-active';
+                setSelectValue(newValue);
+                bulkUpdateRoleStatus(
+                  { ids: selectedRowsIds, status },
+                  {
+                    onSuccess: () => {
+                      clearSelection();
+                      setSelectValue('');
+                    },
+                  },
+                );
+              }}
+            >
+              <SelectTrigger
+                icon={<ChevronsUpDown className="size-4" />}
+                className="data-[placeholder]:text-base-secondary h-8 w-[80px] gap-2 border-none bg-transparent px-0 text-sm font-normal shadow-none focus:ring-0 focus:ring-offset-0 focus-visible:shadow-none focus-visible:ring-0 focus-visible:ring-offset-0"
+              >
+                <SelectValue placeholder={__('Status')} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="set-active">{__('Active')}</SelectItem>
+                <SelectItem value="set-inactive">{__('Inactive')}</SelectItem>
+              </SelectContent>
+            </Select>
+            <span className="h-5 w-px border-r border-solid border-[#F4F4F5]" aria-hidden />
+            <Button
+              variant="ghost"
+              size="icon"
+              className="hover:text-destructive text-base-muted-foreground h-6 w-6 shrink-0 hover:bg-transparent"
+              onClick={handleBulkDelete}
+              aria-label="Delete selected"
+            >
+              <DeleteIcon className="size-4" />
+            </Button>
+          </BulkActionBox>
 
           {/* Right side - Pagination controls */}
           <div className="flex items-center gap-4">

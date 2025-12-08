@@ -12,7 +12,7 @@ function TableToaster({ className, children }: TableToasterProps) {
   return (
     <div
       className={cn(
-        'pointer-events-none fixed bottom-10 left-1/2 z-[9999] w-full max-w-md -translate-x-1/2 transform px-4 sm:left-3/5',
+        'pointer-events-none fixed bottom-10 left-16/25 z-9999 w-full max-w-md -translate-x-1/2 transform px-4',
         className,
       )}
     >

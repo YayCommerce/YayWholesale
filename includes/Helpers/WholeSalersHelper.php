@@ -70,8 +70,12 @@ class WholeSalersHelper {
             [
                 'limit'      => -1,
                 'status'     => 'completed',
-                'meta_key'   => 'yay_wholesale',
-                'meta_value' => 'yes',
+                'meta_query' => [
+                    [
+                        'key'     => '_ywhs_wholesale_role',
+                        'compare' => 'EXISTS',
+                    ],
+                ],
                 'return'     => 'objects',
             ]
         );
