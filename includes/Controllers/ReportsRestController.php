@@ -58,38 +58,60 @@ class ReportsRestController extends BaseRestController {
         $compare_start_date = $request['compareStartDate'];
         $compare_end_date   = $request['compareEndDate'];
 
-        if ( ! isset( $start_date ) ) {
+        $default_date_range = get_transient( ReportsHelper::REPORT_DATE_RANGE_TRANSIENT );
+        if ( false === $default_date_range ) {
             $date = new DateTime();
             $date->modify( '-30 days' );
-            $start_date         = $date->format( 'Y-m-d' );
-            $compare_start_date = $date->modify( '-31 days' )->format( 'Y-m-d' );
+            $default_start_date         = $date->format( 'Y-m-d' );
+            $default_compare_start_date = $date->modify( '-31 days' )->format( 'Y-m-d' );
+
+            $now                      = new DateTime();
+            $default_end_date         = $now->format( 'Y-m-d' );
+            $default_compare_end_date = $now->modify( '-31 days' )->format( 'Y-m-d' );
+
+            $default_date_range = [
+                'default_start_date'         => $default_start_date,
+                'default_end_date'           => $default_end_date,
+                'default_compare_start_date' => $default_compare_start_date,
+                'default_compare_end_date'   => $default_compare_end_date,
+            ];
+
+            set_transient( ReportsHelper::REPORT_DATE_RANGE_TRANSIENT, $default_date_range, strtotime( 'tomorrow' ) - time() );
+        }
+
+        if ( ! isset( $start_date ) ) {
+            $start_date         = $default_date_range['default_start_date'];
+            $compare_start_date = $default_date_range['default_compare_start_date'];
         }
 
         if ( ! isset( $end_date ) ) {
-            $now              = new DateTime();
-            $end_date         = $now->format( 'Y-m-d' );
-            $compare_end_date = $now->modify( '-31 days' )->format( 'Y-m-d' );
+            $end_date         = $default_date_range['default_end_date'];
+            $compare_end_date = $default_date_range['default_compare_end_date'];
         }
 
-        $transient = get_transient( ReportsHelper::REPORT_TRANSIENT );
-        if ( false !== $transient &&
-            $start_date === $transient['start_date'] &&
-            $end_date === $transient['end_date'] &&
-            $compare_start_date === $transient['compare_start_date'] &&
-            $compare_end_date === $transient['compare_end_date'] ) {
-            return $this->success( $transient['data'], __( 'Reports generated!', 'yay-wholesale' ) );
+        $transient_key = ReportsHelper::REPORT_TRANSIENT
+                                . '_'
+                                . $compare_start_date
+                                . '_'
+                                . $compare_end_date
+                                . '_'
+                                . $start_date
+                                . '_'
+                                . $end_date;
+
+        $transient = get_transient( $transient_key );
+        if ( false !== $transient ) {
+            return $this->success( $transient, __( 'Reports generated!', 'yay-wholesale' ) );
         }
 
         $statistic = ReportsHelper::statistic_data( $start_date, $end_date, $compare_start_date, $compare_end_date );
 
-        $transient = [
-            'start_date'         => $start_date,
-            'end_date'           => $end_date,
-            'data'               => $statistic,
-            'compare_start_date' => $compare_start_date,
-            'compare_end_date'   => $compare_end_date,
-        ];
-        set_transient( ReportsHelper::REPORT_TRANSIENT, $transient, 600 );
+        if ( $start_date === $default_date_range['default_start_date'] &&
+            $end_date === $default_date_range['default_end_date'] &&
+            $compare_start_date === $default_date_range['default_compare_start_date'] &&
+            $compare_end_date === $default_date_range['default_compare_end_date'] ) {
+            set_transient( $transient_key, $statistic, 600 );
+        }
 
         return $this->success( $statistic, __( 'Reports generated!', 'yay-wholesale' ) );
     }

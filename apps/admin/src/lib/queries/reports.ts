@@ -14,7 +14,7 @@ export const useReportsQuery = (
   const compareEndDate = dayjs(compareDateRange?.to).format('YYYY-MM-DD');
 
   return useQuery({
-    queryKey: ['reports', { startDate, endDate }],
+    queryKey: ['reports', { startDate, endDate, compareStartDate, compareEndDate }],
     queryFn: () => {
       return fetchReports(startDate, endDate, compareStartDate, compareEndDate);
     },
