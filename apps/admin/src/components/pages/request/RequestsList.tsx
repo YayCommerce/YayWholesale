@@ -67,6 +67,7 @@ export default function RequestsList() {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [openBulkDeleteDialog, setOpenDeleteDialog] = useState(false);
+  const [showActionsId, setShowActionsId] = useState(-1);
   const clientQuery = useQueryClient();
 
   const debouncedSearch = useMemo(() => {
@@ -83,7 +84,7 @@ export default function RequestsList() {
 
   const { data: activeRoles } = useActiveRolesQuery();
 
-  const columns = RequestsColumn;
+  const columns = useMemo(() => RequestsColumn(showActionsId), [showActionsId]);
   const defaultData = useMemo(() => [], []);
 
   const table = useReactTable({
@@ -204,9 +205,17 @@ export default function RequestsList() {
               </TableRow>
             ) : table.getRowModel().rows.length > 0 ? (
               table.getRowModel().rows.map((row) => (
-                <TableRow key={row.id} data-state={row.getIsSelected() && 'selected'}>
+                <TableRow
+                  key={row.id}
+                  data-state={row.getIsSelected() && 'selected'}
+                  onMouseOver={() => setShowActionsId(row.original.id)}
+                  onMouseLeave={() => setShowActionsId(-1)}
+                >
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
+                    <TableCell
+                      key={cell.id}
+                      className={cell.column.id === 'actions' ? 'flex justify-end' : ''}
+                    >
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </TableCell>
                   ))}
@@ -259,7 +268,10 @@ export default function RequestsList() {
               <AlertDialogContent>
                 <AlertDialogHeader>
                   <AlertDialogTitle>
-                    {__('Are you sure you want to bulk delete requests?', 'yay-wholesale')}
+                    {__(`Are you sure you want to delete %SC% requests ?`, 'yay-wholesale').replace(
+                      '%SC%',
+                      selectedCount.toString(),
+                    )}
                   </AlertDialogTitle>
                   <AlertDialogDescription>
                     {__(

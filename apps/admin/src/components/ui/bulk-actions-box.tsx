@@ -23,7 +23,7 @@ const BulkActionBox = ({
     <>
       <div className="flex items-center gap-4">
         {selectedCount > 1 && (isHidingCondition ?? true) && (
-          <div className="border-border hidden items-center gap-2 rounded-md border px-1.5 py-1 shadow-[0_1px_2px_0_#0000000D] lg:flex">
+          <div className="border-border flex items-center gap-2 rounded-md border px-1.5 py-1 shadow-[0_1px_2px_0_#0000000D]">
             <Button
               variant="ghost"
               size="icon"
@@ -41,24 +41,6 @@ const BulkActionBox = ({
           </div>
         )}
       </div>
-
-      <TableToaster className="block lg:hidden">
-        <TableToast
-          open={selectedCount > 1}
-          onOpenChange={(open) => {
-            if (!open) {
-              onResetRow();
-            }
-          }}
-        >
-          <TableToastClose onClick={() => onResetRow()} />
-          <TableToastTitle>
-            {__('%RC% selected').replace('%RC%', selectedCount.toString())}
-          </TableToastTitle>
-          <Separator orientation="vertical" className="ml-2 h-5!" />
-          {children}
-        </TableToast>
-      </TableToaster>
     </>
   );
 };

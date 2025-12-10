@@ -7,6 +7,16 @@ import { useNavigate } from 'react-router-dom';
 import { useDeleteRoleMutation, useUpdateRoleStatusMutation } from '@/lib/queries/roles';
 import { RolesListValues } from '@/lib/schema/roles';
 import { cn } from '@/lib/utils';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { WholeSaleToolTip } from '@/components/custom/WholeSaleToolTip';
@@ -16,7 +26,9 @@ import EditIcon from '@/components/icons/SettingsIcon';
 import { formatWooPrice } from '../roles.helper';
 import RoleStatusSwitch from './RoleStatusSwitch';
 
-export const RolesColumn: ColumnDef<RolesListValues & { count: number }>[] = [
+export const RolesColumn = (
+  showActionsId: number,
+): ColumnDef<RolesListValues & { count: number }>[] => [
   {
     id: 'select',
     header: ({ table }) => (
@@ -143,50 +155,77 @@ export const RolesColumn: ColumnDef<RolesListValues & { count: number }>[] = [
       const { mutate: deleteRoleById, isPending: isDeletingRolePending } = useDeleteRoleMutation(
         row.original.id,
       );
-      const handleDelete = (id: number) => {
-        if (!window.confirm(__('Are you sure you want to delete this role?'))) return;
-        deleteRoleById();
-      };
       const navigate = useNavigate();
+      const [openDialog, setOpenDialog] = useState(false);
       return (
-        <div className="relative flex justify-end">
-          <div className="group relative flex items-center">
-            <button type="button" className="rounded-md p-1 transition group-hover:hidden">
-              <Ellipsis className="text-base-secondary size-4" />
-            </button>
+        <AlertDialog open={openDialog} onOpenChange={setOpenDialog}>
+          <div className="relative flex justify-end">
+            <div className="group relative flex items-center">
+              {showActionsId !== row.original.id ? (
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  className="text-base-muted-foreground transition"
+                >
+                  <Ellipsis className="size-4" />
+                </Button>
+              ) : (
+                <div className="absolute top-1/2 right-0 flex -translate-y-1/2 items-center gap-0">
+                  <WholeSaleToolTip
+                    trigger={
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        onClick={() => navigate(`/roles/edit/${row.original.id}`)}
+                        className="hover:text-primary text-base-muted-foreground transition hover:bg-[#FFFFFF] hover:shadow-xs"
+                      >
+                        <EditIcon className="size-4" />
+                      </Button>
+                    }
+                    content={<span>{__('Edit role')}</span>}
+                  />
 
-            <div className="absolute top-1/2 right-0 hidden -translate-y-1/2 items-center gap-0 group-hover:flex">
-              <WholeSaleToolTip
-                trigger={
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    onClick={() => navigate(`/roles/edit/${row.original.id}`)}
-                    className="hover:text-primary text-base-muted-foreground transition hover:bg-[#FFFFFF] hover:shadow-xs"
-                  >
-                    <EditIcon className="size-4" />
-                  </Button>
-                }
-                content={<span>{__('Edit role')}</span>}
-              />
-
-              <WholeSaleToolTip
-                trigger={
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    onClick={() => handleDelete(row.original.id)}
-                    disabled={isDeletingRolePending}
-                    className="hover:text-destructive text-base-muted-foreground hover:bg-[#FFFFFF] hover:shadow-xs"
-                  >
-                    <DeleteIcon className="size-4" />
-                  </Button>
-                }
-                content={<span>{__('Delete role')}</span>}
-              />
+                  <WholeSaleToolTip
+                    trigger={
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        onClick={() => setOpenDialog(true)}
+                        disabled={isDeletingRolePending}
+                        className="hover:text-destructive text-base-muted-foreground hover:bg-[#FFFFFF] hover:shadow-xs"
+                      >
+                        <DeleteIcon className="size-4" />
+                      </Button>
+                    }
+                    content={<span>{__('Delete role')}</span>}
+                  />
+                </div>
+              )}
             </div>
           </div>
-        </div>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>
+                {__('Are you sure you want to delete this role?', 'yay-wholesale')}
+              </AlertDialogTitle>
+              <AlertDialogDescription>
+                {__(
+                  'This action cannot be undone. This will permanently delete this request and remove data from servers',
+                  'yay-wholesale',
+                )}
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>{__('Cancel', 'yay-wholesale')}</AlertDialogCancel>
+              <AlertDialogAction
+                className="bg-destructive text-destructive-foreground hover:bg-destructive/80"
+                onClick={() => deleteRoleById()}
+              >
+                {__('Continue', 'yay-wholesale')}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       );
     },
     size: 60,

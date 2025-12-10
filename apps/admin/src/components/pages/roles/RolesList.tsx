@@ -17,6 +17,16 @@ import {
   useRolesQuery,
 } from '@/lib/queries/roles';
 import { cn } from '@/lib/utils';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import BulkActionBox from '@/components/ui/bulk-actions-box';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -52,6 +62,8 @@ export default function RolesList() {
 
   const roles = useMemo(() => (data ? [...data].reverse() : []), [data]);
   const [search, setSearch] = useState('');
+  const [showActionsId, setShowActionsId] = useState(-1);
+  const [openBulkDeleteDialog, setOpenDeleteDialog] = useState(false);
   const filteredData = useMemo(
     () =>
       roles
@@ -64,9 +76,11 @@ export default function RolesList() {
     [roles, search],
   );
 
+  const columns = useMemo(() => RolesColumn(showActionsId), [showActionsId]);
+
   const table = useReactTable({
     data: filteredData,
-    columns: RolesColumn,
+    columns,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
@@ -80,12 +94,6 @@ export default function RolesList() {
   };
 
   const handleBulkDelete = () => {
-    if (
-      !window.confirm(
-        `Are you sure you want to delete ${selectedCount} ${selectedCount > 1 ? 'roles' : 'role'}?`,
-      )
-    )
-      return;
     deleteManyRolesByIds(selectedRowsIds, {
       onSuccess: () => {
         clearSelection();
@@ -184,6 +192,8 @@ export default function RolesList() {
                           : 'text-left',
                         cell.column.columnDef.meta?.isCheckbox ? 'w-[36px] pr-0 pl-2' : 'px-3',
                       )}
+                      onMouseOver={() => setShowActionsId(row.original.id)}
+                      onMouseLeave={() => setShowActionsId(-1)}
                     >
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </TableCell>
@@ -233,7 +243,7 @@ export default function RolesList() {
             >
               <SelectTrigger
                 icon={<ChevronsUpDown className="size-4" />}
-                className="data-[placeholder]:text-base-secondary h-8 w-[80px] gap-2 border-none bg-transparent px-0 text-sm font-normal shadow-none focus:ring-0 focus:ring-offset-0 focus-visible:shadow-none focus-visible:ring-0 focus-visible:ring-offset-0"
+                className="data-placeholder:text-base-secondary h-8 w-[80px] gap-2 border-none bg-transparent px-0 text-sm font-normal shadow-none focus:ring-0 focus:ring-offset-0 focus-visible:shadow-none focus-visible:ring-0 focus-visible:ring-offset-0"
               >
                 <SelectValue placeholder={__('Status')} />
               </SelectTrigger>
@@ -243,15 +253,42 @@ export default function RolesList() {
               </SelectContent>
             </Select>
             <span className="h-5 w-px border-r border-solid border-[#F4F4F5]" aria-hidden />
-            <Button
-              variant="ghost"
-              size="icon"
-              className="hover:text-destructive text-base-muted-foreground h-6 w-6 shrink-0 hover:bg-transparent"
-              onClick={handleBulkDelete}
-              aria-label="Delete selected"
-            >
-              <DeleteIcon className="size-4" />
-            </Button>
+            <AlertDialog open={openBulkDeleteDialog} onOpenChange={setOpenDeleteDialog}>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="hover:text-destructive text-base-muted-foreground h-6 w-6 shrink-0 hover:bg-transparent"
+                onClick={() => setOpenDeleteDialog(true)}
+                aria-label="Delete selected"
+              >
+                <DeleteIcon className="size-4" />
+              </Button>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>
+                    {__(`Are you sure you want to delete %SC% roles ?`, 'yay-wholesale').replace(
+                      '%SC%',
+                      selectedCount.toString(),
+                    )}
+                  </AlertDialogTitle>
+                  <AlertDialogDescription>
+                    {__(
+                      'This action cannot be undone. This will permanently delete these request and remove data from servers',
+                      'yay-wholesale',
+                    )}
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>{__('Cancel', 'yay-wholesale')}</AlertDialogCancel>
+                  <AlertDialogAction
+                    className="bg-destructive text-destructive-foreground hover:bg-destructive/80"
+                    onClick={() => handleBulkDelete()}
+                  >
+                    {__('Continue', 'yay-wholesale')}
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           </BulkActionBox>
 
           {/* Right side - Pagination controls */}
