@@ -137,9 +137,9 @@ export default function RequestsList() {
       {/* Header */}
       <div className="flex flex-nowrap items-center justify-between gap-3">
         <h1 className="text-2xl font-bold">{__('Wholesaler Requests', 'yay-wholesale')}</h1>
-        <div className="flex gap-2">
+        <div className="flex flex-col-reverse gap-2 md:flex-row">
           <Select value={statusFilter} onValueChange={setStatusFilter}>
-            <SelectTrigger className="w-40">
+            <SelectTrigger className="w-full md:w-40">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -157,7 +157,7 @@ export default function RequestsList() {
               </SelectGroup>
             </SelectContent>
           </Select>
-          <InputGroup className="w-60">
+          <InputGroup className="w-full md:w-60">
             <InputGroupInput placeholder="Search" value={search} onChange={handleChangeSearch} />
             <InputGroupAddon align="inline-end">
               <Search />
@@ -169,7 +169,7 @@ export default function RequestsList() {
       {/* Table */}
       <div
         className={cn(
-          'overflow-hidden rounded-lg border',
+          'overflow-x-scroll rounded-lg border lg:overflow-hidden',
           isFetchingRequests && 'relative opacity-50',
         )}
       >
@@ -214,7 +214,9 @@ export default function RequestsList() {
                   {row.getVisibleCells().map((cell) => (
                     <TableCell
                       key={cell.id}
-                      className={cell.column.id === 'actions' ? 'flex justify-end' : ''}
+                      className={
+                        cell.column.id === 'actions' ? 'm-0 flex w-25 justify-end lg:w-full' : ''
+                      }
                     >
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </TableCell>

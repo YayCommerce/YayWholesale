@@ -40,6 +40,7 @@ import RolesIcon from '@/components/icons/RolesIcon';
 import { WholesalersColumn } from './wholesalers-table/WholesalersColumn';
 
 export default function WholeSalersList() {
+  const [keyword, setKeyword] = useState('');
   const [search, setSearch] = useState('');
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
@@ -51,7 +52,7 @@ export default function WholeSalersList() {
   const clientQuery = useQueryClient();
   const debouncedSearch = useMemo(() => {
     return debounce((value) => {
-      setSearch(value);
+      setKeyword(value);
     }, 500);
   }, [clientQuery]);
 
@@ -59,7 +60,7 @@ export default function WholeSalersList() {
     data: wholesalersData,
     isLoading: isLoadingWholesalers,
     isFetching: isFetchingWholesalers,
-  } = useWholesalersQuery(search, pagination, roleFilter);
+  } = useWholesalersQuery(keyword, pagination, roleFilter);
 
   const { data: activeRoles } = useActiveRolesQuery();
 
@@ -101,9 +102,9 @@ export default function WholeSalersList() {
       {/* Header */}
       <div className="flex flex-nowrap items-center justify-between gap-3">
         <h1 className="text-2xl font-bold">{__('Wholesalers List', 'yay-wholesale')}</h1>
-        <div className="flex gap-2">
+        <div className="flex flex-col-reverse gap-2 md:flex-row">
           <Select value={roleFilter} onValueChange={setRoleFilter}>
-            <SelectTrigger className="w-40">
+            <SelectTrigger className="w-full md:w-40">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -120,7 +121,7 @@ export default function WholeSalersList() {
               </SelectGroup>
             </SelectContent>
           </Select>
-          <InputGroup className="w-80">
+          <InputGroup className="w-full md:w-80">
             <InputGroupInput
               placeholder="Search by ID, Email, Display Name"
               value={search}
@@ -135,7 +136,7 @@ export default function WholeSalersList() {
             className="border-primary text-primary hover:bg-primary/10 bg-background flex h-[34px] cursor-pointer items-center justify-center gap-2 rounded-sm border px-4 text-sm font-medium"
           >
             <Plus className="h-4 w-4" />
-            {__('Add New Wholesaler')}
+            <span className="text-[12px] sm:text-[14px]">{__('Add New Wholesaler')}</span>
           </a>
         </div>
       </div>
@@ -143,7 +144,7 @@ export default function WholeSalersList() {
       {/* Table */}
       <div
         className={cn(
-          'overflow-hidden rounded-lg border',
+          'overflow-x-scroll rounded-lg border lg:overflow-hidden',
           isFetchingWholesalers && 'relative opacity-50',
         )}
       >

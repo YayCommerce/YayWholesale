@@ -134,7 +134,7 @@ export default function RolesList() {
       {/* Table */}
       <div
         className={cn(
-          'overflow-hidden rounded-lg border',
+          'overflow-x-scroll rounded-lg border lg:overflow-hidden',
           (isDeletingManyRolesPending || isBulkUpdatingRoleStatusPending) && 'relative opacity-50',
         )}
       >
@@ -191,6 +191,7 @@ export default function RolesList() {
                           ? 'text-center'
                           : 'text-left',
                         cell.column.columnDef.meta?.isCheckbox ? 'w-[36px] pr-0 pl-2' : 'px-3',
+                        cell.column.id === 'actions' && 'm-0 flex w-25 justify-end lg:w-full',
                       )}
                       onMouseOver={() => setShowActionsId(row.original.id)}
                       onMouseLeave={() => setShowActionsId(-1)}
