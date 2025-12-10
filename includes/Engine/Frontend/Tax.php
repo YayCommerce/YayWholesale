@@ -22,6 +22,7 @@ class Tax {
         add_action( 'wp', [ $this, 'set_customer_vat_exempt' ], PHP_INT_MAX );
         add_filter( 'pre_option_woocommerce_tax_display_shop', [ $this, 'force_display_excl_tax' ], PHP_INT_MAX );
         add_filter( 'woocommerce_calc_tax', [ $this, 'maybe_disable_tax_calc' ], 9999 );
+        add_filter( 'woocommerce_calc_shipping_tax', [ $this, 'maybe_disable_tax_calc' ], 999 );
     }
 
     /**

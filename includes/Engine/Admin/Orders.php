@@ -8,6 +8,7 @@ use Yay_Wholesale\Engine\Frontend\Tax;
 use Yay_Wholesale\Helpers\RolesHelper;
 use Yay_Wholesale\Helpers\SettingsHelper;
 use Yay_Wholesale\Helpers\PricingHelper;
+use Yay_Wholesale\Helpers\ReportsHelper;
 use Yay_Wholesale\Utils\SingletonTrait;
 
 defined( 'ABSPATH' ) || exit;
@@ -134,6 +135,21 @@ class Orders {
             $order->update_meta_data( '_ywhs_wholesale_role', $is_wholesale_user['name'] );
         } else {
             $order->delete_meta_data( '_ywhs_wholesale_role' );
+        }
+
+        $default_range_transient = get_transient( ReportsHelper::REPORT_DATE_RANGE_TRANSIENT );
+        if ( false !== $default_range_transient ) {
+            $transient_key = ReportsHelper::REPORT_TRANSIENT
+                            . '_'
+                            . $default_range_transient['default_compare_start_date']
+                            . '_'
+                            . $default_range_transient['default_compare_end_date']
+                            . '_'
+                            . $default_range_transient['default_start_date']
+                            . '_'
+                            . $default_range_transient['default_end_date'];
+
+            delete_transient( $transient_key );
         }
 
         add_filter( 'woocommerce_product_get_price', [ Pricing::get_instance(), 'get_price' ], 99, 2 );
