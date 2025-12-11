@@ -144,7 +144,7 @@ export default function WholeSalersList() {
       {/* Table */}
       <div
         className={cn(
-          'overflow-x-scroll rounded-lg border lg:overflow-hidden',
+          'overflow-x-auto rounded-lg border',
           isFetchingWholesalers && 'relative opacity-50',
         )}
       >

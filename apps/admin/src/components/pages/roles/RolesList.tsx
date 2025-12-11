@@ -134,7 +134,7 @@ export default function RolesList() {
       {/* Table */}
       <div
         className={cn(
-          'overflow-x-scroll rounded-lg border lg:overflow-hidden',
+          'overflow-x-auto rounded-lg border',
           (isDeletingManyRolesPending || isBulkUpdatingRoleStatusPending) && 'relative opacity-50',
         )}
       >

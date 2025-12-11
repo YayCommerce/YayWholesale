@@ -47,6 +47,8 @@
 
 #ywhs_request_form > button {
     padding: 5px;
+    margin-top: 5px;
+    border-radius: 10px;
 }
 
 .ywhs_requirement_section {

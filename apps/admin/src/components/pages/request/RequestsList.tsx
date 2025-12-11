@@ -169,7 +169,7 @@ export default function RequestsList() {
       {/* Table */}
       <div
         className={cn(
-          'overflow-x-scroll rounded-lg border lg:overflow-hidden',
+          'overflow-x-auto rounded-lg border',
           isFetchingRequests && 'relative opacity-50',
         )}
       >

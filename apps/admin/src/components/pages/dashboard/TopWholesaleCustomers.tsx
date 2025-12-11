@@ -32,7 +32,7 @@ export default function TopWholesaleCustomers(props: {
 
         {/* DataTable */}
         <div
-          className={cn('overflow-hidden rounded-md border', isFetching && 'relative opacity-50')}
+          className={cn('overflow-x-auto rounded-md border', isFetching && 'relative opacity-50')}
         >
           <Table className="divide-muted min-w-full divide-y">
             <TableHeader className="text-base-foreground h-10 bg-[#FAFAFA]">

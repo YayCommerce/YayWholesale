@@ -33,7 +33,7 @@ export default function TopProducts(props: { reportQuery: ReturnType<typeof useR
         {/* DataTable */}
         <div
           className={cn(
-            'overflow-hidden rounded-md border bg-white',
+            'overflow-x-auto rounded-md border bg-white',
             isFetching && 'relative opacity-50',
           )}
         >
