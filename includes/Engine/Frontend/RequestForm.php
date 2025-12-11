@@ -59,8 +59,7 @@ class RequestForm {
      * @return string Form HTML ouput.
      */
     protected function ywhs_request_form_html( array $attr = [] ): string {
-        $settings            = SettingsHelper::get_settings();
-        $is_use_default_form = $settings['registration_fields']['useDefaultForm'];
+        $settings = SettingsHelper::get_settings();
         ob_start();
         ?>
         <div>
@@ -70,7 +69,7 @@ class RequestForm {
                 <?php
                 foreach ( $settings['registration_fields']['fields'] as $field ) :
                     ?>
-                    <?php if ( $field['isDefault'] || ! $is_use_default_form ) : ?>
+                    <?php if ( ! $field['isHidden'] ) : ?>
                     <div <?php echo esc_html( $field['columnWidth'] ) === '50%' ? 'class="ywhs_half"' : 'class="ywhs_full"'; ?> >
                         <label for="<?php echo esc_html( $field['id'] ); ?>" >
                             <?php echo esc_html( $field['label'] ); ?>
