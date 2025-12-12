@@ -172,7 +172,7 @@ export const RolesColumn = (
       const [openDialog, setOpenDialog] = useState(false);
       return (
         <AlertDialog open={openDialog} onOpenChange={setOpenDialog}>
-          <div className="relative flex justify-end">
+          <div className="relative flex w-15 justify-end">
             <div className="group relative flex items-center">
               {showActionsId !== row.original.id ? (
                 <Button
