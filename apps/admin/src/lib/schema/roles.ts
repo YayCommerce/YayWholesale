@@ -20,7 +20,7 @@ export const roleSchema = z.object({
   applyToSalePrice: z.boolean(),
   status: z.boolean(),
   count: z.number().optional(),
-  isDefault: z.boolean(),
+  isDefault: z.boolean().optional(),
 });
 
 export const createRoleSchema = roleSchema.omit({

@@ -41,7 +41,7 @@ class ActDeact {
                     'discount'         => 0,
                     'minOrderQuantity' => 0,
                     'minOrderAmount'   => 0,
-                    'applyToSalePrice' => 0,
+                    'applyToSalePrice' => false,
                     'status'           => true,
                     'slug'             => $default_slug,
                 ];
