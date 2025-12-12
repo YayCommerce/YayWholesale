@@ -17,6 +17,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { WholeSaleToolTip } from '@/components/custom/WholeSaleToolTip';
@@ -48,6 +49,7 @@ export const RolesColumn = (
           checked={row.getIsSelected()}
           onCheckedChange={(v) => row.toggleSelected(!!v)}
           aria-label="Select row"
+          disabled={row.original.isDefault}
         />
       </div>
     ),
@@ -62,11 +64,16 @@ export const RolesColumn = (
     cell: ({ row }) => {
       const navigate = useNavigate();
       return (
-        <div
-          onClick={() => navigate(`/roles/edit/${row.original.id}`)}
-          className="cursor-pointer hover:underline"
-        >
-          {row.original.name}
+        <div className="flex gap-2">
+          <div
+            onClick={() => navigate(`/roles/edit/${row.original.id}`)}
+            className="cursor-pointer hover:underline"
+          >
+            {row.original.name}
+          </div>
+          {row.original.isDefault && (
+            <Badge variant="primary-soft">{__('Default', 'yay-wholesale')}</Badge>
+          )}
         </div>
       );
     },
@@ -145,7 +152,13 @@ export const RolesColumn = (
   {
     accessorKey: 'status',
     header: 'Status',
-    cell: ({ row }) => <RoleStatusSwitch id={row.original.id} status={row.original.status} />,
+    cell: ({ row }) => (
+      <RoleStatusSwitch
+        id={row.original.id}
+        status={row.original.status}
+        isDefault={row.original.isDefault}
+      />
+    ),
     size: 80,
   },
   {
@@ -191,7 +204,7 @@ export const RolesColumn = (
                         size="icon"
                         variant="ghost"
                         onClick={() => setOpenDialog(true)}
-                        disabled={isDeletingRolePending}
+                        disabled={isDeletingRolePending || row.original.isDefault}
                         className="hover:text-destructive text-base-muted-foreground hover:bg-[#FFFFFF] hover:shadow-xs"
                       >
                         <DeleteIcon className="size-4" />

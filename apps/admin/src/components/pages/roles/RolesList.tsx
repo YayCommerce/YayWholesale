@@ -193,8 +193,8 @@ export default function RolesList() {
                         cell.column.columnDef.meta?.isCheckbox ? 'w-[36px] pr-0 pl-2' : 'px-3',
                         cell.column.id === 'actions' && 'm-0 flex w-25 justify-end lg:w-full',
                       )}
-                      onMouseOver={() => setShowActionsId(row.original.id)}
-                      onMouseLeave={() => setShowActionsId(-1)}
+                      onPointerEnter={() => setShowActionsId(row.original.id)}
+                      onPointerLeave={() => setShowActionsId(-1)}
                     >
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </TableCell>

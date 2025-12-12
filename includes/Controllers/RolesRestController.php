@@ -6,6 +6,7 @@ use Yay_Wholesale\Helpers\RolesHelper;
 use WP_REST_Request;
 use WP_REST_Response;
 use WP_User_Query;
+use Yay_Wholesale\Helpers\SettingsHelper;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -104,7 +105,8 @@ class RolesRestController extends BaseRestController {
      * @return WP_REST_Response The response object.
      */
     public function get_roles( WP_REST_Request $request ): WP_REST_Response {
-        $roles = get_option( 'yay_wholesale_roles', [] );
+        $roles    = get_option( 'yay_wholesale_roles', [] );
+        $settings = SettingsHelper::get_settings();
 
         $active_filter = $request->get_param( 'active' );
 
@@ -126,6 +128,7 @@ class RolesRestController extends BaseRestController {
             if ( $count > 0 ) {
                 $role['role_url'] = admin_url( 'users.php?role=' . rawurlencode( $slug ) );
             }
+            $role['isDefault'] = $slug === $settings['general']['default_role'];
         }
 
         return $this->success( $roles );
