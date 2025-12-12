@@ -13,15 +13,16 @@ class ReportsHelper {
 
     protected static function get_orders_to_statistic( $start_date, $end_date ) {
         $args = [
-            'limit'        => -1,
-            'status'       => [ 'pending', 'on-hold', 'processing', 'completed' ],
-            'meta_query'   => [
+            'limit'                  => -1,
+            'update_post_meta_cache' => true,
+            'status'                 => [ 'pending', 'on-hold', 'processing', 'completed' ],
+            'meta_query'             => [
                 [
                     'key'     => '_ywhs_wholesale_role',
                     'compare' => 'EXISTS',
                 ],
             ],
-            'date_created' => $start_date . '...' . $end_date,
+            'date_created'           => $start_date . '...' . $end_date,
         ];
 
         return wc_get_orders( $args );
@@ -38,9 +39,17 @@ class ReportsHelper {
                 continue;
             }
 
-            $revenue                       += $order->get_subtotal();
-            $customer_id                    = $order->get_customer_id();
-            $top_wholesaler[ $customer_id ] = isset( $top_wholesaler[ $customer_id ] ) ? $top_wholesaler[ $customer_id ] + 1 : 1;
+            $revenue    += $order->get_subtotal();
+            $customer_id = $order->get_customer_id();
+            $order_role  = $order->get_meta( '_ywhs_wholesale_role' );
+            if ( isset( $top_wholesaler[ $customer_id ] ) && $order_role === $top_wholesaler[ $customer_id ]['role'] ) {
+                $top_wholesaler[ $customer_id ]['order_count'] += 1;
+            } else {
+                $top_wholesaler[ $customer_id ] = [
+                    'role'        => $order_role,
+                    'order_count' => 1,
+                ];
+            }
 
             foreach ( $order->get_items() as $item ) {
                 if ( ! $item instanceof \WC_Order_Item_Product ) {
@@ -101,8 +110,7 @@ class ReportsHelper {
 
         if ( ! empty( $top_wholesaler ) ) {
             $query_args = [
-                'role__in' => $wholesale_slugs,
-                'include'  => array_keys( $top_wholesaler ),
+                'include' => array_keys( $top_wholesaler ),
             ];
             $query      = new \WP_User_Query( $query_args );
             $users      = $query->get_results();
@@ -111,21 +119,29 @@ class ReportsHelper {
                 if ( ! $user instanceof \WP_User ) {
                     continue;
                 }
-                $amount                      = $top_wholesaler[ $user->ID ];
+                $amount    = $top_wholesaler[ $user->ID ]['order_count'];
+                $user_role = array_values(
+                    array_filter(
+                        $user->roles,
+                        function ( $r ) use ( $wholesale_slugs ) {
+                            return in_array( $r, $wholesale_slugs, true );
+                        }
+                    )
+                );
+
+                $role;
+                if ( empty( $user_role ) ) {
+                    $role = $top_wholesaler[ $user->ID ]['role'];
+                } else {
+                    $role = RolesHelper::get_role_by_slug( $roles, $user_role[0] )['name'];
+                }
                 $top_wholesaler[ $user->ID ] = [
                     'name'       => $user->display_name,
                     'avatar'     => get_avatar_url( $user->ID ),
-                    'role'       => array_values(
-                        array_filter(
-                            $user->roles,
-                            function ( $r ) use ( $wholesale_slugs ) {
-                                return in_array( $r, $wholesale_slugs, true );
-                            }
-                        )
-                    )[0],
+                    'role'       => $role,
                     'orderCount' => $amount,
                 ];
-            }
+            }//end foreach
         }//end if
 
         return array_values( $top_wholesaler );
