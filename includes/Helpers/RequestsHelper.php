@@ -69,16 +69,13 @@ class RequestsHelper {
                 if ( array_key_exists( $key, $form_data ) ) {
                     if ( 'email' === $gsetting['type'] && ! $gsetting['deletable'] ) {
                         update_post_meta( $new_request_id, self::REQUEST_META_EMAIL, $form_data[ $key ] );
-                    }
-
-                    if ( 'textarea' === $gsetting['type'] && ! $gsetting['deletable'] ) {
+                    } elseif ( 'textarea' === $gsetting['type'] && ! $gsetting['deletable'] ) {
                         update_post_meta( $new_request_id, self::REQUEST_META_MESSAGE, $form_data[ $key ] );
-                    }
-
-                    if ( $gsetting['deletable'] ) {
+                    } else {
                         $data[ $gsetting['label'] ] = [
-                            'type'  => $gsetting['type'],
-                            'value' => $form_data[ $key ],
+                            'type'       => $gsetting['type'],
+                            'value'      => $form_data[ $key ],
+                            'is_default' => $gsetting['isDefault'],
                         ];
                     }
                 }
@@ -182,26 +179,41 @@ class RequestsHelper {
         $status       = get_post_meta( $data->ID, self::REQUEST_META_STATUS, true );
 
         $cleaned = [
-            'id'      => $data->ID,
-            'fields'  => [],
-            'name'    => $display_name,
-            'email'   => $email,
-            'message' => $message,
-            'status'  => $status,
-            'date'    => $data->post_date,
-            'avatar'  => $data->post_author > 0 ? get_avatar_url( $data->post_author ) : '',
+            'id'        => $data->ID,
+            'fields'    => [],
+            'name'      => $display_name,
+            'email'     => $email,
+            'message'   => $message,
+            'status'    => $status,
+            'date'      => $data->post_date,
+            'avatar'    => $data->post_author > 0 ? get_avatar_url( $data->post_author ) : '',
+            'firstName' => '',
+            'lastName'  => '',
         ];
 
+        $last_name_phrase  = __( 'Last Name', 'yay-wholesale' );
+        $first_name_phrase = __( 'First Name', 'yay-wholesale' );
         if ( $is_extra_fields ) {
             foreach ( $post_meta as $key => $field ) {
-                $tmp                 = [
-                    'label' => $key,
-                    'value' => $field['value'],
-                    'type'  => $field['type'],
-                ];
-                $cleaned['fields'][] = $tmp;
+                if ( ! $field['is_default'] ) {
+                    $tmp = [
+                        'label' => $key,
+                        'value' => $field['value'],
+                        'type'  => $field['type'],
+                    ];
+
+                    $cleaned['fields'][] = $tmp;
+                } else {
+                    if ( preg_match( "/(?i)\b$last_name_phrase\b/", $key ) ) {
+                        $cleaned['lastName'] = $field['value'];
+                    }
+
+                    if ( preg_match( "/(?i)\b$first_name_phrase\b/", $key ) ) {
+                        $cleaned['firstName'] = $field['value'];
+                    }
+                }
             }
-        }
+        }//end if
 
         return $cleaned;
     }

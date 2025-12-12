@@ -68,6 +68,7 @@ export default function RequestsList() {
   const [statusFilter, setStatusFilter] = useState('all');
   const [openBulkDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [showActionsId, setShowActionsId] = useState(-1);
+  const [preventReset, setPreventReset] = useState(false);
   const clientQuery = useQueryClient();
 
   const debouncedSearch = useMemo(() => {
@@ -84,7 +85,7 @@ export default function RequestsList() {
 
   const { data: activeRoles } = useActiveRolesQuery();
 
-  const columns = useMemo(() => RequestsColumn(showActionsId), [showActionsId]);
+  const columns = useMemo(() => RequestsColumn(showActionsId, setPreventReset), [showActionsId]);
   const defaultData = useMemo(() => [], []);
 
   const table = useReactTable({
@@ -208,8 +209,10 @@ export default function RequestsList() {
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && 'selected'}
-                  onMouseOver={() => setShowActionsId(row.original.id)}
-                  onMouseLeave={() => setShowActionsId(-1)}
+                  onMouseEnter={() => setShowActionsId(row.original.id)}
+                  onMouseLeave={() => {
+                    if (!preventReset) setShowActionsId(-1);
+                  }}
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell

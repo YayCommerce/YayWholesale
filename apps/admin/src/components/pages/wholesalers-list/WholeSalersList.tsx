@@ -121,7 +121,7 @@ export default function WholeSalersList() {
               </SelectGroup>
             </SelectContent>
           </Select>
-          <InputGroup className="w-full md:w-80">
+          <InputGroup className="w-full sm:w-80">
             <InputGroupInput
               placeholder="Search by ID, Email, Display Name"
               value={search}
@@ -136,7 +136,9 @@ export default function WholeSalersList() {
             className="border-primary text-primary hover:bg-primary/10 bg-background flex h-[34px] cursor-pointer items-center justify-center gap-2 rounded-sm border px-4 text-sm font-medium"
           >
             <Plus className="h-4 w-4" />
-            <span className="text-[12px] sm:text-[14px]">{__('Add New Wholesaler')}</span>
+            <span className="text-[12px] text-nowrap sm:text-[14px]">
+              {__('Add New Wholesaler')}
+            </span>
           </a>
         </div>
       </div>

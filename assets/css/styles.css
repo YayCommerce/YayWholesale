@@ -5,7 +5,7 @@
 #ywhs_form_fields_container {
     display: flex;
     flex-wrap: wrap;
-    gap: 10px;
+    gap: 8px;
 }
 
 #ywhs_form_fields_container > div {
@@ -47,8 +47,8 @@
 
 #ywhs_request_form > button {
     padding: 5px;
-    margin-top: 5px;
-    border-radius: 10px;
+    margin-top: 10px;
+    border-radius: 5px;
 }
 
 .ywhs_requirement_section {

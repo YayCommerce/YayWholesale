@@ -52,7 +52,10 @@ function AvatarCell({ rowData }: { rowData: RequestFormValues }) {
   );
 }
 
-export const RequestsColumn = (showActionsId: number): ColumnDef<RequestFormValues>[] => {
+export const RequestsColumn = (
+  showActionsId: number,
+  preventReset: (isPrevented: boolean) => void,
+): ColumnDef<RequestFormValues>[] => {
   return [
     {
       id: 'select',
@@ -100,7 +103,11 @@ export const RequestsColumn = (showActionsId: number): ColumnDef<RequestFormValu
       accessorKey: 'status',
       header: 'Status',
       cell: ({ row }) => (
-        <RequestsStatusColumn requestId={row.original.id} defaultValue={row.original.status} />
+        <RequestsStatusColumn
+          requestId={row.original.id}
+          defaultValue={row.original.status}
+          preventReset={preventReset}
+        />
       ),
     },
     {

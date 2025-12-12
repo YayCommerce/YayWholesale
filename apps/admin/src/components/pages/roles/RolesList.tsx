@@ -106,14 +106,14 @@ export default function RolesList() {
       {/* Header */}
       <div className="flex flex-nowrap items-center justify-between gap-3">
         <h1 className="text-2xl font-bold">{__('Roles')}</h1>
-        <div className="flex flex-nowrap items-center gap-4">
+        <div className="flex flex-col-reverse flex-nowrap items-end gap-4 sm:flex-row sm:items-center">
           {roles.length > 10 && (
             <div className="relative flex-none">
               <Input
                 placeholder={__('Search')}
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="border-input w-80 rounded-sm border bg-white pr-9 text-sm font-normal"
+                className="border-input w-full rounded-sm border bg-white pr-9 text-sm font-normal sm:w-80"
               />
               <InputSuffix className="absolute top-1/2 right-3 -translate-y-1/2 bg-transparent px-0">
                 <Search className="size-4.5 text-[#A0A0A7]" />
@@ -193,8 +193,8 @@ export default function RolesList() {
                         cell.column.columnDef.meta?.isCheckbox ? 'w-[36px] pr-0 pl-2' : 'px-3',
                         cell.column.id === 'actions' && 'm-0 flex w-25 justify-end lg:w-full',
                       )}
-                      onPointerEnter={() => setShowActionsId(row.original.id)}
-                      onPointerLeave={() => setShowActionsId(-1)}
+                      onMouseEnter={() => setShowActionsId(row.original.id)}
+                      onMouseLeave={() => setShowActionsId(-1)}
                     >
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </TableCell>
