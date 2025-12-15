@@ -86,14 +86,14 @@ export const RequestsColumn = (
     },
     {
       accessorKey: 'name',
-      header: 'Name',
+      header: __('Name', 'yay-wholesale'),
       cell: ({ row }) => {
         return <AvatarCell rowData={row.original} />;
       },
     },
     {
       accessorKey: 'date',
-      header: 'Registration Date',
+      header: __('Registration Date', 'yay-wholesale'),
       cell: ({ row }) => {
         return parseWPDate(row.original.date) + ' ' + parseWPTime(row.original.date);
       },
@@ -101,7 +101,7 @@ export const RequestsColumn = (
     // { accessorKey: 'role', header: 'Role' },
     {
       accessorKey: 'status',
-      header: 'Status',
+      header: __('Status', 'yay-wholesale'),
       cell: ({ row }) => (
         <RequestsStatusColumn
           requestId={row.original.id}

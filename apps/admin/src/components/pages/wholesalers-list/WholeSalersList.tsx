@@ -103,24 +103,6 @@ export default function WholeSalersList() {
       <div className="flex flex-nowrap items-center justify-between gap-3">
         <h1 className="text-2xl font-bold">{__('Wholesalers List', 'yay-wholesale')}</h1>
         <div className="flex flex-col-reverse gap-2 md:flex-row">
-          <Select value={roleFilter} onValueChange={setRoleFilter}>
-            <SelectTrigger className="w-full md:w-40">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectGroup>
-                <SelectLabel>{__('Wholesaler Role Filter', 'yay-wholesale')}</SelectLabel>
-                <SelectItem value="all">{__('All', 'yay-wholesale')}</SelectItem>
-                {activeRoles?.map((role) => {
-                  return (
-                    <SelectItem key={role.id} value={role.slug}>
-                      {role.name}
-                    </SelectItem>
-                  );
-                })}
-              </SelectGroup>
-            </SelectContent>
-          </Select>
           <InputGroup className="w-full sm:w-80">
             <InputGroupInput
               placeholder="Search by ID, Email, Display Name"
@@ -131,6 +113,24 @@ export default function WholeSalersList() {
               <Search />
             </InputGroupAddon>
           </InputGroup>
+          <Select value={roleFilter} onValueChange={setRoleFilter}>
+            <SelectTrigger className="w-full md:w-40">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                <SelectLabel>{__('Wholesaler Role Filter', 'yay-wholesale')}</SelectLabel>
+                <SelectItem value="all">{__('All Roles', 'yay-wholesale')}</SelectItem>
+                {activeRoles?.map((role) => {
+                  return (
+                    <SelectItem key={role.id} value={role.slug}>
+                      {role.name}
+                    </SelectItem>
+                  );
+                })}
+              </SelectGroup>
+            </SelectContent>
+          </Select>
           <a
             href={window.yayWholesale.user_urls.add_new}
             className="border-primary text-primary hover:bg-primary/10 bg-background flex h-[34px] cursor-pointer items-center justify-center gap-2 rounded-sm border px-4 text-sm font-medium"

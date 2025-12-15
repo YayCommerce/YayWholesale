@@ -111,7 +111,7 @@ export function FieldRow({
             render={({ field }) => (
               <FormItem className="w-full">
                 <FormLabel className="text-base-secondary space-y-2.5 text-xs font-medium">
-                  Label
+                  {__('Label', 'yay-wholesale')}
                   {isRequired && <div className="text-destructive">*</div>}
                 </FormLabel>
                 <FormControl>
@@ -136,7 +136,7 @@ export function FieldRow({
             render={({ field }) => (
               <FormItem className="w-full">
                 <FormLabel className="text-base-secondary space-y-2.5 text-xs font-medium">
-                  Type
+                  {__('Type', 'yay-wholesale')}
                 </FormLabel>
                 <FormControl>
                   <Select
@@ -171,7 +171,7 @@ export function FieldRow({
             render={({ field }) => (
               <FormItem className="w-full">
                 <FormLabel className="text-base-secondary space-y-2.5 text-xs font-medium">
-                  Placeholder
+                  {__('Placeholder', 'yay-wholesale')}
                 </FormLabel>
                 <FormControl>
                   <Input
@@ -195,7 +195,7 @@ export function FieldRow({
             render={({ field }) => (
               <FormItem className="w-full">
                 <FormLabel className="text-base-secondary space-y-2.5 text-xs font-medium">
-                  Column Width
+                  {__('Column Width', 'yay-wholesale')}
                 </FormLabel>
                 <FormControl>
                   <ToggleGroup

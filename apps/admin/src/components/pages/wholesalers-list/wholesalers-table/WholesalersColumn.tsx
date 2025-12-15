@@ -1,4 +1,5 @@
 import { ColumnDef } from '@tanstack/react-table';
+import { __ } from '@wordpress/i18n';
 
 import { WholesalerFormValues } from '@/lib/schema/wholesalers';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -59,7 +60,7 @@ export const WholesalersColumn: ColumnDef<WholesalerFormValues>[] = [
   },
   {
     accessorKey: 'name',
-    header: 'Name',
+    header: __('Name', 'yay-wholesale'),
     cell: ({ row }) => {
       return <AvatarCell rowData={row.original} />;
     },
@@ -67,25 +68,34 @@ export const WholesalersColumn: ColumnDef<WholesalerFormValues>[] = [
 
   {
     accessorKey: 'role',
-    header: 'Role',
+    header: __('Role', 'yay-wholesale'),
     cell: ({ row }) => {
       return <WholesalersRoleColumn role={row.original.role} userId={row.original.id} />;
     },
   },
   {
     accessorKey: 'completedOrdersCount',
-    header: 'Completed Orders',
+    header: () => (
+      <span className="flex justify-center">{__('Completed Orders', 'yay-wholesale')}</span>
+    ),
     cell: ({ row }) => {
       const count = row.original.completedOrdersCount ?? 0;
-      return <span className="text-center">{count}</span>;
+      return <span className="flex justify-center">{count}</span>;
     },
   },
   {
     accessorKey: 'wholesaleRevenue',
-    header: 'Wholesale Revenue',
+    header: () => (
+      <span className="flex justify-center">{__('Wholesale Revenue', 'yay-wholesale')}</span>
+    ),
     cell: ({ row }) => {
       const revenue = row.original.wholesaleRevenue ?? 0;
-      return <span dangerouslySetInnerHTML={{ __html: formatWooPrice(revenue) }} />;
+      return (
+        <span
+          className="flex justify-center"
+          dangerouslySetInnerHTML={{ __html: formatWooPrice(revenue) }}
+        />
+      );
     },
   },
 ];

@@ -146,7 +146,7 @@ export default function RequestsList() {
             <SelectContent>
               <SelectGroup>
                 <SelectLabel>{__('Status Filter', 'yay-wholesale')}</SelectLabel>
-                <SelectItem value="all">{__('All', 'yay-wholesale')}</SelectItem>
+                <SelectItem value="all">{__('All status', 'yay-wholesale')}</SelectItem>
                 {Object.entries(requestsStatusMap).map((status) => {
                   const { icon, text } = status[1];
                   return (

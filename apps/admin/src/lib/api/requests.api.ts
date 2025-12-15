@@ -9,7 +9,6 @@ export async function fetchRequests(
   perPage: number,
   status: string,
 ) {
-  const url = 'requests';
   const searchParams = new URLSearchParams({
     kw: keyword,
     page: String(page),
@@ -17,7 +16,7 @@ export async function fetchRequests(
     status: status,
   });
 
-  const response = await api.get(`${url}?${searchParams.toString()}`);
+  const response = await api.get('requests', { searchParams });
   const result = await handleResponse<PaginatedRequestListValues>(
     response,
     __('Failed to fetch requests', 'yay-wholesale'),

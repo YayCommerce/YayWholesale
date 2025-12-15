@@ -102,6 +102,9 @@ export function useUpdateRequestStatusMutation(requestId: number) {
       if (!queryClient.isFetching({ queryKey: ['roles'] })) {
         queryClient.invalidateQueries({ queryKey: ['roles'] });
       }
+      if (!queryClient.isFetching({ queryKey: ['wholesalers'] })) {
+        queryClient.invalidateQueries({ queryKey: ['wholesalers'] });
+      }
     },
     onError: (error: Error) => {
       showToast.error(error.message);
@@ -122,6 +125,9 @@ export function useBulkUpdateRequestStatusMutation(ids: number[]) {
       }
       if (!queryClient.isFetching({ queryKey: ['roles'] })) {
         queryClient.invalidateQueries({ queryKey: ['roles'] });
+      }
+      if (!queryClient.isFetching({ queryKey: ['wholesalers'] })) {
+        queryClient.invalidateQueries({ queryKey: ['wholesalers'] });
       }
     },
     onError: (error: Error) => {
