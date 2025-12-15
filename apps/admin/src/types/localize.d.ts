@@ -6,6 +6,9 @@ declare global {
         add_new: string;
         edit: string;
       };
+      order_urls: {
+        list: string;
+      };
       plugin_url: string;
       rest_url: string;
       rest_nonce: string;

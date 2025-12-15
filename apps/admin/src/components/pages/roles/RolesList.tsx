@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import {
   flexRender,
   getCoreRowModel,
@@ -53,7 +54,8 @@ import { RolesColumn } from './roles-table/RolesColumn';
 export default function RolesList() {
   const navigate = useNavigate();
   const [selectValue, setSelectValue] = useState('');
-  const { data, isLoading: isLoadingRoles } = useRolesQuery();
+  const { data, isLoading: isLoadingRoles, isFetching: isFetchingRoles } = useRolesQuery();
+  const queryClient = useQueryClient();
 
   const { mutate: deleteManyRolesByIds, isPending: isDeletingManyRolesPending } =
     useDeleteManyRolesMutation();
@@ -135,7 +137,8 @@ export default function RolesList() {
       <div
         className={cn(
           'overflow-x-auto rounded-lg border',
-          (isDeletingManyRolesPending || isBulkUpdatingRoleStatusPending) && 'relative opacity-50',
+          (isFetchingRoles || isDeletingManyRolesPending || isBulkUpdatingRoleStatusPending) &&
+            'relative opacity-50',
         )}
       >
         {/* Overlay Spinner */}
@@ -186,7 +189,7 @@ export default function RolesList() {
                     <TableCell
                       key={cell.id}
                       className={cn(
-                        'text-base-foreground h-[53px] text-sm font-normal',
+                        'text-base-foreground h-[53px] cursor-pointer text-sm font-normal',
                         cell.column.columnDef.meta?.align === 'center'
                           ? 'text-center'
                           : 'text-left',
@@ -195,6 +198,10 @@ export default function RolesList() {
                       )}
                       onMouseEnter={() => setShowActionsId(row.original.id)}
                       onMouseLeave={() => setShowActionsId(-1)}
+                      onClick={() => {
+                        queryClient.setQueryData(['role', row.original.id], row.original);
+                        navigate(`/roles/edit/${row.original.id}`);
+                      }}
                     >
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </TableCell>

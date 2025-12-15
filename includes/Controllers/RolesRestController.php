@@ -114,7 +114,7 @@ class RolesRestController extends BaseRestController {
             $roles = array_values( array_filter( $roles, fn( $r ) => $r['status'] === (bool) $active_filter ) );
         }
 
-        foreach ( $roles as &$role ) {
+        foreach ( $roles as $key => &$role ) {
             $slug          = $role['slug'] ?? sanitize_title( $role['name'] );
             $user_query    = new WP_User_Query(
                 [
@@ -129,6 +129,17 @@ class RolesRestController extends BaseRestController {
                 $role['role_url'] = admin_url( 'users.php?role=' . rawurlencode( $slug ) );
             }
             $role['isDefault'] = $slug === $settings['general']['default_role'];
+
+            if ( $role['isDefault'] ) {
+                $default_index = $key;
+            }
+        }
+
+        if ( isset( $default_index ) && $default_index < count( $roles ) - 1 ) {
+            $default_role = $roles[ $default_index ];
+            unset( $roles[ $default_index ] );
+            $roles   = array_values( $roles );
+            $roles[] = $default_role;
         }
 
         return $this->success( $roles );

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { ColumnDef } from '@tanstack/react-table';
 import { __ } from '@wordpress/i18n';
-import { Ellipsis } from 'lucide-react';
+import { Ellipsis, PencilLine } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 import { useDeleteRoleMutation, useUpdateRoleStatusMutation } from '@/lib/queries/roles';
@@ -65,23 +65,20 @@ export const RolesColumn = (
       accessorKey: 'name',
       header: __('Name', 'yay-wholesale'),
       cell: ({ row }) => {
-        const navigate = useNavigate();
-        return (
+        return row.original.isDefault ? (
           <div className="flex gap-2">
-            <div
-              onClick={() => {
-                queryClient.setQueryData(['role', row.original.id], row.original);
-                navigate(`/roles/edit/${row.original.id}`);
-              }}
-              className="cursor-pointer hover:underline"
-            >
-              {row.original.name}
-            </div>
-            {row.original.isDefault && (
-              <Badge variant="primary-soft" className="rounded-sm">
-                {__('Default', 'yay-wholesale')}
-              </Badge>
-            )}
+            <WholeSaleToolTip
+              trigger={
+                <div className="hover:underline hover:decoration-dotted hover:underline-offset-3">
+                  {row.original.name}
+                </div>
+              }
+              content={<span>{__('Default role')}</span>}
+            />
+          </div>
+        ) : (
+          <div className="flex gap-2">
+            <div>{row.original.name}</div>
           </div>
         );
       },
@@ -207,26 +204,48 @@ export const RolesColumn = (
                           }}
                           className="hover:text-primary text-base-muted-foreground transition hover:bg-[#FFFFFF] hover:shadow-xs"
                         >
-                          <EditIcon className="size-4" />
+                          <PencilLine className="size-4" />
                         </Button>
                       }
                       content={<span>{__('Edit role')}</span>}
                     />
 
-                    <WholeSaleToolTip
-                      trigger={
-                        <Button
-                          size="icon"
-                          variant="ghost"
-                          onClick={() => setOpenDialog(true)}
-                          disabled={isDeletingRolePending || row.original.isDefault}
-                          className="hover:text-destructive text-base-muted-foreground hover:bg-[#FFFFFF] hover:shadow-xs"
-                        >
-                          <DeleteIcon className="size-4" />
-                        </Button>
-                      }
-                      content={<span>{__('Delete role')}</span>}
-                    />
+                    {!row.original.isDefault ? (
+                      <WholeSaleToolTip
+                        trigger={
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setOpenDialog(true);
+                            }}
+                            disabled={isDeletingRolePending}
+                            className="hover:text-destructive text-base-muted-foreground hover:bg-[#FFFFFF] hover:shadow-xs"
+                          >
+                            <DeleteIcon className="size-4" />
+                          </Button>
+                        }
+                        content={<span>{__('Delete role')}</span>}
+                      />
+                    ) : (
+                      <WholeSaleToolTip
+                        trigger={
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              navigate(`/settings/general`);
+                            }}
+                            className="hover:text-primary text-base-muted-foreground transition hover:bg-[#FFFFFF] hover:shadow-xs"
+                          >
+                            <EditIcon className="size-4" />
+                          </Button>
+                        }
+                        content={<span>{__('Setting')}</span>}
+                      />
+                    )}
                   </div>
                 )}
               </div>

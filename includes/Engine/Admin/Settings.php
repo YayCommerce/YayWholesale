@@ -136,6 +136,9 @@ class Settings {
                         )
                     ),
                 ],
+                'order_urls'       => [
+                    'list' => esc_url_raw( admin_url( 'edit.php?post_type=shop_order' ) ),
+                ],
                 'plugin_url'       => YAY_WHOLESALE_PLUGIN_URL,
                 'rest_url'         => esc_url_raw( rest_url() ),
                 'rest_nonce'       => wp_create_nonce( 'wp_rest' ),
