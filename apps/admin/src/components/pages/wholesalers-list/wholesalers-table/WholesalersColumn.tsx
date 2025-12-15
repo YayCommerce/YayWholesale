@@ -15,13 +15,18 @@ function AvatarCell({ rowData }: { rowData: WholesalerFormValues }) {
   return (
     <div className="flex items-center gap-3">
       <Avatar className="h-8 w-8">
-        <a href={userLink}>
+        <a href={userLink} target="_blank" rel="noopener noreferrer">
           <AvatarImage src={avatar} alt={name} />
           <AvatarFallback>{name.charAt(0)}</AvatarFallback>
         </a>
       </Avatar>
       <div>
-        <a className="cursor-pointer leading-none font-medium hover:underline" href={userLink}>
+        <a
+          className="cursor-pointer leading-none font-medium hover:underline"
+          href={userLink}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
           {name}
         </a>
         <p className="text-muted-foreground text-xs">{email}</p>

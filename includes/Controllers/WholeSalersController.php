@@ -4,7 +4,7 @@ namespace Yay_Wholesale\Controllers;
 use Yay_Wholesale\Utils\SingletonTrait;
 use WP_REST_Request;
 use WP_REST_Response;
-
+use Yay_Wholesale\Helpers\RolesHelper;
 use Yay_Wholesale\Helpers\WholeSalersHelper;
 
 defined( 'ABSPATH' ) || exit;
@@ -125,7 +125,9 @@ class WholeSalersController extends BaseRestController {
             return $this->error( __( 'User not exists', 'yay-wholesale' ), 404 );
         }
 
-        $user->set_role( $role_slug );
+        RolesHelper::remove_ywhs_role_from_user( $user );
+
+        $user->add_role( $role_slug );
 
         return $this->success( [], __( 'Wholesaler role updated successfully', 'yay-wholesale' ) );
     }

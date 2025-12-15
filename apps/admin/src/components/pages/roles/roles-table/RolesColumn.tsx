@@ -201,7 +201,10 @@ export const RolesColumn = (
                         <Button
                           size="icon"
                           variant="ghost"
-                          onClick={() => navigate(`/roles/edit/${row.original.id}`)}
+                          onClick={() => {
+                            queryClient.setQueryData(['role', row.original.id], row.original);
+                            navigate(`/roles/edit/${row.original.id}`);
+                          }}
                           className="hover:text-primary text-base-muted-foreground transition hover:bg-[#FFFFFF] hover:shadow-xs"
                         >
                           <EditIcon className="size-4" />

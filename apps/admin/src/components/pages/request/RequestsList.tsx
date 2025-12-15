@@ -150,9 +150,11 @@ export default function RequestsList() {
                 {Object.entries(requestsStatusMap).map((status) => {
                   const { icon, text } = status[1];
                   return (
-                    <SelectItem value={status[0]}>
-                      {icon} {text}
-                    </SelectItem>
+                    status[0] !== 'approved' && (
+                      <SelectItem value={status[0]}>
+                        {icon} {text}
+                      </SelectItem>
+                    )
                   );
                 })}
               </SelectGroup>

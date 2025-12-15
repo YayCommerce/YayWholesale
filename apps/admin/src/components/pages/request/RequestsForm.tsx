@@ -108,11 +108,9 @@ export default function RequestsForm() {
             <div>
               <SheetTitle className="flex gap-3 text-[18px] font-semibold text-[#151619]">
                 {dataDisplay?.name}
-                <WholeSaleToolTip
-                  trigger={<div>{icon}</div>}
-                  content={__('%STATUS% Request').replace('%STATUS%', text)}
-                  side="bottom"
-                />
+                {dataDisplay && dataDisplay.status !== 'approved' && (
+                  <WholeSaleToolTip trigger={<div>{icon}</div>} content={text} side="bottom" />
+                )}
               </SheetTitle>
               <SheetDescription className="text-base-muted-foreground mt-[4px] text-sm leading-[20px] font-normal">
                 {__(
@@ -154,7 +152,7 @@ export default function RequestsForm() {
             <Input
               id="email"
               readOnly
-              value={dataDisplay?.firstName}
+              value={dataDisplay?.email}
               className="border-border bg-[#FAFAFA] shadow-xs"
             />
           </div>

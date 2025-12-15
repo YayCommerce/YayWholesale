@@ -109,7 +109,15 @@ class RequestsHelper {
             'post_type'              => self::REQUEST_POST_TYPE,
             'update_post_meta_cache' => true,
             'meta_query'             => [
-                'relation' => 'AND',
+                'relation'      => 'AND',
+                'status_clause' => [
+                    'key'  => self::REQUEST_META_STATUS,
+                    'type' => 'CHAR',
+                ],
+            ],
+            'orderby'                => [
+                'status_clause' => 'ASC',
+                'date'          => 'DESC',
             ],
         ];
 
@@ -138,7 +146,7 @@ class RequestsHelper {
             ];
         }
 
-        if ( isset( $status ) && self::ALL !== $status ) {
+        if ( isset( $status ) && ! in_array( $status, [ self::ALL, self::APPROVED ], true ) ) {
             $args['meta_query'][] = [
                 'key'     => self::REQUEST_META_STATUS,
                 'value'   => $status,
@@ -146,6 +154,13 @@ class RequestsHelper {
                 'type'    => 'CHAR',
             ];
         }
+
+        $args['meta_query'][] = [
+            'key'     => self::REQUEST_META_STATUS,
+            'value'   => self::APPROVED,
+            'compare' => '!=',
+            'type'    => 'CHAR',
+        ];
 
         $query       = new WP_Query( $args );
         $data_list   = $query->posts;
