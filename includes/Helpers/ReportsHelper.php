@@ -8,7 +8,8 @@ use WP_User_Query;
  * Common Helper
  */
 class ReportsHelper {
-    public const REPORT_TRANSIENT = 'ywhs_report_statistic';
+    public const REPORT_TRANSIENT            = 'ywhs_report_statistic';
+    public const REPORT_DATE_RANGE_TRANSIENT = 'ywhs_default_report_date_range';
 
     protected static function get_orders_to_statistic( $start_date, $end_date ) {
         $args = [

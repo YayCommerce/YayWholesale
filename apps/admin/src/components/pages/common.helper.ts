@@ -88,7 +88,7 @@ export function parseWPTimeForInput(date: string) {
 
 export function parseWPCurrency(price: string | number) {
   if (typeof price === 'string') {
-    price = parseInt(price);
+    price = parseFloat(price);
   }
 
   const { symbol, position, thousand_sep, decimal_sep, num_decimals } =
@@ -109,4 +109,12 @@ export function parseWPCurrency(price: string | number) {
     case 'right_space':
       return `${formattedPrice} ${symbol}`;
   }
+}
+
+export function parseWPDecimal(number: number) {
+  const formattedNumber = number
+    .toFixed(2)
+    .replace(/(\d+)\.(\d{2})$/, `$1${window.yayWholesale.currency_data.decimal_sep}$2`);
+
+  return formattedNumber;
 }

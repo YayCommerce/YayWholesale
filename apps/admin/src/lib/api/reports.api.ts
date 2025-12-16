@@ -17,7 +17,9 @@ export async function fetchReports(
     compareEndDate,
   });
 
-  const response = await api.get(`${url}?${searchParams.toString()}`);
+  const response = await api.get('reports', {
+    searchParams,
+  });
   const result = await handleResponse<DashboardReportsValue>(
     response,
     __('Failed to fetch reports', 'yay-wholesale'),

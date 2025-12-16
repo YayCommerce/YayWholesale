@@ -6,6 +6,7 @@ use Yay_Wholesale\Utils\SingletonTrait;
 use Yay_Wholesale\Helpers\RolesHelper;
 use Yay_Wholesale\Helpers\SettingsHelper;
 use Yay_Wholesale\Helpers\PricingHelper;
+use Yay_Wholesale\Helpers\ReportsHelper;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -35,8 +36,6 @@ class Pricing {
         add_filter( 'woocommerce_get_price_html', [ $this, 'display_wholesale_price_html' ], 999, 2 );
 
         add_action( 'woocommerce_before_calculate_totals', [ $this, 'before_caculate_totals' ], 999, 1 );
-
-        add_action( 'woocommerce_checkout_order_processed', [ $this, 'add_custom_fields_for_wholesale_order' ], 999, 3 );
     }
 
     /**
@@ -297,36 +296,13 @@ class Pricing {
             $product   = wc_get_product( $cart_item['product_id'] );
             $new_price = PricingHelper::apply_wholesale_discount( $product->get_price(), $product );
 
+            if ( $new_price < $product->get_price() ) {
+                WC()->customer->set_is_vat_exempt( true );
+            } else {
+                WC()->customer->set_is_vat_exempt( false );
+            }
+
             $cart_item['data']->set_price( $new_price );
         }
-    }
-
-    public function add_custom_fields_for_wholesale_order( $order_id, $posted_data, $order ) {
-        if ( ! $order_id ) {
-            return;
-        }
-
-        remove_filter( 'woocommerce_product_get_price', [ $this, 'get_price' ], 99, 2 );
-
-        $customer_id       = $order->get_customer_id();
-        $is_wholesale_user = RolesHelper::is_wholesale_user( $customer_id );
-
-        $quantity = $order->get_item_count();
-        $subtotal = 0;
-        // Calculate the subtotal with original unit price
-        foreach ( $order->get_items() as $item ) {
-            if ( ! $item instanceof \WC_Order_Item_Product ) {
-                continue;
-            }
-            $product   = $item->get_product();
-            $subtotal += $product->get_price() * $item->get_quantity();
-        }
-        $is_discounted = isset( $is_wholesale_user ) && PricingHelper::meets_discount_conditions( $is_wholesale_user, $quantity, $subtotal );
-
-        if ( $is_discounted ) {
-            $order->update_meta_data( '_ywhs_wholesale_role', $is_wholesale_user['name'] );
-        }
-
-        add_filter( 'woocommerce_product_get_price', [ $this, 'get_price' ], 99, 2 );
     }
 }
