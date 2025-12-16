@@ -31,7 +31,6 @@ import RoleStatusSwitch from './RoleStatusSwitch';
 export const RolesColumn = (
   showActionsId: number,
 ): ColumnDef<RolesListValues & { count: number }>[] => {
-  const queryClient = useQueryClient();
   return [
     {
       id: 'select',
@@ -174,11 +173,12 @@ export const RolesColumn = (
       id: 'actions',
       header: '',
       cell: ({ row }) => {
-        const { mutate: deleteRoleById, isPending: isDeletingRolePending } = useDeleteRoleMutation(
-          row.original.id,
-        );
+        const { mutateAsync: deleteRoleById, isPending: isDeletingRolePending } =
+          useDeleteRoleMutation(row.original.id);
         const navigate = useNavigate();
         const [openDialog, setOpenDialog] = useState(false);
+        const queryClient = useQueryClient();
+
         return (
           <AlertDialog open={openDialog} onOpenChange={setOpenDialog}>
             <div className="relative flex w-15 justify-end">
@@ -263,10 +263,23 @@ export const RolesColumn = (
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
-                <AlertDialogCancel>{__('Cancel', 'yay-wholesale')}</AlertDialogCancel>
+                <AlertDialogCancel
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    setOpenDialog(false);
+                  }}
+                >
+                  {__('Cancel', 'yay-wholesale')}
+                </AlertDialogCancel>
                 <AlertDialogAction
                   className="bg-destructive text-destructive-foreground hover:bg-destructive/80"
-                  onClick={() => deleteRoleById()}
+                  onClick={async (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    await deleteRoleById();
+                    setOpenDialog(false);
+                  }}
                 >
                   {__('Continue', 'yay-wholesale')}
                 </AlertDialogAction>

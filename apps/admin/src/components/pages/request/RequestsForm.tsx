@@ -193,12 +193,20 @@ export default function RequestsForm() {
             return (
               <div className="flex cursor-default flex-col gap-2">
                 <Label htmlFor="email">{field.label}</Label>
-                <Input
-                  id="email"
-                  readOnly
-                  value={handleDataByType()}
-                  className="border-border bg-[#FAFAFA] shadow-xs"
-                />
+                {field.type.toLowerCase() === 'textarea' ? (
+                  <Textarea
+                    className="border-border h-fit min-h-25 resize-none bg-[#FAFAFA]"
+                    readOnly
+                    value={handleDataByType()}
+                  />
+                ) : (
+                  <Input
+                    id="email"
+                    readOnly
+                    value={handleDataByType()}
+                    className="border-border bg-[#FAFAFA] shadow-xs"
+                  />
+                )}
               </div>
             );
           })}

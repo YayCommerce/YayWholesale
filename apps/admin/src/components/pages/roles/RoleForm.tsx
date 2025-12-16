@@ -1,10 +1,10 @@
-import { useEffect } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { X } from 'lucide-react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { useMatch, useNavigate, useParams } from 'react-router-dom';
+import { useUpdateEffect } from 'react-use';
 
 import { useAddRoleMutation, useRoleQuery, useUpdateRoleMutation } from '@/lib/queries/roles';
 import { createRoleSchema, RoleFormValues, roleSchema } from '@/lib/schema/roles';
@@ -21,7 +21,6 @@ import {
   SheetHeader,
   SheetTitle,
 } from '@/components/ui/sheet';
-import { Toaster } from '@/components/ui/sonner';
 import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 
@@ -70,7 +69,7 @@ export default function RoleForm() {
     }
   }
 
-  useEffect(() => {
+  useUpdateEffect(() => {
     if (isAddingRole) {
       form.reset(DEFAULT_ROLE);
     } else if (data) {
