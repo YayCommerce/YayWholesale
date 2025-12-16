@@ -103,14 +103,14 @@ export default function WholeSalersList() {
       <div className="flex flex-nowrap items-center justify-between gap-3">
         <h1 className="text-2xl font-bold">{__('Wholesalers List', 'yay-wholesale')}</h1>
         <div className="flex flex-col-reverse gap-2 lg:flex-row">
-          <InputGroup className="w-full sm:w-80">
+          <InputGroup className="w-full hover:border-black has-[[data-slot=input-group-control]:focus-visible]:border-black has-[[data-slot=input-group-control]:focus-visible]:ring-0 sm:w-80">
             <InputGroupInput
               placeholder="Search by ID, Email, Display Name"
               value={search}
               onChange={handleChangeSearch}
             />
             <InputGroupAddon align="inline-end">
-              <Search />
+              <Search className="size-4.5 text-[#A0A0A7]" />
             </InputGroupAddon>
           </InputGroup>
           <Select value={roleFilter} onValueChange={setRoleFilter}>
@@ -282,7 +282,7 @@ export default function WholeSalersList() {
                     table.setPageIndex(page);
                   }
                 }}
-                className="text-base-secondary h-9 w-15 rounded-sm text-sm font-normal"
+                className="text-base-secondary h-9 w-15 rounded-sm text-sm font-normal focus-visible:ring-0"
               />
             </div>
           </div>

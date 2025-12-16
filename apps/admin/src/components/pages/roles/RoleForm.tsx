@@ -8,6 +8,7 @@ import { useUpdateEffect } from 'react-use';
 
 import { useAddRoleMutation, useRoleQuery, useUpdateRoleMutation } from '@/lib/queries/roles';
 import { createRoleSchema, RoleFormValues, roleSchema } from '@/lib/schema/roles';
+import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
@@ -131,7 +132,10 @@ export default function RoleForm() {
                         {...field}
                         value={field.value ?? ''}
                         placeholder={__('e.g. Wholesale Customer')}
-                        className={`h-9 rounded-md ${error ? 'border-destructive' : ''} focus-visible:ring-0`}
+                        className={cn(
+                          'h-9 rounded-md focus-visible:ring-0',
+                          error && 'border-destructive',
+                        )}
                       />
                     </FormControl>
                     {error && <FormMessage />}
@@ -176,7 +180,7 @@ export default function RoleForm() {
                       >
                         <InputNumberInput
                           placeholder={__('Enter a percentage discount')}
-                          className={`h-9 w-full ${error ? 'border-destructive' : ''} `}
+                          className={cn('h-9 w-full', error && 'border-destructive')}
                         />
                         <InputNumberCarets />
                       </InputNumberRoot>
@@ -202,7 +206,7 @@ export default function RoleForm() {
                       >
                         <InputNumberInput
                           placeholder={__('e.g. 10 (min number of items required per order)')}
-                          className={`h-9 w-full ${error ? 'border-destructive' : ''} `}
+                          className={cn('h-9 w-full', error && 'border-destructive')}
                         />
                         <InputNumberCarets />
                       </InputNumberRoot>
@@ -229,7 +233,7 @@ export default function RoleForm() {
                       >
                         <InputNumberInput
                           placeholder={__('e.g. 200.00 (min total value required per order)')}
-                          className={`h-9 w-full ${error ? 'border-destructive' : ''} `}
+                          className={cn('h-9 w-full', error && 'border-destructive')}
                         />
                         <InputNumberCarets />
                       </InputNumberRoot>

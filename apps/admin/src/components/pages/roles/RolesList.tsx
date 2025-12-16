@@ -32,6 +32,7 @@ import BulkActionBox from '@/components/ui/bulk-actions-box';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input, InputSuffix } from '@/components/ui/input';
+import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group';
 import {
   Select,
   SelectContent,
@@ -110,17 +111,16 @@ export default function RolesList() {
         <h1 className="text-2xl font-bold">{__('Roles')}</h1>
         <div className="flex flex-col-reverse flex-nowrap items-end gap-4 sm:flex-row sm:items-center">
           {roles.length > 10 && (
-            <div className="relative flex-none">
-              <Input
+            <InputGroup className="w-full hover:border-black has-[[data-slot=input-group-control]:focus-visible]:border-black has-[[data-slot=input-group-control]:focus-visible]:ring-0 sm:w-80">
+              <InputGroupInput
                 placeholder={__('Search')}
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="border-input w-full rounded-sm border bg-white pr-9 text-sm font-normal sm:w-80"
               />
-              <InputSuffix className="absolute top-1/2 right-3 -translate-y-1/2 bg-transparent px-0">
+              <InputGroupAddon align="inline-end">
                 <Search className="size-4.5 text-[#A0A0A7]" />
-              </InputSuffix>
-            </div>
+              </InputGroupAddon>
+            </InputGroup>
           )}
           <Button
             variant="outline"
@@ -339,7 +339,7 @@ export default function RolesList() {
                     table.setPageIndex(page);
                   }
                 }}
-                className="text-base-secondary h-9 w-15 rounded-sm text-sm font-normal"
+                className="text-base-secondary h-9 w-15 rounded-sm text-sm font-normal focus-visible:ring-0"
               />
             </div>
           </div>
