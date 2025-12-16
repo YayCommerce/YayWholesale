@@ -39,6 +39,16 @@ class SettingsRestController extends BaseRestController {
                 'permission_callback' => [ $this, 'settings_permission_callback' ],
             ]
         );
+
+        register_rest_route(
+            $this->namespace,
+            '/emails/update-status',
+            [
+                'methods'             => 'POST',
+                'callback'            => [ $this, 'update_email_status' ],
+                'permission_callback' => [ $this, 'settings_permission_callback' ],
+            ]
+        );
     }
 
     /**
@@ -80,5 +90,64 @@ class SettingsRestController extends BaseRestController {
     public function mark_reviewed(): WP_REST_Response {
         update_option( 'yay_wholesale_reviewed', true );
         return $this->success();
+    }
+
+    public function get_email_settings_by_id( string $email_id ): array {
+        $emails = WC()->mailer()->get_emails();
+        foreach ( $emails as $email ) {
+            if ( $email->id === $email_id ) {
+                return $email->settings;
+            }
+        }
+        return [];
+    }
+
+    /**
+     * Update the status of an email.
+     *
+     * @param WP_REST_Request $request The request object.
+     * @return WP_REST_Response The response object.
+     */
+    public function update_email_status( WP_REST_Request $request ): WP_REST_Response {
+        $params = $this->get_json_params( $request );
+
+        $email_id = isset( $params['emailId'] ) ? sanitize_text_field( $params['emailId'] ) : '';
+        $status   = isset( $params['status'] ) ? filter_var( $params['status'], FILTER_VALIDATE_BOOLEAN ) : false;
+
+        if ( empty( $email_id ) || ! is_bool( $status ) ) {
+            return $this->error( __( 'Invalid parameters', 'yay-wholesale' ) );
+        }
+
+        // Compose the option key used by WooCommerce for single-email settings
+        $option_key = sprintf( 'woocommerce_%s_settings', $email_id );
+
+        // Retrieve existing option. Use get_option with default array to avoid falsey returns.
+        $settings = get_option( $option_key, [] );
+
+        if ( ! $settings ) {
+            // get settings by email id
+            $settings = $this->get_email_settings_by_id( $email_id );
+
+            if ( empty( $settings ) ) {
+                return $this->error( __( 'Email settings not found for this email ID', 'yay-wholesale' ) );
+            }
+        }
+
+        // Ensure settings is an array (when stored as serialized array or object)
+        if ( ! is_array( $settings ) ) {
+            // If it's an object (rare), cast to array
+            if ( is_object( $settings ) ) {
+                $settings = (array) $settings;
+            } else {
+                // Can't safely operate on non-array settings
+                return $this->error( __( 'Stored email settings are in an unsupported format.', 'yay-wholesale' ) );
+            }
+        }
+
+        // Update the enabled key
+        $settings['enabled'] = $status ? 'yes' : 'no';
+        update_option( $option_key, $settings, 'yes' );
+
+        return $this->success( [], __( 'Email status updated!', 'yay-wholesale' ) );
     }
 }
