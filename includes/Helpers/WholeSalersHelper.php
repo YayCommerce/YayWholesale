@@ -121,6 +121,28 @@ class WholeSalersHelper {
     }
 
     /**
+     * Get the wholesale role slug.
+     *
+     * @param array $user_roles The user roles.
+     * @return string The wholesale slug.
+     */
+    public static function get_wholesale_role_slug( array $user_roles ): string {
+
+        if ( empty( $user_roles ) ) {
+            return '';
+        }
+
+        if ( count( $user_roles ) === 1 ) {
+            return reset( $user_roles );
+        }
+
+        $roles_option    = get_option( 'yay_wholesale_roles', [] );
+        $wholesale_slugs = array_filter( array_map( fn( $r ) => $r['slug'] ?? null, $roles_option ) );
+        $matched         = array_values( array_intersect( $user_roles, $wholesale_slugs ) );
+        return reset( $matched ) ?? '';
+    }
+
+    /**
      * Clean the wholesalers data.
      *
      * @param array $users The users data.
