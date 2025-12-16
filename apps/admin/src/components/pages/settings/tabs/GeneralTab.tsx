@@ -31,7 +31,7 @@ export default function GeneralTab() {
   const roleSlugs = useMemo(() => new Set(rolesList.map((r) => r.slug)), [rolesList]);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* Default role for new user */}
       <FormField
         control={control}

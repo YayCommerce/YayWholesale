@@ -80,7 +80,11 @@ export default function TopWholesaleCustomers(props: {
                           <img
                             src={data.avatar}
                             alt={data.name}
-                            className="h-full w-full rounded-full object-cover"
+                            className={cn(
+                              'h-full w-full rounded-full object-cover',
+                              reportData.topWholesalers.indexOf(data) < 3 &&
+                                'border-ring ring-1 ring-[#F9BD09] ring-offset-1',
+                            )}
                           />
                         </div>
                         <div className="flex w-40 items-center gap-1 md:w-15 md:flex-wrap lg:w-40 lg:flex-nowrap">
@@ -98,7 +102,10 @@ export default function TopWholesaleCustomers(props: {
                     </TableCell>
                     <TableCell className="text-base-foreground py-3 text-[14px]">
                       <div className="flex justify-center">
-                        <Badge variant="ghost" className="rounded-md text-xs font-semibold">
+                        <Badge
+                          variant="muted"
+                          className="text-base-foreground rounded-md bg-[#FAFAFA] text-xs font-semibold"
+                        >
                           {data.role}
                         </Badge>
                       </div>

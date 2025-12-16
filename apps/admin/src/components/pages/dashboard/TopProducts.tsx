@@ -79,7 +79,13 @@ export default function TopProducts(props: { reportQuery: ReturnType<typeof useR
                     </TableCell>
                     <TableCell className="text-base-foreground py-3 text-[14px]">
                       <div className="flex items-center gap-3">
-                        <div className="h-8 w-8 overflow-hidden rounded-md border">
+                        <div
+                          className={cn(
+                            'h-8 w-8 overflow-hidden rounded-md',
+                            reportData.topProducts.indexOf(data) < 3 &&
+                              'border-ring ring-1 ring-[#F9BD09] ring-offset-1',
+                          )}
+                        >
                           <img
                             src={data.image}
                             alt={data.name}

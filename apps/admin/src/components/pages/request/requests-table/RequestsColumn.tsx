@@ -32,7 +32,7 @@ function AvatarCell({ rowData }: { rowData: RequestFormValues }) {
   const { avatar, name, id, email } = rowData;
   return (
     <div className="flex items-center gap-3">
-      <Avatar className="h-8 w-8">
+      <Avatar className="h-9.5 w-9.5">
         <AvatarImage src={avatar} alt={name} />
         <AvatarFallback>{name.charAt(0)}</AvatarFallback>
       </Avatar>
@@ -46,7 +46,7 @@ function AvatarCell({ rowData }: { rowData: RequestFormValues }) {
         >
           {name}
         </p>
-        <p className="text-muted-foreground text-xs">{email}</p>
+        <p className="text-muted-foreground mt-1 text-xs">{email}</p>
       </div>
     </div>
   );
