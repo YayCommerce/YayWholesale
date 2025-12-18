@@ -160,7 +160,7 @@ export default function RequestsList() {
               </SelectGroup>
             </SelectContent>
           </Select>
-          <InputGroup className="w-full hover:border-black has-[[data-slot=input-group-control]:focus-visible]:border-black has-[[data-slot=input-group-control]:focus-visible]:ring-0 md:w-60">
+          <InputGroup className="w-full md:w-60">
             <InputGroupInput placeholder="Search" value={search} onChange={handleChangeSearch} />
             <InputGroupAddon align="inline-end">
               <Search className="size-4.5 text-[#A0A0A7]" />

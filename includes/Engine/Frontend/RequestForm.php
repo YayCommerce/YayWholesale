@@ -71,7 +71,7 @@ class RequestForm {
                     ?>
                     <?php if ( ! $field['isHidden'] ) : ?>
                     <div <?php echo esc_html( $field['columnWidth'] ) === '50%' ? 'class="ywhs_half"' : 'class="ywhs_full"'; ?> >
-                        <label for="<?php echo esc_html( $field['id'] ); ?>" >
+                        <label class="ywhs_requirement_title" for="<?php echo esc_html( $field['id'] ); ?>" >
                             <?php echo esc_html( $field['label'] ); ?>
                             <div style="color: red">
                             <?php

@@ -5,7 +5,7 @@
 #ywhs_form_fields_container {
     display: flex;
     flex-wrap: wrap;
-    gap: 8px;
+    gap: 15px;
 }
 
 #ywhs_form_fields_container > div {
@@ -41,48 +41,143 @@
 
 #ywhs_form_fields_container input, 
 #ywhs_form_fields_container textarea {
-    padding: 5px;
+    padding: 10px !important;
     font-size: small;
+    border-radius: 10px !important;
+    border: 1px solid #E5E5E5;   
+    box-shadow: 0px 1px 2px 0px #E5E5E5; 
+}
+
+#ywhs_form_fields_container input:hover, 
+#ywhs_form_fields_container textarea:hover{
+    border: 1px solid black !important;
+    transition: color 3s;
 }
 
 #ywhs_request_form > button {
-    padding: 5px;
-    margin-top: 10px;
-    border-radius: 5px;
+    padding: 10px 15px;
+    margin-top: 20px;
+    border-radius: 10px;
+    border: none;
+    box-shadow: 0px 1px 2px 0px #E5E5E5;
+    background-color: black;
+    color: white;
 }
 
+#ywhs_request_form > button:hover {
+    background-color: rgb(40, 40, 40);
+}
+
+/* YayWholesale Requirement Style */
 .ywhs_requirement_section {
-    scale: 90%;
-    box-shadow: 2px 4px 3px 3px rgb(171, 171, 171);
-    border-radius: 15px;
-    padding: 10px !important;
+    border-top: 1px solid #E5E5E5;
+    padding-top: 10px;
     margin-bottom: 25px;
-    font-size: 1em;
-    background: white;
+    width: 100%;
+    font-size: 14px;
 }
-
+.ywhs_requirement_header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
 .ywhs_requirement_title {
-    font-weight: bold;
+    font-weight: 600;
 }
 
+.ywhs_badge {
+    border-radius: 15px;
+    border: 1px solid #E4E4E7;
+    background-color: white;
+    text-align: center;
+    padding: 0px 10px;
+    font-size: 12px;
+}
+
+.ywhs_requirement_opener {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    padding: 3px;
+    --svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='%23000' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m6 9l6 6l6-6'/%3E%3C/svg%3E");
+    background-color: currentColor;
+    -webkit-mask-image: var(--svg);
+    mask-image: var(--svg);
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-size: 100% 100%;
+    mask-size: 100% 100%;
+}
+
+.ywhs_requirement_opener:hover {
+    background-color: #6a6a6a;
+}
+
+.ywhs_requirement_progress_bar {
+    background-color: rgba(34,113,177,0.04);
+    width: 100%;
+    padding: 10px;
+    border-radius: 10px;
+    height: fit-content;
+    margin-top: 10px;
+}
+
+.ywhs_requirement_notice {
+    font-size: 12px;
+    font-weight: 400;
+}
+
+.ywhs_r_base_bar, .ywhs_r_value_bar {
+    width: 100%;
+    height: 3px;
+}
+
+.ywhs_r_base_bar {
+    position: relative;
+    background-color: rgba(34, 113, 177, 0.08);
+    margin: 10px 0px;
+}
+
+.ywhs_r_value_bar{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 50%;
+    background-color: rgb(34, 113, 177);
+}
+.ywhs_requirement_content {
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
 .ywhs_requirement_item {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    font-size: 0.9em;
-    margin-top: 5px;
-} 
-
-.ywhs_rbadge {
-    border-radius: 10px;
-    color: white;
-    padding: 0px 5px;
+    font-size: 14px;
+    font-weight: 500;
 }
 
-.ywhs_rb_qualified {
-    background-color: green;
+.ywhs_r_notice {
+    color: rgb(34, 113, 177);
 }
 
-.ywhs_rb_not_qualified {
-    background-color: red;
+.ywhs_r_base_notice {
+    color: #7B7C80;
+}
+
+@keyframes opener_open {
+    from {transform: rotate(0);}
+    to {transform: rotate(180deg);}
+}
+
+.ywhs_ropened {
+    transform: rotate(180deg);
+    transition: transform 0.6s;
+}
+
+.ywhs_rclosed {
+    transform: rotate(0deg);
+    transition: transform 0.6s;
 }

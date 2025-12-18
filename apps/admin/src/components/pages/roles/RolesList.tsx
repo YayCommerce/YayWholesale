@@ -111,7 +111,7 @@ export default function RolesList() {
         <h1 className="text-2xl font-bold">{__('Roles')}</h1>
         <div className="flex flex-col-reverse flex-nowrap items-end gap-4 sm:flex-row sm:items-center">
           {roles.length > 10 && (
-            <InputGroup className="w-full hover:border-black has-[[data-slot=input-group-control]:focus-visible]:border-black has-[[data-slot=input-group-control]:focus-visible]:ring-0 sm:w-80">
+            <InputGroup className="w-full sm:w-80">
               <InputGroupInput
                 placeholder={__('Search')}
                 value={search}

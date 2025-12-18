@@ -130,11 +130,24 @@ class Orders {
             $order->remove_order_items( 'tax' );
         }
 
+        $trigger_email = false;
+
         // Update meta data for filter
         if ( $is_discounted ) {
-            $order->update_meta_data( '_ywhs_wholesale_role', $is_wholesale_user['name'] );
+            $tmp = $order->get_meta( '_ywhs_wholesale_role' );
+            if ( ! isset( $tmp ) ) {
+                $trigger_email = true;
+            }
+
+            if ( $tmp !== $is_wholesale_user['name'] ) {
+                $order->update_meta_data( '_ywhs_wholesale_role', $is_wholesale_user['name'] );
+            }
         } else {
             $order->delete_meta_data( '_ywhs_wholesale_role' );
+        }
+
+        if ( $trigger_email ) {
+            do_action( 'yhs_new_order_placed', $order->get_id(), $order );
         }
 
         $default_range_transient = get_transient( ReportsHelper::REPORT_DATE_RANGE_TRANSIENT );

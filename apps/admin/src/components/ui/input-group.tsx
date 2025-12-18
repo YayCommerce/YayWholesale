@@ -29,6 +29,8 @@ function InputGroup({ className, ...props }: React.ComponentProps<'div'>) {
         // Error state.
         'has-[[data-slot][aria-invalid=true]]:ring-destructive/20 has-[[data-slot][aria-invalid=true]]:border-destructive dark:has-[[data-slot][aria-invalid=true]]:ring-destructive/40',
 
+        // Custom
+        'transition-colors duration-300 hover:border-black has-[[data-slot=input-group-control]:focus-visible]:border-black has-[[data-slot=input-group-control]:focus-visible]:ring-0',
         className,
       )}
       {...props}
