@@ -54,22 +54,34 @@ class Requirement {
 
             if ( $lack_of_qty > 0 ) {
                 $is_empty  = false;
-                $phrases[] = $lack_of_qty > 1
-                ? str_replace( '%LOQ%', $lack_of_qty, __( '<strong>%LOQ% products</strong>', 'yay-wholesale' ) )
-                : __( '<strong>1 product</strong>', 'yay-wholesale' );
+                $phrases[] = '<strong>' . ( $lack_of_qty > 1
+                ? sprintf(
+                    // translators: %1: the lack of quantity
+                    __( '%1$s products', 'yay-wholesale' ),
+                    esc_html( $lack_of_qty )
+                )
+                : __( '1 product', 'yay-wholesale' ) ) . '</strong>';
             }
 
             if ( $lack_of_amt > 0 ) {
                 $is_empty  = false;
                 $price     = wc_price( $lack_of_amt );
-                $phrases[] = str_replace( '%LOA%', $price, __( '<strong>%LOA%</strong>', 'yay-wholesale' ) );
+                $phrases[] = "<strong>$price</strong>";
             }
 
             if ( ! $is_empty ) {
-                $lack   = implode( ' and ', $phrases );
-                $sale   = $wholesale['discount'];
-                $notice = __( "You're almost there! Add %LACK% more to your order and enjoy <span class='ywhs_r_notice'>%SALE%% Off </span> each products.", 'yay-wholesale' );
-                $notice = str_replace( [ '%LACK%', '%SALE%' ], [ $lack, $sale ], $notice );
+                $lack = implode( ' and ', $phrases );
+                $sale = $wholesale['discount'];
+
+                $notice = sprintf(
+                    // translators: %1: the lack of quantity
+                    __(
+                        'You\'re almost there! Add %1$s more to your order and enjoy %2$s each products.',
+                        'yay-wholesale'
+                    ),
+                    $lack,
+                    "<span class='ywhs_r_notice'>$sale % Off </span>"
+                );
             } else {
                 $notice = __( 'Please add items to your cart to receive wholesale pricing.', 'yay-wholesale' );
             }
@@ -124,10 +136,11 @@ class Requirement {
             ( function_exists( 'is_cart' ) && is_cart() ) ) {
                 $wholesale = RolesHelper::is_wholesale_user();
                 $slug      = 'ywhs_wholesale_requirement';
+                $asset     = include __DIR__ . '/../../../assets/dist/blocks/requirement-slot-fill/index.asset.php';
                 wp_enqueue_script(
                     $slug,
-                    YAY_WHOLESALE_PLUGIN_URL . 'assets/js/wholesale-requirement-slot.js',
-                    [ 'wp-plugins', 'wp-element', 'wp-components', 'wp-i18n', 'wp-data' ],
+                    YAY_WHOLESALE_PLUGIN_URL . 'assets/dist/blocks/requirement-slot-fill/index.js',
+                    $asset['dependencies'],
                     YAY_WHOLESALE_VERSION,
                     true
                 );

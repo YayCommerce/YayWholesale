@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { Spinner } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { Ellipsis, X } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useUpdateEffect } from 'react-use';
@@ -251,7 +251,7 @@ export default function RequestsForm() {
                         return (
                           <DropdownMenuItem onClick={() => onApproveWithRole(role.id)}>
                             <RequestsStatusIcon status="approved" />{' '}
-                            {__('Approve to %RN%', 'yay-wholesale').replace('%RN%', role.name)}
+                            {sprintf(__('Approve to %s', 'yay-wholesale'), role.name)}
                           </DropdownMenuItem>
                         );
                       })}

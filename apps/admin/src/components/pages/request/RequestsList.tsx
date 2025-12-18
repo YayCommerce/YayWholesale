@@ -3,7 +3,7 @@ import { CaretUpDownIcon } from '@phosphor-icons/react';
 import { useQueryClient } from '@tanstack/react-query';
 import { flexRender, getCoreRowModel, PaginationState, useReactTable } from '@tanstack/react-table';
 import { Spinner } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { debounce } from 'lodash';
 import { ChevronLeft, ChevronRight, Search, Trash2, XIcon } from 'lucide-react';
 
@@ -251,7 +251,7 @@ export default function RequestsList() {
                 {activeRoles?.map((role) => (
                   <ActionButton
                     icon={<RequestsStatusIcon status="approved" />}
-                    title={__('Approve to %ROLE%').replace('%ROLE%', role.name)}
+                    title={sprintf(__('Approve to %s'), role.name)}
                     onClick={() => handleBulkStatusChange('approved', role.id)}
                   />
                 ))}
@@ -275,9 +275,9 @@ export default function RequestsList() {
               <AlertDialogContent>
                 <AlertDialogHeader>
                   <AlertDialogTitle>
-                    {__(`Are you sure you want to delete %SC% requests ?`, 'yay-wholesale').replace(
-                      '%SC%',
-                      selectedCount.toString(),
+                    {sprintf(
+                      __(`Are you sure you want to delete %d requests ?`, 'yay-wholesale'),
+                      selectedCount,
                     )}
                   </AlertDialogTitle>
                   <AlertDialogDescription>

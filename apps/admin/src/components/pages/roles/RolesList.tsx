@@ -8,7 +8,7 @@ import {
   useReactTable,
 } from '@tanstack/react-table';
 import { Spinner } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { ChevronLeft, ChevronRight, ChevronsUpDown, Plus, Search, XIcon } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
@@ -274,9 +274,9 @@ export default function RolesList() {
               <AlertDialogContent>
                 <AlertDialogHeader>
                   <AlertDialogTitle>
-                    {__(`Are you sure you want to delete %SC% roles ?`, 'yay-wholesale').replace(
-                      '%SC%',
-                      selectedCount.toString(),
+                    {sprintf(
+                      __(`Are you sure you want to delete %d roles ?`, 'yay-wholesale'),
+                      selectedCount,
                     )}
                   </AlertDialogTitle>
                   <AlertDialogDescription>

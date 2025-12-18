@@ -1,4 +1,4 @@
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { XIcon } from 'lucide-react';
 
 import { Separator } from '@/components/ui/separator';
@@ -34,7 +34,7 @@ const BulkActionBox = ({
               <XIcon className="size-4" />
             </Button>
             <span className="text-sm font-normal text-[#151619]">
-              {__('%RC% selected').replace('%RC%', selectedCount.toString())}
+              {sprintf(__('%d selected'), selectedCount)}
             </span>
             <Separator orientation="vertical" className="ml-2 h-5!" />
             {children}

@@ -27,13 +27,22 @@ pnpm build
 cd "$PROJECT_PATH"
 
 #
-# 3) Copy files
+# 3) Build Requirement Slot Fill
+#
+cd "$PROJECT_PATH/apps/blocks/requirement-slot-fill"
+pnpm install
+echo "Running Reqirement Slot Fill JS Build..."
+pnpm build
+cd "$PROJECT_PATH"
+
+#
+# 4) Copy files
 #
 echo "Syncing files..."
 rsync -rc --exclude-from="$PROJECT_PATH/.distignore" "$PROJECT_PATH/" "$DEST_PATH/" --delete --delete-excluded
 
 #
-# 4) Run code formatter if tools directory exists before running lint
+# 5) Run code formatter if tools directory exists before running lint
 #
 if [ -d "$PROJECT_PATH/tools" ]; then
     echo "Running PHP Code Beautifier..."
@@ -43,13 +52,13 @@ if [ -d "$PROJECT_PATH/tools" ]; then
 fi
 
 #
-# 5) Remove development-only code
+# 6) Remove development-only code
 #
 sed -i "" "/'YAY_WHOLESALE_IS_DEVELOPMENT', true/d" "$DEST_PATH/yay-wholesale.php"
 rm -rf "$DEST_PATH/includes/Engine/Register/RegisterDev.php"
 
 #
-# 6) Generate ZIP
+# 7) Generate ZIP
 #
 echo "Generating zip file..."
 cd "$BUILD_PATH" || exit

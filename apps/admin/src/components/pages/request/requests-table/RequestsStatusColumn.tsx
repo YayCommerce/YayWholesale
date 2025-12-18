@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { ChevronDown } from 'lucide-react';
 import { useUpdateEffect } from 'react-use';
 
@@ -94,11 +94,7 @@ export default function RequestsStatusColumn({
                             <DropdownMenuItem
                               onClick={() => handleStatusChange(statusKey, role.id)}
                             >
-                              {icon}{' '}
-                              {__('Approved to %ROLE_NAME%', 'yay-wholesale').replace(
-                                '%ROLE_NAME%',
-                                role.name,
-                              )}
+                              {icon} {sprintf(__('Approved to %s', 'yay-wholesale'), role.name)}
                             </DropdownMenuItem>
                           ))}
                         </DropdownMenuSubContent>
