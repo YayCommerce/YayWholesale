@@ -102,19 +102,21 @@ export default function WholeSalersList() {
       {/* Header */}
       <div className="flex flex-nowrap items-center justify-between gap-3">
         <h1 className="text-2xl font-bold">{__('Wholesalers List', 'yay-wholesale')}</h1>
-        <div className="flex flex-col-reverse gap-2 lg:flex-row">
-          <InputGroup className="w-full sm:w-80">
-            <InputGroupInput
-              placeholder="Search by ID, Email, Display Name"
-              value={search}
-              onChange={handleChangeSearch}
-            />
-            <InputGroupAddon align="inline-end">
-              <Search className="size-4.5 text-[#A0A0A7]" />
-            </InputGroupAddon>
-          </InputGroup>
+        <div className="flex flex-col-reverse items-end gap-2 lg:flex-row">
+          {wholesalersData && wholesalersData.data.length > 10 && (
+            <InputGroup className="w-full sm:w-80">
+              <InputGroupInput
+                placeholder="Search by ID, Email, Display Name"
+                value={search}
+                onChange={handleChangeSearch}
+              />
+              <InputGroupAddon align="inline-end">
+                <Search className="size-4.5 text-[#A0A0A7]" />
+              </InputGroupAddon>
+            </InputGroup>
+          )}
           <Select value={roleFilter} onValueChange={setRoleFilter}>
-            <SelectTrigger className="w-full lg:w-40">
+            <SelectTrigger className="w-45.5">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -131,29 +133,24 @@ export default function WholeSalersList() {
               </SelectGroup>
             </SelectContent>
           </Select>
-          <a
-            href={window.yayWholesale.user_urls.add_new}
-            className="border-primary text-primary hover:bg-primary/10 bg-background flex h-[34px] cursor-pointer items-center justify-center gap-2 rounded-sm border px-4 text-sm font-medium"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Plus className="h-4 w-4" />
-            <span className="text-[12px] text-nowrap sm:text-[14px]">
-              {__('Add New Wholesaler')}
-            </span>
+          <a href={window.yayWholesale.user_urls.add_new} target="_blank" rel="noopener noreferrer">
+            <Button
+              variant="primary-outline"
+              className="hover:bg-primary/10 h-[34px] gap-2 rounded-sm px-4 text-sm font-medium"
+            >
+              <Plus className="h-4 w-4" />
+              <span className="text-[12px] text-nowrap sm:text-[14px]">
+                {__('Add New Wholesaler')}
+              </span>
+            </Button>
           </a>
         </div>
       </div>
 
       {/* Table */}
-      <div
-        className={cn(
-          'overflow-x-auto rounded-lg border',
-          isFetchingWholesalers && 'relative opacity-50',
-        )}
-      >
+      <div className="overflow-x-auto rounded-lg border">
         <Table className="min-w-full divide-y">
-          <TableHeader className="text-base-foreground h-[46px] bg-[#FAFAFA]">
+          <TableHeader className="text-base-foreground bg-base-muted h-[46px]">
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (
@@ -164,7 +161,7 @@ export default function WholeSalersList() {
                       header.column.columnDef.meta?.align === 'center'
                         ? 'text-center'
                         : 'text-left',
-                      header.column.columnDef.meta?.isCheckbox ? 'w-[36px] pr-0 pl-2' : 'px-3',
+                      header.column.columnDef.meta?.isCheckbox ? 'w-[36px] p-0' : 'px-3',
                     )}
                   >
                     {flexRender(header.column.columnDef.header, header.getContext())}
@@ -189,7 +186,16 @@ export default function WholeSalersList() {
               table.getRowModel().rows.map((row) => (
                 <TableRow key={row.id} data-state={row.getIsSelected() && 'selected'}>
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
+                    <TableCell
+                      key={cell.id}
+                      className={cn(
+                        'h-14',
+                        cell.column.columnDef.meta?.align === 'center'
+                          ? 'text-center'
+                          : 'text-left',
+                        cell.column.columnDef.meta?.isCheckbox ? 'w-[36px] p-0' : 'px-3',
+                      )}
+                    >
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </TableCell>
                   ))}

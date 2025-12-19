@@ -28,7 +28,7 @@ export default function WholesalersRoleColumn({ role, userId }: { role: string; 
       <DropdownMenuTrigger asChild>
         <Button
           variant="outline"
-          className="flex w-40 items-center justify-between font-normal"
+          className="flex w-45.5 items-center justify-between font-normal"
           disabled={isUpdatingRole}
         >
           <span className="flex gap-2">
@@ -38,7 +38,7 @@ export default function WholesalersRoleColumn({ role, userId }: { role: string; 
           <ChevronDown className="cursor-pointer" />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-40">
+      <DropdownMenuContent className="w-45.5">
         <DropdownMenuGroup>
           {roles?.map((roleItem) => (
             <DropdownMenuItem

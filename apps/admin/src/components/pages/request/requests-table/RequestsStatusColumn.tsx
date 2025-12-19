@@ -27,11 +27,9 @@ import requestsStatusMap from './RequestsStatusMap';
 export default function RequestsStatusColumn({
   requestId,
   defaultValue,
-  preventReset,
 }: {
   requestId: number;
   defaultValue: RequestFormValues['status'];
-  preventReset: (isPrevented: boolean) => void;
 }) {
   const [status, setStatus] = useState(defaultValue);
   const { text: currentText } = useMemo(() => {
@@ -53,7 +51,7 @@ export default function RequestsStatusColumn({
 
   return (
     <div className="pointer-events-none">
-      <DropdownMenu onOpenChange={(open) => preventReset(open)}>
+      <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button
             variant="outline"
@@ -68,7 +66,7 @@ export default function RequestsStatusColumn({
               <RequestsStatusIcon status={status} className="mt-0.5 min-h-4 min-w-4" />
               {currentText}
             </span>
-            <ChevronDown className="cursor-pointer" />
+            <ChevronDown className="text-muted-foreground/50 h-6 w-6 cursor-pointer" />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent className="w-40">

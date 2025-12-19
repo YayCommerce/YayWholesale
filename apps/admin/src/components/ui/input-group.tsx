@@ -30,7 +30,7 @@ function InputGroup({ className, ...props }: React.ComponentProps<'div'>) {
         'has-[[data-slot][aria-invalid=true]]:ring-destructive/20 has-[[data-slot][aria-invalid=true]]:border-destructive dark:has-[[data-slot][aria-invalid=true]]:ring-destructive/40',
 
         // Custom
-        'transition-colors duration-300 hover:border-black has-[[data-slot=input-group-control]:focus-visible]:border-black has-[[data-slot=input-group-control]:focus-visible]:ring-0',
+        'hover:border-foreground has-[[data-slot=input-group-control]:focus-visible]:border-foreground transition-colors duration-300 has-[[data-slot=input-group-control]:focus-visible]:ring-0',
         className,
       )}
       {...props}

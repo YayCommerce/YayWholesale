@@ -4,6 +4,7 @@ import { __ } from '@wordpress/i18n';
 import { WholesalerFormValues } from '@/lib/schema/wholesalers';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Label } from '@/components/ui/label';
 import { formatWooPrice } from '@/components/pages/roles/roles.helper';
 
 import WholesalersRoleColumn from './WholesalersRole';
@@ -14,7 +15,7 @@ function AvatarCell({ rowData }: { rowData: WholesalerFormValues }) {
   const userLink = window.yayWholesale.user_urls.edit.replace('%USER_ID%', id.toString());
   return (
     <div className="flex items-center gap-3">
-      <Avatar className="h-8 w-8">
+      <Avatar className="h-9.5 w-9.5">
         <a href={userLink} target="_blank" rel="noopener noreferrer">
           <AvatarImage src={avatar} alt={name} />
           <AvatarFallback>{name.charAt(0)}</AvatarFallback>
@@ -39,25 +40,37 @@ export const WholesalersColumn: ColumnDef<WholesalerFormValues>[] = [
   {
     id: 'select',
     header: ({ table }) => (
-      <div className="flex justify-center">
+      <Label
+        htmlFor="select-all"
+        className="flex h-full w-full cursor-pointer items-center justify-center px-4"
+      >
         <Checkbox
-          className="size-4"
+          id="select-all"
+          className="size-4 bg-white"
           checked={table.getIsAllPageRowsSelected()}
           onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
           aria-label="Select all"
         />
-      </div>
+      </Label>
     ),
-    cell: ({ row }) => (
-      <div className="flex justify-center">
-        <Checkbox
-          className="size-4"
-          checked={row.getIsSelected()}
-          onCheckedChange={(value) => row.toggleSelected(!!value)}
-          aria-label="Select row"
-        />
-      </div>
-    ),
+    cell: ({ row }) => {
+      const id = `select-${row.id}`;
+
+      return (
+        <Label
+          htmlFor={id}
+          className="flex h-full w-full cursor-pointer items-center justify-center px-4"
+        >
+          <Checkbox
+            id={id}
+            className="size-4 bg-white"
+            checked={row.getIsSelected()}
+            onCheckedChange={(value) => row.toggleSelected(!!value)}
+            aria-label="Select row"
+          />
+        </Label>
+      );
+    },
     meta: { align: 'center', isCheckbox: true },
     size: 36,
     enableSorting: false,

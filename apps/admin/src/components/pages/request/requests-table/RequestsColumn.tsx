@@ -20,6 +20,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Label } from '@/components/ui/label';
 import { WholeSaleToolTip } from '@/components/custom/WholeSaleToolTip';
 import SettingsIcon from '@/components/icons/SettingsIcon';
 
@@ -52,150 +53,148 @@ function AvatarCell({ rowData }: { rowData: RequestFormValues }) {
   );
 }
 
-export const RequestsColumn = (
-  showActionsId: number,
-  preventReset: (isPrevented: boolean) => void,
-): ColumnDef<RequestFormValues>[] => {
-  return [
-    {
-      id: 'select',
-      header: ({ table }) => (
-        <div className="flex justify-center">
+export const RequestsColumn: ColumnDef<RequestFormValues>[] = [
+  {
+    id: 'select',
+    header: ({ table }) => (
+      <Label
+        htmlFor="select-all"
+        className="flex h-full w-full cursor-pointer items-center justify-center px-4"
+      >
+        <Checkbox
+          id="select-all"
+          className="size-4 bg-white"
+          checked={table.getIsAllPageRowsSelected()}
+          onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+          aria-label="Select all"
+        />
+      </Label>
+    ),
+    cell: ({ row }) => {
+      const id = `select-${row.original.id}`;
+
+      return (
+        <Label
+          htmlFor={id}
+          className="flex h-full w-full cursor-pointer items-center justify-center px-4"
+        >
           <Checkbox
-            className="size-4"
-            checked={table.getIsAllPageRowsSelected()}
-            onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-            aria-label="Select all"
-          />
-        </div>
-      ),
-      cell: ({ row }) => (
-        <div className="flex justify-center">
-          <Checkbox
-            className="size-4"
+            id={id}
+            className="pointer-events-none size-4 bg-white"
             checked={row.getIsSelected()}
             onCheckedChange={(value) => row.toggleSelected(!!value)}
             aria-label="Select row"
           />
-        </div>
-      ),
-      meta: { align: 'center', isCheckbox: true },
-      size: 36,
-      enableSorting: false,
-      enableHiding: false,
+        </Label>
+      );
     },
-    {
-      accessorKey: 'name',
-      header: __('Name', 'yay-wholesale'),
-      cell: ({ row }) => {
-        return <AvatarCell rowData={row.original} />;
-      },
+    meta: { align: 'center', isCheckbox: true },
+    size: 36,
+    enableSorting: false,
+    enableHiding: false,
+  },
+  {
+    accessorKey: 'name',
+    header: __('Name', 'yay-wholesale'),
+    cell: ({ row }) => {
+      return <AvatarCell rowData={row.original} />;
     },
-    {
-      accessorKey: 'date',
-      header: __('Registration Date', 'yay-wholesale'),
-      cell: ({ row }) => {
-        return parseWPDate(row.original.date) + ' ' + parseWPTime(row.original.date);
-      },
+  },
+  {
+    accessorKey: 'date',
+    header: __('Registration Date', 'yay-wholesale'),
+    cell: ({ row }) => {
+      return parseWPDate(row.original.date) + ' ' + parseWPTime(row.original.date);
     },
-    // { accessorKey: 'role', header: 'Role' },
-    {
-      accessorKey: 'status',
-      header: __('Status', 'yay-wholesale'),
-      cell: ({ row }) => (
-        <RequestsStatusColumn
-          requestId={row.original.id}
-          defaultValue={row.original.status}
-          preventReset={preventReset}
-        />
-      ),
-    },
-    {
-      id: 'actions',
-      header: '',
-      cell: ({ row }) => {
-        const { mutate: deleteRequest, isPending: isDeletingRequestPending } =
-          useDeleteRequestMutation(row.original.id);
-        const navigate = useNavigate();
-        const queryClient = useQueryClient();
+  },
+  // { accessorKey: 'role', header: 'Role' },
+  {
+    accessorKey: 'status',
+    header: __('Status', 'yay-wholesale'),
+    cell: ({ row }) => (
+      <RequestsStatusColumn requestId={row.original.id} defaultValue={row.original.status} />
+    ),
+  },
+  {
+    id: 'actions',
+    header: '',
+    cell: ({ row }) => {
+      const { mutate: deleteRequest, isPending: isDeletingRequestPending } =
+        useDeleteRequestMutation(row.original.id);
+      const navigate = useNavigate();
+      const queryClient = useQueryClient();
 
-        const [openDialog, setOpenDialog] = useState(false);
+      const [openDialog, setOpenDialog] = useState(false);
 
-        return (
-          <AlertDialog open={openDialog} onOpenChange={setOpenDialog}>
-            <div className="m-0 flex w-10 justify-end gap-2 p-0">
-              {showActionsId !== row.original.id ? (
+      return (
+        <AlertDialog open={openDialog} onOpenChange={setOpenDialog}>
+          <div className="flex w-10 items-center justify-end gap-2">
+            <Button
+              size="icon"
+              variant="ghost"
+              className="text-base-muted-foreground flex h-8 w-8 transition group-hover:hidden"
+            >
+              <Ellipsis className="h-4 w-4" />
+            </Button>
+            <WholeSaleToolTip
+              trigger={
                 <Button
                   size="icon"
                   variant="ghost"
-                  className="text-base-muted-foreground h-8 w-8 transition"
+                  className="hover:text-primary text-base-muted-foreground hidden h-8 w-8 transition group-hover:flex hover:bg-white hover:shadow-xs"
+                  onClick={() => {
+                    queryClient.setQueryData(['request', row.original.id], row.original);
+                    navigate(`/request/edit/${row.original.id}`);
+                  }}
                 >
-                  <Ellipsis className="h-4 w-4" />
+                  <SettingsIcon className="h-4 w-4" />
                 </Button>
-              ) : (
-                <>
-                  <WholeSaleToolTip
-                    trigger={
-                      <Button
-                        size="icon"
-                        variant="ghost"
-                        className="hover:text-primary text-base-muted-foreground h-8 w-8 transition hover:bg-white hover:shadow-xs"
-                        onClick={() => {
-                          queryClient.setQueryData(['request', row.original.id], row.original);
-                          navigate(`/request/edit/${row.original.id}`);
-                        }}
-                      >
-                        <SettingsIcon className="h-4 w-4" />
-                      </Button>
-                    }
-                    content={<span>{__('Edit request', 'yay-wholesale')}</span>}
-                  />
+              }
+              content={<span>{__('Edit request', 'yay-wholesale')}</span>}
+            />
 
-                  <WholeSaleToolTip
-                    trigger={
-                      <Button
-                        size="icon"
-                        variant="ghost"
-                        className="hover:text-destructive text-base-muted-foreground h-8 w-8 hover:bg-white hover:shadow-xs"
-                        onClick={() => setOpenDialog(true)}
-                        disabled={
-                          isDeletingRequestPending ||
-                          queryClient.isMutating({ mutationKey: ['requests'] }) > 0
-                        }
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    }
-                    content={<span>{__('Delete request', 'yay-wholesale')}</span>}
-                  />
-                </>
-              )}
-            </div>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>
-                  {__('Are you sure you want to delete this request?', 'yay-wholesale')}
-                </AlertDialogTitle>
-                <AlertDialogDescription>
-                  {__(
-                    'This action cannot be undone. This will permanently delete this request and remove data from servers',
-                    'yay-wholesale',
-                  )}
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>{__('Cancel', 'yay-wholesale')}</AlertDialogCancel>
-                <AlertDialogAction
-                  className="bg-destructive text-destructive-foreground hover:bg-destructive/80"
-                  onClick={() => deleteRequest()}
+            <WholeSaleToolTip
+              trigger={
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  className="hover:text-destructive text-base-muted-foreground hidden h-8 w-8 group-hover:flex hover:bg-white hover:shadow-xs"
+                  onClick={() => setOpenDialog(true)}
+                  disabled={
+                    isDeletingRequestPending ||
+                    queryClient.isMutating({ mutationKey: ['requests'] }) > 0
+                  }
                 >
-                  {__('Continue', 'yay-wholesale')}
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
-        );
-      },
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              }
+              content={<span>{__('Delete request', 'yay-wholesale')}</span>}
+            />
+          </div>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>
+                {__('Are you sure you want to delete this request?', 'yay-wholesale')}
+              </AlertDialogTitle>
+              <AlertDialogDescription>
+                {__(
+                  'This action cannot be undone. This will permanently delete this request and remove data from servers',
+                  'yay-wholesale',
+                )}
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>{__('Cancel', 'yay-wholesale')}</AlertDialogCancel>
+              <AlertDialogAction
+                className="bg-destructive text-destructive-foreground hover:bg-destructive/80"
+                onClick={() => deleteRequest()}
+              >
+                {__('Continue', 'yay-wholesale')}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      );
     },
-  ];
-};
+  },
+];

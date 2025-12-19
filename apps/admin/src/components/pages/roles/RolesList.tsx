@@ -65,7 +65,6 @@ export default function RolesList() {
 
   const roles = useMemo(() => (data ? [...data].reverse() : []), [data]);
   const [search, setSearch] = useState('');
-  const [showActionsId, setShowActionsId] = useState(-1);
   const [openBulkDeleteDialog, setOpenDeleteDialog] = useState(false);
   const filteredData = useMemo(
     () =>
@@ -79,7 +78,7 @@ export default function RolesList() {
     [roles, search],
   );
 
-  const columns = useMemo(() => RolesColumn(showActionsId), [showActionsId]);
+  const columns = RolesColumn;
 
   const table = useReactTable({
     data: filteredData,
@@ -87,6 +86,7 @@ export default function RolesList() {
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
+    enableRowSelection: (row) => !row.original.isDefault,
   });
 
   const selectedCount = table.getFilteredSelectedRowModel().rows.length;
@@ -123,8 +123,8 @@ export default function RolesList() {
             </InputGroup>
           )}
           <Button
-            variant="outline"
-            className="border-primary text-primary hover:bg-primary/10 h-[34px] gap-2 rounded-sm px-4 text-sm font-medium"
+            variant="primary-outline"
+            className="hover:bg-primary/10 h-[34px] gap-2 rounded-sm px-4 text-sm font-medium"
             onClick={() => navigate('/roles/new')}
           >
             <Plus className="h-4 w-4" />
@@ -134,13 +134,7 @@ export default function RolesList() {
       </div>
 
       {/* Table */}
-      <div
-        className={cn(
-          'overflow-x-auto rounded-lg border',
-          (isFetchingRoles || isDeletingManyRolesPending || isBulkUpdatingRoleStatusPending) &&
-            'relative opacity-50',
-        )}
-      >
+      <div className="overflow-x-auto rounded-lg border">
         {/* Overlay Spinner */}
         {(isDeletingManyRolesPending || isBulkUpdatingRoleStatusPending) && (
           <div className="absolute inset-0 z-50 flex items-center justify-center">
@@ -149,7 +143,7 @@ export default function RolesList() {
         )}
 
         <Table className="min-w-full divide-y">
-          <TableHeader className="text-base-foreground h-[46px] bg-[#FAFAFA]">
+          <TableHeader className="text-base-foreground bg-base-muted h-[46px]">
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (
@@ -160,7 +154,7 @@ export default function RolesList() {
                       header.column.columnDef.meta?.align === 'center'
                         ? 'text-center'
                         : 'text-left',
-                      header.column.columnDef.meta?.isCheckbox ? 'w-[36px] pr-0 pl-2' : 'px-3',
+                      header.column.columnDef.meta?.isCheckbox ? 'w-[36px] p-0' : 'px-3',
                     )}
                   >
                     {flexRender(header.column.columnDef.header, header.getContext())}
@@ -184,23 +178,23 @@ export default function RolesList() {
               </TableRow>
             ) : table.getRowModel().rows.length > 0 ? (
               table.getRowModel().rows.map((row) => (
-                <TableRow key={row.id}>
+                <TableRow key={row.id} className="group">
                   {row.getVisibleCells().map((cell) => (
                     <TableCell
                       key={cell.id}
                       className={cn(
-                        'text-base-foreground h-[53px] cursor-pointer text-sm font-normal',
+                        'text-base-foreground h-13 cursor-pointer text-sm font-normal',
                         cell.column.columnDef.meta?.align === 'center'
                           ? 'text-center'
                           : 'text-left',
-                        cell.column.columnDef.meta?.isCheckbox ? 'w-[36px] pr-0 pl-2' : 'px-3',
+                        cell.column.columnDef.meta?.isCheckbox ? 'w-[36px] p-0' : 'px-3',
                         cell.column.id === 'actions' && 'm-0 flex w-25 justify-end lg:w-full',
                       )}
-                      onMouseEnter={() => setShowActionsId(row.original.id)}
-                      onMouseLeave={() => setShowActionsId(-1)}
                       onClick={() => {
-                        queryClient.setQueryData(['role', row.original.id], row.original);
-                        navigate(`/roles/edit/${row.original.id}`);
+                        if (['select', 'actions'].indexOf(cell.column.id) < 0) {
+                          queryClient.setQueryData(['role', row.original.id], row.original);
+                          navigate(`/roles/edit/${row.original.id}`);
+                        }
                       }}
                     >
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}

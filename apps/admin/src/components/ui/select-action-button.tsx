@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { EllipsisVertical } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -134,7 +134,9 @@ export const ActionMenuButton: React.FC<ActionMenuButtonProps> = ({
       </div>
       <Popover>
         <PopoverTrigger className="text-muted-foreground">
-          <EllipsisVertical />
+          <Button variant="ghost" size="icon">
+            <ChevronRight />
+          </Button>
         </PopoverTrigger>
         <PopoverContent
           side="right"

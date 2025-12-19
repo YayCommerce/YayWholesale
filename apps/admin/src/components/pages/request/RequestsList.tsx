@@ -67,7 +67,6 @@ export default function RequestsList() {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [openBulkDeleteDialog, setOpenDeleteDialog] = useState(false);
-  const [showActionsId, setShowActionsId] = useState(-1);
   const [preventReset, setPreventReset] = useState(false);
   const clientQuery = useQueryClient();
 
@@ -85,7 +84,7 @@ export default function RequestsList() {
 
   const { data: activeRoles } = useActiveRolesQuery();
 
-  const columns = useMemo(() => RequestsColumn(showActionsId, setPreventReset), [showActionsId]);
+  const columns = RequestsColumn;
   const defaultData = useMemo(() => [], []);
 
   const table = useReactTable({
@@ -138,9 +137,9 @@ export default function RequestsList() {
       {/* Header */}
       <div className="flex flex-nowrap items-center justify-between gap-3">
         <h1 className="text-2xl font-bold">{__('Wholesaler Requests', 'yay-wholesale')}</h1>
-        <div className="flex flex-col-reverse gap-2 md:flex-row">
+        <div className="flex flex-col items-end gap-2 md:flex-row">
           <Select value={statusFilter} onValueChange={setStatusFilter}>
-            <SelectTrigger className="w-full md:w-40">
+            <SelectTrigger className="w-40">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -160,24 +159,21 @@ export default function RequestsList() {
               </SelectGroup>
             </SelectContent>
           </Select>
-          <InputGroup className="w-full md:w-60">
-            <InputGroupInput placeholder="Search" value={search} onChange={handleChangeSearch} />
-            <InputGroupAddon align="inline-end">
-              <Search className="size-4.5 text-[#A0A0A7]" />
-            </InputGroupAddon>
-          </InputGroup>
+          {data && data.data.length > 10 && (
+            <InputGroup className="w-full md:w-76">
+              <InputGroupInput placeholder="Search" value={search} onChange={handleChangeSearch} />
+              <InputGroupAddon align="inline-end">
+                <Search className="size-4.5 text-[#A0A0A7]" />
+              </InputGroupAddon>
+            </InputGroup>
+          )}
         </div>
       </div>
 
       {/* Table */}
-      <div
-        className={cn(
-          'overflow-x-auto rounded-lg border',
-          isFetchingRequests && 'relative opacity-50',
-        )}
-      >
+      <div className="overflow-x-auto rounded-lg border">
         <Table className="min-w-full divide-y">
-          <TableHeader className="text-base-foreground h-[46px] bg-[#FAFAFA]">
+          <TableHeader className="text-base-foreground bg-base-muted h-[46px]">
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (
@@ -188,7 +184,7 @@ export default function RequestsList() {
                       header.column.columnDef.meta?.align === 'center'
                         ? 'text-center'
                         : 'text-left',
-                      header.column.columnDef.meta?.isCheckbox ? 'w-[36px] pr-0 pl-2' : 'px-3',
+                      header.column.columnDef.meta?.isCheckbox ? 'w-[36px] p-0' : 'px-3',
                     )}
                   >
                     {flexRender(header.column.columnDef.header, header.getContext())}
@@ -211,17 +207,16 @@ export default function RequestsList() {
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && 'selected'}
-                  onMouseEnter={() => setShowActionsId(row.original.id)}
-                  onMouseLeave={() => {
-                    if (!preventReset) setShowActionsId(-1);
-                  }}
+                  className="group"
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell
                       key={cell.id}
-                      className={
-                        cell.column.id === 'actions' ? 'm-0 flex w-25 justify-end lg:w-full' : ''
-                      }
+                      className={cn(
+                        'h-14',
+                        cell.column.id === 'select' ? 'p-0' : '',
+                        cell.column.id === 'actions' ? 'flex w-25 justify-end lg:w-full' : '',
+                      )}
                     >
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </TableCell>

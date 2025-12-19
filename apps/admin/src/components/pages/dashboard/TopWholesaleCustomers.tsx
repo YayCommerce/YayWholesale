@@ -35,7 +35,7 @@ export default function TopWholesaleCustomers(props: {
           className={cn('overflow-x-auto rounded-md border', isFetching && 'relative opacity-50')}
         >
           <Table className="divide-muted min-w-full divide-y">
-            <TableHeader className="text-base-foreground h-10 bg-[#FAFAFA]">
+            <TableHeader className="text-base-foreground bg-base-muted h-10">
               <TableRow className="text-base-foreground bg-muted text-[14px] font-semibold">
                 <TableHead className="text-base-foreground text-[14px]">
                   <span className="flex items-center justify-center font-medium">
@@ -104,7 +104,7 @@ export default function TopWholesaleCustomers(props: {
                       <div className="flex justify-center">
                         <Badge
                           variant="muted"
-                          className="text-base-foreground rounded-md bg-[#FAFAFA] text-xs font-semibold shadow-sm"
+                          className="text-base-foreground bg-base-muted rounded-md text-xs font-semibold shadow-sm"
                         >
                           {data.role}
                         </Badge>

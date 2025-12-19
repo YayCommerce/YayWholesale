@@ -38,7 +38,7 @@ export default function TopProducts(props: { reportQuery: ReturnType<typeof useR
           )}
         >
           <Table className="divide-muted min-w-full divide-y">
-            <TableHeader className="text-base-foreground h-10 bg-[#FAFAFA]">
+            <TableHeader className="text-base-foreground bg-base-muted h-10">
               <TableRow className="text-base-foreground bg-muted text-[14px] font-semibold">
                 <TableHead className="text-base-foreground text-[14px]">
                   <span className="flex items-center justify-center font-medium">

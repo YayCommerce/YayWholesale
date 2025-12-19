@@ -17,8 +17,6 @@ import { v4 as uuidv4 } from 'uuid';
 import type { SettingsFormData } from '@/lib/schema/settings';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { FormField } from '@/components/ui/form';
-import { Switch } from '@/components/ui/switch';
 
 import { FieldRow } from './FieldRow';
 
@@ -63,9 +61,9 @@ export default function RegistrationFieldsTab() {
           <h3 className="mb-4 text-base font-medium text-[#000000]">{__('Registration Fields')}</h3>
           {/* Add new field */}
           <Button
-            variant="outline"
+            variant="primary-outline"
             onClick={addNewField}
-            className="border-primary rounded-1.5 text-primary hover:bg-primary/10 gap-2 p-3 text-sm font-medium"
+            className="rounded-1.5 hover:bg-primary/10 gap-2 p-3 text-sm font-medium"
           >
             <Plus className="h-4 w-4" />
             {__('Add New Field')}
