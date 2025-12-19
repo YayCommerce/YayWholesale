@@ -31,7 +31,7 @@ export default function WholesalersRoleColumn({ role, userId }: { role: string; 
           className="flex w-45.5 items-center justify-between font-normal"
           disabled={isUpdatingRole}
         >
-          <span className="flex gap-2">
+          <span className="flex gap-2 overflow-hidden">
             <RolesIcon role={role} className="mt-0.5 min-h-4 min-w-4" />
             {roles?.find((r) => r.slug === role)?.name ?? role}
           </span>

@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { CaretUpDownIcon } from '@phosphor-icons/react';
 import { useQueryClient } from '@tanstack/react-query';
 import {
   flexRender,
@@ -28,18 +29,14 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import { BulkActionButton } from '@/components/ui/bulk-actions';
 import BulkActionBox from '@/components/ui/bulk-actions-box';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Input, InputSuffix } from '@/components/ui/input';
+import { Input } from '@/components/ui/input';
 import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Separator } from '@/components/ui/separator';
 import {
   Table,
   TableBody,
@@ -54,7 +51,6 @@ import { RolesColumn } from './roles-table/RolesColumn';
 
 export default function RolesList() {
   const navigate = useNavigate();
-  const [selectValue, setSelectValue] = useState('');
   const { data, isLoading: isLoadingRoles, isFetching: isFetchingRoles } = useRolesQuery();
   const queryClient = useQueryClient();
 
@@ -134,7 +130,12 @@ export default function RolesList() {
       </div>
 
       {/* Table */}
-      <div className="overflow-x-auto rounded-lg border">
+      <div
+        className={cn(
+          'relative overflow-x-auto rounded-lg border',
+          (isDeletingManyRolesPending || isBulkUpdatingRoleStatusPending) && 'relative opacity-50',
+        )}
+      >
         {/* Overlay Spinner */}
         {(isDeletingManyRolesPending || isBulkUpdatingRoleStatusPending) && (
           <div className="absolute inset-0 z-50 flex items-center justify-center">
@@ -220,78 +221,107 @@ export default function RolesList() {
 
       {/* Pagination Footer */}
       {filteredData.length > 0 && (
-        <div className="flex h-[46px] items-center justify-between">
-          {/* Left side - Bulk actions or empty */}
-          <BulkActionBox
-            selectedCount={selectedCount}
-            onResetRow={() => table.resetRowSelection()}
-            isHidingCondition={!isBulkUpdatingRoleStatusPending && !isDeletingManyRolesPending}
-          >
-            <Select
-              value={selectValue}
-              onValueChange={(newValue) => {
-                const status = newValue === 'set-active';
-                setSelectValue(newValue);
-                bulkUpdateRoleStatus(
-                  { ids: selectedRowsIds, status },
-                  {
-                    onSuccess: () => {
-                      clearSelection();
-                      setSelectValue('');
-                    },
-                  },
-                );
-              }}
-            >
-              <SelectTrigger
-                icon={<ChevronsUpDown className="size-4" />}
-                className="data-placeholder:text-base-secondary h-8 w-[80px] gap-2 border-none bg-transparent px-0 text-sm font-normal shadow-none focus:ring-0 focus:ring-offset-0 focus-visible:shadow-none focus-visible:ring-0 focus-visible:ring-offset-0"
-              >
-                <SelectValue placeholder={__('Status')} />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="set-active">{__('Active')}</SelectItem>
-                <SelectItem value="set-inactive">{__('Inactive')}</SelectItem>
-              </SelectContent>
-            </Select>
-            <span className="h-5 w-px border-r border-solid border-[#F4F4F5]" aria-hidden />
-            <AlertDialog open={openBulkDeleteDialog} onOpenChange={setOpenDeleteDialog}>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="hover:text-destructive text-base-muted-foreground h-6 w-6 shrink-0 hover:bg-transparent"
-                onClick={() => setOpenDeleteDialog(true)}
-                aria-label="Delete selected"
-              >
-                <DeleteIcon className="size-4" />
-              </Button>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>
-                    {sprintf(
-                      __(`Are you sure you want to delete %d roles ?`, 'yay-wholesale'),
-                      selectedCount,
-                    )}
-                  </AlertDialogTitle>
-                  <AlertDialogDescription>
-                    {__(
-                      'This action cannot be undone. This will permanently delete these request and remove data from servers',
-                      'yay-wholesale',
-                    )}
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>{__('Cancel', 'yay-wholesale')}</AlertDialogCancel>
-                  <AlertDialogAction
-                    className="bg-destructive text-destructive-foreground hover:bg-destructive/80"
-                    onClick={() => handleBulkDelete()}
+        <div
+          className={cn(
+            'relative flex flex-col items-center gap-3 sm:flex-row',
+            selectedCount > 1 && !(isDeletingManyRolesPending || isBulkUpdatingRoleStatusPending)
+              ? 'justify-between'
+              : 'justify-end',
+          )}
+        >
+          {!(isDeletingManyRolesPending || isBulkUpdatingRoleStatusPending) && (
+            <BulkActionBox selected={selectedCount} onClose={() => table.resetRowSelection()}>
+              <span className="text-sm font-normal text-[#151619]">
+                {sprintf(__('%d selected'), selectedCount)}
+              </span>
+              <Separator orientation="vertical" className="ml-2 h-5!" />
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    className="hover:text-primary hover:bg-primary/6 group bold flex cursor-pointer items-center gap-1.5 px-2.5"
                   >
-                    {__('Continue', 'yay-wholesale')}
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
-          </BulkActionBox>
+                    <span className="text-sm font-normal">{__('Status')}</span>
+                    <span className="group-hover:text-primary text-icon flex items-center">
+                      <CaretUpDownIcon size={12} weight="bold" />
+                    </span>
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent align="start" sideOffset={9} className="w-fit min-w-[20px] p-1">
+                  <div className="flex flex-col">
+                    <BulkActionButton
+                      className="w-30"
+                      onClick={() =>
+                        bulkUpdateRoleStatus(
+                          { ids: selectedRowsIds, status: true },
+                          {
+                            onSuccess: () => {
+                              clearSelection();
+                            },
+                          },
+                        )
+                      }
+                    >
+                      {__('Active')}
+                    </BulkActionButton>
+
+                    <BulkActionButton
+                      className="w-30"
+                      onClick={() =>
+                        bulkUpdateRoleStatus(
+                          { ids: selectedRowsIds, status: false },
+                          {
+                            onSuccess: () => {
+                              clearSelection();
+                            },
+                          },
+                        )
+                      }
+                    >
+                      {__('Inactive')}
+                    </BulkActionButton>
+                  </div>
+                </PopoverContent>
+              </Popover>
+              <span className="h-5 w-px border-r border-solid border-[#F4F4F5]" aria-hidden />
+              <AlertDialog open={openBulkDeleteDialog} onOpenChange={setOpenDeleteDialog}>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="hover:text-destructive text-base-muted-foreground h-6 w-6 shrink-0 hover:bg-transparent"
+                  onClick={() => setOpenDeleteDialog(true)}
+                  aria-label="Delete selected"
+                >
+                  <DeleteIcon className="size-4" />
+                </Button>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>
+                      {sprintf(
+                        __(`Are you sure you want to delete %d roles ?`, 'yay-wholesale'),
+                        selectedCount,
+                      )}
+                    </AlertDialogTitle>
+                    <AlertDialogDescription>
+                      {__(
+                        'This action cannot be undone. This will permanently delete these request and remove data from servers',
+                        'yay-wholesale',
+                      )}
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>{__('Cancel', 'yay-wholesale')}</AlertDialogCancel>
+                    <AlertDialogAction
+                      className="bg-destructive text-destructive-foreground hover:bg-destructive/80"
+                      onClick={() => handleBulkDelete()}
+                    >
+                      {__('Continue', 'yay-wholesale')}
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            </BulkActionBox>
+          )}
 
           {/* Right side - Pagination controls */}
           <div className="flex items-center gap-4">

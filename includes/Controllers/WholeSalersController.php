@@ -158,7 +158,9 @@ class WholeSalersController extends BaseRestController {
             if ( ! $user ) {
                 continue;
             }
-            $user->set_role( $role_slug );
+            RolesHelper::remove_ywhs_role_from_user( $user );
+
+            $user->add_role( $role_slug );
         }
 
         return $this->success( [], __( 'Wholesalers role updated successfully', 'yay-wholesale' ) );

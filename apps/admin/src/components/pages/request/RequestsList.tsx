@@ -25,11 +25,18 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import {
+  BulkActionButton,
+  BulkActionMenu,
+  BulkActionMenuContent,
+  BulkMenuButtonAndTrigger,
+} from '@/components/ui/bulk-actions';
 import BulkActionBox from '@/components/ui/bulk-actions-box';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import {
   Select,
   SelectContent,
@@ -39,11 +46,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import {
-  ActionButton,
-  ActionMenuButton,
-  SelectActionButton,
-} from '@/components/ui/select-action-button';
 import { Separator } from '@/components/ui/separator';
 import {
   Table,
@@ -67,7 +69,6 @@ export default function RequestsList() {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [openBulkDeleteDialog, setOpenDeleteDialog] = useState(false);
-  const [preventReset, setPreventReset] = useState(false);
   const clientQuery = useQueryClient();
 
   const debouncedSearch = useMemo(() => {
@@ -171,7 +172,19 @@ export default function RequestsList() {
       </div>
 
       {/* Table */}
-      <div className="overflow-x-auto rounded-lg border">
+      <div
+        className={cn(
+          'relative overflow-x-auto rounded-lg border',
+          (useBulkUpdateMutation.isPending || useBulkDeleteMutation.isPending) &&
+            'relative opacity-50',
+        )}
+      >
+        {/* Overlay Spinner */}
+        {(useBulkUpdateMutation.isPending || useBulkDeleteMutation.isPending) && (
+          <div className="absolute inset-0 z-50 flex items-center justify-center">
+            <Spinner className="text-muted-foreground size-6 animate-spin" />
+          </div>
+        )}
         <Table className="min-w-full divide-y">
           <TableHeader className="text-base-foreground bg-base-muted h-[46px]">
             {table.getHeaderGroups().map((headerGroup) => (
@@ -235,65 +248,98 @@ export default function RequestsList() {
       </div>
       {/* Footer */}
       {data != undefined && data.data.length > 0 && (
-        <div className="relative flex flex-col items-center justify-between gap-3 sm:flex-row">
-          <BulkActionBox selectedCount={selectedCount} onResetRow={() => table.resetRowSelection()}>
-            <SelectActionButton title="Status" icon={<CaretUpDownIcon size={12} weight="bold" />}>
-              <ActionMenuButton
-                icon={<RequestsStatusIcon status="approved" />}
-                title={__('Approve')}
-                onClick={() => handleBulkStatusChange('approved')}
-              >
-                {activeRoles?.map((role) => (
-                  <ActionButton
-                    icon={<RequestsStatusIcon status="approved" />}
-                    title={sprintf(__('Approve to %s'), role.name)}
-                    onClick={() => handleBulkStatusChange('approved', role.id)}
-                  />
-                ))}
-              </ActionMenuButton>
-              <ActionButton
-                icon={<RequestsStatusIcon status="rejected" />}
-                title={__('Reject')}
-                onClick={() => handleBulkStatusChange('rejected')}
-              />
-            </SelectActionButton>
-            <Separator orientation="vertical" className="h-5!" />
-            <AlertDialog open={openBulkDeleteDialog} onOpenChange={setOpenDeleteDialog}>
-              <Button
-                size="icon"
-                variant="ghost"
-                className="hover:text-destructive text-base-muted-foreground h-8 w-8 hover:shadow-xs"
-                onClick={() => setOpenDeleteDialog(true)}
-              >
-                <Trash2 className="h-4 w-4" />
-              </Button>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>
-                    {sprintf(
-                      __(`Are you sure you want to delete %d requests ?`, 'yay-wholesale'),
-                      selectedCount,
-                    )}
-                  </AlertDialogTitle>
-                  <AlertDialogDescription>
-                    {__(
-                      'This action cannot be undone. This will permanently delete these request and remove data from servers',
-                      'yay-wholesale',
-                    )}
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>{__('Cancel', 'yay-wholesale')}</AlertDialogCancel>
-                  <AlertDialogAction
-                    className="bg-destructive text-destructive-foreground hover:bg-destructive/80"
-                    onClick={() => handleBulkDelete()}
+        <div
+          className={cn(
+            'relative flex flex-col items-center gap-3 sm:flex-row',
+            selectedCount > 1 &&
+              !(useBulkUpdateMutation.isPending || useBulkDeleteMutation.isPending)
+              ? 'justify-between'
+              : 'justify-end',
+          )}
+        >
+          {!(useBulkUpdateMutation.isPending || useBulkDeleteMutation.isPending) && (
+            <BulkActionBox selected={selectedCount} onClose={() => table.resetRowSelection()}>
+              <span className="text-sm font-normal text-[#151619]">
+                {sprintf(__('%d selected'), selectedCount)}
+              </span>
+              <Separator orientation="vertical" className="ml-2 h-5!" />
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    className="hover:text-primary hover:bg-primary/6 group bold flex cursor-pointer items-center gap-1.5 px-2.5"
                   >
-                    {__('Continue', 'yay-wholesale')}
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
-          </BulkActionBox>
+                    <span className="text-sm font-normal">{__('Status')}</span>
+                    <span className="group-hover:text-primary text-icon flex items-center">
+                      <CaretUpDownIcon size={12} weight="bold" />
+                    </span>
+                  </Button>
+                </PopoverTrigger>
+
+                <PopoverContent align="start" sideOffset={9} className="w-fit min-w-[20px] p-1">
+                  <div className="flex flex-col">
+                    <BulkActionMenu>
+                      <BulkMenuButtonAndTrigger onClick={() => handleBulkStatusChange('approved')}>
+                        <RequestsStatusIcon status="approved" />
+                        {__('Approve')}
+                      </BulkMenuButtonAndTrigger>
+                      <BulkActionMenuContent>
+                        {activeRoles?.map((role) => (
+                          <BulkActionButton
+                            onClick={() => handleBulkStatusChange('approved', role.id)}
+                          >
+                            <RequestsStatusIcon status="approved" />
+                            {sprintf(__('Approve to %s'), role.name)}
+                          </BulkActionButton>
+                        ))}
+                      </BulkActionMenuContent>
+                    </BulkActionMenu>
+
+                    <BulkActionButton onClick={() => handleBulkStatusChange('rejected')}>
+                      <RequestsStatusIcon status="rejected" />
+                      {__('Reject')}
+                    </BulkActionButton>
+                  </div>
+                </PopoverContent>
+              </Popover>
+              <Separator orientation="vertical" className="h-5!" />
+              <AlertDialog open={openBulkDeleteDialog} onOpenChange={setOpenDeleteDialog}>
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  className="hover:text-destructive text-base-muted-foreground h-8 w-8 hover:shadow-xs"
+                  onClick={() => setOpenDeleteDialog(true)}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>
+                      {sprintf(
+                        __(`Are you sure you want to delete %d requests ?`, 'yay-wholesale'),
+                        selectedCount,
+                      )}
+                    </AlertDialogTitle>
+                    <AlertDialogDescription>
+                      {__(
+                        'This action cannot be undone. This will permanently delete these request and remove data from servers',
+                        'yay-wholesale',
+                      )}
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>{__('Cancel', 'yay-wholesale')}</AlertDialogCancel>
+                    <AlertDialogAction
+                      className="bg-destructive text-destructive-foreground hover:bg-destructive/80"
+                      onClick={() => handleBulkDelete()}
+                    >
+                      {__('Continue', 'yay-wholesale')}
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            </BulkActionBox>
+          )}
 
           <div className="flex items-center gap-4">
             <span className="text-base-secondary text-sm font-normal">

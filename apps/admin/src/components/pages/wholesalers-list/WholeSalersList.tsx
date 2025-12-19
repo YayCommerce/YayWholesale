@@ -1,8 +1,9 @@
 import { useMemo, useState } from 'react';
+import { CaretUpDownIcon } from '@phosphor-icons/react';
 import { useQueryClient } from '@tanstack/react-query';
 import { flexRender, getCoreRowModel, PaginationState, useReactTable } from '@tanstack/react-table';
 import { Spinner } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { debounce } from 'lodash';
 import { ChevronLeft, ChevronRight, ChevronsUpDown, Plus, Search } from 'lucide-react';
 
@@ -12,11 +13,13 @@ import {
   useWholesalersQuery,
 } from '@/lib/queries/wholesalers';
 import { cn } from '@/lib/utils';
+import { BulkActionButton } from '@/components/ui/bulk-actions';
 import BulkActionBox from '@/components/ui/bulk-actions-box';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import {
   Select,
   SelectContent,
@@ -46,7 +49,6 @@ export default function WholeSalersList() {
     pageIndex: 0,
     pageSize: 10,
   });
-  const [bulkRole, setBulkRole] = useState('');
   const [roleFilter, setRoleFilter] = useState('all');
 
   const clientQuery = useQueryClient();
@@ -94,7 +96,7 @@ export default function WholeSalersList() {
     table.setPageIndex(0);
   };
 
-  const { mutate: bulkUpdateWholesalersRole } =
+  const { mutate: bulkUpdateWholesalersRole, isPending: isBulkUpdateWholesalersPending } =
     useBulkUpdateWholesalersRoleMutation(selectedRowsIds);
 
   return (
@@ -148,7 +150,18 @@ export default function WholeSalersList() {
       </div>
 
       {/* Table */}
-      <div className="overflow-x-auto rounded-lg border">
+      <div
+        className={cn(
+          'overflow-x-auto rounded-lg border',
+          isBulkUpdateWholesalersPending && 'relative opacity-50',
+        )}
+      >
+        {/* Overlay Spinner */}
+        {isBulkUpdateWholesalersPending && (
+          <div className="absolute inset-0 z-50 flex items-center justify-center">
+            <Spinner className="text-muted-foreground size-6 animate-spin" />
+          </div>
+        )}
         <Table className="min-w-full divide-y">
           <TableHeader className="text-base-foreground bg-base-muted h-[46px]">
             {table.getHeaderGroups().map((headerGroup) => (
@@ -213,41 +226,57 @@ export default function WholeSalersList() {
       </div>
       {/* Footer */}
       {wholesalersData != undefined && wholesalersData?.data?.length > 0 && (
-        <div className="relative flex flex-col items-center justify-between gap-3 sm:flex-row">
-          <BulkActionBox selectedCount={selectedCount} onResetRow={() => table.resetRowSelection()}>
-            <Select
-              value={bulkRole}
-              onValueChange={(newValue) => {
-                setBulkRole(newValue);
-                bulkUpdateWholesalersRole(
-                  { roleSlug: newValue },
-                  {
-                    onSuccess: () => {
-                      table.resetRowSelection();
-                      setBulkRole('');
-                    },
-                  },
-                );
-              }}
-            >
-              <SelectTrigger
-                icon={<ChevronsUpDown className="size-4" />}
-                className="data-placeholder:text-base-secondary h-8 w-[140px] gap-2 border-none bg-transparent px-0 text-sm font-normal shadow-none focus:ring-0 focus:ring-offset-0 focus-visible:shadow-none focus-visible:ring-0 focus-visible:ring-offset-0"
-              >
-                <SelectValue placeholder={__('Wholesaler Role')} />
-              </SelectTrigger>
-              <SelectContent className="my-2">
-                {activeRoles?.map((role) => {
-                  return (
-                    <SelectItem key={role?.id} value={role?.slug}>
-                      <RolesIcon role={role?.slug} className="mt-0.5 min-h-4 min-w-4" />{' '}
-                      {role?.name}
-                    </SelectItem>
-                  );
-                })}
-              </SelectContent>
-            </Select>
-          </BulkActionBox>
+        <div
+          className={cn(
+            'relative flex flex-col items-center gap-3 sm:flex-row',
+            selectedCount > 1 && !isBulkUpdateWholesalersPending
+              ? 'justify-between'
+              : 'justify-end',
+          )}
+        >
+          {!isBulkUpdateWholesalersPending && (
+            <BulkActionBox selected={selectedCount} onClose={() => table.resetRowSelection()}>
+              <span className="text-sm font-normal text-[#151619]">
+                {sprintf(__('%d selected'), selectedCount)}
+              </span>
+              <Separator orientation="vertical" className="ml-2 h-5!" />
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    className="hover:text-primary hover:bg-primary/6 group bold flex cursor-pointer items-center gap-1.5 px-2.5"
+                  >
+                    <span className="text-sm font-normal">{__('Wholesaler Role')}</span>
+                    <span className="group-hover:text-primary text-icon flex items-center">
+                      <CaretUpDownIcon size={12} weight="bold" />
+                    </span>
+                  </Button>
+                </PopoverTrigger>
+
+                <PopoverContent align="start" sideOffset={9} className="w-fit min-w-[20px] p-1">
+                  <div className="flex flex-col">
+                    {activeRoles?.map((role) => (
+                      <BulkActionButton
+                        onClick={() =>
+                          bulkUpdateWholesalersRole(
+                            { roleSlug: role.slug },
+                            {
+                              onSuccess: () => {
+                                table.resetRowSelection();
+                              },
+                            },
+                          )
+                        }
+                      >
+                        <RolesIcon role={role?.slug} className="mt-0.5 min-h-4 min-w-4" />{' '}
+                        {role.name}
+                      </BulkActionButton>
+                    ))}
+                  </div>
+                </PopoverContent>
+              </Popover>
+            </BulkActionBox>
+          )}
 
           <div className="flex items-center gap-4">
             <span className="text-base-secondary text-sm font-normal">

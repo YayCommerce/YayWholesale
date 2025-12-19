@@ -58,8 +58,7 @@ export default function RequestsStatusColumn({
             className="pointer-events-auto flex w-40 items-center justify-between font-normal"
             disabled={
               updateStatusMutation.isPending ||
-              queryClient.isMutating({ mutationKey: ['requests'] }) > 0 ||
-              queryClient.isFetching({ queryKey: ['requests'] }) > 0
+              queryClient.isMutating({ mutationKey: ['requests'] }) > 0
             }
           >
             <span className="flex gap-2">
