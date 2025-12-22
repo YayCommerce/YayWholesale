@@ -104,7 +104,7 @@ export default function TopWholesaleCustomers(props: {
                       <div className="flex justify-center">
                         <Badge
                           variant="muted"
-                          className="text-base-foreground bg-base-muted rounded-md text-xs font-semibold shadow-sm"
+                          className="text-base-foreground bg-base-muted cursor-default rounded-md text-xs font-semibold shadow-sm"
                         >
                           {data.role}
                         </Badge>

@@ -5,7 +5,7 @@ import { flexRender, getCoreRowModel, PaginationState, useReactTable } from '@ta
 import { Spinner } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { debounce } from 'lodash';
-import { ChevronLeft, ChevronRight, Search, Trash2, XIcon } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Search } from 'lucide-react';
 
 import {
   useBulkDeleteRequestMutation,
@@ -34,9 +34,8 @@ import {
 import BulkActionBox from '@/components/ui/bulk-actions-box';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
 import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group';
-import { InputNumberCarets, InputNumberInput, InputNumberRoot } from '@/components/ui/input-number';
+import { InputNumberInput, InputNumberRoot } from '@/components/ui/input-number';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import {
   Select,
@@ -56,6 +55,8 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { WholeSaleToolTip } from '@/components/custom/WholeSaleToolTip';
+import DeleteIcon from '@/components/icons/DeleteIcon';
 import RequestsStatusIcon from '@/components/icons/RequestStatusIcon';
 
 import { RequestsColumn } from './requests-table/RequestsColumn';
@@ -161,7 +162,7 @@ export default function RequestsList() {
               </SelectGroup>
             </SelectContent>
           </Select>
-          {data && data.data.length > 10 && (
+          {table.getPageCount() > 1 && (
             <InputGroup className="w-full md:w-76">
               <InputGroupInput placeholder="Search" value={search} onChange={handleChangeSearch} />
               <InputGroupAddon align="inline-end">
@@ -305,14 +306,19 @@ export default function RequestsList() {
               </Popover>
               <Separator orientation="vertical" className="h-5!" />
               <AlertDialog open={openBulkDeleteDialog} onOpenChange={setOpenDeleteDialog}>
-                <Button
-                  size="icon"
-                  variant="ghost"
-                  className="hover:text-destructive text-base-muted-foreground h-8 w-8 hover:shadow-xs"
-                  onClick={() => setOpenDeleteDialog(true)}
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
+                <WholeSaleToolTip
+                  trigger={
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      className="hover:text-destructive text-base-muted-foreground h-8 w-8 hover:bg-transparent hover:shadow-sm"
+                      onClick={() => setOpenDeleteDialog(true)}
+                    >
+                      <DeleteIcon className="size-4" />
+                    </Button>
+                  }
+                  content={<span>{__('Delete', 'yay-wholesale')}</span>}
+                />
                 <AlertDialogContent>
                   <AlertDialogHeader>
                     <AlertDialogTitle>

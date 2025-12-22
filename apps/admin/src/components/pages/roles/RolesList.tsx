@@ -10,7 +10,7 @@ import {
 } from '@tanstack/react-table';
 import { Spinner } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
-import { ChevronLeft, ChevronRight, ChevronsUpDown, Plus, Search, XIcon } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Plus, Search, XIcon } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 import {
@@ -46,6 +46,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { WholeSaleToolTip } from '@/components/custom/WholeSaleToolTip';
 import DeleteIcon from '@/components/icons/DeleteIcon';
 
 import { RolesColumn } from './roles-table/RolesColumn';
@@ -286,15 +287,20 @@ export default function RolesList() {
               </Popover>
               <span className="h-5 w-px border-r border-solid border-[#F4F4F5]" aria-hidden />
               <AlertDialog open={openBulkDeleteDialog} onOpenChange={setOpenDeleteDialog}>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="hover:text-destructive text-base-muted-foreground h-6 w-6 shrink-0 hover:bg-transparent"
-                  onClick={() => setOpenDeleteDialog(true)}
-                  aria-label="Delete selected"
-                >
-                  <DeleteIcon className="size-4" />
-                </Button>
+                <WholeSaleToolTip
+                  trigger={
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="hover:text-destructive text-base-muted-foreground h-8 w-8 shrink-0 hover:bg-transparent hover:shadow-sm"
+                      onClick={() => setOpenDeleteDialog(true)}
+                      aria-label="Delete selected"
+                    >
+                      <DeleteIcon className="size-4" />
+                    </Button>
+                  }
+                  content={<span>{__('Delete', 'yay-wholesale')}</span>}
+                />
                 <AlertDialogContent>
                   <AlertDialogHeader>
                     <AlertDialogTitle>
