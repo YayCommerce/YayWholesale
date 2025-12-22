@@ -36,6 +36,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group';
+import { InputNumberCarets, InputNumberInput, InputNumberRoot } from '@/components/ui/input-number';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import {
   Select,
@@ -369,19 +370,22 @@ export default function RequestsList() {
 
             <div className="flex items-center gap-2">
               <span className="text-base-secondary text-sm font-normal">{__('Go to')}</span>
-              <Input
-                type="number"
+              <InputNumberRoot
                 min={1}
                 max={table.getPageCount()}
                 value={table.getState().pagination.pageIndex + 1}
-                onChange={(e) => {
-                  const page = e.target.value ? Number(e.target.value) - 1 : 0;
+                onValueChange={(value) => {
+                  if (isFetchingRequests) return;
+                  const page = value ? Number(value) - 1 : 0;
                   if (page >= 0 && page < table.getPageCount()) {
                     table.setPageIndex(page);
                   }
                 }}
                 className="text-base-secondary h-9 w-15 rounded-sm text-sm font-normal focus-visible:ring-0"
-              />
+                disabled={isFetchingRequests || table.getPageCount() <= 1}
+              >
+                <InputNumberInput className="disabled:bg-base-muted w-full shadow-xs disabled:text-black" />
+              </InputNumberRoot>
             </div>
           </div>
         </div>
