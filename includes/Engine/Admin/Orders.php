@@ -134,20 +134,19 @@ class Orders {
 
         // Update meta data for filter
         if ( $is_discounted ) {
-            $tmp = $order->get_meta( '_ywhs_wholesale_role' );
-            if ( ! isset( $tmp ) ) {
-                $trigger_email = true;
-            }
+            $order->update_meta_data( '_ywhs_wholesale_role', $is_wholesale_user['name'] );
 
-            if ( $tmp !== $is_wholesale_user['name'] ) {
-                $order->update_meta_data( '_ywhs_wholesale_role', $is_wholesale_user['name'] );
+            $created = $order->get_date_created()->getTimestamp();
+            $now     = time();
+            if ( $now - $created < 2000 ) {
+                $trigger_email = true;
             }
         } else {
             $order->delete_meta_data( '_ywhs_wholesale_role' );
         }
 
         if ( $trigger_email ) {
-            do_action( 'yhs_new_order_placed', $order->get_id(), $order );
+            do_action( 'yhs_new_wholesale_order_placed', $order->get_id(), $order );
         }
 
         $default_range_transient = get_transient( ReportsHelper::REPORT_DATE_RANGE_TRANSIENT );

@@ -45,7 +45,7 @@ class Emails {
         $new_actions = array_merge(
             $actions,
             [
-                'yhs_new_order_placed',
+                'yhs_new_wholesale_order_placed',
                 'yhs_new_account_registered',
                 'yhs_account_registration_pending',
                 'yhs_account_registration_rejected',

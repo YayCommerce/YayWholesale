@@ -393,8 +393,7 @@ class RequestsHelper {
             $display_name = get_post_meta( $request_id, self::REQUEST_META_DISPLAY_NAME, true );
             $post_meta    = get_post_meta( $request_id, self::REQUEST_META_DATA, true );
             $email        = get_post_meta( $request_id, self::REQUEST_META_EMAIL, true );
-            $password     = '123456';
-            // $password = wp_generate_password( 12, true, true );
+            $password     = wp_generate_password( 12, true, true );
 
             $request_user = wp_insert_user(
                 [

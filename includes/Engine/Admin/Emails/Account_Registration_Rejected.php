@@ -61,7 +61,7 @@ class Account_Registration_Rejected extends Wholesale_Email_Base {
      * @return string
      */
     public function get_default_email_content() {
-        $content  = sprintf( '%s {name}', __( 'Hi', 'yay-wholesale' ) );
+        $content  = sprintf( '%s {account_name}', __( 'Hi', 'yay-wholesale' ) );
         $content .= "\n\n";
         $content .= sprintf( __( 'Thank you for your interest in partnering with %s.', 'yay-wholesale' ), $this->get_blogname() );
         $content .= "\n\n";
