@@ -27,9 +27,9 @@ class RequestsHelper {
      *
      * @param int   $user_id The sender account ID .
      * @param array $form_data The form data in request.
-     * @return void A new wholesale is registered.
+     * @return int A new wholesale ID registered.
      */
-    public static function insert_whs_request( int $user_id, array $form_data ): void {
+    public static function insert_whs_request( int $user_id, array $form_data ): int {
         $name         = '';
         $display_name = '';
         if ( array_key_exists( 'name', $form_data ) ) {
@@ -60,39 +60,41 @@ class RequestsHelper {
             ]
         );
 
-        if ( $new_request_id ) {
+        if ( is_wp_error( $new_request_id ) ) {
+            return -1;
+        }
 
-            $general_setting = SettingsHelper::get_settings();
+        $general_setting = SettingsHelper::get_settings();
 
-            foreach ( $general_setting['registration_fields']['fields'] as $gsetting ) {
-                $key = self::label_to_input_name( $gsetting['label'] );
-                if ( array_key_exists( $key, $form_data ) ) {
-                    if ( 'email' === $gsetting['type'] && ! $gsetting['deletable'] ) {
-                        update_post_meta( $new_request_id, self::REQUEST_META_EMAIL, $form_data[ $key ] );
-                    } elseif ( 'textarea' === $gsetting['type'] && ! $gsetting['deletable'] ) {
-                        update_post_meta( $new_request_id, self::REQUEST_META_MESSAGE, $form_data[ $key ] );
-                    } else {
-                        $data[ $gsetting['label'] ] = [
-                            'type'       => $gsetting['type'],
-                            'value'      => $form_data[ $key ],
-                            'is_default' => $gsetting['isDefault'],
-                        ];
-                    }
+        foreach ( $general_setting['registration_fields']['fields'] as $gsetting ) {
+            $key = self::label_to_input_name( $gsetting['label'] );
+            if ( array_key_exists( $key, $form_data ) ) {
+                if ( 'email' === $gsetting['type'] && ! $gsetting['deletable'] ) {
+                    update_post_meta( $new_request_id, self::REQUEST_META_EMAIL, $form_data[ $key ] );
+                } elseif ( 'textarea' === $gsetting['type'] && ! $gsetting['deletable'] ) {
+                    update_post_meta( $new_request_id, self::REQUEST_META_MESSAGE, $form_data[ $key ] );
+                } else {
+                    $data[ $gsetting['label'] ] = [
+                        'type'       => $gsetting['type'],
+                        'value'      => $form_data[ $key ],
+                        'is_default' => $gsetting['isDefault'],
+                    ];
                 }
             }
-            update_post_meta( $new_request_id, self::REQUEST_META_DATA, $data );
+        }
+        update_post_meta( $new_request_id, self::REQUEST_META_DATA, $data );
 
-            update_post_meta( $new_request_id, self::REQUEST_META_DISPLAY_NAME, $display_name );
+        update_post_meta( $new_request_id, self::REQUEST_META_DISPLAY_NAME, $display_name );
 
-            update_post_meta( $new_request_id, self::REQUEST_META_STATUS, self::PENDING );
+        update_post_meta( $new_request_id, self::REQUEST_META_STATUS, self::PENDING );
 
-            // Trigger the email when a new wholesale account is registered.
-            do_action( 'yhs_new_account_registered', $new_request_id );
+        // Trigger the email when a new wholesale account is registered.
+        do_action( 'yhs_new_account_registered', $new_request_id );
 
-            // Trigger the email when a new wholesale account is pending.
-            do_action( 'yhs_account_registration_pending', $new_request_id );
+        // Trigger the email when a new wholesale account is pending.
+        do_action( 'yhs_account_registration_pending', $new_request_id );
 
-        }//end if
+        return $new_request_id;
     }
 
     /**

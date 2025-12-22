@@ -11,7 +11,6 @@ import { Card, CardContent } from '@/components/ui/card';
 import { FormProvider } from '@/components/ui/form';
 import { Toaster } from '@/components/ui/sonner';
 
-import DesignTab from './tabs/DesignTab';
 import DisplayTab from './tabs/DisplayTab';
 import EmailsTab from './tabs/EmailsTab';
 import GeneralTab from './tabs/GeneralTab';
@@ -28,7 +27,6 @@ const tabs = [
     component: <RegistrationFieldsTab />,
   },
   { path: 'emails', label: 'Emails', component: <EmailsTab /> },
-  { path: 'design', label: 'Design', component: <DesignTab /> },
 ];
 
 export default function SettingsPage() {
