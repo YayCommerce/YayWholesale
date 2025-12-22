@@ -445,4 +445,28 @@ class RequestsHelper {
             RolesHelper::remove_ywhs_role_from_user( $current_user );
         }
     }
+
+    /**
+     * Count the pending requests
+     *
+     * @return int count of the pending requests.
+     */
+    public static function count_pending_requests(): int {
+        $args  = [
+            'post_type'              => self::REQUEST_POST_TYPE,
+            'update_post_meta_cache' => true,
+            'meta_query'             => [
+                'relation' => 'AND',
+                [
+                    'key'     => self::REQUEST_META_STATUS,
+                    'value'   => self::PENDING,
+                    'compare' => '==',
+                    'type'    => 'CHAR',
+                ],
+            ],
+        ];
+        $query = new WP_Query( $args );
+
+        return $query->post_count;
+    }
 }

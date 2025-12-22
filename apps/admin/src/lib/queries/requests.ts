@@ -1,5 +1,4 @@
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { useNavigate } from 'react-router-dom';
 
 import { showToast } from '@/components/custom/showToast';
 
@@ -9,6 +8,7 @@ import {
   deleteRequestById,
   fetchRequestById,
   fetchRequests,
+  getPendingCount,
   updateRequestById,
   updateRequestStatusById,
 } from '../api/requests.api';
@@ -53,12 +53,8 @@ export function useUpdateRequestMutation(requestId: number) {
     onSuccess: (response) => {
       showToast.success(response.message);
       queryClient.invalidateQueries({ queryKey: ['request', requestId] });
-      if (!queryClient.isFetching({ queryKey: ['requests'] })) {
-        queryClient.invalidateQueries({ queryKey: ['requests'] });
-      }
-      if (!queryClient.isFetching({ queryKey: ['roles'] })) {
-        queryClient.invalidateQueries({ queryKey: ['roles'] });
-      }
+      queryClient.invalidateQueries({ queryKey: ['requests'] });
+      queryClient.invalidateQueries({ queryKey: ['roles'] });
     },
     onError: (error: Error) => {
       showToast.error(error.message);
@@ -74,12 +70,8 @@ export function useDeleteRequestMutation(requestId: number) {
     onSuccess: (response) => {
       showToast.success(response.message);
       queryClient.invalidateQueries({ queryKey: ['request', requestId] });
-      if (!queryClient.isFetching({ queryKey: ['requests'] })) {
-        queryClient.invalidateQueries({ queryKey: ['requests'] });
-      }
-      if (!queryClient.isFetching({ queryKey: ['roles'] })) {
-        queryClient.invalidateQueries({ queryKey: ['roles'] });
-      }
+      queryClient.invalidateQueries({ queryKey: ['requests'] });
+      queryClient.invalidateQueries({ queryKey: ['roles'] });
     },
     onError: (error: Error) => {
       showToast.error(error.message);
@@ -96,15 +88,9 @@ export function useUpdateRequestStatusMutation(requestId: number) {
     onSuccess: (response) => {
       showToast.success(response.message);
       queryClient.invalidateQueries({ queryKey: ['request', requestId] });
-      if (!queryClient.isFetching({ queryKey: ['requests'] })) {
-        queryClient.invalidateQueries({ queryKey: ['requests'] });
-      }
-      if (!queryClient.isFetching({ queryKey: ['roles'] })) {
-        queryClient.invalidateQueries({ queryKey: ['roles'] });
-      }
-      if (!queryClient.isFetching({ queryKey: ['wholesalers'] })) {
-        queryClient.invalidateQueries({ queryKey: ['wholesalers'] });
-      }
+      queryClient.invalidateQueries({ queryKey: ['requests'] });
+      queryClient.invalidateQueries({ queryKey: ['roles'] });
+      queryClient.invalidateQueries({ queryKey: ['wholesalers'] });
     },
     onError: (error: Error) => {
       showToast.error(error.message);
@@ -120,15 +106,9 @@ export function useBulkUpdateRequestStatusMutation(ids: number[]) {
       bulkUpdateRequestStatus(ids, status, roleId),
     onSuccess: (response) => {
       showToast.success(response.message);
-      if (!queryClient.isFetching({ queryKey: ['requests'] })) {
-        queryClient.invalidateQueries({ queryKey: ['requests'] });
-      }
-      if (!queryClient.isFetching({ queryKey: ['roles'] })) {
-        queryClient.invalidateQueries({ queryKey: ['roles'] });
-      }
-      if (!queryClient.isFetching({ queryKey: ['wholesalers'] })) {
-        queryClient.invalidateQueries({ queryKey: ['wholesalers'] });
-      }
+      queryClient.invalidateQueries({ queryKey: ['requests'] });
+      queryClient.invalidateQueries({ queryKey: ['roles'] });
+      queryClient.invalidateQueries({ queryKey: ['wholesalers'] });
     },
     onError: (error: Error) => {
       showToast.error(error.message);
@@ -143,15 +123,18 @@ export function useBulkDeleteRequestMutation(ids: number[]) {
     mutationFn: () => bulkDeleteRequest(ids),
     onSuccess: (response) => {
       showToast.success(response.message);
-      if (!queryClient.isFetching({ queryKey: ['requests'] })) {
-        queryClient.invalidateQueries({ queryKey: ['requests'] });
-      }
-      if (!queryClient.isFetching({ queryKey: ['roles'] })) {
-        queryClient.invalidateQueries({ queryKey: ['roles'] });
-      }
+      queryClient.invalidateQueries({ queryKey: ['requests'] });
+      queryClient.invalidateQueries({ queryKey: ['roles'] });
     },
     onError: (error: Error) => {
       showToast.error(error.message);
     },
+  });
+}
+
+export function usePendingCountQuery() {
+  return useQuery({
+    queryKey: ['requests', 'pending-count'],
+    queryFn: () => getPendingCount(),
   });
 }

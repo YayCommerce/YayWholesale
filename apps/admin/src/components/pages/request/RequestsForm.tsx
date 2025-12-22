@@ -111,10 +111,12 @@ export default function RequestsForm() {
                 {dataDisplay && dataDisplay.status !== 'approved' && (
                   <WholeSaleToolTip
                     trigger={
-                      <RequestsStatusIcon
-                        status={dataDisplay?.status ?? 'pending'}
-                        className="h-3.5 w-3.5"
-                      />
+                      <div>
+                        <RequestsStatusIcon
+                          status={dataDisplay?.status ?? 'pending'}
+                          className="h-3.5 w-3.5"
+                        />
+                      </div>
                     }
                     content={text}
                     side="bottom"
@@ -212,7 +214,7 @@ export default function RequestsForm() {
                   <Input
                     readOnly
                     value={handleDataByType()}
-                    className="border-border bg-base-muted bg-red cursor-default shadow-xs"
+                    className="border-border bg-base-muted cursor-default shadow-xs"
                   />
                 )}
               </div>

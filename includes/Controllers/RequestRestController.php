@@ -109,6 +109,18 @@ class RequestRestController extends BaseRestController {
                 ],
             ]
         );
+
+        register_rest_route(
+            $this->namespace,
+            '/requests/pending',
+            [
+                [
+                    'methods'  => 'GET',
+                    'callback' => [ $this, 'get_pending_count' ],
+                    // 'permission_callback' => [ $this,'request_permission_callback' ],
+                ],
+            ]
+        );
     }
 
     /**
@@ -394,5 +406,17 @@ class RequestRestController extends BaseRestController {
         $message = sprintf( $message, $deleted, $failed );
 
         return $this->success( [], $message );
+    }
+
+    /**
+     * Get the count of pending requests.
+     *
+     * @param WP_REST_Request $request The request object.
+     * @return WP_REST_Response The response object.
+     */
+    public function get_pending_count( WP_REST_Request $request ): WP_REST_Response {
+        $count = RequestsHelper::count_pending_requests();
+
+        return $this->success( [ 'count' => $count ], __( 'Pending Requests are successfully counted', 'yay-wholesale' ) );
     }
 }
