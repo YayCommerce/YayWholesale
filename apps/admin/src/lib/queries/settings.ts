@@ -14,6 +14,9 @@ export function useSaveSettingsMutation() {
     onSuccess: () => {
       showToast.success(__('Settings saved!'));
       queryClient.invalidateQueries({ queryKey: ['settings'] });
+      if (!queryClient.isFetching({ queryKey: ['roles'] })) {
+        queryClient.invalidateQueries({ queryKey: ['roles'] });
+      }
     },
     onError: () => {
       showToast.error(__('Oops! Something went wrong!'));

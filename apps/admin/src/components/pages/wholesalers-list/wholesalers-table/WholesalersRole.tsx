@@ -28,17 +28,17 @@ export default function WholesalersRoleColumn({ role, userId }: { role: string; 
       <DropdownMenuTrigger asChild>
         <Button
           variant="outline"
-          className="flex w-40 items-center justify-between font-normal"
+          className="flex w-45.5 items-center justify-between font-normal"
           disabled={isUpdatingRole}
         >
-          <span className="flex gap-2">
+          <span className="flex gap-2 overflow-hidden">
             <RolesIcon role={role} className="mt-0.5 min-h-4 min-w-4" />
             {roles?.find((r) => r.slug === role)?.name ?? role}
           </span>
-          <ChevronDown className="cursor-pointer" />
+          <ChevronDown className="text-muted-foreground/70 h-6 w-6 cursor-pointer" />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-40">
+      <DropdownMenuContent className="w-45.5">
         <DropdownMenuGroup>
           {roles?.map((roleItem) => (
             <DropdownMenuItem

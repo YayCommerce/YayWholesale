@@ -1,9 +1,10 @@
 import { useCallback, useEffect, useState } from 'react';
 import { CircleNotchIcon } from '@phosphor-icons/react';
 import { useIsMutating } from '@tanstack/react-query';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { useMatch, useNavigate } from 'react-router-dom';
 
+import { usePendingCountQuery } from '@/lib/queries/requests';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import DashboardIcon from '@/components/icons/DashboardIcon';
@@ -11,19 +12,66 @@ import RequestIcon from '@/components/icons/RequestIcon';
 import RolesIcon from '@/components/icons/RolesIcon';
 import SettingsIcon from '@/components/icons/SettingsIcon';
 
+import { WholeSaleToolTip } from '../custom/WholeSaleToolTip';
+import { Badge } from '../ui/badge';
 import { HeaderNavMenuItem, HeaderNavMenuList } from '../ui/navmenu-header';
 
 const NAV_ITEMS = [
-  { path: '/dashboard/*', to: '/dashboard', icon: DashboardIcon, label: 'Dashboard' },
-  { path: '/request/*', to: '/request', icon: RequestIcon, label: 'Request' },
+  {
+    path: '/dashboard/*',
+    to: '/dashboard',
+    icon: DashboardIcon,
+    label: 'Dashboard',
+    side: () => <></>,
+  },
+  {
+    path: '/request/*',
+    to: '/request',
+    icon: RequestIcon,
+    label: 'Request',
+    side: (props: { classname?: string }) => {
+      const { data } = usePendingCountQuery();
+
+      return (
+        data &&
+        data.count > 0 && (
+          <WholeSaleToolTip
+            trigger={
+              <div>
+                <Badge
+                  variant="destructive"
+                  className={cn('h-2 w-fit px-1.5 py-2', props.classname)}
+                >
+                  {data.count}
+                </Badge>
+              </div>
+            }
+            content={
+              data.count > 1
+                ? sprintf(__('%d requests are pending', 'yay-wholesale'), data.count)
+                : __('1 request is pending', 'yay-wholesale')
+            }
+            side="bottom"
+          />
+        )
+      );
+    },
+  },
   {
     path: '/wholesalers-list/*',
     to: '/wholesalers-list',
     icon: RolesIcon,
     label: 'Wholesalers List',
+    side: () => <></>,
   },
-  { path: '/roles/*', to: '/roles', icon: RolesIcon, label: 'Roles' },
-  { path: '/settings/*', to: '/settings', icon: SettingsIcon, label: 'Settings' },
+  { path: '/roles/*', to: '/roles', icon: RolesIcon, label: 'Roles', side: () => <></> },
+  {
+    path: '/settings/*',
+    to: '/settings',
+    icon: SettingsIcon,
+    label: 'Settings',
+    side: () => <></>,
+  },
 ];
 
 function useScrolled(threshold = 0) {
@@ -69,8 +117,8 @@ export default function Header() {
       </div>
 
       {/* Navigation */}
-      <HeaderNavMenuList className="h-[54px] justify-start gap-7.5">
-        {NAV_ITEMS.map(({ path, to, icon: Icon, label }) => {
+      <HeaderNavMenuList className="h-[56px] justify-start gap-7.5">
+        {NAV_ITEMS.map(({ path, to, icon: Icon, label, side: Side }) => {
           const isActive = !!useMatch({ path });
           return (
             <HeaderNavMenuItem
@@ -78,8 +126,14 @@ export default function Header() {
               onClick={() => handleNavClick(to)}
               className={cn(baseItemClass, isActive && activeItemClass)}
             >
-              <Icon />
+              <span className="relative">
+                <Icon />
+                <Side classname="absolute flex lg:hidden right-0.5 top-0.5 w-fit h-3 text-[7px] py-0 px-1 translate-x-1/2 -translate-y-1/2" />
+              </span>
               <span className="hidden sm:inline">{__(label)}</span>
+              <span>
+                <Side classname="hidden lg:flex" />
+              </span>
             </HeaderNavMenuItem>
           );
         })}

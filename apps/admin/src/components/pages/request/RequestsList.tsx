@@ -3,16 +3,9 @@ import { CaretUpDownIcon } from '@phosphor-icons/react';
 import { useQueryClient } from '@tanstack/react-query';
 import { flexRender, getCoreRowModel, PaginationState, useReactTable } from '@tanstack/react-table';
 import { Spinner } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { debounce } from 'lodash';
-import {
-  ChevronLeft,
-  ChevronRight,
-  ChevronsLeft,
-  ChevronsRight,
-  Search,
-  Trash2,
-} from 'lucide-react';
+import { ChevronLeft, ChevronRight, Search } from 'lucide-react';
 
 import {
   useBulkDeleteRequestMutation,
@@ -32,9 +25,18 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import {
+  BulkActionButton,
+  BulkActionMenu,
+  BulkActionMenuContent,
+  BulkMenuButtonAndTrigger,
+} from '@/components/ui/bulk-actions';
+import BulkActionBox from '@/components/ui/bulk-actions-box';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group';
+import { InputNumberInput, InputNumberRoot } from '@/components/ui/input-number';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import {
   Select,
   SelectContent,
@@ -44,11 +46,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import {
-  ActionButton,
-  ActionMenuButton,
-  SelectActionButton,
-} from '@/components/ui/select-action-button';
 import { Separator } from '@/components/ui/separator';
 import {
   Table,
@@ -58,12 +55,8 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import {
-  TableToast,
-  TableToastClose,
-  TableToaster,
-  TableToastTitle,
-} from '@/components/ui/table-toast';
+import { WholeSaleToolTip } from '@/components/custom/WholeSaleToolTip';
+import DeleteIcon from '@/components/icons/DeleteIcon';
 import RequestsStatusIcon from '@/components/icons/RequestStatusIcon';
 
 import { RequestsColumn } from './requests-table/RequestsColumn';
@@ -147,7 +140,7 @@ export default function RequestsList() {
       {/* Header */}
       <div className="flex flex-nowrap items-center justify-between gap-3">
         <h1 className="text-2xl font-bold">{__('Wholesaler Requests', 'yay-wholesale')}</h1>
-        <div className="flex gap-2">
+        <div className="flex flex-col items-end gap-2 md:flex-row">
           <Select value={statusFilter} onValueChange={setStatusFilter}>
             <SelectTrigger className="w-40">
               <SelectValue />
@@ -155,36 +148,47 @@ export default function RequestsList() {
             <SelectContent>
               <SelectGroup>
                 <SelectLabel>{__('Status Filter', 'yay-wholesale')}</SelectLabel>
-                <SelectItem value="all">{__('All', 'yay-wholesale')}</SelectItem>
+                <SelectItem value="all">{__('All status', 'yay-wholesale')}</SelectItem>
                 {Object.entries(requestsStatusMap).map((status) => {
                   const { icon, text } = status[1];
                   return (
-                    <SelectItem value={status[0]}>
-                      {icon} {text}
-                    </SelectItem>
+                    status[0] !== 'approved' && (
+                      <SelectItem value={status[0]}>
+                        {icon} {text}
+                      </SelectItem>
+                    )
                   );
                 })}
               </SelectGroup>
             </SelectContent>
           </Select>
-          <InputGroup className="w-60">
-            <InputGroupInput placeholder="Search" value={search} onChange={handleChangeSearch} />
-            <InputGroupAddon align="inline-end">
-              <Search />
-            </InputGroupAddon>
-          </InputGroup>
+          {(table.getPageCount() > 1 || keyword !== '') && (
+            <InputGroup className="w-full md:w-76">
+              <InputGroupInput placeholder="Search" value={search} onChange={handleChangeSearch} />
+              <InputGroupAddon align="inline-end">
+                <Search className="size-4.5 text-[#A0A0A7]" />
+              </InputGroupAddon>
+            </InputGroup>
+          )}
         </div>
       </div>
 
       {/* Table */}
       <div
         className={cn(
-          'overflow-hidden rounded-lg border',
-          isFetchingRequests && 'relative opacity-50',
+          'relative overflow-x-auto rounded-lg border',
+          (useBulkUpdateMutation.isPending || useBulkDeleteMutation.isPending) &&
+            'relative opacity-50',
         )}
       >
+        {/* Overlay Spinner */}
+        {(useBulkUpdateMutation.isPending || useBulkDeleteMutation.isPending) && (
+          <div className="absolute inset-0 z-50 flex items-center justify-center">
+            <Spinner className="text-muted-foreground size-6 animate-spin" />
+          </div>
+        )}
         <Table className="min-w-full divide-y">
-          <TableHeader className="text-base-foreground h-[46px] bg-[#FAFAFA]">
+          <TableHeader className="text-base-foreground bg-base-muted h-[46px]">
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (
@@ -195,7 +199,7 @@ export default function RequestsList() {
                       header.column.columnDef.meta?.align === 'center'
                         ? 'text-center'
                         : 'text-left',
-                      header.column.columnDef.meta?.isCheckbox ? 'w-[36px] pr-0 pl-2' : 'px-3',
+                      header.column.columnDef.meta?.isCheckbox ? 'w-[36px] p-0' : 'px-3',
                     )}
                   >
                     {flexRender(header.column.columnDef.header, header.getContext())}
@@ -215,9 +219,20 @@ export default function RequestsList() {
               </TableRow>
             ) : table.getRowModel().rows.length > 0 ? (
               table.getRowModel().rows.map((row) => (
-                <TableRow key={row.id} data-state={row.getIsSelected() && 'selected'}>
+                <TableRow
+                  key={row.id}
+                  data-state={row.getIsSelected() && 'selected'}
+                  className="group"
+                >
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
+                    <TableCell
+                      key={cell.id}
+                      className={cn(
+                        'h-14',
+                        cell.column.id === 'select' ? 'p-0' : '',
+                        cell.column.id === 'actions' ? 'flex w-25 justify-end lg:w-full' : '',
+                      )}
+                    >
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </TableCell>
                   ))}
@@ -235,55 +250,82 @@ export default function RequestsList() {
       </div>
       {/* Footer */}
       {data != undefined && data.data.length > 0 && (
-        <div className="relative flex flex-col items-center justify-end gap-3 sm:flex-row">
-          <TableToaster className="left-2/3 md:left-2/7">
-            <TableToast
-              open={selectedCount > 0}
-              onOpenChange={(open) => {
-                if (!open) {
-                  table.resetRowSelection();
-                }
-              }}
-            >
-              <TableToastClose onClick={() => table.resetRowSelection()} />
-              <TableToastTitle>
-                {__('%RC% selected').replace('%RC%', selectedCount.toString())}
-              </TableToastTitle>
+        <div
+          className={cn(
+            'relative flex flex-col items-center gap-3 sm:flex-row',
+            selectedCount > 1 &&
+              !(useBulkUpdateMutation.isPending || useBulkDeleteMutation.isPending)
+              ? 'justify-between'
+              : 'justify-end',
+          )}
+        >
+          {!(useBulkUpdateMutation.isPending || useBulkDeleteMutation.isPending) && (
+            <BulkActionBox selected={selectedCount} onClose={() => table.resetRowSelection()}>
+              <span className="text-sm font-normal text-[#151619]">
+                {sprintf(__('%d selected'), selectedCount)}
+              </span>
               <Separator orientation="vertical" className="ml-2 h-5!" />
-              <SelectActionButton title="Status" icon={<CaretUpDownIcon size={12} weight="bold" />}>
-                <ActionMenuButton
-                  icon={<RequestsStatusIcon status="approved" />}
-                  title={__('Approve')}
-                  onClick={() => handleBulkStatusChange('approved')}
-                >
-                  {activeRoles?.map((role) => (
-                    <ActionButton
-                      icon={<RequestsStatusIcon status="approved" />}
-                      title={__('Approve to %ROLE%').replace('%ROLE%', role.name)}
-                      onClick={() => handleBulkStatusChange('approved', role.id)}
-                    />
-                  ))}
-                </ActionMenuButton>
-                <ActionButton
-                  icon={<RequestsStatusIcon status="rejected" />}
-                  title={__('Reject')}
-                  onClick={() => handleBulkStatusChange('rejected')}
-                />
-              </SelectActionButton>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    className="hover:text-primary hover:bg-primary/6 group bold flex cursor-pointer items-center gap-1.5 px-2.5"
+                  >
+                    <span className="text-sm font-normal">{__('Status')}</span>
+                    <span className="group-hover:text-primary text-icon flex items-center">
+                      <CaretUpDownIcon size={12} weight="bold" />
+                    </span>
+                  </Button>
+                </PopoverTrigger>
+
+                <PopoverContent align="start" sideOffset={9} className="w-fit min-w-[20px] p-1">
+                  <div className="flex flex-col">
+                    <BulkActionMenu>
+                      <BulkMenuButtonAndTrigger onClick={() => handleBulkStatusChange('approved')}>
+                        <RequestsStatusIcon status="approved" />
+                        {__('Approve')}
+                      </BulkMenuButtonAndTrigger>
+                      <BulkActionMenuContent>
+                        {activeRoles?.map((role) => (
+                          <BulkActionButton
+                            onClick={() => handleBulkStatusChange('approved', role.id)}
+                          >
+                            <RequestsStatusIcon status="approved" />
+                            {sprintf(__('Approve to %s'), role.name)}
+                          </BulkActionButton>
+                        ))}
+                      </BulkActionMenuContent>
+                    </BulkActionMenu>
+
+                    <BulkActionButton onClick={() => handleBulkStatusChange('rejected')}>
+                      <RequestsStatusIcon status="rejected" />
+                      {__('Reject')}
+                    </BulkActionButton>
+                  </div>
+                </PopoverContent>
+              </Popover>
               <Separator orientation="vertical" className="h-5!" />
               <AlertDialog open={openBulkDeleteDialog} onOpenChange={setOpenDeleteDialog}>
-                <Button
-                  size="icon"
-                  variant="ghost"
-                  className="hover:text-destructive text-base-muted-foreground h-8 w-8 hover:shadow-xs"
-                  onClick={() => setOpenDeleteDialog(true)}
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
+                <WholeSaleToolTip
+                  trigger={
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      className="hover:text-destructive text-base-muted-foreground h-8 w-8 hover:bg-transparent hover:shadow-sm"
+                      onClick={() => setOpenDeleteDialog(true)}
+                    >
+                      <DeleteIcon className="size-4" />
+                    </Button>
+                  }
+                  content={<span>{__('Delete', 'yay-wholesale')}</span>}
+                />
                 <AlertDialogContent>
                   <AlertDialogHeader>
                     <AlertDialogTitle>
-                      {__('Are you sure you want to bulk delete requests?', 'yay-wholesale')}
+                      {sprintf(
+                        __(`Are you sure you want to delete %d requests ?`, 'yay-wholesale'),
+                        selectedCount,
+                      )}
                     </AlertDialogTitle>
                     <AlertDialogDescription>
                       {__(
@@ -303,64 +345,53 @@ export default function RequestsList() {
                   </AlertDialogFooter>
                 </AlertDialogContent>
               </AlertDialog>
-            </TableToast>
-          </TableToaster>
+            </BulkActionBox>
+          )}
 
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-[#171719]">Rows per page:</span>
-            <Select
-              value={`${pagination.pageSize}`}
-              onValueChange={(value) => handleChangePerPage(value)}
-            >
-              <SelectTrigger size="sm" className="w-20" id="rows-per-page">
-                <SelectValue placeholder={pagination.pageSize} />
-              </SelectTrigger>
-              <SelectContent side="top">
-                {[10, 50, 100, 200].map((pageSize) => (
-                  <SelectItem key={pageSize} value={`${pageSize}`}>
-                    {pageSize}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+          <div className="flex items-center gap-4">
+            <span className="text-base-secondary text-sm font-normal">
+              Page {table.getState().pagination.pageIndex + 1} of {table.getPageCount()}
+            </span>
 
             <div className="flex items-center gap-1">
-              <span className="mx-5 text-sm">
-                Page {pagination.pageIndex + 1} of {data?.totalPage ?? 0}
-              </span>
               <Button
                 variant="outline"
                 size="icon"
-                onClick={() => table.setPageIndex(0)}
-                disabled={!table.getCanPreviousPage()}
-              >
-                <ChevronsLeft />
-              </Button>
-              <Button
-                variant="outline"
-                size="icon"
+                className="h-9 w-9 rounded-sm"
                 onClick={() => table.previousPage()}
                 disabled={!table.getCanPreviousPage()}
               >
-                <ChevronLeft />
+                <ChevronLeft className="h-4 w-4" />
               </Button>
-
               <Button
                 variant="outline"
                 size="icon"
+                className="h-9 w-9 rounded-sm"
                 onClick={() => table.nextPage()}
                 disabled={!table.getCanNextPage()}
               >
-                <ChevronRight />
+                <ChevronRight className="h-4 w-4" />
               </Button>
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={() => table.setPageIndex((data?.totalPage ?? 1) - 1)}
-                disabled={!table.getCanNextPage()}
+            </div>
+
+            <div className="flex items-center gap-2">
+              <span className="text-base-secondary text-sm font-normal">{__('Go to')}</span>
+              <InputNumberRoot
+                min={1}
+                max={table.getPageCount()}
+                value={table.getState().pagination.pageIndex + 1}
+                onValueChange={(value) => {
+                  if (isFetchingRequests) return;
+                  const page = value ? Number(value) - 1 : 0;
+                  if (page >= 0 && page < table.getPageCount()) {
+                    table.setPageIndex(page);
+                  }
+                }}
+                className="text-base-secondary h-9 w-15 rounded-sm text-sm font-normal focus-visible:ring-0"
+                disabled={isFetchingRequests || table.getPageCount() <= 1}
               >
-                <ChevronsRight />
-              </Button>
+                <InputNumberInput className="disabled:bg-base-muted w-full shadow-xs disabled:text-black" />
+              </InputNumberRoot>
             </div>
           </div>
         </div>

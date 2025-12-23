@@ -56,7 +56,10 @@ const DashboardDatePicker: FC<DashboardDatePickerProps> = ({ dateRange, setDateR
             {displayDateRange}
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="h-fit w-fit px-1" align="end">
+        <PopoverContent
+          className="h-fit w-fit px-1 sm:-translate-x-5 lg:-translate-x-6"
+          align="start"
+        >
           <Calendar
             mode="range"
             defaultMonth={previewDateRange?.from}
@@ -66,7 +69,7 @@ const DashboardDatePicker: FC<DashboardDatePickerProps> = ({ dateRange, setDateR
             disabled={{
               after: new Date(),
             }}
-            className="hidden lg:block"
+            className="hidden md:block"
           />
           <Calendar
             mode="range"
@@ -77,7 +80,7 @@ const DashboardDatePicker: FC<DashboardDatePickerProps> = ({ dateRange, setDateR
             disabled={{
               after: new Date(),
             }}
-            className="block lg:hidden"
+            className="block md:hidden"
           />
           <div className="px-4 pt-2">
             <Separator />

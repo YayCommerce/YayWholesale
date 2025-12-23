@@ -1,4 +1,6 @@
 import { useMemo, useState } from 'react';
+import { CaretUpDownIcon } from '@phosphor-icons/react';
+import { useQueryClient } from '@tanstack/react-query';
 import {
   flexRender,
   getCoreRowModel,
@@ -7,8 +9,8 @@ import {
   useReactTable,
 } from '@tanstack/react-table';
 import { Spinner } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
-import { ChevronLeft, ChevronRight, ChevronsUpDown, Plus, Search, XIcon } from 'lucide-react';
+import { __, sprintf } from '@wordpress/i18n';
+import { ChevronLeft, ChevronRight, Plus, Search, XIcon } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 import {
@@ -17,16 +19,25 @@ import {
   useRolesQuery,
 } from '@/lib/queries/roles';
 import { cn } from '@/lib/utils';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import { BulkActionButton } from '@/components/ui/bulk-actions';
+import BulkActionBox from '@/components/ui/bulk-actions-box';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Input, InputSuffix } from '@/components/ui/input';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+import { Input } from '@/components/ui/input';
+import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group';
+import { InputNumberInput, InputNumberRoot } from '@/components/ui/input-number';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Separator } from '@/components/ui/separator';
 import {
   Table,
   TableBody,
@@ -35,14 +46,15 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { WholeSaleToolTip } from '@/components/custom/WholeSaleToolTip';
 import DeleteIcon from '@/components/icons/DeleteIcon';
 
 import { RolesColumn } from './roles-table/RolesColumn';
 
 export default function RolesList() {
   const navigate = useNavigate();
-  const [selectValue, setSelectValue] = useState('');
-  const { data, isLoading: isLoadingRoles } = useRolesQuery();
+  const { data, isLoading: isLoadingRoles, isFetching: isFetchingRoles } = useRolesQuery();
+  const queryClient = useQueryClient();
 
   const { mutate: deleteManyRolesByIds, isPending: isDeletingManyRolesPending } =
     useDeleteManyRolesMutation();
@@ -51,6 +63,7 @@ export default function RolesList() {
 
   const roles = useMemo(() => (data ? [...data].reverse() : []), [data]);
   const [search, setSearch] = useState('');
+  const [openBulkDeleteDialog, setOpenDeleteDialog] = useState(false);
   const filteredData = useMemo(
     () =>
       roles
@@ -63,12 +76,15 @@ export default function RolesList() {
     [roles, search],
   );
 
+  const columns = RolesColumn;
+
   const table = useReactTable({
     data: filteredData,
-    columns: RolesColumn,
+    columns,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
+    enableRowSelection: (row) => !row.original.isDefault,
   });
 
   const selectedCount = table.getFilteredSelectedRowModel().rows.length;
@@ -79,12 +95,6 @@ export default function RolesList() {
   };
 
   const handleBulkDelete = () => {
-    if (
-      !window.confirm(
-        `Are you sure you want to delete ${selectedCount} ${selectedCount > 1 ? 'roles' : 'role'}?`,
-      )
-    )
-      return;
     deleteManyRolesByIds(selectedRowsIds, {
       onSuccess: () => {
         clearSelection();
@@ -97,23 +107,22 @@ export default function RolesList() {
       {/* Header */}
       <div className="flex flex-nowrap items-center justify-between gap-3">
         <h1 className="text-2xl font-bold">{__('Roles')}</h1>
-        <div className="flex flex-nowrap items-center gap-4">
+        <div className="flex flex-col-reverse flex-nowrap items-end gap-4 sm:flex-row sm:items-center">
           {roles.length > 10 && (
-            <div className="relative flex-none">
-              <Input
+            <InputGroup className="w-full sm:w-80">
+              <InputGroupInput
                 placeholder={__('Search')}
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="border-input w-80 rounded-sm border bg-white pr-9 text-sm font-normal"
               />
-              <InputSuffix className="absolute top-1/2 right-3 -translate-y-1/2 bg-transparent px-0">
+              <InputGroupAddon align="inline-end">
                 <Search className="size-4.5 text-[#A0A0A7]" />
-              </InputSuffix>
-            </div>
+              </InputGroupAddon>
+            </InputGroup>
           )}
           <Button
-            variant="outline"
-            className="border-primary text-primary hover:bg-primary/10 h-[34px] gap-2 rounded-sm px-4 text-sm font-medium"
+            variant="primary-outline"
+            className="hover:bg-primary/10 h-[34px] gap-2 rounded-sm px-4 text-sm font-medium"
             onClick={() => navigate('/roles/new')}
           >
             <Plus className="h-4 w-4" />
@@ -125,7 +134,7 @@ export default function RolesList() {
       {/* Table */}
       <div
         className={cn(
-          'overflow-hidden rounded-lg border',
+          'relative overflow-x-auto rounded-lg border',
           (isDeletingManyRolesPending || isBulkUpdatingRoleStatusPending) && 'relative opacity-50',
         )}
       >
@@ -137,7 +146,7 @@ export default function RolesList() {
         )}
 
         <Table className="min-w-full divide-y">
-          <TableHeader className="text-base-foreground h-[46px] bg-[#FAFAFA]">
+          <TableHeader className="text-base-foreground bg-base-muted h-[46px]">
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (
@@ -148,7 +157,7 @@ export default function RolesList() {
                       header.column.columnDef.meta?.align === 'center'
                         ? 'text-center'
                         : 'text-left',
-                      header.column.columnDef.meta?.isCheckbox ? 'w-[36px] pr-0 pl-2' : 'px-3',
+                      header.column.columnDef.meta?.isCheckbox ? 'w-[36px] p-0' : 'px-3',
                     )}
                   >
                     {flexRender(header.column.columnDef.header, header.getContext())}
@@ -172,17 +181,24 @@ export default function RolesList() {
               </TableRow>
             ) : table.getRowModel().rows.length > 0 ? (
               table.getRowModel().rows.map((row) => (
-                <TableRow key={row.id}>
+                <TableRow key={row.id} className="group">
                   {row.getVisibleCells().map((cell) => (
                     <TableCell
                       key={cell.id}
                       className={cn(
-                        'text-base-foreground h-[53px] text-sm font-normal',
+                        'text-base-foreground h-13 cursor-pointer text-sm font-normal',
                         cell.column.columnDef.meta?.align === 'center'
                           ? 'text-center'
                           : 'text-left',
-                        cell.column.columnDef.meta?.isCheckbox ? 'w-[36px] pr-0 pl-2' : 'px-3',
+                        cell.column.columnDef.meta?.isCheckbox ? 'w-[36px] p-0' : 'px-3',
+                        cell.column.id === 'actions' && 'm-0 flex w-25 justify-end lg:w-full',
                       )}
+                      onClick={() => {
+                        if (['select', 'actions'].indexOf(cell.column.id) < 0) {
+                          queryClient.setQueryData(['role', row.original.id], row.original);
+                          navigate(`/roles/edit/${row.original.id}`);
+                        }
+                      }}
                     >
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </TableCell>
@@ -207,66 +223,112 @@ export default function RolesList() {
 
       {/* Pagination Footer */}
       {filteredData.length > 0 && (
-        <div className="flex h-[46px] items-center justify-between">
-          {/* Left side - Bulk actions or empty */}
-          <div className="flex items-center gap-4">
-            {selectedCount > 1 &&
-              !isBulkUpdatingRoleStatusPending &&
-              !isDeletingManyRolesPending && (
-                <div className="border-border flex items-center gap-2 rounded-md border px-1.5 py-1 shadow-[0_1px_2px_0_#0000000D]">
+        <div
+          className={cn(
+            'relative flex flex-col items-center gap-3 sm:flex-row',
+            selectedCount > 1 && !(isDeletingManyRolesPending || isBulkUpdatingRoleStatusPending)
+              ? 'justify-between'
+              : 'justify-end',
+          )}
+        >
+          {!(isDeletingManyRolesPending || isBulkUpdatingRoleStatusPending) && (
+            <BulkActionBox selected={selectedCount} onClose={() => table.resetRowSelection()}>
+              <span className="text-sm font-normal text-[#151619]">
+                {sprintf(__('%d selected'), selectedCount)}
+              </span>
+              <Separator orientation="vertical" className="ml-2 h-5!" />
+              <Popover>
+                <PopoverTrigger asChild>
                   <Button
                     variant="ghost"
-                    size="icon"
-                    className="hover:text-foreground text-muted-foreground h-6 w-6 shrink-0 hover:bg-transparent"
-                    onClick={clearSelection}
-                    aria-label="Clear selection"
+                    className="hover:text-primary hover:bg-primary/6 group bold flex cursor-pointer items-center gap-1.5 px-2.5"
                   >
-                    <XIcon className="size-4" />
+                    <span className="text-sm font-normal">{__('Status')}</span>
+                    <span className="group-hover:text-primary text-icon flex items-center">
+                      <CaretUpDownIcon size={12} weight="bold" />
+                    </span>
                   </Button>
-                  <span className="text-sm font-normal text-[#151619]">
-                    {selectedCount} {__('selected')}
-                  </span>
-                  <span className="h-5 w-px border-r border-solid border-[#F4F4F5]" aria-hidden />
-                  <Select
-                    value={selectValue}
-                    onValueChange={(newValue) => {
-                      const status = newValue === 'set-active';
-                      setSelectValue(newValue);
-                      bulkUpdateRoleStatus(
-                        { ids: selectedRowsIds, status },
-                        {
-                          onSuccess: () => {
-                            clearSelection();
-                            setSelectValue('');
+                </PopoverTrigger>
+                <PopoverContent align="start" sideOffset={9} className="w-fit min-w-[20px] p-1">
+                  <div className="flex flex-col">
+                    <BulkActionButton
+                      className="w-30"
+                      onClick={() =>
+                        bulkUpdateRoleStatus(
+                          { ids: selectedRowsIds, status: true },
+                          {
+                            onSuccess: () => {
+                              clearSelection();
+                            },
                           },
-                        },
-                      );
-                    }}
-                  >
-                    <SelectTrigger
-                      icon={<ChevronsUpDown className="size-4" />}
-                      className="data-[placeholder]:text-base-secondary h-8 w-[80px] gap-2 border-none bg-transparent px-0 text-sm font-normal shadow-none focus:ring-0 focus:ring-offset-0 focus-visible:shadow-none focus-visible:ring-0 focus-visible:ring-offset-0"
+                        )
+                      }
                     >
-                      <SelectValue placeholder={__('Status')} />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="set-active">{__('Active')}</SelectItem>
-                      <SelectItem value="set-inactive">{__('Inactive')}</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <span className="h-5 w-px border-r border-solid border-[#F4F4F5]" aria-hidden />
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="hover:text-destructive text-base-muted-foreground h-6 w-6 shrink-0 hover:bg-transparent"
-                    onClick={handleBulkDelete}
-                    aria-label="Delete selected"
-                  >
-                    <DeleteIcon className="size-4" />
-                  </Button>
-                </div>
-              )}
-          </div>
+                      {__('Active')}
+                    </BulkActionButton>
+
+                    <BulkActionButton
+                      className="w-30"
+                      onClick={() =>
+                        bulkUpdateRoleStatus(
+                          { ids: selectedRowsIds, status: false },
+                          {
+                            onSuccess: () => {
+                              clearSelection();
+                            },
+                          },
+                        )
+                      }
+                    >
+                      {__('Inactive')}
+                    </BulkActionButton>
+                  </div>
+                </PopoverContent>
+              </Popover>
+              <span className="h-5 w-px border-r border-solid border-[#F4F4F5]" aria-hidden />
+              <AlertDialog open={openBulkDeleteDialog} onOpenChange={setOpenDeleteDialog}>
+                <WholeSaleToolTip
+                  trigger={
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="hover:text-destructive text-base-muted-foreground h-8 w-8 shrink-0 hover:bg-transparent hover:shadow-sm"
+                      onClick={() => setOpenDeleteDialog(true)}
+                      aria-label="Delete selected"
+                    >
+                      <DeleteIcon className="size-4" />
+                    </Button>
+                  }
+                  content={<span>{__('Delete', 'yay-wholesale')}</span>}
+                />
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>
+                      {sprintf(
+                        __(`Are you sure you want to delete %d roles ?`, 'yay-wholesale'),
+                        selectedCount,
+                      )}
+                    </AlertDialogTitle>
+                    <AlertDialogDescription>
+                      {__(
+                        'This action cannot be undone. This will permanently delete these request and remove data from servers',
+                        'yay-wholesale',
+                      )}
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>{__('Cancel', 'yay-wholesale')}</AlertDialogCancel>
+                    <AlertDialogAction
+                      className="bg-destructive text-destructive-foreground hover:bg-destructive/80"
+                      onClick={() => handleBulkDelete()}
+                    >
+                      {__('Continue', 'yay-wholesale')}
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            </BulkActionBox>
+          )}
 
           {/* Right side - Pagination controls */}
           <div className="flex items-center gap-4">
@@ -297,19 +359,21 @@ export default function RolesList() {
 
             <div className="flex items-center gap-2">
               <span className="text-base-secondary text-sm font-normal">{__('Go to')}</span>
-              <Input
-                type="number"
+              <InputNumberRoot
                 min={1}
                 max={table.getPageCount()}
                 value={table.getState().pagination.pageIndex + 1}
-                onChange={(e) => {
-                  const page = e.target.value ? Number(e.target.value) - 1 : 0;
+                onValueChange={(value) => {
+                  const page = value ? Number(value) - 1 : 0;
                   if (page >= 0 && page < table.getPageCount()) {
                     table.setPageIndex(page);
                   }
                 }}
-                className="text-base-secondary h-9 w-15 rounded-sm text-sm font-normal"
-              />
+                className="text-base-secondary h-9 w-15 rounded-sm text-sm font-normal focus-visible:ring-0"
+                disabled={isFetchingRoles || table.getPageCount() <= 1}
+              >
+                <InputNumberInput className="disabled:bg-base-muted w-full shadow-xs disabled:text-black" />
+              </InputNumberRoot>
             </div>
           </div>
         </div>

@@ -32,10 +32,10 @@ export default function TopWholesaleCustomers(props: {
 
         {/* DataTable */}
         <div
-          className={cn('overflow-hidden rounded-md border', isFetching && 'relative opacity-50')}
+          className={cn('overflow-x-auto rounded-md border', isFetching && 'relative opacity-50')}
         >
           <Table className="divide-muted min-w-full divide-y">
-            <TableHeader className="text-base-foreground h-10 bg-[#FAFAFA]">
+            <TableHeader className="text-base-foreground bg-base-muted h-10">
               <TableRow className="text-base-foreground bg-muted text-[14px] font-semibold">
                 <TableHead className="text-base-foreground text-[14px]">
                   <span className="flex items-center justify-center font-medium">
@@ -80,7 +80,11 @@ export default function TopWholesaleCustomers(props: {
                           <img
                             src={data.avatar}
                             alt={data.name}
-                            className="h-full w-full rounded-full object-cover"
+                            className={cn(
+                              'h-full w-full rounded-full object-cover',
+                              reportData.topWholesalers.indexOf(data) < 3 &&
+                                'border-ring ring-1 ring-[#F9BD09] ring-offset-1',
+                            )}
                           />
                         </div>
                         <div className="flex w-40 items-center gap-1 md:w-15 md:flex-wrap lg:w-40 lg:flex-nowrap">
@@ -98,7 +102,10 @@ export default function TopWholesaleCustomers(props: {
                     </TableCell>
                     <TableCell className="text-base-foreground py-3 text-[14px]">
                       <div className="flex justify-center">
-                        <Badge variant="ghost" className="rounded-md text-xs font-semibold">
+                        <Badge
+                          variant="muted"
+                          className="text-base-foreground bg-base-muted cursor-default rounded-md text-xs font-semibold shadow-sm"
+                        >
                           {data.role}
                         </Badge>
                       </div>

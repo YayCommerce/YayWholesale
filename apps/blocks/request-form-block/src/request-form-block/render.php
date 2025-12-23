@@ -5,7 +5,6 @@ use Yay_Wholesale\Helpers\RequestsHelper;
 use Yay_Wholesale\Helpers\SettingsHelper;
 
 $settings = SettingsHelper::get_settings();
-$is_use_default_form = $settings['registration_fields']['useDefaultForm'];
 ?>
 <div <?php echo get_block_wrapper_attributes(); ?>>
 	<h4 style="text-align: <?php echo $attributes['titleAlign']; ?>;"><?php echo $attributes['formTitle']; ?></h4>
@@ -14,9 +13,9 @@ $is_use_default_form = $settings['registration_fields']['useDefaultForm'];
 		<?php
 		foreach ( $settings['registration_fields']['fields'] as $field ) :
 			?>
-			<?php if ( $field['isDefault'] || ! $is_use_default_form ) : ?>
+			<?php if ( !$field['isHidden'] ) : ?>
 			<div <?php echo esc_html( $field['columnWidth'] ) === '50%' ? 'class="ywhs_half"' : 'class="ywhs_full"'; ?> >
-				<label for="<?php echo esc_html( $field['id'] ); ?>" >
+				<label class="ywhs_requirement_title" for="<?php echo esc_html( $field['id'] ); ?>" >
 					<?php echo esc_html( $field['label'] ); ?>
 					<div style="color: red">
 					<?php

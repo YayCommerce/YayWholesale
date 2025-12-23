@@ -9,7 +9,6 @@ export async function fetchWholesalersList(
   perPage: number,
   role: string,
 ) {
-  const url = 'wholesalers';
   const searchParams = new URLSearchParams({
     search: search,
     page: String(page),
@@ -17,7 +16,7 @@ export async function fetchWholesalersList(
     role: role,
   });
 
-  const response = await api.get(`${url}?${searchParams.toString()}`);
+  const response = await api.get('wholesalers', { searchParams });
   const result = await handleResponse<PaginatedWholesalerListValues>(
     response,
     __('Failed to fetch wholesalers', 'yay-wholesale'),

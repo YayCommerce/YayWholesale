@@ -17,7 +17,7 @@ export default function EmailsTab() {
   const { mutate } = useUpdateEmailStatusMutation();
 
   return (
-    <div className="overflow-hidden rounded-lg border bg-white shadow-sm">
+    <div className="overflow-x-auto rounded-lg border bg-white shadow-sm">
       <Table>
         <TableHeader>
           <TableRow className="bg-[#f6f6f7] hover:bg-[#f6f6f7]">

@@ -1,6 +1,8 @@
 import { useMemo } from 'react';
 import { Spinner } from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
 import { TrendingDown, TrendingUp } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 import { useReportsQuery } from '@/lib/queries/reports';
 import { cn } from '@/lib/utils';
@@ -14,6 +16,7 @@ export default function DashboardSummary(props: {
   reportQuery: ReturnType<typeof useReportsQuery>;
 }) {
   const { data: reportData, isFetching, isLoading } = props.reportQuery;
+  const navigate = useNavigate();
   const cards = useMemo(
     () => [
       {
@@ -21,7 +24,16 @@ export default function DashboardSummary(props: {
         value: reportData?.wholesalersAmount ?? 0,
         percent: reportData?.wholesalersIncreaseRate ?? 0,
         desc: 'Total Wholesalers',
-        button: 'View all wholesalers',
+        button: () => (
+          <Button
+            variant="outline"
+            size="sm"
+            className="text-base-foreground mt-3 text-xs font-medium"
+            onClick={() => navigate('/wholesalers-list')}
+          >
+            {__('View all wholesalers', 'yay-wholesale')}
+          </Button>
+        ),
         overPercent:
           reportData &&
           (reportData.wholesalersIncreaseRate > 100 || reportData.wholesalersIncreaseRate < -100),
@@ -31,7 +43,17 @@ export default function DashboardSummary(props: {
         value: reportData?.orderAmount ?? 0,
         percent: reportData?.orderIncreaseRate ?? 0,
         desc: 'Total Orders',
-        button: 'View all orders',
+        button: () => (
+          <a href={window.yayWholesale.order_urls.list} target="_blank" rel="noopener noreferrer">
+            <Button
+              variant="outline"
+              size="sm"
+              className="text-base-foreground mt-3 text-xs font-medium"
+            >
+              {__('View all orders', 'yay-wholesale')}
+            </Button>
+          </a>
+        ),
         overPercent:
           reportData && (reportData.orderIncreaseRate > 100 || reportData.orderIncreaseRate < -100),
       },
@@ -40,7 +62,17 @@ export default function DashboardSummary(props: {
         value: parseWPCurrency(reportData?.revenue ?? 0),
         percent: reportData?.revenueIncreaseRate ?? 0,
         desc: 'Total Revenue',
-        button: 'View all revenue',
+        button: () => (
+          <a href={window.yayWholesale.order_urls.list} target="_blank" rel="noopener noreferrer">
+            <Button
+              variant="outline"
+              size="sm"
+              className="text-base-foreground mt-3 text-xs font-medium"
+            >
+              {__('View all revenue', 'yay-wholesale')}
+            </Button>
+          </a>
+        ),
         overPercent:
           reportData &&
           (reportData.revenueIncreaseRate > 100 || reportData.revenueIncreaseRate < -100),
@@ -84,13 +116,7 @@ export default function DashboardSummary(props: {
               )}
             </p>
             <p className="mt-1 text-sm text-[#A0A0A7]">{c.desc}</p>
-            <Button
-              variant="outline"
-              size="sm"
-              className="text-base-foreground mt-3 text-xs font-medium"
-            >
-              {c.button}
-            </Button>
+            {c.button()}
           </CardContent>
         </Card>
       ))}

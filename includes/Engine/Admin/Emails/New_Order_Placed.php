@@ -1,6 +1,8 @@
 <?php
 namespace Yay_Wholesale\Engine\Admin\Emails;
 
+use WC_Order;
+
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
@@ -28,7 +30,7 @@ class New_Order_Placed extends Wholesale_Email_Base {
         ];
 
         // Trigger the email when a new order is placed.
-        add_action( 'yhs_new_order_placed', [ $this, 'trigger' ], 10, 2 );
+        add_action( 'yhs_new_wholesale_order_placed', [ $this, 'trigger' ], 10, 2 );
 
         parent::__construct();
 
@@ -144,8 +146,8 @@ class New_Order_Placed extends Wholesale_Email_Base {
             $this->placeholders['{customer_name}'] = $this->object->get_formatted_billing_full_name();
             if ( $this->is_enabled() && $this->get_recipient() ) {
                 // Wholesale order
-                if ( $order->get_meta( 'yay_wholesale' ) === 'yes' ) {
-                    $this->send( $this->get_recipient(), $this->get_subject(), $this->get_content(), $this->get_headers(), $this->get_attachments() );
+                if ( $order->get_meta( '_ywhs_wholesale_role' ) ) {
+                        $this->send( $this->get_recipient(), $this->get_subject(), $this->get_content(), $this->get_headers(), $this->get_attachments() );
                 }
             }
         }

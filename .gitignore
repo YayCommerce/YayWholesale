@@ -1,6 +1,7 @@
 /vendor/
 apps/admin/node_modules
 apps/blocks/request-formm-block/node_modules
+apps/blocks/requirement-slot-fill/node_modules
 /assets/dist/*
 /release/dest/*
 /release/*.zip

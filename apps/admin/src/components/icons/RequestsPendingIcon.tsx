@@ -12,7 +12,7 @@ export default function RequestsPendingIcon({ className = '', ...props }) {
       strokeLinecap="round"
       strokeLinejoin="round"
       strokeWidth="2"
-      className={cn('text-muted-foreground', className)}
+      className={cn('text-[#A0A0A7]', className)}
       {...props}
     >
       <path d="M12 6v6l4 2" />

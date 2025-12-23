@@ -54,7 +54,7 @@ class WholeSalersHelper {
             'currentPage' => $page,
             'totalPage'   => $total_pages,
             'totalItems'  => $total,
-            'data'        => self::clean_wholesalers_data( $users ),
+            'data'        => self::clean_wholesalers_data( $users, $wholesale_slugs ),
         ];
     }
 
@@ -70,8 +70,12 @@ class WholeSalersHelper {
             [
                 'limit'      => -1,
                 'status'     => 'completed',
-                'meta_key'   => 'yay_wholesale',
-                'meta_value' => 'yes',
+                'meta_query' => [
+                    [
+                        'key'     => '_ywhs_wholesale_role',
+                        'compare' => 'EXISTS',
+                    ],
+                ],
                 'return'     => 'objects',
             ]
         );
@@ -142,15 +146,17 @@ class WholeSalersHelper {
      * Clean the wholesalers data.
      *
      * @param array $users The users data.
+     * @param array $wholesale_slugs The wholesale role slugs.
      * @return array The cleaned wholesalers data.
      */
-    public static function clean_wholesalers_data( array $users ): array {
+    public static function clean_wholesalers_data( array $users, array $wholesale_slugs ): array {
         $cleaned_users = array_map(
-            function ( \WP_User $user ) {
+            function ( \WP_User $user ) use ( $wholesale_slugs ) {
                 $stats = self::get_wholesaler_order_stats( (int) $user->ID );
+                $role  = current( array_intersect( $user->roles, $wholesale_slugs ) );
                 return [
                     'id'                   => (int) $user->ID,
-                    'role'                 => self::get_wholesale_role_slug( $user->roles ),
+                    'role'                 => $role ?? '',
                     'userName'             => $user->user_login ?? '',
                     'firstName'            => $user->first_name ?? '',
                     'lastName'             => $user->last_name ?? '',

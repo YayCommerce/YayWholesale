@@ -33,12 +33,12 @@ export default function TopProducts(props: { reportQuery: ReturnType<typeof useR
         {/* DataTable */}
         <div
           className={cn(
-            'overflow-hidden rounded-md border bg-white',
+            'overflow-x-auto rounded-md border bg-white',
             isFetching && 'relative opacity-50',
           )}
         >
           <Table className="divide-muted min-w-full divide-y">
-            <TableHeader className="text-base-foreground h-10 bg-[#FAFAFA]">
+            <TableHeader className="text-base-foreground bg-base-muted h-10">
               <TableRow className="text-base-foreground bg-muted text-[14px] font-semibold">
                 <TableHead className="text-base-foreground text-[14px]">
                   <span className="flex items-center justify-center font-medium">
@@ -79,7 +79,13 @@ export default function TopProducts(props: { reportQuery: ReturnType<typeof useR
                     </TableCell>
                     <TableCell className="text-base-foreground py-3 text-[14px]">
                       <div className="flex items-center gap-3">
-                        <div className="h-8 w-8 overflow-hidden rounded-md border">
+                        <div
+                          className={cn(
+                            'h-8 w-8 overflow-hidden rounded-md',
+                            reportData.topProducts.indexOf(data) < 3 &&
+                              'border-ring ring-1 ring-[#F9BD09] ring-offset-1',
+                          )}
+                        >
                           <img
                             src={data.image}
                             alt={data.name}

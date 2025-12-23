@@ -41,7 +41,7 @@ export default function RegistrationTab() {
       {/* Two column layout */}
       <div className="grid grid-cols-2 gap-6">
         {/* Wholesale registration page */}
-        <FormField
+        {/* <FormField
           control={control}
           name={`registration.wholesale_registration_page`}
           render={({ field }) => (
@@ -64,7 +64,7 @@ export default function RegistrationTab() {
               </FormControl>
             </FormItem>
           )}
-        />
+        /> */}
 
         {/* Submit button label */}
         <FormField
@@ -90,17 +90,6 @@ export default function RegistrationTab() {
       </div>
 
       {/* Successful registration message */}
-      {/* <div className="space-y-2.5">
-        <Label htmlFor="success-message" className="text-base-secondary text-xs font-medium">
-          Successful registration message
-        </Label>
-        <Textarea
-          id="success-message"
-          rows={4}
-          defaultValue="Thank you for registering. Your account begin reviewing. Please wait to be approved."
-          className="w-full resize-none font-normal"
-        />
-      </div> */}
       <FormField
         control={control}
         name={`registration.successful_registration_message`}

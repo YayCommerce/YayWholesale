@@ -1,8 +1,10 @@
 import { ColumnDef } from '@tanstack/react-table';
+import { __ } from '@wordpress/i18n';
 
 import { WholesalerFormValues } from '@/lib/schema/wholesalers';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Label } from '@/components/ui/label';
 import { formatWooPrice } from '@/components/pages/roles/roles.helper';
 
 import WholesalersRoleColumn from './WholesalersRole';
@@ -13,14 +15,19 @@ function AvatarCell({ rowData }: { rowData: WholesalerFormValues }) {
   const userLink = window.yayWholesale.user_urls.edit.replace('%USER_ID%', id.toString());
   return (
     <div className="flex items-center gap-3">
-      <Avatar className="h-8 w-8">
-        <a href={userLink}>
+      <Avatar className="h-9.5 w-9.5">
+        <a href={userLink} target="_blank" rel="noopener noreferrer">
           <AvatarImage src={avatar} alt={name} />
           <AvatarFallback>{name.charAt(0)}</AvatarFallback>
         </a>
       </Avatar>
       <div>
-        <a className="cursor-pointer leading-none font-medium hover:underline" href={userLink}>
+        <a
+          className="cursor-pointer leading-none font-medium hover:underline"
+          href={userLink}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
           {name}
         </a>
         <p className="text-muted-foreground text-xs">{email}</p>
@@ -33,25 +40,37 @@ export const WholesalersColumn: ColumnDef<WholesalerFormValues>[] = [
   {
     id: 'select',
     header: ({ table }) => (
-      <div className="flex justify-center">
+      <Label
+        htmlFor="select-all"
+        className="flex h-full w-full cursor-pointer items-center justify-center px-4"
+      >
         <Checkbox
-          className="size-4"
+          id="select-all"
+          className="size-4 bg-white"
           checked={table.getIsAllPageRowsSelected()}
           onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
           aria-label="Select all"
         />
-      </div>
+      </Label>
     ),
-    cell: ({ row }) => (
-      <div className="flex justify-center">
-        <Checkbox
-          className="size-4"
-          checked={row.getIsSelected()}
-          onCheckedChange={(value) => row.toggleSelected(!!value)}
-          aria-label="Select row"
-        />
-      </div>
-    ),
+    cell: ({ row }) => {
+      const id = `select-${row.id}`;
+
+      return (
+        <Label
+          htmlFor={id}
+          className="flex h-full w-full cursor-pointer items-center justify-center px-4"
+        >
+          <Checkbox
+            id={id}
+            className="size-4 bg-white"
+            checked={row.getIsSelected()}
+            onCheckedChange={(value) => row.toggleSelected(!!value)}
+            aria-label="Select row"
+          />
+        </Label>
+      );
+    },
     meta: { align: 'center', isCheckbox: true },
     size: 36,
     enableSorting: false,
@@ -59,7 +78,7 @@ export const WholesalersColumn: ColumnDef<WholesalerFormValues>[] = [
   },
   {
     accessorKey: 'name',
-    header: 'Name',
+    header: __('Name', 'yay-wholesale'),
     cell: ({ row }) => {
       return <AvatarCell rowData={row.original} />;
     },
@@ -67,25 +86,34 @@ export const WholesalersColumn: ColumnDef<WholesalerFormValues>[] = [
 
   {
     accessorKey: 'role',
-    header: 'Role',
+    header: __('Role', 'yay-wholesale'),
     cell: ({ row }) => {
       return <WholesalersRoleColumn role={row.original.role} userId={row.original.id} />;
     },
   },
   {
     accessorKey: 'completedOrdersCount',
-    header: 'Completed Orders',
+    header: () => (
+      <span className="flex justify-center">{__('Completed Orders', 'yay-wholesale')}</span>
+    ),
     cell: ({ row }) => {
       const count = row.original.completedOrdersCount ?? 0;
-      return <span className="text-center">{count}</span>;
+      return <span className="flex justify-center">{count}</span>;
     },
   },
   {
     accessorKey: 'wholesaleRevenue',
-    header: 'Wholesale Revenue',
+    header: () => (
+      <span className="flex justify-center">{__('Wholesale Revenue', 'yay-wholesale')}</span>
+    ),
     cell: ({ row }) => {
       const revenue = row.original.wholesaleRevenue ?? 0;
-      return <span dangerouslySetInnerHTML={{ __html: formatWooPrice(revenue) }} />;
+      return (
+        <span
+          className="flex justify-center"
+          dangerouslySetInnerHTML={{ __html: formatWooPrice(revenue) }}
+        />
+      );
     },
   },
 ];

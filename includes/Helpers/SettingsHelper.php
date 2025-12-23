@@ -34,17 +34,17 @@ class SettingsHelper {
                 'successful_registration_message' => 'Thank you for registering. Your account begin reviewing. Please wait to be approved.',
             ],
             'registration_fields' => [
-                'useDefaultForm' => false,
-                'fields'         => [
+                'fields' => [
                     [
                         'id'          => uniqid( 'field_' ),
                         'label'       => 'First Name',
                         'type'        => 'text',
                         'placeholder' => 'Enter First Name',
                         'columnWidth' => '50%',
-                        'deletable'   => true,
+                        'deletable'   => false,
                         'isDefault'   => true,
-                        'isRequired'  => false,
+                        'isRequired'  => true,
+                        'isHidden'    => false,
                     ],
                     [
                         'id'          => uniqid( 'field_' ),
@@ -52,9 +52,10 @@ class SettingsHelper {
                         'type'        => 'text',
                         'placeholder' => 'Enter Last Name',
                         'columnWidth' => '50%',
-                        'deletable'   => true,
+                        'deletable'   => false,
                         'isDefault'   => true,
-                        'isRequired'  => false,
+                        'isRequired'  => true,
+                        'isHidden'    => false,
                     ],
                     [
                         'id'          => uniqid( 'field_' ),
@@ -65,6 +66,7 @@ class SettingsHelper {
                         'deletable'   => false,
                         'isDefault'   => true,
                         'isRequired'  => true,
+                        'isHidden'    => false,
                     ],
                     [
                         'id'          => uniqid( 'field_' ),
@@ -75,6 +77,7 @@ class SettingsHelper {
                         'deletable'   => false,
                         'isDefault'   => true,
                         'isRequired'  => true,
+                        'isHidden'    => false,
                     ],
                 ],
             ],

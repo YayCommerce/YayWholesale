@@ -1,14 +1,26 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { ColumnDef } from '@tanstack/react-table';
 import { __ } from '@wordpress/i18n';
-import { Ellipsis } from 'lucide-react';
+import { Ellipsis, PencilLine } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 import { useDeleteRoleMutation, useUpdateRoleStatusMutation } from '@/lib/queries/roles';
 import { RolesListValues } from '@/lib/schema/roles';
 import { cn } from '@/lib/utils';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Label } from '@/components/ui/label';
 import { WholeSaleToolTip } from '@/components/custom/WholeSaleToolTip';
 import DeleteIcon from '@/components/icons/DeleteIcon';
 import EditIcon from '@/components/icons/SettingsIcon';
@@ -20,25 +32,38 @@ export const RolesColumn: ColumnDef<RolesListValues & { count: number }>[] = [
   {
     id: 'select',
     header: ({ table }) => (
-      <div className="flex justify-center">
+      <Label
+        htmlFor="select-all"
+        className="flex h-full w-full cursor-pointer items-center justify-center px-4"
+      >
         <Checkbox
-          className="size-4"
+          id="select-all"
+          className="size-4 bg-white"
           checked={table.getIsAllRowsSelected()}
           onCheckedChange={(v) => table.toggleAllRowsSelected(!!v)}
           aria-label="Select all"
         />
-      </div>
+      </Label>
     ),
-    cell: ({ row }) => (
-      <div className="flex justify-center">
-        <Checkbox
-          className="size-4"
-          checked={row.getIsSelected()}
-          onCheckedChange={(v) => row.toggleSelected(!!v)}
-          aria-label="Select row"
-        />
-      </div>
-    ),
+    cell: ({ row }) => {
+      const id = `select-${row.id}`;
+
+      return (
+        <Label
+          htmlFor={id}
+          className="flex h-full w-full cursor-pointer items-center justify-center px-4"
+        >
+          <Checkbox
+            id={id}
+            className="pointer-events-none size-4 bg-white"
+            checked={row.getIsSelected()}
+            onCheckedChange={(v) => row.toggleSelected(!!v)}
+            aria-label="Select row"
+            disabled={row.original.isDefault}
+          />
+        </Label>
+      );
+    },
     meta: { align: 'center', isCheckbox: true },
     size: 36,
     enableSorting: false,
@@ -46,15 +71,22 @@ export const RolesColumn: ColumnDef<RolesListValues & { count: number }>[] = [
   },
   {
     accessorKey: 'name',
-    header: 'Name',
+    header: __('Name', 'yay-wholesale'),
     cell: ({ row }) => {
-      const navigate = useNavigate();
-      return (
-        <div
-          onClick={() => navigate(`/roles/edit/${row.original.id}`)}
-          className="cursor-pointer hover:underline"
-        >
-          {row.original.name}
+      return row.original.isDefault ? (
+        <div className="flex gap-2">
+          <WholeSaleToolTip
+            trigger={
+              <div className="hover:underline hover:decoration-dotted hover:underline-offset-3">
+                {row.original.name}
+              </div>
+            }
+            content={<span>{__('Default role')}</span>}
+          />
+        </div>
+      ) : (
+        <div className="flex gap-2">
+          <div>{row.original.name}</div>
         </div>
       );
     },
@@ -67,7 +99,7 @@ export const RolesColumn: ColumnDef<RolesListValues & { count: number }>[] = [
   },
   {
     accessorKey: 'count',
-    header: 'Count',
+    header: __('Count', 'yay-wholesale'),
     cell: (column) => {
       const count = column.row.original.count;
       return (
@@ -91,7 +123,7 @@ export const RolesColumn: ColumnDef<RolesListValues & { count: number }>[] = [
   },
   {
     accessorKey: 'discount',
-    header: 'Discount',
+    header: __('Discount', 'yay-wholesale'),
     cell: (column) => <div className="text-center">{column.row.original.discount}%</div>,
     meta: { align: 'center' },
     size: 80,
@@ -101,7 +133,9 @@ export const RolesColumn: ColumnDef<RolesListValues & { count: number }>[] = [
     header: () => (
       <WholeSaleToolTip
         trigger={
-          <div className="border-border inline-block border-b-2 border-dotted pb-px">MOQ</div>
+          <div className="border-border inline-block border-b-2 border-dotted pb-px">
+            {__('MOQ', 'yay-wholesale')}
+          </div>
         }
         content={<span>{__('Minimum order quantity')}</span>}
       />
@@ -115,7 +149,9 @@ export const RolesColumn: ColumnDef<RolesListValues & { count: number }>[] = [
     header: () => (
       <WholeSaleToolTip
         trigger={
-          <div className="border-border inline-block border-b-2 border-dotted pb-px">MOA</div>
+          <div className="border-border inline-block border-b-2 border-dotted pb-px">
+            {__('MOA', 'yay-wholesale')}
+          </div>
         }
         content={<span>{__('Minimum order amount')}</span>}
       />
@@ -132,8 +168,14 @@ export const RolesColumn: ColumnDef<RolesListValues & { count: number }>[] = [
 
   {
     accessorKey: 'status',
-    header: 'Status',
-    cell: ({ row }) => <RoleStatusSwitch id={row.original.id} status={row.original.status} />,
+    header: __('Status', 'yay-wholesale'),
+    cell: ({ row }) => (
+      <RoleStatusSwitch
+        id={row.original.id}
+        status={row.original.status}
+        isDefault={row.original.isDefault ?? false}
+      />
+    ),
     size: 80,
   },
   {
@@ -143,50 +185,98 @@ export const RolesColumn: ColumnDef<RolesListValues & { count: number }>[] = [
       const { mutate: deleteRoleById, isPending: isDeletingRolePending } = useDeleteRoleMutation(
         row.original.id,
       );
-      const handleDelete = (id: number) => {
-        if (!window.confirm(__('Are you sure you want to delete this role?'))) return;
-        deleteRoleById();
-      };
       const navigate = useNavigate();
+      const [openDialog, setOpenDialog] = useState(false);
+      const queryClient = useQueryClient();
+
       return (
-        <div className="relative flex justify-end">
-          <div className="group relative flex items-center">
-            <button type="button" className="rounded-md p-1 transition group-hover:hidden">
-              <Ellipsis className="text-base-secondary size-4" />
-            </button>
+        <AlertDialog open={openDialog} onOpenChange={setOpenDialog}>
+          <div className="relative flex w-15 justify-end">
+            <div className="relative flex items-center">
+              <Button
+                size="icon"
+                variant="ghost"
+                className="text-base-muted-foreground flex transition group-hover:hidden"
+              >
+                <Ellipsis className="size-4" />
+              </Button>
+              <div className="absolute top-1/2 right-0 hidden -translate-y-1/2 items-center gap-0 group-hover:flex">
+                <WholeSaleToolTip
+                  trigger={
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      onClick={() => {
+                        queryClient.setQueryData(['role', row.original.id], row.original);
+                        navigate(`/roles/edit/${row.original.id}`);
+                      }}
+                      className="hover:text-primary text-base-muted-foreground transition hover:bg-[#FFFFFF] hover:shadow-xs"
+                    >
+                      <PencilLine className="size-4" />
+                    </Button>
+                  }
+                  content={<span>{__('Edit role')}</span>}
+                />
 
-            <div className="absolute top-1/2 right-0 hidden -translate-y-1/2 items-center gap-0 group-hover:flex">
-              <WholeSaleToolTip
-                trigger={
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    onClick={() => navigate(`/roles/edit/${row.original.id}`)}
-                    className="hover:text-primary text-base-muted-foreground transition hover:bg-[#FFFFFF] hover:shadow-xs"
-                  >
-                    <EditIcon className="size-4" />
-                  </Button>
-                }
-                content={<span>{__('Edit role')}</span>}
-              />
-
-              <WholeSaleToolTip
-                trigger={
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    onClick={() => handleDelete(row.original.id)}
-                    disabled={isDeletingRolePending}
-                    className="hover:text-destructive text-base-muted-foreground hover:bg-[#FFFFFF] hover:shadow-xs"
-                  >
-                    <DeleteIcon className="size-4" />
-                  </Button>
-                }
-                content={<span>{__('Delete role')}</span>}
-              />
+                {!row.original.isDefault ? (
+                  <WholeSaleToolTip
+                    trigger={
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setOpenDialog(true);
+                        }}
+                        disabled={isDeletingRolePending}
+                        className="hover:text-destructive text-base-muted-foreground hover:bg-white hover:shadow-xs"
+                      >
+                        <DeleteIcon className="size-4" />
+                      </Button>
+                    }
+                    content={<span>{__('Delete role')}</span>}
+                  />
+                ) : (
+                  <WholeSaleToolTip
+                    trigger={
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        onClick={() => navigate(`/settings/general`)}
+                        className="hover:text-primary text-base-muted-foreground hover:bg-wh transition hover:shadow-xs"
+                      >
+                        <EditIcon className="size-4" />
+                      </Button>
+                    }
+                    content={<span>{__('Setting')}</span>}
+                  />
+                )}
+              </div>
             </div>
           </div>
-        </div>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>
+                {__('Are you sure you want to delete this role?', 'yay-wholesale')}
+              </AlertDialogTitle>
+              <AlertDialogDescription>
+                {__(
+                  'This action cannot be undone. This will permanently delete this request and remove data from servers',
+                  'yay-wholesale',
+                )}
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>{__('Cancel', 'yay-wholesale')}</AlertDialogCancel>
+              <AlertDialogAction
+                className="bg-destructive text-destructive-foreground hover:bg-destructive/80"
+                onClick={() => deleteRoleById()}
+              >
+                {__('Continue', 'yay-wholesale')}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       );
     },
     size: 60,

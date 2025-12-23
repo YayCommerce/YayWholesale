@@ -27,9 +27,9 @@ class RequestsHelper {
      *
      * @param int   $user_id The sender account ID .
      * @param array $form_data The form data in request.
-     * @return void A new wholesale is registered.
+     * @return int A new wholesale ID registered.
      */
-    public static function insert_whs_request( int $user_id, array $form_data ): void {
+    public static function insert_whs_request( int $user_id, array $form_data ): int {
         $name         = '';
         $display_name = '';
         if ( array_key_exists( 'name', $form_data ) ) {
@@ -60,42 +60,41 @@ class RequestsHelper {
             ]
         );
 
-        if ( $new_request_id ) {
+        if ( is_wp_error( $new_request_id ) ) {
+            return -1;
+        }
 
-            $general_setting = SettingsHelper::get_settings();
+        $general_setting = SettingsHelper::get_settings();
 
-            foreach ( $general_setting['registration_fields']['fields'] as $gsetting ) {
-                $key = self::label_to_input_name( $gsetting['label'] );
-                if ( array_key_exists( $key, $form_data ) ) {
-                    if ( 'email' === $gsetting['type'] && ! $gsetting['deletable'] ) {
-                        update_post_meta( $new_request_id, self::REQUEST_META_EMAIL, $form_data[ $key ] );
-                    }
-
-                    if ( 'textarea' === $gsetting['type'] && ! $gsetting['deletable'] ) {
-                        update_post_meta( $new_request_id, self::REQUEST_META_MESSAGE, $form_data[ $key ] );
-                    }
-
-                    if ( $gsetting['deletable'] ) {
-                        $data[ $gsetting['label'] ] = [
-                            'type'  => $gsetting['type'],
-                            'value' => $form_data[ $key ],
-                        ];
-                    }
+        foreach ( $general_setting['registration_fields']['fields'] as $gsetting ) {
+            $key = self::label_to_input_name( $gsetting['label'] );
+            if ( array_key_exists( $key, $form_data ) ) {
+                if ( 'email' === $gsetting['type'] && ! $gsetting['deletable'] ) {
+                    update_post_meta( $new_request_id, self::REQUEST_META_EMAIL, $form_data[ $key ] );
+                } elseif ( 'textarea' === $gsetting['type'] && ! $gsetting['deletable'] ) {
+                    update_post_meta( $new_request_id, self::REQUEST_META_MESSAGE, $form_data[ $key ] );
+                } else {
+                    $data[ $gsetting['label'] ] = [
+                        'type'       => $gsetting['type'],
+                        'value'      => $form_data[ $key ],
+                        'is_default' => $gsetting['isDefault'],
+                    ];
                 }
             }
-            update_post_meta( $new_request_id, self::REQUEST_META_DATA, $data );
+        }
+        update_post_meta( $new_request_id, self::REQUEST_META_DATA, $data );
 
-            update_post_meta( $new_request_id, self::REQUEST_META_DISPLAY_NAME, $display_name );
+        update_post_meta( $new_request_id, self::REQUEST_META_DISPLAY_NAME, $display_name );
 
-            update_post_meta( $new_request_id, self::REQUEST_META_STATUS, self::PENDING );
+        update_post_meta( $new_request_id, self::REQUEST_META_STATUS, self::PENDING );
 
-            // Trigger the email when a new wholesale account is registered.
-            do_action( 'yhs_new_account_registered', $new_request_id );
+        // Trigger the email when a new wholesale account is registered.
+        do_action( 'yhs_new_account_registered', $new_request_id );
 
-            // Trigger the email when a new wholesale account is pending.
-            do_action( 'yhs_account_registration_pending', $new_request_id );
+        // Trigger the email when a new wholesale account is pending.
+        do_action( 'yhs_account_registration_pending', $new_request_id );
 
-        }//end if
+        return $new_request_id;
     }
 
     /**
@@ -112,7 +111,15 @@ class RequestsHelper {
             'post_type'              => self::REQUEST_POST_TYPE,
             'update_post_meta_cache' => true,
             'meta_query'             => [
-                'relation' => 'AND',
+                'relation'      => 'AND',
+                'status_clause' => [
+                    'key'  => self::REQUEST_META_STATUS,
+                    'type' => 'CHAR',
+                ],
+            ],
+            'orderby'                => [
+                'status_clause' => 'ASC',
+                'date'          => 'DESC',
             ],
         ];
 
@@ -141,7 +148,7 @@ class RequestsHelper {
             ];
         }
 
-        if ( isset( $status ) && self::ALL !== $status ) {
+        if ( isset( $status ) && ! in_array( $status, [ self::ALL, self::APPROVED ], true ) ) {
             $args['meta_query'][] = [
                 'key'     => self::REQUEST_META_STATUS,
                 'value'   => $status,
@@ -149,6 +156,13 @@ class RequestsHelper {
                 'type'    => 'CHAR',
             ];
         }
+
+        $args['meta_query'][] = [
+            'key'     => self::REQUEST_META_STATUS,
+            'value'   => self::APPROVED,
+            'compare' => '!=',
+            'type'    => 'CHAR',
+        ];
 
         $query       = new WP_Query( $args );
         $data_list   = $query->posts;
@@ -182,26 +196,41 @@ class RequestsHelper {
         $status       = get_post_meta( $data->ID, self::REQUEST_META_STATUS, true );
 
         $cleaned = [
-            'id'      => $data->ID,
-            'fields'  => [],
-            'name'    => $display_name,
-            'email'   => $email,
-            'message' => $message,
-            'status'  => $status,
-            'date'    => $data->post_date,
-            'avatar'  => $data->post_author > 0 ? get_avatar_url( $data->post_author ) : '',
+            'id'        => $data->ID,
+            'fields'    => [],
+            'name'      => $display_name,
+            'email'     => $email,
+            'message'   => $message,
+            'status'    => $status,
+            'date'      => $data->post_date,
+            'avatar'    => $data->post_author > 0 ? get_avatar_url( $data->post_author ) : '',
+            'firstName' => '',
+            'lastName'  => '',
         ];
 
+        $last_name_phrase  = __( 'Last Name', 'yay-wholesale' );
+        $first_name_phrase = __( 'First Name', 'yay-wholesale' );
         if ( $is_extra_fields ) {
             foreach ( $post_meta as $key => $field ) {
-                $tmp                 = [
-                    'label' => $key,
-                    'value' => $field['value'],
-                    'type'  => $field['type'],
-                ];
-                $cleaned['fields'][] = $tmp;
+                if ( ! $field['is_default'] ) {
+                    $tmp = [
+                        'label' => $key,
+                        'value' => $field['value'],
+                        'type'  => $field['type'],
+                    ];
+
+                    $cleaned['fields'][] = $tmp;
+                } else {
+                    if ( preg_match( "/(?i)\b$last_name_phrase\b/", $key ) ) {
+                        $cleaned['lastName'] = $field['value'];
+                    }
+
+                    if ( preg_match( "/(?i)\b$first_name_phrase\b/", $key ) ) {
+                        $cleaned['firstName'] = $field['value'];
+                    }
+                }
             }
-        }
+        }//end if
 
         return $cleaned;
     }
@@ -366,8 +395,7 @@ class RequestsHelper {
             $display_name = get_post_meta( $request_id, self::REQUEST_META_DISPLAY_NAME, true );
             $post_meta    = get_post_meta( $request_id, self::REQUEST_META_DATA, true );
             $email        = get_post_meta( $request_id, self::REQUEST_META_EMAIL, true );
-            $password     = '123456';
-            // $password = wp_generate_password( 12, true, true );
+            $password     = wp_generate_password( 12, true, true );
 
             $request_user = wp_insert_user(
                 [
@@ -418,5 +446,29 @@ class RequestsHelper {
             $current_user = new WP_User( $request->post_author );
             RolesHelper::remove_ywhs_role_from_user( $current_user );
         }
+    }
+
+    /**
+     * Count the pending requests
+     *
+     * @return int count of the pending requests.
+     */
+    public static function count_pending_requests(): int {
+        $args  = [
+            'post_type'              => self::REQUEST_POST_TYPE,
+            'update_post_meta_cache' => true,
+            'meta_query'             => [
+                'relation' => 'AND',
+                [
+                    'key'     => self::REQUEST_META_STATUS,
+                    'value'   => self::PENDING,
+                    'compare' => '==',
+                    'type'    => 'CHAR',
+                ],
+            ],
+        ];
+        $query = new WP_Query( $args );
+
+        return $query->post_count;
     }
 }

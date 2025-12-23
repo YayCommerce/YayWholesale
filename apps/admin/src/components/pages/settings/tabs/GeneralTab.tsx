@@ -28,10 +28,10 @@ export default function GeneralTab() {
     );
   }, [activeRoles]);
 
-  const roleSlugs = useMemo(() => new Set(rolesList.map((r) => r.slug)), [rolesList]);
+  // const roleSlugs = useMemo(() => new Set(rolesList.map((r) => r.slug)), [rolesList]);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* Default role for new user */}
       <FormField
         control={control}
@@ -42,10 +42,7 @@ export default function GeneralTab() {
               {__('Default role for new user')}
             </FormLabel>
             <FormControl>
-              <Select
-                value={field.value && roleSlugs.has(field.value) ? field.value : ''}
-                onValueChange={field.onChange}
-              >
+              <Select value={field.value ? field.value : ''} onValueChange={field.onChange}>
                 <SelectTrigger className="w-[160px] text-sm font-normal">
                   <SelectValue placeholder={__('Select a role')} />
                 </SelectTrigger>

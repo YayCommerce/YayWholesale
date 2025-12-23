@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { __ } from '@wordpress/i18n';
-import { Ellipsis, EyeOff, GripVertical, Info, Trash2 } from 'lucide-react';
+import { CirclePlus, Ellipsis, Eye, EyeOff, GripVertical, Info, Trash2 } from 'lucide-react';
 import { useFormContext } from 'react-hook-form';
 
 import { SettingsFormData } from '@/lib/schema/settings';
@@ -10,18 +10,15 @@ import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
-  DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuGroup,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuSeparator,
-  DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { FormControl, FormField, FormItem, FormLabel } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { InputGroup, InputGroupInput } from '@/components/ui/input-group';
+import { Label } from '@/components/ui/label';
 import {
   Select,
   SelectContent,
@@ -29,6 +26,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { Switch } from '@/components/ui/switch';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { WholeSaleToolTip } from '@/components/custom/WholeSaleToolTip';
 
@@ -37,11 +35,13 @@ export function FieldRow({
   index,
   update,
   remove,
+  append,
 }: {
   field: any;
   index: number;
   update: (index: number, value: any) => void;
   remove: (index: number) => void;
+  append: () => void;
 }) {
   const { control, watch } = useFormContext<SettingsFormData>();
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
@@ -53,13 +53,9 @@ export function FieldRow({
     opacity: isDragging ? 0.6 : 1,
   };
 
-  const isUseDefaultForm = watch('registration_fields.useDefaultForm');
   const isRequired = watch(`registration_fields.fields.${index}.isRequired`);
+  const isHidden = watch(`registration_fields.fields.${index}.isHidden`);
 
-  const isHidden: boolean = useMemo(
-    () => !field.isDefault && isUseDefaultForm,
-    [field, isUseDefaultForm],
-  );
   const isDefault: boolean = useMemo(() => field.isDefault, [field]);
 
   return (
@@ -73,16 +69,37 @@ export function FieldRow({
     >
       {/* Drag handle */}
       <div className="flex w-[32px] shrink-0 items-center justify-center">
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon"
-          className="hover:text-foreground text-base-muted-foreground h-[36px] w-[18px] cursor-grab hover:bg-transparent active:cursor-grabbing"
-          {...attributes}
-          {...listeners}
-        >
-          <GripVertical className="h-5 w-5" />
-        </Button>
+        {isHidden ? (
+          <WholeSaleToolTip
+            trigger={
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                className="hover:text-foreground text-base-muted-foreground h-[36px] w-[18px] cursor-grab hover:bg-transparent active:cursor-grabbing"
+              >
+                <EyeOff className="h-5 w-5 cursor-default" />
+              </Button>
+            }
+            content={
+              <div className="flex items-center gap-2">
+                <Info className="mt-6/7 h-3.5 w-3.5" />
+                {__('Field is hidden')}
+              </div>
+            }
+          />
+        ) : (
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            className="hover:text-foreground text-base-muted-foreground h-[36px] w-[18px] cursor-grab hover:bg-transparent active:cursor-grabbing"
+            {...attributes}
+            {...listeners}
+          >
+            <GripVertical className="h-5 w-5" />
+          </Button>
+        )}
       </div>
 
       <div className="flex flex-1 flex-wrap gap-4">
@@ -94,40 +111,17 @@ export function FieldRow({
             render={({ field }) => (
               <FormItem className="w-full">
                 <FormLabel className="text-base-secondary space-y-2.5 text-xs font-medium">
-                  Label
-                  {isRequired && (
-                    <WholeSaleToolTip
-                      trigger={<div className="text-destructive">*</div>}
-                      content={
-                        <div className="flex items-center gap-2">
-                          <Info className="mt-6/7 h-3.5 w-3.5" />
-                          {__('Field is required')}
-                        </div>
-                      }
-                    />
-                  )}
+                  {__('Label', 'yay-wholesale')}
+                  {isRequired && <div className="text-destructive">*</div>}
                 </FormLabel>
                 <FormControl>
-                  <InputGroup>
-                    <InputGroupInput
-                      placeholder="Enter field label"
-                      defaultValue={field.value}
-                      onChange={field.onChange}
-                      className="h-9 w-full"
-                      disabled={isHidden}
-                    />
-                    {isHidden && (
-                      <WholeSaleToolTip
-                        trigger={<EyeOff className="text-muted-foreground mx-2 h-3 w-3" />}
-                        content={
-                          <div className="flex items-center gap-2">
-                            <Info className="mt-6/7 h-3.5 w-3.5" />
-                            {__('Field is hidden')}
-                          </div>
-                        }
-                      />
-                    )}
-                  </InputGroup>
+                  <Input
+                    placeholder="Enter field label"
+                    defaultValue={field.value}
+                    onChange={field.onChange}
+                    className="h-9 w-full"
+                    disabled={isHidden}
+                  />
                 </FormControl>
               </FormItem>
             )}
@@ -142,7 +136,7 @@ export function FieldRow({
             render={({ field }) => (
               <FormItem className="w-full">
                 <FormLabel className="text-base-secondary space-y-2.5 text-xs font-medium">
-                  Type
+                  {__('Type', 'yay-wholesale')}
                 </FormLabel>
                 <FormControl>
                   <Select
@@ -177,7 +171,7 @@ export function FieldRow({
             render={({ field }) => (
               <FormItem className="w-full">
                 <FormLabel className="text-base-secondary space-y-2.5 text-xs font-medium">
-                  Placeholder
+                  {__('Placeholder', 'yay-wholesale')}
                 </FormLabel>
                 <FormControl>
                   <Input
@@ -201,7 +195,7 @@ export function FieldRow({
             render={({ field }) => (
               <FormItem className="w-full">
                 <FormLabel className="text-base-secondary space-y-2.5 text-xs font-medium">
-                  Column Width
+                  {__('Column Width', 'yay-wholesale')}
                 </FormLabel>
                 <FormControl>
                   <ToggleGroup
@@ -231,21 +225,56 @@ export function FieldRow({
       <div className="flex shrink-0 items-center justify-center">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" disabled={isHidden}>
+            <Button variant="ghost" size="icon" disabled={isDefault}>
               <Ellipsis />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-56" align="end">
-            <DropdownMenuLabel>{__('Action', 'yay-wholesale')}</DropdownMenuLabel>
+          <DropdownMenuContent className="w-48" align="end">
             <FormField
               control={control}
               name={`registration_fields.fields.${index}.isRequired`}
               render={({ field }) => (
-                <DropdownMenuCheckboxItem checked={field.value} onCheckedChange={field.onChange}>
-                  {__('Set As Required', 'yay-wholesale')}
-                </DropdownMenuCheckboxItem>
+                <div className="flex items-center justify-between p-2">
+                  <Label>{__('Set as required', 'yay-wholesale')}</Label>
+                  <Switch
+                    className="translate-y-0.5 scale-70"
+                    checked={field.value}
+                    onCheckedChange={field.onChange}
+                    disabled={isHidden}
+                  />
+                </div>
               )}
             />
+            <DropdownMenuSeparator className="text-base-foreground w-[95%]" />
+            <DropdownMenuGroup>
+              <DropdownMenuItem onClick={append} disabled={isHidden}>
+                <CirclePlus />
+                {__('Add new field', 'yay-wholesale')}
+              </DropdownMenuItem>
+              <FormField
+                control={control}
+                name={`registration_fields.fields.${index}.isHidden`}
+                render={({ field }) => (
+                  <DropdownMenuItem
+                    onClick={() => {
+                      field.onChange(!field.value); // Toggle
+                    }}
+                  >
+                    {isHidden ? (
+                      <>
+                        <Eye />
+                        {__('Show field', 'yay-wholesale')}
+                      </>
+                    ) : (
+                      <>
+                        <EyeOff />
+                        {__('Hide field', 'yay-wholesale')}
+                      </>
+                    )}
+                  </DropdownMenuItem>
+                )}
+              />
+            </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
               <DropdownMenuItem
@@ -255,10 +284,10 @@ export function FieldRow({
                     remove(index);
                   }
                 }}
-                disabled={field.isDefault || !field.deletable}
+                disabled={field.isHidden || !field.deletable}
               >
                 <Trash2 />
-                Delete
+                {__('Delete', 'yay-wholesale')}
               </DropdownMenuItem>
             </DropdownMenuGroup>
           </DropdownMenuContent>

@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { Spinner } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
-import { ChevronDownIcon, X } from 'lucide-react';
+import { __, sprintf } from '@wordpress/i18n';
+import { Ellipsis, X } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useUpdateEffect } from 'react-use';
 
@@ -17,6 +17,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import {
   Sheet,
   SheetClose,
@@ -26,6 +28,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from '@/components/ui/sheet';
+import { Textarea } from '@/components/ui/textarea';
 import { WholeSaleToolTip } from '@/components/custom/WholeSaleToolTip';
 import RequestsStatusIcon from '@/components/icons/RequestStatusIcon';
 
@@ -37,6 +40,8 @@ export const DEFAULT_REQUEST: RequestFormValues = {
   name: '',
   email: '',
   message: '',
+  firstName: '',
+  lastName: '',
   status: 'pending',
   date: '',
   avatar: '',
@@ -98,16 +103,25 @@ export default function RequestsForm() {
             <Spinner className="text-muted-foreground size-6 animate-spin" />
           </div>
         )}
-        <SheetHeader className="border-border border-b p-5">
-          <div className="flex items-start justify-between">
+        <SheetHeader className="border-b border-[#F4F4F5] p-5">
+          <div className="flex items-start justify-between gap-2.5">
             <div>
-              <SheetTitle className="flex gap-3 text-[18px] font-semibold text-[#151619]">
+              <SheetTitle className="text-foreground flex items-center gap-2 text-[18px] font-semibold">
                 {dataDisplay?.name}
-                <WholeSaleToolTip
-                  trigger={<div>{icon}</div>}
-                  content={__('%STATUS% Request').replace('%STATUS%', text)}
-                  side="bottom"
-                />
+                {dataDisplay && dataDisplay.status !== 'approved' && (
+                  <WholeSaleToolTip
+                    trigger={
+                      <div>
+                        <RequestsStatusIcon
+                          status={dataDisplay?.status ?? 'pending'}
+                          className="h-3.5 w-3.5"
+                        />
+                      </div>
+                    }
+                    content={text}
+                    side="bottom"
+                  />
+                )}
               </SheetTitle>
               <SheetDescription className="text-base-muted-foreground mt-[4px] text-sm leading-[20px] font-normal">
                 {__(
@@ -123,81 +137,97 @@ export default function RequestsForm() {
             </SheetClose>
           </div>
         </SheetHeader>
-
-        <div className="grid gap-5 overflow-auto p-5">
-          <dl className="divide-y divide-black/10">
-            <div className="px-2 py-2 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-              <dt className="text-base-secondary text-xs font-medium">
-                {__('Name', 'yay-wholesale')}
-              </dt>
-              <dd className="mt-1 text-sm/6 text-gray-400 sm:col-span-2 sm:mt-0">
-                {dataDisplay?.name ?? ''}
-              </dd>
+        <div className="flex cursor-default flex-col gap-5 overflow-auto p-5">
+          <div className="grid cursor-default grid-cols-2 gap-2">
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="firstName">{__('First Name', 'yay-wholesale')}</Label>
+              <Input
+                id="firstName"
+                readOnly
+                value={dataDisplay?.firstName}
+                className="border-border bg-base-muted cursor-default shadow-xs"
+              />
             </div>
-
-            <div className="px-2 py-2 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-              <dt className="text-base-secondary text-xs font-medium">
-                {__('Email', 'yay-wholesale')}
-              </dt>
-              <dd className="mt-1 text-sm/6 text-gray-400 sm:col-span-2 sm:mt-0">
-                {dataDisplay?.email ?? ''}
-              </dd>
+            <div className="flex cursor-default flex-col gap-2">
+              <Label htmlFor="lastName">{__('Last Name', 'yay-wholesale')}</Label>
+              <Input
+                id="lastName"
+                readOnly
+                value={dataDisplay?.lastName}
+                className="border-border bg-base-muted cursor-default shadow-xs"
+              />
             </div>
+          </div>
+          <div className="flex cursor-default flex-col gap-2">
+            <Label htmlFor="email">{__('Email address', 'yay-wholesale')}</Label>
+            <Input
+              id="email"
+              readOnly
+              value={dataDisplay?.email}
+              className="border-border bg-base-muted cursor-default shadow-xs"
+            />
+          </div>
+          <div className="flex cursor-default flex-col gap-2">
+            <Label htmlFor="registrationDate">{__('Registration date', 'yay-wholesale')}</Label>
+            <Input
+              id="registrationDate"
+              readOnly
+              className="border-border bg-base-muted cursor-default shadow-xs"
+              value={
+                dataDisplay?.date
+                  ? parseWPDate(dataDisplay.date) + ' ' + parseWPTime(dataDisplay.date)
+                  : ''
+              }
+            />
+          </div>
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="message">{__('Message', 'yay-wholesale')}</Label>
+            <Textarea
+              className="border-border bg-base-muted h-fit min-h-25 cursor-default resize-none"
+              readOnly
+              value={dataDisplay.message}
+            />
+          </div>
+          {dataDisplay?.fields.map((field, index) => {
+            const handleDataByType = () => {
+              const value = field.value;
+              if (field.type.toLowerCase() == 'date') {
+                return parseWPDate(value);
+              }
 
-            <div className="px-2 py-2 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-              <dt className="text-base-secondary text-xs font-medium">
-                {__('Registration Date', 'yay-wholesale')}
-              </dt>
-              <dd className="mt-1 text-sm/6 text-gray-400 sm:col-span-2 sm:mt-0">
-                {dataDisplay?.date ? parseWPDate(dataDisplay.date) : ''}{' '}
-                {dataDisplay?.date ? parseWPTime(dataDisplay.date) : ''}
-              </dd>
-            </div>
+              if (field.type.toLowerCase() == 'time') {
+                return parseWPTime(value);
+              }
 
-            <div className="px-2 py-2 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-              <dt className="text-base-secondary text-xs font-medium">
-                {__('Message', 'yay-wholesale')}
-              </dt>
-              <dd className="mt-1 text-sm/6 text-gray-400 sm:col-span-2 sm:mt-0">
-                {dataDisplay?.message}
-              </dd>
-            </div>
-
-            {dataDisplay?.fields.map((field, index) => {
-              const handleDataByType = (value: string) => {
-                if (field.type.toLowerCase() == 'date') {
-                  return parseWPDate(value);
-                }
-
-                if (field.type.toLowerCase() == 'time') {
-                  return parseWPTime(value);
-                }
-
-                return value;
-              };
-              return (
-                <div key={index} className="px-2 py-2 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-                  <dt className="text-base-secondary text-xs font-medium">{field.label}</dt>
-                  <dd className="mt-1 text-sm/6 text-gray-400 sm:col-span-2 sm:mt-0">
-                    {handleDataByType(field.value)}
-                  </dd>
-                </div>
-              );
-            })}
-          </dl>
+              return value;
+            };
+            return (
+              <div className="flex flex-col gap-2">
+                <Label>{field.label}</Label>
+                {field.type.toLowerCase() === 'textarea' ? (
+                  <Textarea
+                    className="border-border bg-base-muted h-fit min-h-25 cursor-default resize-none"
+                    readOnly
+                    value={handleDataByType()}
+                  />
+                ) : (
+                  <Input
+                    readOnly
+                    value={handleDataByType()}
+                    className="border-border bg-base-muted cursor-default shadow-xs"
+                  />
+                )}
+              </div>
+            );
+          })}
         </div>
 
-        <SheetFooter>
-          <div className="flex justify-between gap-2 border-t border-[#E5E7EB] bg-white p-5">
-            <SheetClose asChild>
-              <Button variant="outline" className="w-fit">
-                {__('Cancel', 'yay-wholesale')}
-              </Button>
-            </SheetClose>
+        <SheetFooter className="p-0">
+          <div className="flex justify-end gap-2 border-t border-[#F4F4F5] bg-white p-5">
             <div className="flex gap-2">
               <Button
-                variant="destructive-outline"
-                className="hover:bg-destructive/20 bg-destructive/10 w-fit"
+                variant="destructive-soft"
+                className="hover:bg-destructive/10 w-fit"
                 disabled={dataDisplay?.status === 'rejected' || updateStatusMutation.isPending}
                 onClick={onReject}
               >
@@ -207,22 +237,18 @@ export default function RequestsForm() {
 
               <ButtonGroup>
                 <Button
-                  variant="success-outline"
-                  className="hover:bg-success/20 bg-success/10 w-fit"
+                  variant="outline"
+                  className="w-fit"
                   disabled={updateStatusMutation.isPending}
                   onClick={onApprove}
                 >
-                  <RequestsStatusIcon status="approved" />
+                  <RequestsStatusIcon status="approved" className="text-foreground" />
                   {__('Approve', 'yay-wholesale')}
                 </Button>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button
-                      variant="success-outline"
-                      className="hover:bg-success/20 bg-success/10"
-                      disabled={updateStatusMutation.isPending}
-                    >
-                      <ChevronDownIcon />
+                    <Button variant="outline" disabled={updateStatusMutation.isPending}>
+                      <Ellipsis />
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="[--radius:1rem]">
@@ -230,7 +256,8 @@ export default function RequestsForm() {
                       {rolesData?.map((role) => {
                         return (
                           <DropdownMenuItem onClick={() => onApproveWithRole(role.id)}>
-                            <RequestsStatusIcon status="approved" /> Approve to {role.name}
+                            <RequestsStatusIcon status="approved" />{' '}
+                            {sprintf(__('Approve to %s', 'yay-wholesale'), role.name)}
                           </DropdownMenuItem>
                         );
                       })}

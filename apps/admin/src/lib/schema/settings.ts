@@ -9,6 +9,7 @@ const fieldSchema = z.object({
   deletable: z.boolean(),
   isDefault: z.boolean(),
   isRequired: z.boolean(),
+  isHidden: z.boolean(),
 });
 
 export const settingsFormSchema = z.object({
@@ -30,7 +31,6 @@ export const settingsFormSchema = z.object({
     successful_registration_message: z.string(),
   }),
   registration_fields: z.object({
-    useDefaultForm: z.boolean(),
     fields: z.array(fieldSchema),
   }),
 });
