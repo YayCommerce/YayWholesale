@@ -134,44 +134,49 @@ class Requirement {
     public function enqueue_wholesale_requirement() {
         if ( ( function_exists( 'is_checkout' ) && is_checkout() ) ||
             ( function_exists( 'is_cart' ) && is_cart() ) ) {
-                $wholesale = RolesHelper::is_wholesale_user();
-                $slug      = 'ywhs_wholesale_requirement';
-                $asset     = include __DIR__ . '/../../../assets/dist/blocks/requirement-slot-fill/index.asset.php';
-                wp_enqueue_script(
-                    $slug,
-                    YAY_WHOLESALE_PLUGIN_URL . 'assets/dist/blocks/requirement-slot-fill/index.js',
-                    $asset['dependencies'],
-                    YAY_WHOLESALE_VERSION,
-                    true
-                );
+            $wholesale = RolesHelper::is_wholesale_user();
+            $slug      = 'ywhs_wholesale_requirement';
+            $asset     = include __DIR__ . '/../../../assets/dist/blocks/requirement-slot-fill/index.asset.php';
+            wp_enqueue_script(
+                $slug,
+                YAY_WHOLESALE_PLUGIN_URL . 'assets/dist/blocks/requirement-slot-fill/index.js',
+                $asset['dependencies'],
+                YAY_WHOLESALE_VERSION,
+                true
+            );
 
-                remove_filter( 'woocommerce_product_get_price', [ Pricing::get_instance(), 'get_price' ], 99, 2 );
+            remove_filter( 'woocommerce_product_get_price', [ Pricing::get_instance(), 'get_price' ], 99, 2 );
+            remove_filter( 'woocommerce_product_variation_get_price', [ Pricing::get_instance(), 'get_price' ], 99, 2 );
+            remove_filter( 'woocommerce_variation_prices_price', [ Pricing::get_instance(), 'get_price' ], 99, 2 );
 
-                $price_map = [];
-                $cart      = WC()->cart->get_cart();
+            $price_map = [];
+            $cart      = WC()->cart->get_cart();
             foreach ( $cart as $cart_item ) {
-                $product                               = wc_get_product( $cart_item['product_id'] );
-                $price_map[ $cart_item['product_id'] ] = $product->get_price();
+                $product_id               = ! empty( $cart_item['variation_id'] ) ? $cart_item['variation_id'] : $cart_item['product_id'];
+                $product                  = wc_get_product( $product_id );
+                $price_map[ $product_id ] = $product->get_price();
             }
 
-                add_filter( 'woocommerce_product_get_price', [ Pricing::get_instance(), 'get_price' ], 99, 2 );
+            add_filter( 'woocommerce_product_get_price', [ Pricing::get_instance(), 'get_price' ], 99, 2 );
+            add_filter( 'woocommerce_product_variation_get_price', [ Pricing::get_instance(), 'get_price' ], 99, 2 );
+            add_filter( 'woocommerce_variation_prices_price', [ Pricing::get_instance(), 'get_price' ], 99, 2 );
 
-                wp_localize_script(
-                    $slug,
-                    'ywhsRequirement',
-                    [
-                        'wholesale'     => $wholesale,
-                        'priceMap'      => $price_map,
-                        'currency_data' => [
-                            'currency'     => get_woocommerce_currency(),
-                            'symbol'       => html_entity_decode( \get_woocommerce_currency_symbol(), ENT_COMPAT ),
-                            'position'     => get_option( 'woocommerce_currency_pos' ),
-                            'thousand_sep' => get_option( 'woocommerce_price_thousand_sep' ),
-                            'decimal_sep'  => get_option( 'woocommerce_price_decimal_sep' ),
-                            'num_decimals' => intval( get_option( 'woocommerce_price_num_decimals' ) ),
-                        ],
-                    ]
-                );
+            wp_localize_script(
+                $slug,
+                'ywhsRequirement',
+                [
+                    'wholesale'     => $wholesale,
+                    'priceMap'      => $price_map,
+                    'currency_data' => [
+                        'currency'     => get_woocommerce_currency(),
+                        'symbol'       => html_entity_decode( \get_woocommerce_currency_symbol(), ENT_COMPAT ),
+                        'position'     => get_option( 'woocommerce_currency_pos' ),
+                        'thousand_sep' => get_option( 'woocommerce_price_thousand_sep' ),
+                        'decimal_sep'  => get_option( 'woocommerce_price_decimal_sep' ),
+                        'num_decimals' => intval( get_option( 'woocommerce_price_num_decimals' ) ),
+                    ],
+                ]
+            );
         }//end if
     }
 }

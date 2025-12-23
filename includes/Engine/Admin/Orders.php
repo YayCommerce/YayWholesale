@@ -105,10 +105,11 @@ class Orders {
             $order->update_meta_data( '_ywhs_wholesale_role', $wholesale_role['name'] );
 
             // Send email when new wholesale order has just been placed
-            $email_trigger = $order->get_meta( '__ywhs_wholesale_email_trigger' );
-            if ( ! isset( $email_trigger ) || ! $email_trigger ) {
+            $email_trigger = (int) $order->get_meta( '_ywhs_wholesale_email_trigger' );
+            // This hook runs twice, check the trigger <= 1
+            if ( ( ! isset( $email_trigger ) || $email_trigger <= 1 ) && 'wc_checkout_draft' !== $order->get_status() ) {
                 do_action( 'yhs_new_wholesale_order_placed', $order->get_id(), $order );
-                $order->update_meta_data( '__ywhs_wholesale_email_trigger', true );
+                $order->add_meta_data( '_ywhs_wholesale_email_trigger', $email_trigger++ );
             }
         } else {
             $order->delete_meta_data( '_ywhs_wholesale_role' );
@@ -140,6 +141,10 @@ class Orders {
      * @param \WC_Order $order The order object.
      */
     public function tax_enabled_handler( bool $is_exempt, \WC_Order $order ) {
+        if ( ! is_admin() ) {
+            return $is_exempt;
+        }
+
         $customer_id     = $order->get_customer_id();
         $wholesale_role  = RolesHelper::is_wholesale_user( $customer_id );
         $setting         = SettingsHelper::get_settings();
@@ -191,6 +196,7 @@ class Orders {
             $quantity = $item->get_quantity();
             $item->set_subtotal( $new_price * $quantity );
 
+            // Set directly to total skip the coupon
             if ( $is_discounted && $is_disabled_coupon ) {
                 $item->set_total( $new_price * $quantity );
             }
