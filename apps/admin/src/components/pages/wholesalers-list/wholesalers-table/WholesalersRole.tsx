@@ -35,7 +35,7 @@ export default function WholesalersRoleColumn({ role, userId }: { role: string; 
             <RolesIcon role={role} className="mt-0.5 min-h-4 min-w-4" />
             {roles?.find((r) => r.slug === role)?.name ?? role}
           </span>
-          <ChevronDown className="cursor-pointer" />
+          <ChevronDown className="text-muted-foreground/70 h-6 w-6 cursor-pointer" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-45.5">
