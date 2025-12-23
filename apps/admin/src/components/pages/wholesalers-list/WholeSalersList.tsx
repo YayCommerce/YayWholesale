@@ -106,7 +106,7 @@ export default function WholeSalersList() {
       <div className="flex flex-nowrap items-center justify-between gap-3">
         <h1 className="text-2xl font-bold">{__('Wholesalers List', 'yay-wholesale')}</h1>
         <div className="flex flex-col-reverse items-end gap-2 lg:flex-row">
-          {table.getPageCount() > 1 && (
+          {(table.getPageCount() > 1 || keyword !== '') && (
             <InputGroup className="w-full sm:w-80">
               <InputGroupInput
                 placeholder="Search by ID, Email, Display Name"

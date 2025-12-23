@@ -35,7 +35,7 @@ class Coupon {
             return $enabled;
         }
 
-        if ( RolesHelper::is_wholesale_user() ) {
+        if ( ! is_admin() && RolesHelper::is_wholesale_user() ) {
             return false;
         }
 

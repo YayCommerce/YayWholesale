@@ -22,6 +22,8 @@ class Orders {
     protected function __construct() {
         add_action( 'woocommerce_order_before_calculate_totals', [ $this, 'admin_recalculate_order' ], 999, 2 );
 
+        add_filter( 'woocommerce_order_is_vat_exempt', [ $this, 'tax_enabled_handler' ], 999, 2 );
+
         add_action( 'woocommerce_order_list_table_restrict_manage_orders', [ $this, 'admin_wc_orders_wholesale_filter_html' ], 10, 1 );
 
         add_filter( 'woocommerce_order_query', [ $this, 'admin_wc_orders_wholesale_filtered' ], 999, 2 );
@@ -32,23 +34,17 @@ class Orders {
     }
 
     /**
-     * Set the order data discounted when the admin recalculates orders
+     * Check if the order meets the condition of wholesale role
      *
-     * @param bool      $and_taxes the taxes included flag.
-     * @param \WC_Order $order The cart object.
+     * @param \WC_Order $order The order object.
+     * @param array     $wholesale_role the wholesale role.
+     * @return bool
      */
-    public function admin_recalculate_order( $and_taxes, \WC_Order $order ) {
-        $customer_id       = $order->get_customer_id();
-        $is_wholesale_user = RolesHelper::is_wholesale_user( $customer_id );
-        $is_disabled_tax   = SettingsHelper::get_settings()['general']['disable_tax'] ?? false;
-        $is_removing_tax   = false;
-        $items             = [];
-
-        remove_filter( 'woocommerce_product_get_price', [ Pricing::get_instance(), 'get_price' ], 99, 2 );
-        remove_filter( 'woocommerce_calc_tax', [ Tax::get_instance(), 'maybe_disable_tax_calc' ], 9999 );
-
+    protected function check_is_discounted( \WC_Order $order, array $wholesale_role ) {
         $quantity = $order->get_item_count();
         $subtotal = 0;
+
+        remove_filter( 'woocommerce_product_get_price', [ Pricing::get_instance(), 'get_price' ], 99, 2 );
         // Calculate the subtotal with original unit price
         foreach ( $order->get_items() as $item ) {
             if ( ! $item instanceof \WC_Order_Item_Product ) {
@@ -57,27 +53,148 @@ class Orders {
             $product   = $item->get_product();
             $subtotal += $product->get_price() * $item->get_quantity();
         }
-        $is_discounted = isset( $is_wholesale_user ) && PricingHelper::meets_discount_conditions( $is_wholesale_user, $quantity, $subtotal );
+        $is_discounted = isset( $wholesale_role ) && PricingHelper::meets_discount_conditions( $wholesale_role, $quantity, $subtotal );
+        add_filter( 'woocommerce_product_get_price', [ Pricing::get_instance(), 'get_price' ], 99, 2 );
+
+        return $is_discounted;
+    }
+
+    /**
+     * Set the order data discounted when the admin recalculates orders or new order has just created
+     *
+     * @param bool      $and_taxes the taxes included flag.
+     * @param \WC_Order $order The order object.
+     */
+    public function admin_recalculate_order( $and_taxes, \WC_Order $order ) {
+        $customer_id        = $order->get_customer_id();
+        $wholesale_role     = RolesHelper::is_wholesale_user( $customer_id );
+        $setting            = SettingsHelper::get_settings();
+        $is_disabled_tax    = $setting['general']['disable_tax'] ?? false;
+        $is_disabled_coupon = $setting['general']['disable_coupon'] ?? false;
+        $items              = [];
+
+        remove_filter( 'woocommerce_order_is_vat_exempt', [ $this, 'tax_enabled_handler' ], 999, 2 );
+        remove_filter( 'woocommerce_calc_tax', [ Tax::get_instance(), 'maybe_disable_tax_calc' ], 9999 );
+
+        $is_discounted = $this->check_is_discounted( $order, $wholesale_role );
 
         // Force tax exempted (default is the value of 'is_vat_exempt' in meta_data of order)
         $is_force_tax_exempt = apply_filters( 'woocommerce_order_is_vat_exempt', 'yes' === $order->get_meta( 'is_vat_exempt' ), $order );
 
-        // Update the price of order items
+        $this->calculate_price_and_tax_of_items(
+            $order,
+            $is_discounted,
+            $is_disabled_coupon,
+            $wholesale_role,
+            $is_disabled_tax,
+            $is_force_tax_exempt,
+            $items
+        );
+
+        // update "Items" displaying and calculate taxes in shipping items
+        $this->calculate_tax_of_shippings( $order, $items, $is_discounted, $is_disabled_tax, $is_force_tax_exempt );
+
+        // calculate taxes in fee items
+        $this->calculate_tax_of_fees( $order, $is_discounted, $is_disabled_tax, $is_force_tax_exempt );
+
+        // Update taxes
+        $order->update_taxes();
+
+        // Update meta data for filter
+        if ( $is_discounted ) {
+            $order->update_meta_data( '_ywhs_wholesale_role', $wholesale_role['name'] );
+
+            // Send email when new wholesale order has just been placed
+            $email_trigger = $order->get_meta( '__ywhs_wholesale_email_trigger' );
+            if ( ! isset( $email_trigger ) || ! $email_trigger ) {
+                do_action( 'yhs_new_wholesale_order_placed', $order->get_id(), $order );
+                $order->update_meta_data( '__ywhs_wholesale_email_trigger', true );
+            }
+        } else {
+            $order->delete_meta_data( '_ywhs_wholesale_role' );
+        }
+
+        $default_range_transient = get_transient( ReportsHelper::REPORT_DATE_RANGE_TRANSIENT );
+        if ( false !== $default_range_transient ) {
+            $transient_key = ReportsHelper::REPORT_TRANSIENT
+                            . '_'
+                            . $default_range_transient['default_compare_start_date']
+                            . '_'
+                            . $default_range_transient['default_compare_end_date']
+                            . '_'
+                            . $default_range_transient['default_start_date']
+                            . '_'
+                            . $default_range_transient['default_end_date'];
+
+            delete_transient( $transient_key );
+        }
+
+        add_filter( 'woocommerce_order_is_vat_exempt', [ $this, 'tax_enabled_handler' ], 999, 2 );
+        add_filter( 'woocommerce_calc_tax', [ Tax::get_instance(), 'maybe_disable_tax_calc' ], 9999 );
+    }//end admin_recalculate_order()
+
+    /**
+     * Handle the status of tax exemption
+     *
+     * @param bool      $is_exempt the default flag.
+     * @param \WC_Order $order The order object.
+     */
+    public function tax_enabled_handler( bool $is_exempt, \WC_Order $order ) {
+        $customer_id     = $order->get_customer_id();
+        $wholesale_role  = RolesHelper::is_wholesale_user( $customer_id );
+        $setting         = SettingsHelper::get_settings();
+        $is_disabled_tax = $setting['general']['disable_tax'] ?? false;
+
+        $is_discounted = $this->check_is_discounted( $order, $wholesale_role );
+        if ( $is_discounted && $is_disabled_tax ) {
+            return true;
+        }
+
+        return $is_exempt;
+    }
+
+    /**
+     * Calculate the final price and tax of order items
+     *
+     * @param \WC_Order $order the order object.
+     * @param bool      $is_discounted the status of order that meet the discount requirement.
+     * @param bool      $is_disabled_coupon the disabled coupon setting.
+     * @param array     $wholesale_role wholesale role of owner.
+     * @param bool      $is_disabled_tax the disabled tax setting.
+     * @param bool      $is_force_tax_exempt the tax exemption flag.
+     * @param array     $items the items array to statistic items in order.
+     */
+    protected function calculate_price_and_tax_of_items(
+        \WC_Order $order,
+        bool $is_discounted,
+        bool $is_disabled_coupon,
+        array $wholesale_role,
+        bool $is_disabled_tax,
+        bool $is_force_tax_exempt,
+        array &$items
+    ) {
+
+        // Handeling price and tax
         foreach ( $order->get_items() as $item ) {
             if ( ! $item instanceof \WC_Order_Item_Product ) {
                 continue;
             }
 
-            $product   = $item->get_product();
-            $new_price = $product->get_price();
+            $product         = $item->get_product();
+            $new_price       = $product->get_price();
+            $is_removing_tax = false;
 
             if ( $is_discounted ) {
-                $new_price = PricingHelper::calc_discounted_price( $new_price, $is_wholesale_user, $product );
+                $new_price = PricingHelper::calc_discounted_price( $new_price, $wholesale_role, $product );
             }
 
             $quantity = $item->get_quantity();
             $item->set_subtotal( $new_price * $quantity );
-            $item->set_total( $new_price * $quantity );
+
+            if ( $is_discounted && $is_disabled_coupon ) {
+                $item->set_total( $new_price * $quantity );
+            }
+
             $items[] = $item->get_name() . ' x ' . $quantity;
 
             if ( ( $is_discounted && $is_disabled_tax ) ||
@@ -100,8 +217,27 @@ class Orders {
                 );
             }//end if
         }//end foreach
+        if ( $is_removing_tax ) {
+            $order->remove_order_items( 'tax' );
+        }
+    }
 
-        // update "Items" displaying in shipping items
+    /**
+     * Calculate the tax of order shipping items
+     *
+     * @param \WC_Order $order the order object.
+     * @param array     $items the items array to statistic items in order.
+     * @param bool      $is_discounted the status of order that meet the discount requirement.
+     * @param bool      $is_disabled_tax the disabled tax setting.
+     * @param bool      $is_force_tax_exempt the tax exemption flag.
+     */
+    protected function calculate_tax_of_shippings(
+        \WC_Order $order,
+        array $items,
+        bool $is_discounted,
+        bool $is_disabled_tax,
+        bool $is_force_tax_exempt
+    ) {
         foreach ( $order->get_items( 'shipping' ) as $shipping ) {
             $shipping->update_meta_data( 'Items', implode( ', ', $items ) );
 
@@ -123,50 +259,42 @@ class Orders {
                 );
             }//end if
         }//end foreach
+    }
 
-        // Update taxes
-        $order->update_taxes();
-        if ( $is_removing_tax ) {
-            $order->remove_order_items( 'tax' );
-        }
-
-        $trigger_email = false;
-
-        // Update meta data for filter
-        if ( $is_discounted ) {
-            $order->update_meta_data( '_ywhs_wholesale_role', $is_wholesale_user['name'] );
-
-            $created = $order->get_date_created()->getTimestamp();
-            $now     = time();
-            if ( $now - $created < 2000 ) {
-                $trigger_email = true;
+    /**
+     * Calculate the tax of order fee items
+     *
+     * @param \WC_Order $order the order object.
+     * @param bool      $is_discounted the status of order that meet the discount requirement.
+     * @param bool      $is_disabled_tax the disabled tax setting.
+     * @param bool      $is_force_tax_exempt the tax exemption flag.
+     */
+    protected function calculate_tax_of_fees(
+        \WC_Order $order,
+        bool $is_discounted,
+        bool $is_disabled_tax,
+        bool $is_force_tax_exempt
+    ) {
+        foreach ( $order->get_items( 'fee' ) as $fee ) {
+            if ( ! $fee instanceof \WC_Order_Item_Fee ) {
+                continue;
             }
-        } else {
-            $order->delete_meta_data( '_ywhs_wholesale_role' );
-        }
 
-        if ( $trigger_email ) {
-            do_action( 'yhs_new_wholesale_order_placed', $order->get_id(), $order );
-        }
-
-        $default_range_transient = get_transient( ReportsHelper::REPORT_DATE_RANGE_TRANSIENT );
-        if ( false !== $default_range_transient ) {
-            $transient_key = ReportsHelper::REPORT_TRANSIENT
-                            . '_'
-                            . $default_range_transient['default_compare_start_date']
-                            . '_'
-                            . $default_range_transient['default_compare_end_date']
-                            . '_'
-                            . $default_range_transient['default_start_date']
-                            . '_'
-                            . $default_range_transient['default_end_date'];
-
-            delete_transient( $transient_key );
-        }
-
-        add_filter( 'woocommerce_product_get_price', [ Pricing::get_instance(), 'get_price' ], 99, 2 );
-        add_filter( 'woocommerce_calc_tax', [ Tax::get_instance(), 'maybe_disable_tax_calc' ], 9999 );
-    }//end admin_recalculate_order()
+            if ( ( $is_discounted && $is_disabled_tax ) ||
+            ( ! $is_discounted && $is_force_tax_exempt ) ) {
+                $fee->set_taxes( [] );
+            } else {
+                $tax_rates = WC_Tax::get_rates( $fee->get_tax_class() );
+                $taxes     = WC_Tax::calc_tax( $fee->get_total(), $tax_rates, false );
+                $fee->set_taxes(
+                    [
+                        'total'    => $taxes,
+                        'subtotal' => $taxes,
+                    ]
+                );
+            }//end if
+        }//end foreach
+    }
 
     /**
      * Add the wholesale and retail order filter to admin WC order list page
