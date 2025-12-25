@@ -129,47 +129,50 @@ export const RequestsColumn: ColumnDef<RequestFormValues>[] = [
       return (
         <AlertDialog open={openDialog} onOpenChange={setOpenDialog}>
           <div className="flex w-10 items-center justify-end gap-2">
+            <div className="peer opacity-0 group-hover:opacity-100 has-data-[state='delayed-open']:opacity-100">
+              <WholeSaleToolTip
+                trigger={
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    className="hover:text-primary text-base-muted-foreground h-8 w-8 hover:bg-white hover:shadow-xs"
+                    onClick={() => {
+                      queryClient.setQueryData(['request', row.original.id], row.original);
+                      navigate(`/request/edit/${row.original.id}`);
+                    }}
+                  >
+                    <SettingsIcon className="h-4 w-4" />
+                  </Button>
+                }
+                content={<span>{__('Edit request', 'yay-wholesale')}</span>}
+              />
+
+              <WholeSaleToolTip
+                trigger={
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    className="hover:text-destructive text-base-muted-foreground m-0 h-8 w-8 hover:bg-white hover:shadow-xs"
+                    onClick={() => setOpenDialog(true)}
+                    disabled={
+                      isDeletingRequestPending ||
+                      queryClient.isMutating({ mutationKey: ['requests'] }) > 0
+                    }
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                }
+                content={<span>{__('Delete request', 'yay-wholesale')}</span>}
+              />
+            </div>
+
             <Button
               size="icon"
               variant="ghost"
-              className="text-base-muted-foreground flex h-8 w-8 transition group-hover:hidden"
+              className="text-base-muted-foreground absolute z-1 flex h-8 w-8 group-hover:-z-10 peer-has-data-[state='delayed-open']:-z-10"
             >
               <Ellipsis className="h-4 w-4" />
             </Button>
-            <WholeSaleToolTip
-              trigger={
-                <Button
-                  size="icon"
-                  variant="ghost"
-                  className="hover:text-primary text-base-muted-foreground hidden h-8 w-8 transition group-hover:flex hover:bg-white hover:shadow-xs"
-                  onClick={() => {
-                    queryClient.setQueryData(['request', row.original.id], row.original);
-                    navigate(`/request/edit/${row.original.id}`);
-                  }}
-                >
-                  <SettingsIcon className="h-4 w-4" />
-                </Button>
-              }
-              content={<span>{__('Edit request', 'yay-wholesale')}</span>}
-            />
-
-            <WholeSaleToolTip
-              trigger={
-                <Button
-                  size="icon"
-                  variant="ghost"
-                  className="hover:text-destructive text-base-muted-foreground hidden h-8 w-8 group-hover:flex hover:bg-white hover:shadow-xs"
-                  onClick={() => setOpenDialog(true)}
-                  disabled={
-                    isDeletingRequestPending ||
-                    queryClient.isMutating({ mutationKey: ['requests'] }) > 0
-                  }
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-              }
-              content={<span>{__('Delete request', 'yay-wholesale')}</span>}
-            />
           </div>
           <AlertDialogContent>
             <AlertDialogHeader>
