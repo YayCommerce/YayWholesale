@@ -28,7 +28,7 @@ export default function DashboardSummary(props: {
           <Button
             variant="outline"
             size="sm"
-            className="text-base-foreground mt-3 text-xs font-medium"
+            className="text-base-foreground h-8 w-fit text-sm font-medium"
             onClick={() => navigate('/wholesalers-list')}
           >
             {__('View all wholesalers', 'yay-wholesale')}
@@ -48,7 +48,7 @@ export default function DashboardSummary(props: {
             <Button
               variant="outline"
               size="sm"
-              className="text-base-foreground mt-3 text-xs font-medium"
+              className="text-base-foreground h-8 text-sm font-medium"
             >
               {__('View all orders', 'yay-wholesale')}
             </Button>
@@ -67,7 +67,7 @@ export default function DashboardSummary(props: {
             <Button
               variant="outline"
               size="sm"
-              className="text-base-foreground mt-3 text-xs font-medium"
+              className="text-base-foreground h-8 text-sm font-medium"
             >
               {__('View all revenue', 'yay-wholesale')}
             </Button>
@@ -87,20 +87,23 @@ export default function DashboardSummary(props: {
     >
       {cards.map((c, i) => (
         <Card key={i} className="mt-0 rounded-lg py-0 shadow-none">
-          <CardContent className="p-5">
+          <CardContent className="flex flex-col gap-4 p-6">
             <div className="flex items-center justify-between">
               <h3 className="text-base-foreground text-base font-medium">{c.title}</h3>
-              <Badge variant="outline" className="rounded-md text-xs font-semibold">
+              <Badge
+                variant="outline"
+                className="flex h-[24px] gap-1 rounded-md px-2 py-1.5 text-xs font-semibold shadow-xs hover:bg-white"
+              >
                 {c.percent && c.percent < 0 ? (
-                  <TrendingDown size={10} className="text-destructive" />
+                  <TrendingDown className="text-destructive h-1.25 w-2.5" />
                 ) : (
-                  <TrendingUp size={10} className="text-success" />
+                  <TrendingUp className="text-success h-1.25 w-2.5" />
                 )}
-                <p>
+                <p className="text-xs">
                   {c.percent && c.percent < 0 ? '' : '+'}
                   {c.overPercent ? (
                     <>
-                      100<sup className="text-[10px]">+</sup> %
+                      100<sup className="text-[10px]">+</sup>%
                     </>
                   ) : (
                     <>{parseWPDecimal(c.percent)}%</>
@@ -108,14 +111,16 @@ export default function DashboardSummary(props: {
                 </p>
               </Badge>
             </div>
-            <p className="text-base-foreground mt-2 text-3xl font-semibold">
-              {isLoading ? (
-                <Spinner className="text-muted-foreground size-6 animate-spin" />
-              ) : (
-                c.value
-              )}
-            </p>
-            <p className="mt-1 text-sm text-[#A0A0A7]">{c.desc}</p>
+            <div className="flex flex-col gap-2">
+              <p className="text-base-foreground text-3xl font-semibold">
+                {isLoading ? (
+                  <Spinner className="text-muted-foreground size-6 animate-spin" />
+                ) : (
+                  c.value
+                )}
+              </p>
+              <p className="pb-2 text-sm text-[#A0A0A7]">{c.desc}</p>
+            </div>
             {c.button()}
           </CardContent>
         </Card>

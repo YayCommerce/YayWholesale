@@ -51,7 +51,10 @@ export const RolesColumn: ColumnDef<RolesListValues & { count: number }>[] = [
       return (
         <Label
           htmlFor={id}
-          className="flex h-full w-full cursor-pointer items-center justify-center px-4"
+          className={cn(
+            'flex h-full w-full items-center justify-center px-4',
+            row.original.isDefault ? 'cursor-no-drop' : 'cursor-pointer',
+          )}
         >
           <Checkbox
             id={id}
@@ -77,7 +80,7 @@ export const RolesColumn: ColumnDef<RolesListValues & { count: number }>[] = [
         <div className="flex gap-2">
           <WholeSaleToolTip
             trigger={
-              <div className="hover:underline hover:decoration-dotted hover:underline-offset-3">
+              <div className="border-border inline-block border-b-2 border-dotted pb-px">
                 {row.original.name}
               </div>
             }
@@ -243,7 +246,7 @@ export const RolesColumn: ColumnDef<RolesListValues & { count: number }>[] = [
                         size="icon"
                         variant="ghost"
                         onClick={() => navigate(`/settings/general`)}
-                        className="hover:text-primary text-base-muted-foreground hover:bg-wh transition hover:shadow-xs"
+                        className="hover:text-primary text-base-muted-foreground transition hover:bg-white hover:shadow-xs"
                       >
                         <EditIcon className="size-4" />
                       </Button>

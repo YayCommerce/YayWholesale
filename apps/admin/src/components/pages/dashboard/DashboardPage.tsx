@@ -41,7 +41,7 @@ export default function DashboardPage() {
 
       <DashboardSummary reportQuery={reportQuery} />
 
-      <div className="grid gap-6 md:grid-cols-2">
+      <div className="grid items-stretch gap-6 md:grid-cols-2">
         <TopWholesaleCustomers reportQuery={reportQuery} />
         <TopProducts reportQuery={reportQuery} />
       </div>

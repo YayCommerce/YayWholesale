@@ -140,7 +140,7 @@ export default function RequestsList() {
       {/* Header */}
       <div className="flex flex-nowrap items-center justify-between gap-3">
         <h1 className="text-2xl font-bold">{__('Wholesaler Requests', 'yay-wholesale')}</h1>
-        <div className="flex flex-col items-end gap-2 md:flex-row">
+        <div className="flex flex-col items-end gap-4 md:flex-row">
           <Select value={statusFilter} onValueChange={setStatusFilter}>
             <SelectTrigger className="w-40">
               <SelectValue />
@@ -282,7 +282,7 @@ export default function RequestsList() {
                   <div className="flex flex-col">
                     <BulkActionMenu>
                       <BulkMenuButtonAndTrigger onClick={() => handleBulkStatusChange('approved')}>
-                        <RequestsStatusIcon status="approved" />
+                        <RequestsStatusIcon status="approved" className="mt-0.5" />
                         {__('Approve')}
                       </BulkMenuButtonAndTrigger>
                       <BulkActionMenuContent>
@@ -350,7 +350,11 @@ export default function RequestsList() {
 
           <div className="flex items-center gap-4">
             <span className="text-base-secondary text-sm font-normal">
-              Page {table.getState().pagination.pageIndex + 1} of {table.getPageCount()}
+              {sprintf(
+                __('Page %d of %d'),
+                table.getState().pagination.pageIndex + 1,
+                table.getPageCount(),
+              )}
             </span>
 
             <div className="flex items-center gap-1">

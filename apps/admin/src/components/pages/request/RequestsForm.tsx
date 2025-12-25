@@ -8,6 +8,7 @@ import { useUpdateEffect } from 'react-use';
 import { useRequestQuery, useUpdateRequestStatusMutation } from '@/lib/queries/requests';
 import { useActiveRolesQuery } from '@/lib/queries/roles';
 import { RequestFormValues } from '@/lib/schema/requests';
+import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { ButtonGroup } from '@/components/ui/button-group';
 import {
@@ -87,6 +88,11 @@ export default function RequestsForm() {
     if (data?.id) setDataDisplay(data);
   }, [data]);
 
+  const readonlyClassName = useMemo(
+    () => 'border-border bg-base-muted hover:border-border cursor-default shadow-xs',
+    [],
+  );
+
   return (
     <Sheet
       open={isOpen}
@@ -138,14 +144,14 @@ export default function RequestsForm() {
           </div>
         </SheetHeader>
         <div className="flex cursor-default flex-col gap-5 overflow-auto p-5">
-          <div className="grid cursor-default grid-cols-2 gap-2">
+          <div className="grid cursor-default grid-cols-2 gap-5">
             <div className="flex flex-col gap-2">
               <Label htmlFor="firstName">{__('First Name', 'yay-wholesale')}</Label>
               <Input
                 id="firstName"
                 readOnly
                 value={dataDisplay?.firstName}
-                className="border-border bg-base-muted cursor-default shadow-xs"
+                className={cn(readonlyClassName)}
               />
             </div>
             <div className="flex cursor-default flex-col gap-2">
@@ -154,7 +160,7 @@ export default function RequestsForm() {
                 id="lastName"
                 readOnly
                 value={dataDisplay?.lastName}
-                className="border-border bg-base-muted cursor-default shadow-xs"
+                className={cn(readonlyClassName)}
               />
             </div>
           </div>
@@ -164,7 +170,7 @@ export default function RequestsForm() {
               id="email"
               readOnly
               value={dataDisplay?.email}
-              className="border-border bg-base-muted cursor-default shadow-xs"
+              className={cn(readonlyClassName)}
             />
           </div>
           <div className="flex cursor-default flex-col gap-2">
@@ -172,7 +178,7 @@ export default function RequestsForm() {
             <Input
               id="registrationDate"
               readOnly
-              className="border-border bg-base-muted cursor-default shadow-xs"
+              className={cn(readonlyClassName)}
               value={
                 dataDisplay?.date
                   ? parseWPDate(dataDisplay.date) + ' ' + parseWPTime(dataDisplay.date)
@@ -183,7 +189,7 @@ export default function RequestsForm() {
           <div className="flex flex-col gap-2">
             <Label htmlFor="message">{__('Message', 'yay-wholesale')}</Label>
             <Textarea
-              className="border-border bg-base-muted h-fit min-h-25 cursor-default resize-none"
+              className={cn('h-fit min-h-25 resize-none', readonlyClassName)}
               readOnly
               value={dataDisplay.message}
             />
@@ -206,16 +212,12 @@ export default function RequestsForm() {
                 <Label>{field.label}</Label>
                 {field.type.toLowerCase() === 'textarea' ? (
                   <Textarea
-                    className="border-border bg-base-muted h-fit min-h-25 cursor-default resize-none"
+                    className={cn('h-fit min-h-25 resize-none', readonlyClassName)}
                     readOnly
                     value={handleDataByType()}
                   />
                 ) : (
-                  <Input
-                    readOnly
-                    value={handleDataByType()}
-                    className="border-border bg-base-muted cursor-default shadow-xs"
-                  />
+                  <Input readOnly value={handleDataByType()} className={cn(readonlyClassName)} />
                 )}
               </div>
             );
