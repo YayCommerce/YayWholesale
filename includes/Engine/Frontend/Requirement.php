@@ -17,8 +17,12 @@ class Requirement {
     protected function __construct() {
         // --- WooCommerce hooks ---
         add_action( 'woocommerce_widget_shopping_cart_before_buttons', [ $this, 'add_wholesale_requirement' ], 999, 0 );
+        add_action( 'woocommerce_before_cart_totals', [ $this, 'add_wholesale_requirement' ], 999, 0 );
+        add_action( 'woocommerce_review_order_before_payment', [ $this, 'add_wholesale_requirement' ], 999, 0 );
 
         add_action( 'wp_enqueue_scripts', [ $this, 'enqueue_wholesale_requirement' ], 999 );
+        add_action( 'init', [ $this, 'create_block_requirement_block_init' ], 999 );
+        add_action( 'wp_enqueue_scripts', [ $this, 'enqueue_view_script' ] );
     }
 
     /**
@@ -136,7 +140,7 @@ class Requirement {
             ( function_exists( 'is_cart' ) && is_cart() ) ) {
             $wholesale = RolesHelper::is_wholesale_user();
             $slug      = 'ywhs_wholesale_requirement';
-            $asset     = include __DIR__ . '/../../../assets/dist/blocks/requirement-slot-fill/index.asset.php';
+            $asset     = include YAY_WHOLESALE_PLUGIN_DIR . 'assets/dist/blocks/requirement-slot-fill/index.asset.php';
             wp_enqueue_script(
                 $slug,
                 YAY_WHOLESALE_PLUGIN_URL . 'assets/dist/blocks/requirement-slot-fill/index.js',
@@ -178,5 +182,79 @@ class Requirement {
                 ]
             );
         }//end if
+    }
+
+    // public function render_to_mini_cart_block( $block_content ) {
+
+    // $wholesale = RolesHelper::is_wholesale_user();
+
+    // if ( ! $wholesale ) {
+    // return $block_content;
+    // }
+
+    // wp_interactivity_config(
+    // 'ywhs_wholesale_requirement',
+    // [
+    // 'wholesale'     => $wholesale,
+    // 'currency_data' => [
+    // 'currency'     => get_woocommerce_currency(),
+    // 'symbol'       => html_entity_decode( \get_woocommerce_currency_symbol(), ENT_COMPAT ),
+    // 'position'     => get_option( 'woocommerce_currency_pos' ),
+    // 'thousand_sep' => get_option( 'woocommerce_price_thousand_sep' ),
+    // 'decimal_sep'  => get_option( 'woocommerce_price_decimal_sep' ),
+    // 'num_decimals' => intval( get_option( 'woocommerce_price_num_decimals' ) ),
+    // ],
+    // ]
+    // );
+
+    // ob_start();
+
+
+    // $requirement = ob_get_clean();
+
+    // $block_content = preg_replace(
+    // '/(<div class="wc-block-mini-cart__footer">)/',
+    // $requirement . '$1',
+    // $block_content
+    // );
+
+    // return $requirement . (string) $block_content;
+    // }
+
+    public function create_block_requirement_block_init() {
+        $block_json_path = YAY_WHOLESALE_PLUGIN_DIR . 'assets/dist/blocks/requirement-block/block.json';
+
+        if ( ! file_exists( $block_json_path ) ) {
+            return;
+        }
+
+        // Register block with feature context for render.php
+        // Frontend data localization handled via wp_interactivity_state() in render.php
+        register_block_type(
+            $block_json_path,
+            []
+        );
+    }
+
+    public function enqueue_view_script() {
+        // Only enqueue if block is present on the page
+        // if ( ! has_block( 'yayboost/free-shipping-bar' ) ) {
+        // return;
+        // }
+
+        $view_asset_path = YAY_WHOLESALE_PLUGIN_DIR . 'assets/dist/blocks/requirement-block/view.asset.php';
+        if ( ! file_exists( $view_asset_path ) ) {
+            return;
+        }
+
+        $view_asset = require $view_asset_path;
+        wp_enqueue_script(
+            'ywhs_requirement_view',
+            YAY_WHOLESALE_PLUGIN_DIR . 'assets/dist/blocks/requirement-block/view.js',
+            $view_asset['dependencies'],
+            $view_asset['version'],
+            true
+        );
+        wp_script_add_data( 'ywhs_requirement_view', 'type', 'module' );
     }
 }

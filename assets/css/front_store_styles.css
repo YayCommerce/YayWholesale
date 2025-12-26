@@ -115,7 +115,9 @@
 
 .ywhs_requirement_progress_bar {
     background-color: rgba(34,113,177,0.04);
-    width: 100%;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
     padding: 10px;
     border-radius: 10px;
     height: fit-content;

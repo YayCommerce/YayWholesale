@@ -5,6 +5,8 @@ jQuery(document).ready(() => {
         var formData = jQuery(this).serialize();
         var yayWholesale = window.yayWholesale;
 
+        jQuery("#ywhs_request_form button[type='submit']").css('opacity', '0.5');
+
         jQuery("#ywhs_request_form button[type='submit']").attr("disabled", "disabled");
 
         jQuery.ajax({
@@ -24,6 +26,7 @@ jQuery(document).ready(() => {
             error: (jqXHR, textStatus, errorThrown) => {
                 alert("Failed");
                 jQuery("#ywhs_request_form button[type='submit']").removeAttr("disabled");
+                jQuery("#ywhs_request_form button[type='submit']").css('opacity', '1');
             }
         })
     });
