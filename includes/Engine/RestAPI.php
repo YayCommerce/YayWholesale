@@ -1,6 +1,7 @@
 <?php
 namespace Yay_Wholesale\Engine;
 
+use Yay_Wholesale\Controllers\PricesRestController;
 use Yay_Wholesale\Controllers\ReportsRestController;
 use Yay_Wholesale\Controllers\RequestRestController;
 use Yay_Wholesale\Controllers\RolesRestController;
@@ -29,5 +30,6 @@ class RestAPI {
         RequestRestController::get_instance();
         WholeSalersController::get_instance();
         ReportsRestController::get_instance();
+        PricesRestController::get_instance();
     }
 }

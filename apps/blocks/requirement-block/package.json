@@ -6,6 +6,7 @@
 	"license": "GPL-2.0-or-later",
 	"main": "build/index.js",
 	"scripts": {
+		"dev": "wp-scripts start --experimental-modules --webpack-src-dir=src/ --output-path=../../../assets/dist/blocks/",
 		"build": "wp-scripts build --experimental-modules --webpack-src-dir=src/ --output-path=../../../assets/dist/blocks/",
 		"format": "wp-scripts format",
 		"lint:css": "wp-scripts lint-style",
