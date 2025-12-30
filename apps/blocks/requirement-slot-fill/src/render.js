@@ -77,14 +77,14 @@ const Render = () => {
             let isEmpty = true;
             let phrases = [];
 
-            if ( lackOfQty > 0 ) {
+            if ( lackOfQty > 0 && lackOfQty < wholesale.minOrderQuantity) {
                 isEmpty  = false;
                 phrases.push(lackOfQty > 1
                 ? sprintf(__('<strong>%d products</strong>', 'yay-wholesale'), lackOfQty)
                 : __('<strong>1 product</strong>', 'yay-wholesale'));
             }
 
-            if ( lackOfAmt > 0 ) {
+            if ( lackOfAmt > 0 && lackOfAmt < wholesale.minOrderAmount) {
                 isEmpty  = false;
                 let price     = parseWPCurrency(lackOfAmt) ;
                 phrases.push(`<strong>${price}</strong>`);

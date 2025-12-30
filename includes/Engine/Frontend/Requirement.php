@@ -22,6 +22,7 @@ class Requirement {
 
         add_action( 'wp_enqueue_scripts', [ $this, 'enqueue_wholesale_requirement' ], 999 );
         add_action( 'init', [ $this, 'create_block_requirement_block_init' ], 999 );
+        add_filter( 'render_block_woocommerce/mini-cart-footer-block', [ $this, 'automatically_add_to_mini_cart' ], 999 );
     }
 
     /**
@@ -55,7 +56,7 @@ class Requirement {
             $is_empty = true;
             $phrases  = [];
 
-            if ( $lack_of_qty > 0 ) {
+            if ( $lack_of_qty > 0 && $lack_of_qty < $wholesale['minOrderQuantity'] ) {
                 $is_empty  = false;
                 $phrases[] = '<strong>' . ( $lack_of_qty > 1
                 ? sprintf(
@@ -66,7 +67,7 @@ class Requirement {
                 : __( '1 product', 'yay-wholesale' ) ) . '</strong>';
             }
 
-            if ( $lack_of_amt > 0 ) {
+            if ( $lack_of_amt > 0 && $lack_of_amt < $wholesale['minOrderAmount'] ) {
                 $is_empty  = false;
                 $price     = wc_price( $lack_of_amt );
                 $phrases[] = "<strong>$price</strong>";
@@ -207,6 +208,9 @@ class Requirement {
         }//end if
     }
 
+    /**
+     * Register new block type of Wholesale Requirement
+     */
     public function create_block_requirement_block_init() {
         $block_json_path = YAY_WHOLESALE_PLUGIN_DIR . 'assets/dist/blocks/requirement-block/block.json';
 
@@ -218,5 +222,16 @@ class Requirement {
             $block_json_path,
             []
         );
+    }
+
+    /**
+     * Automatically add requirement block to mini cart block of woocommerce
+     */
+    public function automatically_add_to_mini_cart( $block_content ) {
+        // Your custom block HTML
+        $custom_block         = '<!-- wp:yay-wholesale/requirement-block /-->';
+        $custom_block_content = do_blocks( $custom_block );
+
+        return $custom_block_content . $block_content;
     }
 }

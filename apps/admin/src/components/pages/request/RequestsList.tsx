@@ -348,56 +348,58 @@ export default function RequestsList() {
             </BulkActionBox>
           )}
 
-          <div className="flex items-center gap-4">
-            <span className="text-base-secondary text-sm font-normal">
-              {sprintf(
-                __('Page %d of %d'),
-                table.getState().pagination.pageIndex + 1,
-                table.getPageCount(),
-              )}
-            </span>
+          {table.getPageCount() > 1 && (
+            <div className="flex items-center gap-4">
+              <span className="text-base-secondary text-sm font-normal">
+                {sprintf(
+                  __('Page %d of %d'),
+                  table.getState().pagination.pageIndex + 1,
+                  table.getPageCount(),
+                )}
+              </span>
 
-            <div className="flex items-center gap-1">
-              <Button
-                variant="outline"
-                size="icon"
-                className="h-9 w-9 rounded-sm"
-                onClick={() => table.previousPage()}
-                disabled={!table.getCanPreviousPage()}
-              >
-                <ChevronLeft className="h-4 w-4" />
-              </Button>
-              <Button
-                variant="outline"
-                size="icon"
-                className="h-9 w-9 rounded-sm"
-                onClick={() => table.nextPage()}
-                disabled={!table.getCanNextPage()}
-              >
-                <ChevronRight className="h-4 w-4" />
-              </Button>
-            </div>
+              <div className="flex items-center gap-1">
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="h-9 w-9 rounded-sm"
+                  onClick={() => table.previousPage()}
+                  disabled={!table.getCanPreviousPage()}
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="h-9 w-9 rounded-sm"
+                  onClick={() => table.nextPage()}
+                  disabled={!table.getCanNextPage()}
+                >
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              </div>
 
-            <div className="flex items-center gap-2">
-              <span className="text-base-secondary text-sm font-normal">{__('Go to')}</span>
-              <InputNumberRoot
-                min={1}
-                max={table.getPageCount()}
-                value={table.getState().pagination.pageIndex + 1}
-                onValueChange={(value) => {
-                  if (isFetchingRequests) return;
-                  const page = value ? Number(value) - 1 : 0;
-                  if (page >= 0 && page < table.getPageCount()) {
-                    table.setPageIndex(page);
-                  }
-                }}
-                className="text-base-secondary h-9 w-15 rounded-sm text-sm font-normal focus-visible:ring-0"
-                disabled={isFetchingRequests || table.getPageCount() <= 1}
-              >
-                <InputNumberInput className="disabled:bg-base-muted w-full shadow-xs disabled:text-black" />
-              </InputNumberRoot>
+              <div className="flex items-center gap-2">
+                <span className="text-base-secondary text-sm font-normal">{__('Go to')}</span>
+                <InputNumberRoot
+                  min={1}
+                  max={table.getPageCount()}
+                  value={table.getState().pagination.pageIndex + 1}
+                  onValueChange={(value) => {
+                    if (isFetchingRequests) return;
+                    const page = value ? Number(value) - 1 : 0;
+                    if (page >= 0 && page < table.getPageCount()) {
+                      table.setPageIndex(page);
+                    }
+                  }}
+                  className="text-base-secondary h-9 w-15 rounded-sm text-sm font-normal focus-visible:ring-0"
+                  disabled={isFetchingRequests || table.getPageCount() <= 1}
+                >
+                  <InputNumberInput className="disabled:bg-base-muted w-full shadow-xs disabled:text-black" />
+                </InputNumberRoot>
+              </div>
             </div>
-          </div>
+          )}
         </div>
       )}
     </Card>

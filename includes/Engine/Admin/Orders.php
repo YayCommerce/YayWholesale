@@ -34,32 +34,6 @@ class Orders {
     }
 
     /**
-     * Check if the order meets the condition of wholesale role
-     *
-     * @param \WC_Order $order The order object.
-     * @param array     $wholesale_role the wholesale role.
-     * @return bool
-     */
-    protected function check_is_discounted( \WC_Order $order, array $wholesale_role ) {
-        $quantity = $order->get_item_count();
-        $subtotal = 0;
-
-        remove_filter( 'woocommerce_product_get_price', [ Pricing::get_instance(), 'get_price' ], 99, 2 );
-        // Calculate the subtotal with original unit price
-        foreach ( $order->get_items() as $item ) {
-            if ( ! $item instanceof \WC_Order_Item_Product ) {
-                continue;
-            }
-            $product   = $item->get_product();
-            $subtotal += $product->get_price() * $item->get_quantity();
-        }
-        $is_discounted = isset( $wholesale_role ) && PricingHelper::meets_discount_conditions( $wholesale_role, $quantity, $subtotal );
-        add_filter( 'woocommerce_product_get_price', [ Pricing::get_instance(), 'get_price' ], 99, 2 );
-
-        return $is_discounted;
-    }
-
-    /**
      * Set the order data discounted when the admin recalculates orders or new order has just created
      *
      * @param bool      $and_taxes the taxes included flag.
@@ -76,7 +50,7 @@ class Orders {
         remove_filter( 'woocommerce_order_is_vat_exempt', [ $this, 'tax_enabled_handler' ], 999, 2 );
         remove_filter( 'woocommerce_calc_tax', [ Tax::get_instance(), 'maybe_disable_tax_calc' ], 9999 );
 
-        $is_discounted = $this->check_is_discounted( $order, $wholesale_role );
+        $is_discounted = PricingHelper::check_is_discounted( $order, $wholesale_role );
 
         // Force tax exempted (default is the value of 'is_vat_exempt' in meta_data of order)
         $is_force_tax_exempt = apply_filters( 'woocommerce_order_is_vat_exempt', 'yes' === $order->get_meta( 'is_vat_exempt' ), $order );
@@ -101,34 +75,7 @@ class Orders {
         $order->update_taxes();
 
         // Update meta data for filter
-        if ( $is_discounted ) {
-            $order->update_meta_data( '_ywhs_wholesale_role', $wholesale_role['name'] );
-
-            // Send email when new wholesale order has just been placed
-            $email_trigger = (int) $order->get_meta( '_ywhs_wholesale_email_trigger' );
-            // This hook runs twice, check the trigger <= 1
-            if ( ( ! isset( $email_trigger ) || $email_trigger <= 1 ) && 'wc_checkout_draft' !== $order->get_status() ) {
-                do_action( 'yhs_new_wholesale_order_placed', $order->get_id(), $order );
-                $order->add_meta_data( '_ywhs_wholesale_email_trigger', $email_trigger++ );
-            }
-        } else {
-            $order->delete_meta_data( '_ywhs_wholesale_role' );
-        }
-
-        $default_range_transient = get_transient( ReportsHelper::REPORT_DATE_RANGE_TRANSIENT );
-        if ( false !== $default_range_transient ) {
-            $transient_key = ReportsHelper::REPORT_TRANSIENT
-                            . '_'
-                            . $default_range_transient['default_compare_start_date']
-                            . '_'
-                            . $default_range_transient['default_compare_end_date']
-                            . '_'
-                            . $default_range_transient['default_start_date']
-                            . '_'
-                            . $default_range_transient['default_end_date'];
-
-            delete_transient( $transient_key );
-        }
+        PricingHelper::handle_order( $order, $wholesale_role, $is_discounted );
 
         add_filter( 'woocommerce_order_is_vat_exempt', [ $this, 'tax_enabled_handler' ], 999, 2 );
         add_filter( 'woocommerce_calc_tax', [ Tax::get_instance(), 'maybe_disable_tax_calc' ], 9999 );
@@ -150,7 +97,7 @@ class Orders {
         $setting         = SettingsHelper::get_settings();
         $is_disabled_tax = $setting['general']['disable_tax'] ?? false;
 
-        $is_discounted = $this->check_is_discounted( $order, $wholesale_role );
+        $is_discounted = PricingHelper::check_is_discounted( $order, $wholesale_role );
         if ( $is_discounted && $is_disabled_tax ) {
             return true;
         }

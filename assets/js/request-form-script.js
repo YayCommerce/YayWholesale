@@ -1,4 +1,8 @@
 jQuery(document).ready(() => {
+    jQuery(".ywhs_request_form_error").hide();
+
+    const {__} = window.wp.i18n;
+
     jQuery("#ywhs_request_form").on("submit", function (e) {
         e.preventDefault();
 
@@ -20,13 +24,22 @@ jQuery(document).ready(() => {
               },
             data: formData,
             success: (response) => {
-                jQuery("#ywhs_success_notice").show();
-                jQuery("#ywhs_request_form").hide();
+                    jQuery("#ywhs_success_notice").show();
+                    jQuery("#ywhs_request_form").hide();
+                    jQuery(this).siblings(".ywhs_request_form_error").hide();
             },
             error: (jqXHR, textStatus, errorThrown) => {
-                alert("Failed");
                 jQuery("#ywhs_request_form button[type='submit']").removeAttr("disabled");
                 jQuery("#ywhs_request_form button[type='submit']").css('opacity', '1');
+                jQuery(this).siblings(".ywhs_request_form_error").show();
+                const defautMsg  = __("Unexpected Error Occured", "yay-wholesale");
+                try {
+                    data = JSON.parse(jqXHR.responseText);
+                    jQuery(this).siblings(".ywhs_form_error_msg").text(data.message ? data.message : defautMsg);
+                }
+                catch {
+                    jQuery(this).siblings(".ywhs_form_error_msg").text(defautMsg);
+                }
             }
         })
     });

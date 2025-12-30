@@ -144,14 +144,14 @@ const { state } = store('ywhs_wholesale_requirement', {
                 let isEmpty = true;
                 let phrases = [];
 
-                if ( lackOfQty > 0 ) {
+                if ( lackOfQty > 0  && lackOfQty < wholesaleRole.minOrderQuantity) {
                     isEmpty  = false;
                     phrases.push(lackOfQty > 1
                     ? sprintf(__('<strong>%d products</strong>', 'yay-wholesale'), lackOfQty)
                     : __('<strong>1 product</strong>', 'yay-wholesale'));
                 }
 
-                if ( lackOfAmt > 0 ) {
+                if ( lackOfAmt > 0 && lackOfAmt < wholesaleRole.minOrderAmount) {
                     isEmpty  = false;
                     let price     = parseWPCurrency(lackOfAmt) ;
                     phrases.push(`<strong>${price}</strong>`);
