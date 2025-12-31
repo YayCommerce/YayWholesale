@@ -84,7 +84,7 @@ export const RolesColumn: ColumnDef<RolesListValues & { count: number }>[] = [
                 {row.original.name}
               </div>
             }
-            content={<span>{__('Default role')}</span>}
+            content={<span>{__('Default role', 'yay-wholesale')}</span>}
           />
         </div>
       ) : (
@@ -140,7 +140,7 @@ export const RolesColumn: ColumnDef<RolesListValues & { count: number }>[] = [
             {__('MOQ', 'yay-wholesale')}
           </div>
         }
-        content={<span>{__('Minimum order quantity')}</span>}
+        content={<span>{__('Minimum order quantity', 'yay-wholesale')}</span>}
       />
     ),
     cell: (column) => <div className="text-center">{column.row.original.minOrderQuantity}</div>,
@@ -156,7 +156,7 @@ export const RolesColumn: ColumnDef<RolesListValues & { count: number }>[] = [
             {__('MOA', 'yay-wholesale')}
           </div>
         }
-        content={<span>{__('Minimum order amount')}</span>}
+        content={<span>{__('Minimum order amount', 'yay-wholesale')}</span>}
       />
     ),
     cell: (column) => (
@@ -210,7 +210,7 @@ export const RolesColumn: ColumnDef<RolesListValues & { count: number }>[] = [
                     <PencilLine className="size-4" />
                   </Button>
                 }
-                content={<span>{__('Edit role')}</span>}
+                content={<span>{__('Edit role', 'yay-wholesale')}</span>}
               />
 
               {!row.original.isDefault ? (
@@ -229,7 +229,7 @@ export const RolesColumn: ColumnDef<RolesListValues & { count: number }>[] = [
                       <DeleteIcon className="size-4" />
                     </Button>
                   }
-                  content={<span>{__('Delete role')}</span>}
+                  content={<span>{__('Delete role', 'yay-wholesale')}</span>}
                 />
               ) : (
                 <WholeSaleToolTip
@@ -243,7 +243,7 @@ export const RolesColumn: ColumnDef<RolesListValues & { count: number }>[] = [
                       <EditIcon className="size-4" />
                     </Button>
                   }
-                  content={<span>{__('Setting')}</span>}
+                  content={<span>{__('Setting', 'yay-wholesale')}</span>}
                 />
               )}
             </div>

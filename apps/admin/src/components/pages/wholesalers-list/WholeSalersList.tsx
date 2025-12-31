@@ -143,7 +143,7 @@ export default function WholeSalersList() {
             >
               <Plus className="h-4 w-4" />
               <span className="text-[12px] text-nowrap sm:text-[14px]">
-                {__('Add New Wholesaler')}
+                {__('Add New Wholesaler', 'yay-wholesale')}
               </span>
             </Button>
           </a>
@@ -238,7 +238,7 @@ export default function WholeSalersList() {
           {!isBulkUpdateWholesalersPending && (
             <BulkActionBox selected={selectedCount} onClose={() => table.resetRowSelection()}>
               <span className="text-sm font-normal text-[#151619]">
-                {sprintf(__('%d selected'), selectedCount)}
+                {sprintf(__('%d selected', 'yay-wholesale'), selectedCount)}
               </span>
               <Separator orientation="vertical" className="ml-2 h-5!" />
               <Popover>
@@ -247,7 +247,9 @@ export default function WholeSalersList() {
                     variant="ghost"
                     className="hover:text-primary hover:bg-primary/6 group bold flex cursor-pointer items-center gap-1.5 px-2.5"
                   >
-                    <span className="text-sm font-normal">{__('Wholesaler Role')}</span>
+                    <span className="text-sm font-normal">
+                      {__('Wholesaler Role', 'yay-wholesale')}
+                    </span>
                     <span className="group-hover:text-primary text-icon flex items-center">
                       <CaretUpDownIcon size={12} weight="bold" />
                     </span>
@@ -283,7 +285,7 @@ export default function WholeSalersList() {
             <div className="flex items-center gap-4">
               <span className="text-base-secondary text-sm font-normal">
                 {sprintf(
-                  __('Page %d of %d'),
+                  __('Page %d of %d', 'yay-wholesale'),
                   table.getState().pagination.pageIndex + 1,
                   table.getPageCount(),
                 )}
@@ -311,7 +313,9 @@ export default function WholeSalersList() {
               </div>
 
               <div className="flex items-center gap-2">
-                <span className="text-base-secondary text-sm font-normal">{__('Go to')}</span>
+                <span className="text-base-secondary text-sm font-normal">
+                  {__('Go to', 'yay-wholesale')}
+                </span>
                 <InputNumberRoot
                   min={1}
                   max={table.getPageCount()}

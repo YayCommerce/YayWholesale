@@ -262,7 +262,7 @@ export default function RequestsList() {
           {!(useBulkUpdateMutation.isPending || useBulkDeleteMutation.isPending) && (
             <BulkActionBox selected={selectedCount} onClose={() => table.resetRowSelection()}>
               <span className="text-sm font-normal text-[#151619]">
-                {sprintf(__('%d selected'), selectedCount)}
+                {sprintf(__('%d selected', 'yay-wholesale'), selectedCount)}
               </span>
               <Separator orientation="vertical" className="ml-2 h-5!" />
               <Popover>
@@ -271,7 +271,7 @@ export default function RequestsList() {
                     variant="ghost"
                     className="hover:text-primary hover:bg-primary/6 group bold flex cursor-pointer items-center gap-1.5 px-2.5"
                   >
-                    <span className="text-sm font-normal">{__('Status')}</span>
+                    <span className="text-sm font-normal">{__('Status', 'yay-wholesale')}</span>
                     <span className="group-hover:text-primary text-icon flex items-center">
                       <CaretUpDownIcon size={12} weight="bold" />
                     </span>
@@ -283,7 +283,7 @@ export default function RequestsList() {
                     <BulkActionMenu>
                       <BulkMenuButtonAndTrigger onClick={() => handleBulkStatusChange('approved')}>
                         <RequestsStatusIcon status="approved" className="mt-0.5" />
-                        {__('Approve')}
+                        {__('Approve', 'yay-wholesale')}
                       </BulkMenuButtonAndTrigger>
                       <BulkActionMenuContent>
                         {activeRoles?.map((role) => (
@@ -291,7 +291,7 @@ export default function RequestsList() {
                             onClick={() => handleBulkStatusChange('approved', role.id)}
                           >
                             <RequestsStatusIcon status="approved" />
-                            {sprintf(__('Approve to %s'), role.name)}
+                            {sprintf(__('Approve to %s', 'yay-wholesale'), role.name)}
                           </BulkActionButton>
                         ))}
                       </BulkActionMenuContent>
@@ -299,7 +299,7 @@ export default function RequestsList() {
 
                     <BulkActionButton onClick={() => handleBulkStatusChange('rejected')}>
                       <RequestsStatusIcon status="rejected" />
-                      {__('Reject')}
+                      {__('Reject', 'yay-wholesale')}
                     </BulkActionButton>
                   </div>
                 </PopoverContent>
@@ -352,7 +352,7 @@ export default function RequestsList() {
             <div className="flex items-center gap-4">
               <span className="text-base-secondary text-sm font-normal">
                 {sprintf(
-                  __('Page %d of %d'),
+                  __('Page %d of %d', 'yay-wholesale'),
                   table.getState().pagination.pageIndex + 1,
                   table.getPageCount(),
                 )}
@@ -380,7 +380,9 @@ export default function RequestsList() {
               </div>
 
               <div className="flex items-center gap-2">
-                <span className="text-base-secondary text-sm font-normal">{__('Go to')}</span>
+                <span className="text-base-secondary text-sm font-normal">
+                  {__('Go to', 'yay-wholesale')}
+                </span>
                 <InputNumberRoot
                   min={1}
                   max={table.getPageCount()}

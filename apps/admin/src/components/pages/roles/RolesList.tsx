@@ -106,12 +106,12 @@ export default function RolesList() {
     <Card className="gap-4 rounded-lg p-6 shadow-sm">
       {/* Header */}
       <div className="flex flex-nowrap items-center justify-between gap-3">
-        <h1 className="text-2xl font-bold">{__('Roles')}</h1>
+        <h1 className="text-2xl font-bold">{__('Roles', 'yay-wholesale')}</h1>
         <div className="flex flex-col-reverse flex-nowrap items-end gap-4 sm:flex-row sm:items-center">
           {roles.length > 10 && (
             <InputGroup className="w-full sm:w-80">
               <InputGroupInput
-                placeholder={__('Search')}
+                placeholder={__('Search', 'yay-wholesale')}
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
               />
@@ -126,7 +126,7 @@ export default function RolesList() {
             onClick={() => navigate('/roles/new')}
           >
             <Plus className="h-4 w-4" />
-            {__('Add New Role')}
+            {__('Add New Role', 'yay-wholesale')}
           </Button>
         </div>
       </div>
@@ -211,7 +211,7 @@ export default function RolesList() {
                   colSpan={table.getAllColumns().length}
                   className="h-32 text-center align-middle"
                 >
-                  {__('No roles found.')}
+                  {__('No roles found.', 'yay-wholesale')}
                 </TableCell>
               </TableRow>
             )}
@@ -234,7 +234,7 @@ export default function RolesList() {
           {!(isDeletingManyRolesPending || isBulkUpdatingRoleStatusPending) && (
             <BulkActionBox selected={selectedCount} onClose={() => table.resetRowSelection()}>
               <span className="text-sm font-normal text-[#151619]">
-                {sprintf(__('%d selected'), selectedCount)}
+                {sprintf(__('%d selected', 'yay-wholesale'), selectedCount)}
               </span>
               <Separator orientation="vertical" className="ml-2 h-5!" />
               <Popover>
@@ -243,7 +243,7 @@ export default function RolesList() {
                     variant="ghost"
                     className="hover:text-primary hover:bg-primary/6 group bold flex cursor-pointer items-center gap-1.5 px-2.5"
                   >
-                    <span className="text-sm font-normal">{__('Status')}</span>
+                    <span className="text-sm font-normal">{__('Status', 'yay-wholesale')}</span>
                     <span className="group-hover:text-primary text-icon flex items-center">
                       <CaretUpDownIcon size={12} weight="bold" />
                     </span>
@@ -264,7 +264,7 @@ export default function RolesList() {
                         )
                       }
                     >
-                      {__('Active')}
+                      {__('Active', 'yay-wholesale')}
                     </BulkActionButton>
 
                     <BulkActionButton
@@ -280,7 +280,7 @@ export default function RolesList() {
                         )
                       }
                     >
-                      {__('Inactive')}
+                      {__('Inactive', 'yay-wholesale')}
                     </BulkActionButton>
                   </div>
                 </PopoverContent>
@@ -335,7 +335,7 @@ export default function RolesList() {
             <div className="flex items-center gap-4">
               <span className="text-base-secondary text-sm font-normal">
                 {sprintf(
-                  __('Page %d of %d'),
+                  __('Page %d of %d', 'yay-wholesale'),
                   table.getState().pagination.pageIndex + 1,
                   table.getPageCount(),
                 )}
@@ -363,7 +363,9 @@ export default function RolesList() {
               </div>
 
               <div className="flex items-center gap-2">
-                <span className="text-base-secondary text-sm font-normal">{__('Go to')}</span>
+                <span className="text-base-secondary text-sm font-normal">
+                  {__('Go to', 'yay-wholesale')}
+                </span>
                 <InputNumberRoot
                   min={1}
                   max={table.getPageCount()}

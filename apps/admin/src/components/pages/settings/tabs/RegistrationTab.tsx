@@ -27,10 +27,13 @@ export default function RegistrationTab() {
           <div className="base-base-border flex items-center justify-between rounded-md border p-4">
             <div>
               <h2 className="text-base-secondary text-sm font-normal">
-                {__('Moderate new registrations')}
+                {__('Moderate new registrations', 'yay-wholesale')}
               </h2>
               <p className="text-base-muted-foreground mt-1 text-xs font-normal">
-                {__('Hold new wholesale registrations for moderation by an administrator.')}
+                {__(
+                  'Hold new wholesale registrations for moderation by an administrator.',
+                  'yay-wholesale',
+                )}
               </p>
             </div>
             <Switch size="md" checked={field.value} onCheckedChange={field.onChange} />
@@ -47,18 +50,18 @@ export default function RegistrationTab() {
           render={({ field }) => (
             <FormItem className="w-full">
               <FormLabel className="text-base-secondary space-y-2.5 text-xs font-medium">
-                {__('Wholesale registration page')}
+                {__('Wholesale registration page', 'yay-wholesale')}
               </FormLabel>
               <FormControl>
                 <Select defaultValue={field.value} onValueChange={field.onChange}>
                   <SelectTrigger className="w-full font-normal focus-visible:border-none focus-visible:ring-0 focus-visible:ring-offset-0">
-                    <SelectValue placeholder={__('Select a option')} />
+                    <SelectValue placeholder={__('Select a option', 'yay-wholesale')} />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="wholesale-registration">
-                      {__('Wholesale Registration')}
+                      {__('Wholesale Registration', 'yay-wholesale')}
                     </SelectItem>
-                    <SelectItem value="b2b-registration">{__('B2B Registration')}</SelectItem>
+                    <SelectItem value="b2b-registration">{__('B2B Registration', 'yay-wholesale')}</SelectItem>
                   </SelectContent>
                 </Select>
               </FormControl>
@@ -73,13 +76,13 @@ export default function RegistrationTab() {
           render={({ field }) => (
             <FormItem className="w-full">
               <FormLabel className="text-base-secondary space-y-2.5 text-xs font-medium">
-                {__('Submit button label')}
+                {__('Submit button label', 'yay-wholesale')}
               </FormLabel>
               <FormControl>
                 <Input
                   id="submit-label"
                   defaultValue={field.value}
-                  placeholder={__('Register now')}
+                  placeholder={__('Register now', 'yay-wholesale')}
                   className="w-full font-normal"
                   onChange={field.onChange}
                 />
@@ -96,7 +99,7 @@ export default function RegistrationTab() {
         render={({ field }) => (
           <FormItem className="w-full">
             <FormLabel className="text-base-secondary space-y-2.5 text-xs font-medium">
-              {__('Successful registration message')}
+              {__('Successful registration message', 'yay-wholesale')}
             </FormLabel>
             <FormControl>
               <Textarea
@@ -104,7 +107,7 @@ export default function RegistrationTab() {
                 rows={4}
                 defaultValue={field.value}
                 onChange={field.onChange}
-                placeholder={__('Enter your message here...')}
+                placeholder={__('Enter your message here...', 'yay-wholesale')}
                 className="w-full resize-none font-normal"
               />
             </FormControl>

@@ -1,14 +1,10 @@
 /vendor/
-apps/admin/node_modules
-apps/blocks/request-formm-block/node_modules
-apps/blocks/requirement-slot-fill/node_modules
-apps/blocks/requirement-block/node_modules
+node_modules/
 /assets/dist/*
 /release/dest/*
 /release/*.zip
 /blocks/dist/
 /blocks/build/*
-/blocks/node_modules
 /build
 /tools
 yay-wholesale-pro.zip

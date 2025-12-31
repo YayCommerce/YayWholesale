@@ -84,7 +84,7 @@ export function FieldRow({
             content={
               <div className="flex items-center gap-2">
                 <Info className="mt-6/7 h-3.5 w-3.5" />
-                {__('Field is hidden')}
+                {__('Field is hidden', 'yay-wholesale')}
               </div>
             }
           />

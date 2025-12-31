@@ -58,7 +58,9 @@ export default function RegistrationFieldsTab() {
       {/* Custom Fields */}
       <div>
         <div className="mb-3 flex justify-between">
-          <h3 className="mb-4 text-base font-medium text-[#000000]">{__('Registration Fields')}</h3>
+          <h3 className="mb-4 text-base font-medium text-[#000000]">
+            {__('Registration Fields', 'yay-wholesale')}
+          </h3>
           {/* Add new field */}
           <Button
             variant="primary-outline"
@@ -66,7 +68,7 @@ export default function RegistrationFieldsTab() {
             className="rounded-1.5 hover:bg-primary/10 gap-2 p-3 text-sm font-medium"
           >
             <Plus className="h-4 w-4" />
-            {__('Add New Field')}
+            {__('Add New Field', 'yay-wholesale')}
           </Button>
         </div>
         <Card className="m-0 rounded-md p-0 shadow-none">

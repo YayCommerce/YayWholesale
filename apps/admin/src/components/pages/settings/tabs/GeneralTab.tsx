@@ -39,12 +39,12 @@ export default function GeneralTab() {
         render={({ field }) => (
           <FormItem className="w-full">
             <FormLabel className="space-y-2.5 text-xs font-medium">
-              {__('Default role for new user')}
+              {__('Default role for new user', 'yay-wholesale')}
             </FormLabel>
             <FormControl>
               <Select value={field.value ? field.value : ''} onValueChange={field.onChange}>
                 <SelectTrigger className="w-[160px] text-sm font-normal">
-                  <SelectValue placeholder={__('Select a role')} />
+                  <SelectValue placeholder={__('Select a role', 'yay-wholesale')} />
                 </SelectTrigger>
                 <SelectContent>
                   {rolesList.map((role) => (
@@ -66,10 +66,10 @@ export default function GeneralTab() {
           <div className="base-base-border flex items-center justify-between rounded-md border p-4">
             <div>
               <h2 className="text-base-secondary text-sm font-normal">
-                Show Wholesale Price to non-wholesale users
+                {__('Show Wholesale Price to non-wholesale users', 'yay-wholesale')}
               </h2>
               <p className="text-base-muted-foreground mt-1 text-xs font-normal">
-                If enable, wholesale price will display for all users.
+                {__('If enable, wholesale price will display for all users.', 'yay-wholesale')}
               </p>
             </div>
             <Switch
@@ -88,9 +88,11 @@ export default function GeneralTab() {
         render={({ field }) => (
           <div className="base-base-border flex items-center justify-between rounded-lg border p-4">
             <div>
-              <h2 className="text-base-secondary text-sm font-normal">Disable coupon</h2>
+              <h2 className="text-base-secondary text-sm font-normal">
+                {__('Disable coupon', 'yay-wholesale')}
+              </h2>
               <p className="text-base-muted-foreground mt-1 text-xs font-normal">
-                Hide coupon field for wholesale users.
+                {__("Hide coupon field for wholesale users., 'yay-wholesale'")}
               </p>
             </div>
             <Switch size="md" checked={field.value} onCheckedChange={field.onChange} />
@@ -106,9 +108,11 @@ export default function GeneralTab() {
         render={({ field }) => (
           <div className="base-base-border flex items-center justify-between rounded-md border p-4">
             <div>
-              <h2 className="text-base-secondary text-sm font-normal">Disable tax</h2>
+              <h2 className="text-base-secondary text-sm font-normal">
+                {__('Disable tax', 'yay-wholesale')}
+              </h2>
               <p className="text-base-muted-foreground mt-1 text-xs font-normal">
-                Don't charge tax for wholesale users.
+                {__("Don't charge tax for wholesale users.", 'yay-wholesale')}
               </p>
             </div>
             <Switch size="md" checked={field.value} onCheckedChange={field.onChange} />

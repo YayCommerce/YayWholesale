@@ -26,21 +26,23 @@ export default function DisplayTab() {
           render={({ field }) => (
             <FormItem className="w-full">
               <FormLabel className="text-base-secondary space-y-2.5 text-xs font-medium">
-                {__('Display price format')}
+                {__('Display price format', 'yay-wholesale')}
               </FormLabel>
               <FormControl>
                 <Select defaultValue={field.value} onValueChange={field.onChange}>
                   <SelectTrigger id="display-price-format" className="w-full font-normal">
-                    <SelectValue placeholder={__('Select a option')} />
+                    <SelectValue placeholder={__('Select a option', 'yay-wholesale')} />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="retail-and-wholesale">
-                      {__('Show retail and wholesale prices')}
+                      {__('Show retail and wholesale prices', 'yay-wholesale')}
                     </SelectItem>
                     <SelectItem value="wholesale-only">
-                      {__('Show only wholesale prices')}
+                      {__('Show only wholesale prices', 'yay-wholesale')}
                     </SelectItem>
-                    <SelectItem value="retail-only">{__('Show only retail prices')}</SelectItem>
+                    <SelectItem value="retail-only">
+                      {__('Show only retail prices', 'yay-wholesale')}
+                    </SelectItem>
                   </SelectContent>
                 </Select>
               </FormControl>
@@ -56,14 +58,14 @@ export default function DisplayTab() {
           render={({ field }) => (
             <FormItem className="w-full">
               <FormLabel className="text-base-secondary space-y-2.5 text-xs font-medium">
-                {__('Wholesale price label')}
+                {__('Wholesale price label', 'yay-wholesale')}
               </FormLabel>
               <FormControl>
                 <Input
                   id="wholesale-price-label"
                   defaultValue={field.value}
                   onChange={field.onChange}
-                  placeholder={__('Wholesale price')}
+                  placeholder={__('Wholesale price', 'yay-wholesale')}
                   className="w-full font-normal"
                 />
               </FormControl>
@@ -80,7 +82,7 @@ export default function DisplayTab() {
         render={({ field }) => (
           <FormItem className="w-full">
             <FormLabel className="text-base-secondary space-y-2.5 text-xs font-medium">
-              {__('Wholesale price color')}
+              {__('Wholesale price color', 'yay-wholesale')}
             </FormLabel>
             <FormControl>
               <ColorPicker
