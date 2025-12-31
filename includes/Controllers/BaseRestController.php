@@ -35,7 +35,7 @@ abstract class BaseRestController {
      * @return WP_REST_Response The response object.
      */
     protected function error( string $message, int $status = 400 ): WP_REST_Response {
-        return rest_ensure_response(
+        return new WP_REST_Response(
             [
                 'success' => false,
                 'message' => $message,

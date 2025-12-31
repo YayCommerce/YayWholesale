@@ -51,7 +51,10 @@ export const RolesColumn: ColumnDef<RolesListValues & { count: number }>[] = [
       return (
         <Label
           htmlFor={id}
-          className="flex h-full w-full cursor-pointer items-center justify-center px-4"
+          className={cn(
+            'flex h-full w-full items-center justify-center px-4',
+            row.original.isDefault ? 'cursor-no-drop' : 'cursor-pointer',
+          )}
         >
           <Checkbox
             id={id}
@@ -77,7 +80,7 @@ export const RolesColumn: ColumnDef<RolesListValues & { count: number }>[] = [
         <div className="flex gap-2">
           <WholeSaleToolTip
             trigger={
-              <div className="hover:underline hover:decoration-dotted hover:underline-offset-3">
+              <div className="border-border inline-block border-b-2 border-dotted pb-px">
                 {row.original.name}
               </div>
             }
@@ -191,68 +194,67 @@ export const RolesColumn: ColumnDef<RolesListValues & { count: number }>[] = [
 
       return (
         <AlertDialog open={openDialog} onOpenChange={setOpenDialog}>
-          <div className="relative flex w-15 justify-end">
-            <div className="relative flex items-center">
-              <Button
-                size="icon"
-                variant="ghost"
-                className="text-base-muted-foreground flex transition group-hover:hidden"
-              >
-                <Ellipsis className="size-4" />
-              </Button>
-              <div className="absolute top-1/2 right-0 hidden -translate-y-1/2 items-center gap-0 group-hover:flex">
+          <div className="flex w-10 items-center justify-end gap-2">
+            <div className="peer flex justify-end gap-1.5 opacity-0 group-hover:opacity-100 has-data-[state='delayed-open']:opacity-100">
+              <WholeSaleToolTip
+                trigger={
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    onClick={() => {
+                      queryClient.setQueryData(['role', row.original.id], row.original);
+                      navigate(`/roles/edit/${row.original.id}`);
+                    }}
+                    className="hover:text-primary text-base-muted-foreground transition hover:bg-[#FFFFFF] hover:shadow-xs"
+                  >
+                    <PencilLine className="size-4" />
+                  </Button>
+                }
+                content={<span>{__('Edit role')}</span>}
+              />
+
+              {!row.original.isDefault ? (
                 <WholeSaleToolTip
                   trigger={
                     <Button
                       size="icon"
                       variant="ghost"
-                      onClick={() => {
-                        queryClient.setQueryData(['role', row.original.id], row.original);
-                        navigate(`/roles/edit/${row.original.id}`);
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setOpenDialog(true);
                       }}
-                      className="hover:text-primary text-base-muted-foreground transition hover:bg-[#FFFFFF] hover:shadow-xs"
+                      disabled={isDeletingRolePending}
+                      className="hover:text-destructive text-base-muted-foreground hover:bg-white hover:shadow-xs"
                     >
-                      <PencilLine className="size-4" />
+                      <DeleteIcon className="size-4" />
                     </Button>
                   }
-                  content={<span>{__('Edit role')}</span>}
+                  content={<span>{__('Delete role')}</span>}
                 />
-
-                {!row.original.isDefault ? (
-                  <WholeSaleToolTip
-                    trigger={
-                      <Button
-                        size="icon"
-                        variant="ghost"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setOpenDialog(true);
-                        }}
-                        disabled={isDeletingRolePending}
-                        className="hover:text-destructive text-base-muted-foreground hover:bg-white hover:shadow-xs"
-                      >
-                        <DeleteIcon className="size-4" />
-                      </Button>
-                    }
-                    content={<span>{__('Delete role')}</span>}
-                  />
-                ) : (
-                  <WholeSaleToolTip
-                    trigger={
-                      <Button
-                        size="icon"
-                        variant="ghost"
-                        onClick={() => navigate(`/settings/general`)}
-                        className="hover:text-primary text-base-muted-foreground hover:bg-wh transition hover:shadow-xs"
-                      >
-                        <EditIcon className="size-4" />
-                      </Button>
-                    }
-                    content={<span>{__('Setting')}</span>}
-                  />
-                )}
-              </div>
+              ) : (
+                <WholeSaleToolTip
+                  trigger={
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      onClick={() => navigate(`/settings/general`)}
+                      className="hover:text-primary text-base-muted-foreground transition hover:bg-white hover:shadow-xs"
+                    >
+                      <EditIcon className="size-4" />
+                    </Button>
+                  }
+                  content={<span>{__('Setting')}</span>}
+                />
+              )}
             </div>
+
+            <Button
+              size="icon"
+              variant="ghost"
+              className="text-base-muted-foreground absolute z-1 mr-0.5 flex h-8 w-8 duration-75 group-hover:-z-10 peer-has-data-[state='delayed-open']:-z-10"
+            >
+              <Ellipsis className="h-4 w-4" />
+            </Button>
           </div>
           <AlertDialogContent>
             <AlertDialogHeader>

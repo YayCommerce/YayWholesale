@@ -13,6 +13,7 @@ import RolesIcon from '@/components/icons/RolesIcon';
 import SettingsIcon from '@/components/icons/SettingsIcon';
 
 import { WholeSaleToolTip } from '../custom/WholeSaleToolTip';
+import WholesalersIcon from '../icons/WholesalersIcon';
 import { Badge } from '../ui/badge';
 import { HeaderNavMenuItem, HeaderNavMenuList } from '../ui/navmenu-header';
 
@@ -40,7 +41,7 @@ const NAV_ITEMS = [
               <div>
                 <Badge
                   variant="destructive"
-                  className={cn('h-2 w-fit px-1.5 py-2', props.classname)}
+                  className={cn('h-5 min-w-5 rounded-full px-1 tabular-nums', props.classname)}
                 >
                   {data.count}
                 </Badge>
@@ -60,8 +61,8 @@ const NAV_ITEMS = [
   {
     path: '/wholesalers-list/*',
     to: '/wholesalers-list',
-    icon: RolesIcon,
-    label: 'Wholesalers List',
+    icon: WholesalersIcon,
+    label: 'Wholesalers',
     side: () => <></>,
   },
   { path: '/roles/*', to: '/roles', icon: RolesIcon, label: 'Roles', side: () => <></> },
@@ -128,7 +129,7 @@ export default function Header() {
             >
               <span className="relative">
                 <Icon />
-                <Side classname="absolute flex lg:hidden right-0.5 top-0.5 w-fit h-3 text-[7px] py-0 px-1 translate-x-1/2 -translate-y-1/2" />
+                <Side classname="absolute flex lg:hidden right-0.5 top-0.5 w-fit text-[7px] h-3 min-w-3 translate-x-1/2 -translate-y-1/2" />
               </span>
               <span className="hidden sm:inline">{__(label)}</span>
               <span>

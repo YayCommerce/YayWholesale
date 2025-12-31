@@ -42,12 +42,12 @@ class ReportsHelper {
             $revenue    += $order->get_subtotal();
             $customer_id = $order->get_customer_id();
             $order_role  = $order->get_meta( '_ywhs_wholesale_role' );
-            if ( isset( $top_wholesaler[ $customer_id ] ) && $order_role === $top_wholesaler[ $customer_id ]['role'] ) {
-                $top_wholesaler[ $customer_id ]['order_count'] += 1;
+            if ( isset( $top_wholesaler[ $customer_id ] ) ) {
+                $top_wholesaler[ $customer_id ]['orderCount'] += 1;
             } else {
                 $top_wholesaler[ $customer_id ] = [
-                    'role'        => $order_role,
-                    'order_count' => 1,
+                    'role'       => $order_role,
+                    'orderCount' => 1,
                 ];
             }
 
@@ -82,8 +82,18 @@ class ReportsHelper {
         $revenue_increase_rate   = round( ( $revenue - $compare_revenue ) / max( 1, $compare_revenue ) * 100, 2 );
         $wholesale_increase_rate = round( ( count( $top_wholesaler ) - count( $compare_wholesalers ) ) / max( 1, count( $compare_wholesalers ) ) * 100, 2 );
 
-        arsort( $top_wholesaler );
-        arsort( $top_product );
+        uasort(
+            $top_wholesaler,
+            function ( $a, $b ) {
+                return $b['orderCount'] <=> $a['orderCount'];
+            }
+        );
+        uasort(
+            $top_product,
+            function ( $a, $b ) {
+                return $b['orderCount'] <=> $a['orderCount'];
+            }
+        );
 
         return [
             'revenue'                 => $revenue,
@@ -119,7 +129,7 @@ class ReportsHelper {
                 if ( ! $user instanceof \WP_User ) {
                     continue;
                 }
-                $amount    = $top_wholesaler[ $user->ID ]['order_count'];
+                $amount    = $top_wholesaler[ $user->ID ]['orderCount'];
                 $user_role = array_values(
                     array_filter(
                         $user->roles,

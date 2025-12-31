@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { Crown } from 'lucide-react';
@@ -21,11 +22,11 @@ export default function TopProducts(props: { reportQuery: ReturnType<typeof useR
   const { data: reportData, isFetching, isLoading } = props.reportQuery;
 
   return (
-    <Card className="mt-0 rounded-lg py-0 shadow-none">
-      <CardContent className="p-5">
+    <Card className="mt-0 flex h-full flex-col rounded-lg py-0 shadow-none">
+      <CardContent className="flex min-h-0 flex-1 flex-col gap-5 p-5">
         {/* Header */}
-        <div className="mb-3 flex items-center justify-between">
-          <h3 className="text-base-foreground font-semibold">
+        <div className="flex items-center justify-between">
+          <h3 className="text-base-foreground text-[16px] font-semibold">
             {__('Top Products', 'yay-wholesale')}
           </h3>
         </div>
@@ -33,13 +34,13 @@ export default function TopProducts(props: { reportQuery: ReturnType<typeof useR
         {/* DataTable */}
         <div
           className={cn(
-            'overflow-x-auto rounded-md border bg-white',
+            'min-h-0 flex-1 overflow-x-auto rounded-md border bg-white',
             isFetching && 'relative opacity-50',
           )}
         >
           <Table className="divide-muted min-w-full divide-y">
             <TableHeader className="text-base-foreground bg-base-muted h-10">
-              <TableRow className="text-base-foreground bg-muted text-[14px] font-semibold">
+              <TableRow className="text-base-foreground text-[14px] font-semibold">
                 <TableHead className="text-base-foreground text-[14px]">
                   <span className="flex items-center justify-center font-medium">
                     {__('No', 'yay-wholesale')}
@@ -60,7 +61,7 @@ export default function TopProducts(props: { reportQuery: ReturnType<typeof useR
                 </TableHead>
               </TableRow>
             </TableHeader>
-            <TableBody className="divide-muted divide-y">
+            <TableBody className="divide-muted border-muted divide-y border-b">
               {isLoading ? (
                 <TableRow>
                   <TableCell colSpan={4} className="h-32 text-center align-middle">

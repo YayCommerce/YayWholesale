@@ -135,27 +135,38 @@ class RequestRestController extends BaseRestController {
 
         $wholesale_id = RequestsHelper::insert_whs_request( $current_user, $params );
 
+        if ( $wholesale_id < 0 ) {
+            return $this->error( __( 'Failed to register this request', 'yay-wholesale' ) );
+        }
+
         $settings = SettingsHelper::get_settings();
-        if ( $wholesale_id > 0 && ! $settings['registration']['moderate'] ) {
+        if ( ! $settings['registration']['moderate'] ) {
             $roles        = get_option( 'yay_wholesale_roles', [] );
             $active_roles = array_values( array_filter( $roles, fn( $r ) => $r['status'] ) );
             $role_slug    = $settings['general']['default_role'];
             $role         = array_values( array_filter( $active_roles, fn( $r ) => $r['slug'] === $role_slug ) )[0] ?? null;
             if ( ! isset( $role ) ) {
-                return $this->error( __( 'The default role is inactive, please set the default active or change the default role to continue', 'yay-wholesale' ), 404 );
+                do_action( 'yhs_account_registration_pending', $wholesale_id );
+                return $this->error( __( 'The default role is inactive, your request is changed to pending', 'yay-wholesale' ), 404 );
             }
 
             try {
                 RequestsHelper::add_role_to_ywhs_request_author( $wholesale_id, $role_slug );
             } catch ( Exception $e ) {
+                do_action( 'yhs_account_registration_pending', $wholesale_id );
                 return $this->error( $e->getMessage(), 404 );
             }
 
             if ( ! RequestsHelper::update_whs_request( $wholesale_id, [ 'status' => RequestsHelper::APPROVED ] ) ) {
-                return $this->error( __( 'Role has been added to the request author, but cannot change the status', 'yay-wholesale' ), 404 );
+                do_action( 'yhs_account_registration_pending', $wholesale_id );
+                return $this->error( __( 'Role has been applied, but your request is still pending', 'yay-wholesale' ), 404 );
             }
 
+            // Trigger the email when a new wholesale account is approved.
             do_action( 'yhs_account_registration_approved', $wholesale_id );
+        } else {
+            // Trigger the email when a new wholesale account is pending.
+            do_action( 'yhs_account_registration_pending', $wholesale_id );
         }//end if
 
         return $this->success( [], __( 'Request Saved', 'yay-wholesale' ) );

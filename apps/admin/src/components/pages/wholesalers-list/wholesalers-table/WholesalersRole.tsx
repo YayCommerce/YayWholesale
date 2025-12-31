@@ -1,56 +1,47 @@
-import { useEffect, useState } from 'react';
-import { ChevronDown } from 'lucide-react';
+import { useState } from 'react';
+import { SelectGroup } from '@radix-ui/react-select';
 
 import { useActiveRolesQuery } from '@/lib/queries/roles';
 import { useUpdateWholesalersRoleMutation } from '@/lib/queries/wholesalers';
-import { Button } from '@/components/ui/button';
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuSub,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import RolesIcon from '@/components/icons/RolesIcon';
 
 export default function WholesalersRoleColumn({ role, userId }: { role: string; userId: number }) {
   const { data: roles } = useActiveRolesQuery();
-  const { mutate: updateRole, isPending: isUpdatingRole } =
+  const { mutateAsync: updateRole, isPending: isUpdatingRole } =
     useUpdateWholesalersRoleMutation(userId);
 
-  const handleRoleChange = (roleKey: string) => {
-    updateRole({ roleSlug: roleKey });
+  const [currentRole, setCurrentRole] = useState(roles?.find((r) => r.slug === role)?.slug);
+
+  const handleRoleChange = async (roleKey: string) => {
+    await updateRole({ roleSlug: roleKey });
+    setCurrentRole(roleKey);
   };
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button
-          variant="outline"
-          className="flex w-45.5 items-center justify-between font-normal"
-          disabled={isUpdatingRole}
-        >
-          <span className="flex gap-2 overflow-hidden">
-            <RolesIcon role={role} className="mt-0.5 min-h-4 min-w-4" />
-            {roles?.find((r) => r.slug === role)?.name ?? role}
-          </span>
-          <ChevronDown className="text-muted-foreground/70 h-6 w-6 cursor-pointer" />
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-45.5">
-        <DropdownMenuGroup>
+    <Select value={currentRole} onValueChange={handleRoleChange}>
+      <SelectTrigger
+        disabled={isUpdatingRole}
+        className="hover:bg-accent flex w-45.5 items-center justify-between gap-2 overflow-hidden bg-white font-normal"
+      >
+        <SelectValue />
+      </SelectTrigger>
+      <SelectContent>
+        <SelectGroup>
           {roles?.map((roleItem) => (
-            <DropdownMenuItem
-              key={roleItem.slug}
-              disabled={roleItem.slug === role}
-              onClick={() => roleItem.slug !== role && handleRoleChange(roleItem.slug)}
-            >
-              <RolesIcon role={roleItem.slug} className="mt-0.5 min-h-4 min-w-4" /> {roleItem.name}
-            </DropdownMenuItem>
+            <SelectItem key={roleItem.id} value={roleItem.slug}>
+              <RolesIcon role={roleItem.slug} className="mt-0.5 min-h-4 min-w-4 text-[#333333]" />{' '}
+              <span className="truncate">{roleItem.name}</span>
+            </SelectItem>
           ))}
-        </DropdownMenuGroup>
-      </DropdownMenuContent>
-    </DropdownMenu>
+        </SelectGroup>
+      </SelectContent>
+    </Select>
   );
 }

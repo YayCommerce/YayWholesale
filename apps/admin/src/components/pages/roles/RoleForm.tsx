@@ -111,7 +111,7 @@ export default function RoleForm() {
                   </SheetDescription>
                 </div>
                 <SheetClose asChild>
-                  <button className="mt-1 text-[#67708066] hover:text-[#677080]">
+                  <button className="hover:text-muted-foreground mt-1 text-[#67708066]">
                     <X className="h-5 w-5" />
                   </button>
                 </SheetClose>

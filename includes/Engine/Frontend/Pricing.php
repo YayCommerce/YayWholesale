@@ -36,6 +36,7 @@ class Pricing {
         add_filter( 'woocommerce_get_price_html', [ $this, 'display_wholesale_price_html' ], 999, 2 );
 
         add_action( 'woocommerce_before_calculate_totals', [ $this, 'before_caculate_totals' ], 999, 1 );
+        add_action( 'woocommerce_checkout_order_processed', [ $this, 'checkout_wholesale_order_handling' ], 999, 3 );
     }
 
     /**
@@ -154,7 +155,7 @@ class Pricing {
      */
     protected function format_wholesale_only_price_html( \WC_Product $product ): string {
         $discount = PricingHelper::apply_wholesale_discount( $product->get_price( 'edit' ), $product, true );
-        return $this->get_wholesale_label_html() . wc_price( $discount );
+        return $this->get_wholesale_price_html( wc_price( $discount ) );
     }
 
     /**
@@ -174,8 +175,7 @@ class Pricing {
             : wc_price( $regular );
         $html .= '</span><br>';
         $html .= '<span class="yay-wholesale-price">'
-            . $this->get_wholesale_label_html()
-            . wc_price( $discounted )
+            . $this->get_wholesale_price_html( wc_price( $discounted ) )
             . '</span>';
 
         return $html;
@@ -241,11 +241,11 @@ class Pricing {
         ? wc_format_price_range( wc_price( $min_ws ), wc_price( $max_ws ) )
         : wc_price( $min_ws );
 
-        $label = $this->get_wholesale_label_html();
+        $label = $this->get_wholesale_price_html( $wholesale_price );
 
         // Wholesale-only mode
         if ( 'wholesale-only' === $display_mode || $is_wholesale_only ) {
-            $html = $label . $wholesale_price . $product->get_price_suffix();
+            $html = $label . $product->get_price_suffix();
             add_filter( 'woocommerce_get_price_html', [ $this, 'display_wholesale_price_html' ], 999, 2 );
             return $html;
         }
@@ -266,7 +266,13 @@ class Pricing {
         }
 
         $sale_html = wc_format_sale_price( $price_html, $wholesale_price );
-        $html      = str_replace( $wholesale_price, $label . $wholesale_price, $sale_html );
+
+        // Replace only the last found in the string
+        $pos = strrpos( $sale_html, $wholesale_price );
+        if ( false === $pos ) {
+            $pos = 0;
+        }
+        $html = substr_replace( $sale_html, $label, $pos, strlen( $wholesale_price ) );
 
         // Add the filter again
         add_filter( 'woocommerce_get_price_html', [ $this, 'display_wholesale_price_html' ], 999, 2 );
@@ -277,12 +283,14 @@ class Pricing {
     /**
      * Get the wholesale label HTML
      *
-     * @return string The wholesale label HTML.
+     * @param string $discounted_price_html the discounted price HTML.
+     * @return string The wholesale price HTML.
      */
-    protected function get_wholesale_label_html(): string {
+    protected function get_wholesale_price_html( string $discounted_price_html ): string {
         $label = $this->settings['display']['wholesale_price_label'] ?? __( 'Wholesale price', 'yay-wholesale' );
         $color = $this->settings['display']['wholesale_price_color'] ?? '#333333';
-        return '<span class="yay-wholesale-label" style="color:' . esc_attr( $color ) . '">' . esc_html( $label ) . ':</span> ';
+        return '<span class="yay-wholesale-label">' . esc_html( $label ) . ':</span> '
+                . '<span style="color:' . esc_attr( $color ) . '">' . $discounted_price_html . '</span>';
     }
 
     /**
@@ -304,5 +312,23 @@ class Pricing {
 
             $cart_item['data']->set_price( $new_price );
         }
+    }
+
+    /**
+     * Run when order has just been placed from the checkout hook
+     *
+     * @param int       $order_id The order object.
+     * @param array     $posted_data the data object.
+     * @param \WC_Order $order The order object.
+     */
+    public function checkout_wholesale_order_handling( $order_id, $posted_data, $order ) {
+        $customer_id    = $order->get_customer_id();
+        $wholesale_role = RolesHelper::is_wholesale_user( $customer_id );
+
+        $is_discounted = PricingHelper::check_is_discounted( $order, $wholesale_role );
+
+        PricingHelper::handle_order( $order, $wholesale_role, $is_discounted, false );
+
+        do_action( 'yhs_new_wholesale_order_placed', $order->get_id(), $order );
     }
 }

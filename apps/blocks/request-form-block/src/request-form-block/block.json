@@ -5,6 +5,7 @@
 	"version": "0.1.0",
 	"title": "Request Registration Form",
 	"category": "widgets",
+	"icon": "format-aside",
 	"description": "A block displaying yay-wholesale request registration form ",
 	"example": {},
 	"supports": {

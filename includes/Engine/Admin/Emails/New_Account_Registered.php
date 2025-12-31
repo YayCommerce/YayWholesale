@@ -20,7 +20,7 @@ class New_Account_Registered extends Wholesale_Email_Base {
     public function __construct() {
 
         $this->id             = 'yay_wholesale_new_account_registered';
-        $this->customer_email = true;
+        $this->customer_email = false;
         $this->title          = __( 'New wholesale account register', 'yay-wholesale' );
         $this->email_group    = 'wholesale_account';
         $this->description    = __( 'Notify when a user registers a wholesale account', 'yay-wholesale' );
@@ -34,6 +34,9 @@ class New_Account_Registered extends Wholesale_Email_Base {
 
         // Call parent constructor
         parent::__construct();
+
+        // Other settings.
+        $this->recipient = $this->get_option( 'recipient', get_option( 'admin_email' ) );
     }
 
     /**
@@ -144,9 +147,7 @@ class New_Account_Registered extends Wholesale_Email_Base {
 
         if ( $request_id ) {
             $this->object                         = RequestsHelper::get_request_by_id( $request_id );
-            $this->recipient                      = $this->object['email'];
             $this->placeholders['{account_name}'] = $this->object['name'];
-
         }
 
         if ( $this->is_enabled() && $this->get_recipient() ) {

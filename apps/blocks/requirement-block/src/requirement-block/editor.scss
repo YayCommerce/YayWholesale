@@ -1,99 +1,10 @@
-.price del.yay-wholesale-price-range, .price ins.yay-wholesale-price-range {
-    display: block
-}
+/**
+ * The following styles get applied inside the editor only.
+ *
+ * Replace them with your own styles or remove the file completely.
+ */
 
-#ywhs_form_fields_container {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 15px;
-}
-
-#ywhs_form_fields_container > div {
-    display: flex;
-    flex-direction: column;
-}
-
-.ywhs_half {
-    flex: 0 0 calc(50% - 10px);
-}
-
-.ywhs_full {
-    flex: 0 0 calc(100% - 10px);
-}
-
-#ywhs_form_fields_container textarea {
-    resize: none;
-    font-family: sans-serif;
-    min-height: 50px;
-    overflow: hidden;
-}
-
-#ywhs_success_notice {
-    display: none;
-}
-
-#ywhs_form_fields_container label {
-    font-size: small;
-    margin: 5px 0px;
-    display: flex;
-    gap: 3px;
-}
-
-#ywhs_form_fields_container input, 
-#ywhs_form_fields_container textarea {
-    padding: 10px !important;
-    font-size: small;
-    border-radius: 10px !important;
-    border: 1px solid #E5E5E5;   
-    box-shadow: 0px 1px 2px 0px #E5E5E5; 
-}
-
-#ywhs_form_fields_container input:hover, 
-#ywhs_form_fields_container textarea:hover{
-    border: 1px solid black !important;
-    transition: color 3s;
-}
-
-#ywhs_request_form > button {
-    padding: 10px 15px;
-    margin-top: 20px;
-    border-radius: 10px;
-    border: none;
-    box-shadow: 0px 1px 2px 0px #E5E5E5;
-    background-color: black;
-    color: white;
-}
-
-#ywhs_request_form > button:hover {
-    background-color: rgb(40, 40, 40);
-}
-
-.ywhs_request_form_error {
-    padding: 20px;
-    border-radius: 10px !important;
-    border: 1px solid #E5E5E5;   
-    box-shadow: 0px 1px 2px 0px #E5E5E5; 
-    display: none;
-    margin-bottom: 20px;
-}
-.ywhs_request_form_error > div {
-    display: flex;
-    gap: 10px;
-    width: 100%;
-    color: red;
-    font-size: 14px;
-    font-weight: 600;
-}
-
-.ywhs_form_error_msg {
-    width: 10px;
-    font-size: 12px;
-    font-weight: 500;
-}
-
-
-/* YayWholesale Requirement Style */
-.ywhs_requirement_section {
+ .ywhs_requirement_section {
     border-top: 1px solid #F4F4F5;
     padding: 24px 0px;
     width: 100%;
@@ -177,7 +88,7 @@
     position: absolute;
     top: 0;
     left: 0;
-    width: 0;
+    width: 100%;
     background-color: rgb(34, 113, 177);
 }
 .ywhs_requirement_content {

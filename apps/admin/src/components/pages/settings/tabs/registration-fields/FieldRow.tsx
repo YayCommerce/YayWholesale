@@ -108,7 +108,7 @@ export function FieldRow({
           <FormField
             control={control}
             name={`registration_fields.fields.${index}.label`}
-            render={({ field }) => (
+            render={({ field, fieldState }) => (
               <FormItem className="w-full">
                 <FormLabel className="text-base-secondary space-y-2.5 text-xs font-medium">
                   {__('Label', 'yay-wholesale')}
@@ -116,13 +116,18 @@ export function FieldRow({
                 </FormLabel>
                 <FormControl>
                   <Input
+                    {...field}
                     placeholder="Enter field label"
                     defaultValue={field.value}
                     onChange={field.onChange}
-                    className="h-9 w-full"
+                    aria-invalid={fieldState.invalid}
+                    className={cn('h-9 w-full', fieldState.invalid && 'border-destructive')}
                     disabled={isHidden}
                   />
                 </FormControl>
+                {fieldState.invalid && (
+                  <div className="text-destructive text-[12px]">{fieldState.error?.message}</div>
+                )}
               </FormItem>
             )}
           />
@@ -199,7 +204,7 @@ export function FieldRow({
                 </FormLabel>
                 <FormControl>
                   <ToggleGroup
-                    className="flex h-9 w-full gap-1 rounded-[6px] border border-[#E5E5E5] bg-white p-[3px]"
+                    className="flex h-9 w-full gap-1 rounded-[8px] border border-[#E5E5E5] bg-white p-[3px]"
                     type="single"
                     value={field.value}
                     onValueChange={(val) => {
@@ -207,10 +212,10 @@ export function FieldRow({
                     }}
                     disabled={isHidden}
                   >
-                    <ToggleGroupItem className="size-xs" value="50%">
+                    <ToggleGroupItem className="size-xs rounded-[6px]" value="50%">
                       50%
                     </ToggleGroupItem>
-                    <ToggleGroupItem className="size-xs" value="100%">
+                    <ToggleGroupItem className="size-xs rounded-[6px]" value="100%">
                       100%
                     </ToggleGroupItem>
                   </ToggleGroup>
