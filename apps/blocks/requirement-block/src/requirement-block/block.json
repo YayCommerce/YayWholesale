@@ -3,10 +3,10 @@
 	"apiVersion": 3,
 	"name": "yay-wholesale/requirement-block",
 	"version": "0.1.0",
-	"title": "Requirement Block",
+	"title": "Wholesale Requirement",
 	"category": "widgets",
-	"icon": "smiley",
-	"description": "Example block scaffolded with Create Block tool.",
+	"icon": "awards",
+	"description": "A block displaying yay-wholesale requirement of the current user's wholesale role",
 	"example": {},
 	"supports": {
 		"html": false

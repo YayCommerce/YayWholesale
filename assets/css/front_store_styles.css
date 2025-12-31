@@ -107,6 +107,9 @@
 }
 .ywhs_requirement_title {
     font-weight: 600;
+	display: flex;
+	align-items: center;
+	gap: 10px;
 }
 
 .ywhs_badge {
@@ -174,7 +177,7 @@
     position: absolute;
     top: 0;
     left: 0;
-    width: 50%;
+    width: 0;
     background-color: rgb(34, 113, 177);
 }
 .ywhs_requirement_content {
