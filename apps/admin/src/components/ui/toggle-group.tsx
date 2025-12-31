@@ -55,7 +55,7 @@ function ToggleGroupItem({
           size: context.size || size,
         }),
         'flex h-full flex-1 items-center justify-center rounded-[6px] text-sm transition-colors',
-        '!data-[state=on]:bg-[#F4F4F5] !data-[state=on]:text-base-secondary !data-[state=on]:font-medium text-muted-foreground font-normal hover:bg-[#F4F4F5]',
+        '!data-[state=on]:bg-muted !data-[state=on]:text-foreground-400 !data-[state=on]:font-medium text-muted-foreground hover:bg-muted font-normal',
         'disabled:cursor-not-allowed disabled:opacity-50',
         className,
       )}

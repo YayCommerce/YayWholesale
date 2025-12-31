@@ -88,11 +88,6 @@ export default function RequestsForm() {
     if (data?.id) setDataDisplay(data);
   }, [data]);
 
-  const readonlyClassName = useMemo(
-    () => 'border-border bg-base-muted hover:border-border cursor-default shadow-xs',
-    [],
-  );
-
   return (
     <Sheet
       open={isOpen}
@@ -109,7 +104,7 @@ export default function RequestsForm() {
             <Spinner className="text-muted-foreground size-6 animate-spin" />
           </div>
         )}
-        <SheetHeader className="border-b border-[#F4F4F5] p-5">
+        <SheetHeader className="border-muted border-b p-5">
           <div className="flex items-start justify-between gap-2.5">
             <div>
               <SheetTitle className="text-foreground flex items-center gap-2 text-[18px] font-semibold">
@@ -129,7 +124,7 @@ export default function RequestsForm() {
                   />
                 )}
               </SheetTitle>
-              <SheetDescription className="text-base-muted-foreground mt-[4px] text-sm leading-[20px] font-normal">
+              <SheetDescription className="text-muted-foreground mt-[4px] text-sm leading-[20px] font-normal">
                 {__(
                   "Use the button below to approve or reject this user's wholesale user request",
                   'yay-wholesale',
@@ -147,38 +142,22 @@ export default function RequestsForm() {
           <div className="grid cursor-default grid-cols-2 gap-5">
             <div className="flex flex-col gap-2">
               <Label htmlFor="firstName">{__('First Name', 'yay-wholesale')}</Label>
-              <Input
-                id="firstName"
-                readOnly
-                value={dataDisplay?.firstName}
-                className={cn(readonlyClassName)}
-              />
+              <Input id="firstName" readOnly value={dataDisplay?.firstName} />
             </div>
             <div className="flex cursor-default flex-col gap-2">
               <Label htmlFor="lastName">{__('Last Name', 'yay-wholesale')}</Label>
-              <Input
-                id="lastName"
-                readOnly
-                value={dataDisplay?.lastName}
-                className={cn(readonlyClassName)}
-              />
+              <Input id="lastName" readOnly value={dataDisplay?.lastName} />
             </div>
           </div>
           <div className="flex cursor-default flex-col gap-2">
             <Label htmlFor="email">{__('Email address', 'yay-wholesale')}</Label>
-            <Input
-              id="email"
-              readOnly
-              value={dataDisplay?.email}
-              className={cn(readonlyClassName)}
-            />
+            <Input id="email" readOnly value={dataDisplay?.email} />
           </div>
           <div className="flex cursor-default flex-col gap-2">
             <Label htmlFor="registrationDate">{__('Registration date', 'yay-wholesale')}</Label>
             <Input
               id="registrationDate"
               readOnly
-              className={cn(readonlyClassName)}
               value={
                 dataDisplay?.date
                   ? parseWPDate(dataDisplay.date) + ' ' + parseWPTime(dataDisplay.date)
@@ -188,11 +167,7 @@ export default function RequestsForm() {
           </div>
           <div className="flex flex-col gap-2">
             <Label htmlFor="message">{__('Message', 'yay-wholesale')}</Label>
-            <Textarea
-              className={cn('h-fit min-h-25 resize-none', readonlyClassName)}
-              readOnly
-              value={dataDisplay.message}
-            />
+            <Textarea className="h-fit min-h-25 resize-none" readOnly value={dataDisplay.message} />
           </div>
           {dataDisplay?.fields.map((field, index) => {
             const handleDataByType = () => {
@@ -212,12 +187,12 @@ export default function RequestsForm() {
                 <Label>{field.label}</Label>
                 {field.type.toLowerCase() === 'textarea' ? (
                   <Textarea
-                    className={cn('h-fit min-h-25 resize-none', readonlyClassName)}
+                    className="h-fit min-h-25 resize-none"
                     readOnly
                     value={handleDataByType()}
                   />
                 ) : (
-                  <Input readOnly value={handleDataByType()} className={cn(readonlyClassName)} />
+                  <Input readOnly value={handleDataByType()} />
                 )}
               </div>
             );
@@ -225,7 +200,7 @@ export default function RequestsForm() {
         </div>
 
         <SheetFooter className="p-0">
-          <div className="flex justify-end gap-2 border-t border-[#F4F4F5] bg-white p-5">
+          <div className="border-muted flex justify-end gap-2 border-t bg-white p-5">
             <div className="flex gap-2">
               <Button
                 variant="destructive-soft"

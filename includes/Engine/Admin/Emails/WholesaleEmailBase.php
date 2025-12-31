@@ -10,7 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Base class for all YayWholesale Emails
  */
-abstract class Wholesale_Email_Base extends WC_Email {
+abstract class WholesaleEmailBase extends WC_Email {
 
     public function __construct() {
 

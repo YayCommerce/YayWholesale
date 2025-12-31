@@ -59,7 +59,7 @@ export default function SettingsPage() {
                         key={tab.path}
                         to={`/settings/${tab.path}`}
                         className={cn(
-                          'justify-start rounded-none border-none p-4 py-2.5 text-left text-sm font-normal text-nowrap text-[#333333] ring-0 outline-none focus:ring-0 focus:outline-none sm:text-wrap',
+                          'text-foreground-400 justify-start rounded-none border-none p-4 py-2.5 text-left text-sm font-normal text-nowrap ring-0 outline-none focus:ring-0 focus:outline-none sm:text-wrap',
                           tab.path === subMenu &&
                             'text-primary rounded-md bg-white font-medium shadow-none',
                         )}

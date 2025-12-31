@@ -1,7 +1,6 @@
 <?php
 namespace Yay_Wholesale\Engine\Admin\Emails;
 
-use Automattic\WooCommerce\Utilities\FeaturesUtil;
 use Yay_Wholesale\Helpers\RequestsHelper;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -9,32 +8,35 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Wholesale Account Registration Rejected Email
+ * Wholesale New Account Registered Email
  *
- * @method static Account_Registration_Rejected get_instance()
+ * @method static NewAccountRegistered get_instance()
  */
-class Account_Registration_Rejected extends Wholesale_Email_Base {
+class NewAccountRegistered extends WholesaleEmailBase {
 
     /**
      * Constructor.
      */
     public function __construct() {
 
-        $this->id             = 'yay_wholesale_account_registration_rejected';
-        $this->customer_email = true;
-        $this->title          = __( 'Wholesale account is rejected', 'yay-wholesale' );
+        $this->id             = 'yay_wholesale_new_account_registered';
+        $this->customer_email = false;
+        $this->title          = __( 'New wholesale account register', 'yay-wholesale' );
         $this->email_group    = 'wholesale_account';
-        $this->description    = __( 'Notify when a wholesale account is rejected', 'yay-wholesale' );
-        $this->template_html  = 'account-registration-rejected.php';
-        $this->template_plain = 'plain/account-registration-rejected.php';
+        $this->description    = __( 'Notify when a user registers a wholesale account', 'yay-wholesale' );
+        $this->template_html  = 'new-account-registered.php';
+        $this->template_plain = 'plain/new-account-registered.php';
         $this->placeholders   = [
             '{account_name}' => '{account_name}',
         ];
         // Trigger the email when a new wholesale account is registered.
-        add_action( 'yhs_account_registration_rejected', [ $this, 'trigger' ], 10, 1 );
+        add_action( 'yhs_new_account_registered', [ $this, 'trigger' ], 10, 1 );
 
         // Call parent constructor
         parent::__construct();
+
+        // Other settings.
+        $this->recipient = $this->get_option( 'recipient', get_option( 'admin_email' ) );
     }
 
     /**
@@ -43,7 +45,7 @@ class Account_Registration_Rejected extends Wholesale_Email_Base {
      * @return string
      */
     public function get_default_subject() {
-        return __( '[{site_title}]: Your wholesale account is rejected', 'yay-wholesale' );
+        return __( '[{site_title}]: New wholesale account registration', 'yay-wholesale' );
     }
 
     /**
@@ -52,7 +54,7 @@ class Account_Registration_Rejected extends Wholesale_Email_Base {
      * @return string
      */
     public function get_default_heading() {
-        return __( 'Your Wholesale Account Application has been Rejected', 'yay-wholesale' );
+        return __( 'Welcome to Our Wholesale Program!', 'yay-wholesale' );
     }
 
     /**
@@ -63,12 +65,22 @@ class Account_Registration_Rejected extends Wholesale_Email_Base {
     public function get_default_email_content() {
         $content  = sprintf( '%s {account_name}', __( 'Hi', 'yay-wholesale' ) );
         $content .= "\n\n";
-        $content .= sprintf( __( 'Thank you for your interest in partnering with %s.', 'yay-wholesale' ), $this->get_blogname() );
+        $content .= __( 'Thank you for registering a wholesale account on our store.', 'yay-wholesale' );
         $content .= "\n\n";
-
-        $content .= __( 'After careful review, we regret to inform you that your wholesale account application has not been approved at this time.', 'yay-wholesale' );
+        $content .= __( 'We have received your application and our team is currently reviewing your information.', 'yay-wholesale' );
         $content .= "\n\n";
-        $content .= __( 'If you believe this decision is in error or would like more information, please feel free to contact our support team.', 'yay-wholesale' );
+        $content .= sprintf( '<strong>%s</strong>', __( 'What happens next?', 'yay-wholesale' ) );
+        $content .= "\n\n";
+        $content .= sprintf(
+            '<ul>
+                <li>%s</li>
+                <li>%s</li>
+            </ul>',
+            __( 'Your account will be reviewed within 24-48 hours.', 'yay-wholesale' ),
+            __( 'We will notify you once your wholesale account has been approved or if more information is needed.', 'yay-wholesale' )
+        );
+        $content .= "\n\n";
+        $content .= __( 'Thank you for your interest in partnering with us. We look forward to working with you!', 'yay-wholesale' );
         $content .= "\n\n";
 
         return $content;
@@ -95,6 +107,7 @@ class Account_Registration_Rejected extends Wholesale_Email_Base {
                 'email_heading'      => $this->get_heading(),
                 'content'            => $this->get_email_content(),
                 'additional_content' => $this->get_additional_content(),
+                'placeholders'       => $this->placeholders,
                 'blogname'           => $this->get_blogname(),
                 'sent_to_admin'      => false,
                 'plain_text'         => false,
@@ -115,6 +128,7 @@ class Account_Registration_Rejected extends Wholesale_Email_Base {
                 'email_heading'      => $this->get_heading(),
                 'content'            => $this->get_email_content(),
                 'additional_content' => $this->get_additional_content(),
+                'placeholders'       => $this->placeholders,
                 'blogname'           => $this->get_blogname(),
                 'sent_to_admin'      => false,
                 'plain_text'         => true,
@@ -133,9 +147,7 @@ class Account_Registration_Rejected extends Wholesale_Email_Base {
 
         if ( $request_id ) {
             $this->object                         = RequestsHelper::get_request_by_id( $request_id );
-            $this->recipient                      = $this->object['email'];
             $this->placeholders['{account_name}'] = $this->object['name'];
-
         }
 
         if ( $this->is_enabled() && $this->get_recipient() ) {

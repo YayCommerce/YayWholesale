@@ -25,7 +25,7 @@ export default function DisplayTab() {
           name={`display.price_format`}
           render={({ field }) => (
             <FormItem className="w-full">
-              <FormLabel className="text-base-secondary space-y-2.5 text-xs font-medium">
+              <FormLabel className="text-foreground-400 space-y-2.5 text-xs font-medium">
                 {__('Display price format', 'yay-wholesale')}
               </FormLabel>
               <FormControl>
@@ -57,7 +57,7 @@ export default function DisplayTab() {
           name={`display.wholesale_price_label`}
           render={({ field }) => (
             <FormItem className="w-full">
-              <FormLabel className="text-base-secondary space-y-2.5 text-xs font-medium">
+              <FormLabel className="text-foreground-400 space-y-2.5 text-xs font-medium">
                 {__('Wholesale price label', 'yay-wholesale')}
               </FormLabel>
               <FormControl>
@@ -81,7 +81,7 @@ export default function DisplayTab() {
         name={`display.wholesale_price_color`}
         render={({ field }) => (
           <FormItem className="w-full">
-            <FormLabel className="text-base-secondary space-y-2.5 text-xs font-medium">
+            <FormLabel className="text-foreground-400 space-y-2.5 text-xs font-medium">
               {__('Wholesale price color', 'yay-wholesale')}
             </FormLabel>
             <FormControl>

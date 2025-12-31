@@ -24,12 +24,12 @@ export default function RegistrationTab() {
         control={control}
         name={`registration.moderate`}
         render={({ field }) => (
-          <div className="base-base-border flex items-center justify-between rounded-md border p-4">
+          <div className="base-border flex items-center justify-between rounded-md border p-4">
             <div>
-              <h2 className="text-base-secondary text-sm font-normal">
+              <h2 className="text-foreground-400 text-sm font-normal">
                 {__('Moderate new registrations', 'yay-wholesale')}
               </h2>
-              <p className="text-base-muted-foreground mt-1 text-xs font-normal">
+              <p className="text-muted-foreground mt-1 text-xs font-normal">
                 {__(
                   'Hold new wholesale registrations for moderation by an administrator.',
                   'yay-wholesale',
@@ -49,7 +49,7 @@ export default function RegistrationTab() {
           name={`registration.wholesale_registration_page`}
           render={({ field }) => (
             <FormItem className="w-full">
-              <FormLabel className="text-base-secondary space-y-2.5 text-xs font-medium">
+              <FormLabel className="text-foreground-400 space-y-2.5 text-xs font-medium">
                 {__('Wholesale registration page', 'yay-wholesale')}
               </FormLabel>
               <FormControl>
@@ -75,7 +75,7 @@ export default function RegistrationTab() {
           name={`registration.submit_button_label`}
           render={({ field }) => (
             <FormItem className="w-full">
-              <FormLabel className="text-base-secondary space-y-2.5 text-xs font-medium">
+              <FormLabel className="text-foreground-400 space-y-2.5 text-xs font-medium">
                 {__('Submit button label', 'yay-wholesale')}
               </FormLabel>
               <FormControl>
@@ -98,7 +98,7 @@ export default function RegistrationTab() {
         name={`registration.successful_registration_message`}
         render={({ field }) => (
           <FormItem className="w-full">
-            <FormLabel className="text-base-secondary space-y-2.5 text-xs font-medium">
+            <FormLabel className="text-foreground-400 space-y-2.5 text-xs font-medium">
               {__('Successful registration message', 'yay-wholesale')}
             </FormLabel>
             <FormControl>

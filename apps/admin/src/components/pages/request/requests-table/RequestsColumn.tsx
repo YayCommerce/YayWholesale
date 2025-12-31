@@ -135,7 +135,7 @@ export const RequestsColumn: ColumnDef<RequestFormValues>[] = [
                   <Button
                     size="icon"
                     variant="ghost"
-                    className="hover:text-primary text-base-muted-foreground h-8 w-8 hover:bg-white hover:shadow-xs"
+                    className="hover:text-primary text-muted-foreground h-8 w-8 hover:bg-white hover:shadow-xs"
                     onClick={() => {
                       queryClient.setQueryData(['request', row.original.id], row.original);
                       navigate(`/request/edit/${row.original.id}`);
@@ -152,7 +152,7 @@ export const RequestsColumn: ColumnDef<RequestFormValues>[] = [
                   <Button
                     size="icon"
                     variant="ghost"
-                    className="hover:text-destructive text-base-muted-foreground m-0 h-8 w-8 hover:bg-white hover:shadow-xs"
+                    className="hover:text-destructive text-muted-foreground m-0 h-8 w-8 hover:bg-white hover:shadow-xs"
                     onClick={() => setOpenDialog(true)}
                     disabled={
                       isDeletingRequestPending ||
@@ -169,7 +169,7 @@ export const RequestsColumn: ColumnDef<RequestFormValues>[] = [
             <Button
               size="icon"
               variant="ghost"
-              className="text-base-muted-foreground absolute z-1 flex h-8 w-8 group-hover:-z-10 peer-has-data-[state='delayed-open']:-z-10"
+              className="text-muted-foreground absolute z-1 flex h-8 w-8 group-hover:-z-10 peer-has-data-[state='delayed-open']:-z-10"
             >
               <Ellipsis className="h-4 w-4" />
             </Button>

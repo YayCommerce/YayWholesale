@@ -20,7 +20,7 @@ export default function StatusSegmentedField() {
         };
         return (
           <FormItem className="w-full gap-2.5">
-            <FormLabel className="text-base-secondary text-xs font-medium">
+            <FormLabel className="text-foreground-400 text-xs font-medium">
               {__('Status', 'yay-wholesale')}
             </FormLabel>
             <Segmented

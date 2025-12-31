@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { __ } from '@wordpress/i18n';
 
 import { useUpdateEmailStatusMutation, useWholesaleEmailsQuery } from '@/lib/queries/emails';
 import { Switch } from '@/components/ui/switch';
@@ -20,7 +21,7 @@ export default function EmailsTab() {
     <div className="overflow-x-auto rounded-lg border bg-white shadow-sm">
       <Table>
         <TableHeader>
-          <TableRow className="bg-[#f6f6f7] hover:bg-[#f6f6f7]">
+          <TableRow className="bg-muted-400 hover:bg-muted-400">
             <TableHead className="w-12"></TableHead>
             <TableHead className="text-sm font-medium">Emails</TableHead>
             <TableHead className="text-sm font-medium">Description</TableHead>
@@ -53,10 +54,10 @@ export default function EmailsTab() {
                 </a>
               </TableCell>
 
-              <TableCell className="text-base-foreground">{email.description}</TableCell>
+              <TableCell className="text-foreground">{email.description}</TableCell>
 
-              <TableCell className="text-base-foreground">
-                {email.recipients || 'Customer'}
+              <TableCell className="text-foreground">
+                {email.recipients || __('Customer', 'yay-wholesale')}
               </TableCell>
 
               <TableCell className="px-4 text-center">

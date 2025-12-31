@@ -10,9 +10,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Wholesale New Order Placed Email
  *
- * @method static New_Order_Placed get_instance()
+ * @method static NewOrderPlaced get_instance()
  */
-class New_Order_Placed extends Wholesale_Email_Base {
+class NewOrderPlaced extends WholesaleEmailBase {
 
     public function __construct() {
         $this->id             = 'yay_wholesale_new_order_placed';

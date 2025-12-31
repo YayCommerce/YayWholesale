@@ -10,9 +10,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Wholesale Account Registration Pending Email
  *
- * @method static Account_Registration_Pending get_instance()
+ * @method static AccountRegistrationPending get_instance()
  */
-class Account_Registration_Pending extends Wholesale_Email_Base {
+class AccountRegistrationPending extends WholesaleEmailBase {
 
     /**
      * Constructor.

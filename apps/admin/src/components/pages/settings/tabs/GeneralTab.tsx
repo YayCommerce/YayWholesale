@@ -63,12 +63,12 @@ export default function GeneralTab() {
         control={control}
         name={`general.show_wholesale_price`}
         render={({ field }) => (
-          <div className="base-base-border flex items-center justify-between rounded-md border p-4">
+          <div className="base-border flex items-center justify-between rounded-md border p-4">
             <div>
-              <h2 className="text-base-secondary text-sm font-normal">
+              <h2 className="text-foreground-400 text-sm font-normal">
                 {__('Show Wholesale Price to non-wholesale users', 'yay-wholesale')}
               </h2>
-              <p className="text-base-muted-foreground mt-1 text-xs font-normal">
+              <p className="text-muted-foreground mt-1 text-xs font-normal">
                 {__('If enable, wholesale price will display for all users.', 'yay-wholesale')}
               </p>
             </div>
@@ -86,12 +86,12 @@ export default function GeneralTab() {
         control={control}
         name={`general.disable_coupon`}
         render={({ field }) => (
-          <div className="base-base-border flex items-center justify-between rounded-lg border p-4">
+          <div className="base-border flex items-center justify-between rounded-lg border p-4">
             <div>
-              <h2 className="text-base-secondary text-sm font-normal">
+              <h2 className="text-foreground-400 text-sm font-normal">
                 {__('Disable coupon', 'yay-wholesale')}
               </h2>
-              <p className="text-base-muted-foreground mt-1 text-xs font-normal">
+              <p className="text-muted-foreground mt-1 text-xs font-normal">
                 {__("Hide coupon field for wholesale users., 'yay-wholesale'")}
               </p>
             </div>
@@ -106,12 +106,12 @@ export default function GeneralTab() {
         control={control}
         name={`general.disable_tax`}
         render={({ field }) => (
-          <div className="base-base-border flex items-center justify-between rounded-md border p-4">
+          <div className="base-border flex items-center justify-between rounded-md border p-4">
             <div>
-              <h2 className="text-base-secondary text-sm font-normal">
+              <h2 className="text-foreground-400 text-sm font-normal">
                 {__('Disable tax', 'yay-wholesale')}
               </h2>
-              <p className="text-base-muted-foreground mt-1 text-xs font-normal">
+              <p className="text-muted-foreground mt-1 text-xs font-normal">
                 {__("Don't charge tax for wholesale users.", 'yay-wholesale')}
               </p>
             </div>

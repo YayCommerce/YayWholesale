@@ -205,7 +205,7 @@ export const RolesColumn: ColumnDef<RolesListValues & { count: number }>[] = [
                       queryClient.setQueryData(['role', row.original.id], row.original);
                       navigate(`/roles/edit/${row.original.id}`);
                     }}
-                    className="hover:text-primary text-base-muted-foreground transition hover:bg-[#FFFFFF] hover:shadow-xs"
+                    className="hover:text-primary text-muted-foreground transition hover:bg-white hover:shadow-xs"
                   >
                     <PencilLine className="size-4" />
                   </Button>
@@ -224,7 +224,7 @@ export const RolesColumn: ColumnDef<RolesListValues & { count: number }>[] = [
                         setOpenDialog(true);
                       }}
                       disabled={isDeletingRolePending}
-                      className="hover:text-destructive text-base-muted-foreground hover:bg-white hover:shadow-xs"
+                      className="hover:text-destructive text-muted-foreground hover:bg-white hover:shadow-xs"
                     >
                       <DeleteIcon className="size-4" />
                     </Button>
@@ -238,7 +238,7 @@ export const RolesColumn: ColumnDef<RolesListValues & { count: number }>[] = [
                       size="icon"
                       variant="ghost"
                       onClick={() => navigate(`/settings/general`)}
-                      className="hover:text-primary text-base-muted-foreground transition hover:bg-white hover:shadow-xs"
+                      className="hover:text-primary text-muted-foreground transition hover:bg-white hover:shadow-xs"
                     >
                       <EditIcon className="size-4" />
                     </Button>
@@ -251,7 +251,7 @@ export const RolesColumn: ColumnDef<RolesListValues & { count: number }>[] = [
             <Button
               size="icon"
               variant="ghost"
-              className="text-base-muted-foreground absolute z-1 mr-0.5 flex h-8 w-8 duration-75 group-hover:-z-10 peer-has-data-[state='delayed-open']:-z-10"
+              className="text-muted-foreground absolute z-1 mr-0.5 flex h-8 w-8 duration-75 group-hover:-z-10 peer-has-data-[state='delayed-open']:-z-10"
             >
               <Ellipsis className="h-4 w-4" />
             </Button>

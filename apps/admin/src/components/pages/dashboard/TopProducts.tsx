@@ -26,7 +26,7 @@ export default function TopProducts(props: { reportQuery: ReturnType<typeof useR
       <CardContent className="flex min-h-0 flex-1 flex-col gap-5 p-5">
         {/* Header */}
         <div className="flex items-center justify-between">
-          <h3 className="text-base-foreground text-[16px] font-semibold">
+          <h3 className="text-foreground text-[16px] font-semibold">
             {__('Top Products', 'yay-wholesale')}
           </h3>
         </div>
@@ -39,22 +39,22 @@ export default function TopProducts(props: { reportQuery: ReturnType<typeof useR
           )}
         >
           <Table className="divide-muted min-w-full divide-y">
-            <TableHeader className="text-base-foreground bg-base-muted h-10">
-              <TableRow className="text-base-foreground text-[14px] font-semibold">
-                <TableHead className="text-base-foreground text-[14px]">
+            <TableHeader className="text-foreground bg-muted-400 h-10">
+              <TableRow className="text-foreground text-[14px] font-semibold">
+                <TableHead className="text-foreground text-[14px]">
                   <span className="flex items-center justify-center font-medium">
                     {__('No', 'yay-wholesale')}
                   </span>
                 </TableHead>
-                <TableHead className="text-base-foreground text-[14px]">
+                <TableHead className="text-foreground text-[14px]">
                   {__('Product', 'yay-wholesale')}
                 </TableHead>
-                <TableHead className="text-base-foreground text-[14px]">
+                <TableHead className="text-foreground text-[14px]">
                   <span className="flex items-center justify-center font-medium">
                     {__('Item Sold', 'yay-wholesale')}
                   </span>
                 </TableHead>
-                <TableHead className="text-base-foreground text-[14px]">
+                <TableHead className="text-foreground text-[14px]">
                   <span className="flex items-center justify-center font-medium">
                     {__('Net Sales', 'yay-wholesale')}
                   </span>
@@ -73,12 +73,12 @@ export default function TopProducts(props: { reportQuery: ReturnType<typeof useR
               ) : reportData ? (
                 reportData.topProducts.map((data) => (
                   <TableRow>
-                    <TableCell className="text-base-foreground py-3 text-[14px]">
+                    <TableCell className="text-foreground py-3 text-[14px]">
                       <span className="flex items-center justify-center">
                         {reportData.topProducts.indexOf(data) + 1}
                       </span>
                     </TableCell>
-                    <TableCell className="text-base-foreground py-3 text-[14px]">
+                    <TableCell className="text-foreground py-3 text-[14px]">
                       <div className="flex items-center gap-3">
                         <div
                           className={cn(
@@ -94,7 +94,7 @@ export default function TopProducts(props: { reportQuery: ReturnType<typeof useR
                           />
                         </div>
                         <div className="flex w-40 items-center gap-1 md:w-15 md:flex-wrap lg:w-40 lg:flex-nowrap">
-                          <span className="text-base-foreground text-[14px] font-medium whitespace-normal md:text-[13px] lg:text-[14px]">
+                          <span className="text-foreground text-[14px] font-medium whitespace-normal md:text-[13px] lg:text-[14px]">
                             {data.name}
                           </span>
                           {reportData.topProducts.indexOf(data) < 3 && (
@@ -103,10 +103,10 @@ export default function TopProducts(props: { reportQuery: ReturnType<typeof useR
                         </div>
                       </div>
                     </TableCell>
-                    <TableCell className="text-base-foreground py-3 text-[14px]">
+                    <TableCell className="text-foreground py-3 text-[14px]">
                       <span className="flex items-center justify-center">{data.orderCount}</span>
                     </TableCell>
-                    <TableCell className="text-base-foreground py-3 text-[14px]">
+                    <TableCell className="text-foreground py-3 text-[14px]">
                       <span className="flex items-center justify-center font-medium">
                         {parseWPCurrency(data.netSale)}
                       </span>

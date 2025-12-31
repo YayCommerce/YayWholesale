@@ -36,7 +36,10 @@ export default function WholesalersRoleColumn({ role, userId }: { role: string; 
         <SelectGroup>
           {roles?.map((roleItem) => (
             <SelectItem key={roleItem.id} value={roleItem.slug}>
-              <RolesIcon role={roleItem.slug} className="mt-0.5 min-h-4 min-w-4 text-[#333333]" />{' '}
+              <RolesIcon
+                role={roleItem.slug}
+                className="text-foreground-400 mt-0.5 min-h-4 min-w-4"
+              />{' '}
               <span className="truncate">{roleItem.name}</span>
             </SelectItem>
           ))}

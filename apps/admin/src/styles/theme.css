@@ -1,12 +1,7 @@
 :root {
   --background: oklch(1 0 0); /* #FFFFFF */
-  --foreground: oklch(0.205 0 0); /* #171717 neutral-900 */
-
-  --base-foreground: #171719;
-  --base-muted-foreground: #737373;
-  --base-secondary: #333333;
-  --base-border: #e4e4e7;
-  --base-muted: oklch(0.9851 0 0); /* #fafafa */
+  --foreground-400: #333333;
+  --foreground: #171719; /* #171717 #151619 neutral-900 */
 
   --primary: oklch(0.5339 0.1249 247.74); /* #2271B1 */
   --primary-foreground: oklch(1 0 0); /* #FFFFFF */
@@ -24,12 +19,13 @@
   --warning-foreground: oklch(0.1923 0.0074 229.32); /* #111517 */
   --warning-accent: oklch(0.7745 0.1637 72.66); /* #f4a20a */
 
-  --muted: oklch(0.97 0 0); /* #f5f5f5 neutral-100 */
+  --muted-400: #fafafa;
+  --muted: #f4f4f5; /* #f5f5f5 #f4f4f5 neutral-100 */
   --muted-foreground: oklch(0.556 0 0); /* #737373 neutral-500 */
   --accent: oklch(0.97 0 0); /* #f5f5f5 neutral-100 */
   --accent-foreground: oklch(0.205 0 0); /* #171717 neutral-900 */
-  --border: oklch(0.922 0 0); /* #e5e5e5 neutral-200 */
-  --input: oklch(0.922 0 0); /* #e5e5e5 neutral-200 */
+  --border: #e4e4e7; /* #e5e5e5 #E5E7EB neutral-200 */
+  --input: #e4e4e7; /* #e5e5e5 neutral-200 */
   --input-accent: oklch(0.87 0 0); /* #d4d4d4 neutral-300 */
   --ring: oklch(0.5339 0.1249 247.74); /* #2271B1 */
   --ring-accent: oklch(0.4682 0.1138 247.02); /* #135E96 */
@@ -54,13 +50,8 @@
   --color-black: #000;
   --color-white: #fff;
   --color-background: var(--background);
+  --color-foreground-400: var(--foreground-400);
   --color-foreground: var(--foreground);
-
-  --color-base-foreground: var(--base-foreground);
-  --color-base-muted-foreground: var(--base-muted-foreground);
-  --color-base-secondary: var(--base-secondary);
-  --color-base-border: var(--base-border);
-  --color-base-muted: var(--base-muted);
 
   --color-primary: var(--primary);
   --color-primary-accent: var(--primary-accent);
@@ -75,6 +66,7 @@
   --color-warning-foreground: var(--warning-foreground);
   --color-warning-accent: var(--warning-accent);
 
+  --color-muted-400: var(--muted-400);
   --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);
   --color-accent: var(--accent);

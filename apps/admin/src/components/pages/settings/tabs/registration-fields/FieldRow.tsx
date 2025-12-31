@@ -76,7 +76,7 @@ export function FieldRow({
                 type="button"
                 variant="ghost"
                 size="icon"
-                className="hover:text-foreground text-base-muted-foreground h-[36px] w-[18px] cursor-grab hover:bg-transparent active:cursor-grabbing"
+                className="hover:text-foreground text-muted-foreground h-[36px] w-[18px] cursor-grab hover:bg-transparent active:cursor-grabbing"
               >
                 <EyeOff className="h-5 w-5 cursor-default" />
               </Button>
@@ -93,7 +93,7 @@ export function FieldRow({
             type="button"
             variant="ghost"
             size="icon"
-            className="hover:text-foreground text-base-muted-foreground h-[36px] w-[18px] cursor-grab hover:bg-transparent active:cursor-grabbing"
+            className="hover:text-foreground text-muted-foreground h-[36px] w-[18px] cursor-grab hover:bg-transparent active:cursor-grabbing"
             {...attributes}
             {...listeners}
           >
@@ -110,7 +110,7 @@ export function FieldRow({
             name={`registration_fields.fields.${index}.label`}
             render={({ field, fieldState }) => (
               <FormItem className="w-full">
-                <FormLabel className="text-base-secondary space-y-2.5 text-xs font-medium">
+                <FormLabel className="text-foreground-400 space-y-2.5 text-xs font-medium">
                   {__('Label', 'yay-wholesale')}
                   {isRequired && <div className="text-destructive">*</div>}
                 </FormLabel>
@@ -121,7 +121,7 @@ export function FieldRow({
                     defaultValue={field.value}
                     onChange={field.onChange}
                     aria-invalid={fieldState.invalid}
-                    className={cn('h-9 w-full', fieldState.invalid && 'border-destructive')}
+                    className="h-9 w-full"
                     disabled={isHidden}
                   />
                 </FormControl>
@@ -140,7 +140,7 @@ export function FieldRow({
             name={`registration_fields.fields.${index}.type`}
             render={({ field }) => (
               <FormItem className="w-full">
-                <FormLabel className="text-base-secondary space-y-2.5 text-xs font-medium">
+                <FormLabel className="text-foreground-400 space-y-2.5 text-xs font-medium">
                   {__('Type', 'yay-wholesale')}
                 </FormLabel>
                 <FormControl>
@@ -175,7 +175,7 @@ export function FieldRow({
             name={`registration_fields.fields.${index}.placeholder`}
             render={({ field }) => (
               <FormItem className="w-full">
-                <FormLabel className="text-base-secondary space-y-2.5 text-xs font-medium">
+                <FormLabel className="text-foreground-400 space-y-2.5 text-xs font-medium">
                   {__('Placeholder', 'yay-wholesale')}
                 </FormLabel>
                 <FormControl>
@@ -199,12 +199,12 @@ export function FieldRow({
             name={`registration_fields.fields.${index}.columnWidth`}
             render={({ field }) => (
               <FormItem className="w-full">
-                <FormLabel className="text-base-secondary space-y-2.5 text-xs font-medium">
+                <FormLabel className="text-foreground-400 space-y-2.5 text-xs font-medium">
                   {__('Column Width', 'yay-wholesale')}
                 </FormLabel>
                 <FormControl>
                   <ToggleGroup
-                    className="flex h-9 w-full gap-1 rounded-[8px] border border-[#E5E5E5] bg-white p-[3px]"
+                    className="border-border flex h-9 w-full gap-1 rounded-[8px] border bg-white p-[3px]"
                     type="single"
                     value={field.value}
                     onValueChange={(val) => {
@@ -250,7 +250,7 @@ export function FieldRow({
                 </div>
               )}
             />
-            <DropdownMenuSeparator className="text-base-foreground w-[95%]" />
+            <DropdownMenuSeparator className="text-foreground w-[95%]" />
             <DropdownMenuGroup>
               <DropdownMenuItem onClick={append} disabled={isHidden}>
                 <CirclePlus />

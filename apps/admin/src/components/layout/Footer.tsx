@@ -73,7 +73,7 @@ export default function Footer({
 
       <footer
         className={cn(
-          'border-border text-foreground fixed bottom-0 z-50 flex flex-col items-center justify-center gap-2 border-t bg-[#F5F5F5] px-4 py-1 text-xs md:flex-row md:justify-between',
+          'border-border text-foreground bg-muted fixed bottom-0 z-50 flex flex-col items-center justify-center gap-2 border-t px-4 py-1 text-xs md:flex-row md:justify-between',
         )}
         style={{
           left: `${containerRect.left}px`,
@@ -146,7 +146,7 @@ export default function Footer({
         ) : (
           <p className="text-right text-xs">
             {createInterpolateElement(
-              __('Thank you for using YayWholesale from <link>.', 'yay-wholesale'),
+              __('Thank you for using YayWholesale from <link/>.', 'yay-wholesale'),
               {
                 link: (
                   <a

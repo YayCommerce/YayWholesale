@@ -58,7 +58,7 @@ export default function RegistrationFieldsTab() {
       {/* Custom Fields */}
       <div>
         <div className="mb-3 flex justify-between">
-          <h3 className="mb-4 text-base font-medium text-[#000000]">
+          <h3 className="text-foreground-400 mb-4 text-base font-medium">
             {__('Registration Fields', 'yay-wholesale')}
           </h3>
           {/* Add new field */}

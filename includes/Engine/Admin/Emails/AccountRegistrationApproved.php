@@ -9,9 +9,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Wholesale Account Registration Approved Email
  *
- * @method static Account_Registration_Approved get_instance()
+ * @method static AccountRegistrationApproved get_instance()
  */
-class Account_Registration_Approved extends Wholesale_Email_Base {
+class AccountRegistrationApproved extends WholesaleEmailBase {
     /**
      * User login name.
      *

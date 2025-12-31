@@ -188,14 +188,14 @@ export default function RequestsList() {
           </div>
         )}
         <Table className="min-w-full divide-y">
-          <TableHeader className="text-base-foreground bg-base-muted h-[46px]">
+          <TableHeader className="text-foreground bg-muted-400 h-[46px]">
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (
                   <TableHead
                     key={header.id}
                     className={cn(
-                      'text-base-secondary py-2 text-sm font-medium',
+                      'text-foreground-400 py-2 text-sm font-medium',
                       header.column.columnDef.meta?.align === 'center'
                         ? 'text-center'
                         : 'text-left',
@@ -261,7 +261,7 @@ export default function RequestsList() {
         >
           {!(useBulkUpdateMutation.isPending || useBulkDeleteMutation.isPending) && (
             <BulkActionBox selected={selectedCount} onClose={() => table.resetRowSelection()}>
-              <span className="text-sm font-normal text-[#151619]">
+              <span className="text-foreground text-sm font-normal">
                 {sprintf(__('%d selected', 'yay-wholesale'), selectedCount)}
               </span>
               <Separator orientation="vertical" className="ml-2 h-5!" />
@@ -311,7 +311,7 @@ export default function RequestsList() {
                     <Button
                       size="icon"
                       variant="ghost"
-                      className="hover:text-destructive text-base-muted-foreground h-8 w-8 hover:bg-transparent hover:shadow-sm"
+                      className="hover:text-destructive text-muted-foreground h-8 w-8 hover:bg-transparent hover:shadow-sm"
                       onClick={() => setOpenDeleteDialog(true)}
                     >
                       <DeleteIcon className="size-4" />
@@ -350,7 +350,7 @@ export default function RequestsList() {
 
           {table.getPageCount() > 1 && (
             <div className="flex items-center gap-4">
-              <span className="text-base-secondary text-sm font-normal">
+              <span className="text-foreground-400 text-sm font-normal">
                 {sprintf(
                   __('Page %d of %d', 'yay-wholesale'),
                   table.getState().pagination.pageIndex + 1,
@@ -380,7 +380,7 @@ export default function RequestsList() {
               </div>
 
               <div className="flex items-center gap-2">
-                <span className="text-base-secondary text-sm font-normal">
+                <span className="text-foreground-400 text-sm font-normal">
                   {__('Go to', 'yay-wholesale')}
                 </span>
                 <InputNumberRoot
@@ -394,10 +394,10 @@ export default function RequestsList() {
                       table.setPageIndex(page);
                     }
                   }}
-                  className="text-base-secondary h-9 w-15 rounded-sm text-sm font-normal focus-visible:ring-0"
+                  className="text-foreground-400 h-9 w-15 rounded-sm text-sm font-normal focus-visible:ring-0"
                   disabled={isFetchingRequests || table.getPageCount() <= 1}
                 >
-                  <InputNumberInput className="disabled:bg-base-muted w-full shadow-xs disabled:text-black" />
+                  <InputNumberInput className="disabled:bg-muted-400 w-full shadow-xs disabled:text-black" />
                 </InputNumberRoot>
               </div>
             </div>
