@@ -1,9 +1,35 @@
 
 import { store, getConfig, subcribe } from '@wordpress/interactivity';
 
+
 let wcState = null;
 let quantityMap = {};
-const {__, sprintf} = wp.i18n;
+const i18n = window.wp?.i18n;
+
+const __ = i18n?.__ || ((s) => s);
+
+const sprintf =
+  i18n?.sprintf ||
+  ((template, ...args) => {
+    const placeholder = '__PERCENT__';
+    template = template.replace(/%%/g, placeholder);
+  
+    template = template.replace(/%(\d+\$)?([sd])/g, (_, position, type) => {
+      let val;
+      if (position) {
+        const index = parseInt(position.slice(0, -1), 10) - 1; // "1$" -> 0
+        val = args[index];
+      } else {
+        val = args.shift();
+      }
+  
+      if (type === 'd') return Number(val) ?? 0;
+      return val ?? '';
+    });  
+    return template.replace(new RegExp(placeholder, 'g'), '%');
+  }
+  );
+
 try {
   const wcStore = store(
     "woocommerce",
@@ -13,7 +39,6 @@ try {
     }
   );
   wcState = wcStore?.state;
-  console.log(wcState);
 } catch (e) {
     console.log(e);
   // WooCommerce store not available
