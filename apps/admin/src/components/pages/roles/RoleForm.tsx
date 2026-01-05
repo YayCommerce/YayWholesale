@@ -100,7 +100,7 @@ export default function RoleForm() {
                 <Spinner className="text-muted-foreground size-6 animate-spin" />
               </div>
             )}
-            <SheetHeader className="border-border border-b p-5">
+            <SheetHeader className="border-muted border-b p-5">
               <div className="flex items-start justify-between">
                 <div>
                   <SheetTitle className="text-foreground text-[18px] font-semibold">
@@ -276,7 +276,7 @@ export default function RoleForm() {
             </div>
 
             <SheetFooter className="p-0">
-              <div className="border-border flex justify-end gap-4 border-t bg-white p-5">
+              <div className="border-muted flex justify-end gap-4 border-t bg-white p-5">
                 <SheetClose asChild>
                   <Button
                     variant="outline"
