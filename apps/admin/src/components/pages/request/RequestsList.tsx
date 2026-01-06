@@ -187,7 +187,7 @@ export default function RequestsList() {
             <Spinner className="text-muted-foreground size-6 animate-spin" />
           </div>
         )}
-        <Table className="min-w-full divide-y">
+        <Table className="divide-muted min-w-full divide-y">
           <TableHeader className="text-foreground bg-muted-400 h-[46px]">
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
@@ -208,7 +208,7 @@ export default function RequestsList() {
               </TableRow>
             ))}
           </TableHeader>
-          <TableBody className="divide-y">
+          <TableBody className="divide-muted divide-y">
             {isLoadingRequests ? (
               <TableRow>
                 <TableCell colSpan={columns.length} className="h-32 text-center align-middle">

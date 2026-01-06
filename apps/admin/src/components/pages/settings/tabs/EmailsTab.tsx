@@ -30,7 +30,7 @@ export default function EmailsTab() {
           </TableRow>
         </TableHeader>
 
-        <TableBody>
+        <TableBody className="divide-muted divide-y">
           {emails?.map((email) => (
             <TableRow key={email.id} className="h-[52px] border-b last:border-0">
               <TableCell className="px-4">

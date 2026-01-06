@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { __ } from '@wordpress/i18n';
-import { CirclePlus, Ellipsis, Eye, EyeOff, GripVertical, Info, Trash2 } from 'lucide-react';
+import { CirclePlus, Eye, EyeOff, GripVertical, Info, Trash2 } from 'lucide-react';
 import { useFormContext } from 'react-hook-form';
 
 import { SettingsFormData } from '@/lib/schema/settings';
@@ -29,6 +29,7 @@ import {
 import { Switch } from '@/components/ui/switch';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { WholeSaleToolTip } from '@/components/custom/WholeSaleToolTip';
+import EllipsisIcon from '@/components/icons/EllipsisIcon';
 
 export function FieldRow({
   field,
@@ -93,7 +94,7 @@ export function FieldRow({
             type="button"
             variant="ghost"
             size="icon"
-            className="hover:text-foreground text-muted-foreground h-[36px] w-[18px] cursor-grab hover:bg-transparent active:cursor-grabbing"
+            className="hover:text-foreground text-muted-foreground hover:bg-muted h-[36px] w-[20px] cursor-grab rounded-sm active:cursor-grabbing"
             {...attributes}
             {...listeners}
           >
@@ -230,30 +231,32 @@ export function FieldRow({
       <div className="flex shrink-0 items-center justify-center">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" disabled={isDefault}>
-              <Ellipsis />
+            <Button variant="ghost" size="icon" disabled={isDefault} className="hover:bg-muted">
+              <EllipsisIcon />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-48" align="end">
-            <FormField
-              control={control}
-              name={`registration_fields.fields.${index}.isRequired`}
-              render={({ field }) => (
-                <div className="flex items-center justify-between p-2">
-                  <Label>{__('Set as required', 'yay-wholesale')}</Label>
-                  <Switch
-                    className="translate-y-0.5 scale-70"
-                    checked={field.value}
-                    onCheckedChange={field.onChange}
-                    disabled={isHidden}
-                  />
-                </div>
-              )}
-            />
-            <DropdownMenuSeparator className="text-foreground w-[95%]" />
+          <DropdownMenuContent className="w-48 p-1" align="end">
             <DropdownMenuGroup>
-              <DropdownMenuItem onClick={append} disabled={isHidden}>
-                <CirclePlus />
+              <FormField
+                control={control}
+                name={`registration_fields.fields.${index}.isRequired`}
+                render={({ field }) => (
+                  <div className="flex items-center justify-between p-2">
+                    <Label>{__('Set as required', 'yay-wholesale')}</Label>
+                    <Switch
+                      className="translate-y-0.5 scale-70"
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                      disabled={isHidden}
+                    />
+                  </div>
+                )}
+              />
+            </DropdownMenuGroup>
+            <DropdownMenuSeparator className="mx-0.25 mt-1" />
+            <DropdownMenuGroup>
+              <DropdownMenuItem onClick={append} disabled={isHidden} className="mt-1">
+                <CirclePlus className="translate-y-0.5" />
                 {__('Add new field', 'yay-wholesale')}
               </DropdownMenuItem>
               <FormField
@@ -264,15 +267,16 @@ export function FieldRow({
                     onClick={() => {
                       field.onChange(!field.value); // Toggle
                     }}
+                    className="mt-1"
                   >
                     {isHidden ? (
                       <>
-                        <Eye />
+                        <Eye className="translate-y-0.5" />
                         {__('Show field', 'yay-wholesale')}
                       </>
                     ) : (
                       <>
-                        <EyeOff />
+                        <EyeOff className="translate-y-0.5" />
                         {__('Hide field', 'yay-wholesale')}
                       </>
                     )}
@@ -280,7 +284,7 @@ export function FieldRow({
                 )}
               />
             </DropdownMenuGroup>
-            <DropdownMenuSeparator />
+            <DropdownMenuSeparator className="mx-0.25 mt-1" />
             <DropdownMenuGroup>
               <DropdownMenuItem
                 variant="destructive"
@@ -290,6 +294,7 @@ export function FieldRow({
                   }
                 }}
                 disabled={field.isHidden || !field.deletable}
+                className="mt-1"
               >
                 <Trash2 />
                 {__('Delete', 'yay-wholesale')}

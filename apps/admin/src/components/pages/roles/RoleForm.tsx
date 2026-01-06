@@ -280,7 +280,7 @@ export default function RoleForm() {
                 <SheetClose asChild>
                   <Button
                     variant="outline"
-                    className="border-border text-foreground-400 border bg-white px-5 hover:bg-gray-50"
+                    className="border-border text-foreground-400 hover:bg-muted border bg-white px-4.5"
                   >
                     {__('Cancel', 'yay-wholesale')}
                   </Button>

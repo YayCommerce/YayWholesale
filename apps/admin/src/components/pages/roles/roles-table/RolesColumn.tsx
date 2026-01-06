@@ -80,7 +80,7 @@ export const RolesColumn: ColumnDef<RolesListValues & { count: number }>[] = [
         <div className="flex gap-2">
           <WholeSaleToolTip
             trigger={
-              <div className="border-border inline-block border-b-2 border-dotted pb-px">
+              <div className="border-foreground/45 inline-block border-b-2 border-dotted pb-0">
                 {row.original.name}
               </div>
             }
@@ -136,7 +136,7 @@ export const RolesColumn: ColumnDef<RolesListValues & { count: number }>[] = [
     header: () => (
       <WholeSaleToolTip
         trigger={
-          <div className="border-border inline-block border-b-2 border-dotted pb-px">
+          <div className="border-foreground/45 inline-block border-b-2 border-dotted pb-0">
             {__('MOQ', 'yay-wholesale')}
           </div>
         }
@@ -152,7 +152,7 @@ export const RolesColumn: ColumnDef<RolesListValues & { count: number }>[] = [
     header: () => (
       <WholeSaleToolTip
         trigger={
-          <div className="border-border inline-block border-b-2 border-dotted pb-px">
+          <div className="border-foreground/45 inline-block border-b-2 border-dotted pb-0">
             {__('MOA', 'yay-wholesale')}
           </div>
         }

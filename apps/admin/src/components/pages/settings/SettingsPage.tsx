@@ -60,6 +60,7 @@ export default function SettingsPage() {
                         to={`/settings/${tab.path}`}
                         className={cn(
                           'text-foreground-400 justify-start rounded-none border-none p-4 py-2.5 text-left text-sm font-normal text-nowrap ring-0 outline-none focus:ring-0 focus:outline-none sm:text-wrap',
+                          'hover:text-primary hover:rounded-md hover:bg-white',
                           tab.path === subMenu &&
                             'text-primary rounded-md bg-white font-medium shadow-none',
                         )}

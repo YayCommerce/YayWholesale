@@ -122,7 +122,7 @@ export default function RolesList() {
           )}
           <Button
             variant="primary-outline"
-            className="hover:bg-primary/10 gap-2 rounded-sm px-4 text-sm font-medium"
+            className="hover:bg-primary gap-2 rounded-sm px-4 text-sm font-medium hover:text-white"
             onClick={() => navigate('/roles/new')}
           >
             <Plus className="h-4 w-4" />
@@ -145,7 +145,7 @@ export default function RolesList() {
           </div>
         )}
 
-        <Table className="min-w-full divide-y">
+        <Table className="divide-muted min-w-full divide-y">
           <TableHeader className="text-foreground bg-muted-400 h-[46px]">
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
@@ -167,7 +167,7 @@ export default function RolesList() {
             ))}
           </TableHeader>
 
-          <TableBody className="divide-y">
+          <TableBody className="divide-muted divide-y">
             {isLoadingRoles ? (
               <TableRow>
                 <TableCell
