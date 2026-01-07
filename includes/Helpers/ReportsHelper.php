@@ -39,7 +39,7 @@ class ReportsHelper {
                 continue;
             }
 
-            $revenue    += $order->get_subtotal();
+            $revenue    += $order->get_total();
             $customer_id = $order->get_customer_id();
             $order_role  = $order->get_meta( '_ywhs_wholesale_role' );
             if ( isset( $top_wholesaler[ $customer_id ] ) ) {
@@ -59,7 +59,7 @@ class ReportsHelper {
                 $product_id                 = $item->get_product_id();
                 $top_product[ $product_id ] = [
                     'orderCount' => isset( $top_product[ $product_id ] ) ? $top_product[ $product_id ]['orderCount'] + $item->get_quantity() : $item->get_quantity(),
-                    'netSale'    => isset( $top_product[ $product_id ] ) ? $top_product[ $product_id ]['netSale'] + $item->get_subtotal() : $item->get_subtotal(),
+                    'netSale'    => isset( $top_product[ $product_id ] ) ? $top_product[ $product_id ]['netSale'] + $item->get_total() + $item->get_total_tax() : $item->get_total() + $item->get_total_tax(),
                 ];
             }
         }//end foreach

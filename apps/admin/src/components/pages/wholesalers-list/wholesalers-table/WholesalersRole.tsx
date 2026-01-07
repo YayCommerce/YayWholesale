@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { SelectGroup } from '@radix-ui/react-select';
+import { useUpdateEffect } from 'react-use';
 
 import { useActiveRolesQuery } from '@/lib/queries/roles';
 import { useUpdateWholesalersRoleMutation } from '@/lib/queries/wholesalers';
@@ -23,6 +24,10 @@ export default function WholesalersRoleColumn({ role, userId }: { role: string; 
     await updateRole({ roleSlug: roleKey });
     setCurrentRole(roleKey);
   };
+
+  useUpdateEffect(() => {
+    setCurrentRole(roles?.find((r) => r.slug === role)?.slug);
+  }, [roles, role]);
 
   return (
     <Select value={currentRole} onValueChange={handleRoleChange}>

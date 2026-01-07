@@ -63,9 +63,9 @@ export default function EmailsTab() {
               <TableCell className="px-4 text-center">
                 <a
                   href={email.url}
-                  className="bg-background hover:bg-accent hover:text-accent-foreground inline-flex h-8 items-center justify-center rounded-md border px-3 py-1 text-sm font-medium"
+                  className="bg-background hover:bg-accent hover:text-accent-foreground inline-flex h-8 items-center justify-center rounded-md border px-3 py-1 text-sm font-medium shadow-xs"
                 >
-                  Manage
+                  {__('Manage', 'yay-wholesale')}
                 </a>
               </TableCell>
             </TableRow>

@@ -80,8 +80,9 @@ export const RolesColumn: ColumnDef<RolesListValues & { count: number }>[] = [
         <div className="flex gap-2">
           <WholeSaleToolTip
             trigger={
-              <div className="border-foreground/45 inline-block border-b-2 border-dotted pb-0">
+              <div className="inline-block">
                 {row.original.name}
+                <div className="text-foreground/45 h-0.25 bg-[radial-gradient(circle,currentColor_0.5px,transparent_0.8px)] bg-size-[2.25px_2px] bg-repeat-x"></div>
               </div>
             }
             content={<span>{__('Default role', 'yay-wholesale')}</span>}
@@ -136,9 +137,10 @@ export const RolesColumn: ColumnDef<RolesListValues & { count: number }>[] = [
     header: () => (
       <WholeSaleToolTip
         trigger={
-          <div className="border-foreground/45 inline-block border-b-2 border-dotted pb-0">
+          <span className="inline-block p-0">
             {__('MOQ', 'yay-wholesale')}
-          </div>
+            <div className="text-foreground/45 h-0.25 -translate-y-0.5 bg-[radial-gradient(circle,currentColor_0.5px,transparent_0.8px)] bg-size-[2.25px_2px] bg-repeat-x"></div>
+          </span>
         }
         content={<span>{__('Minimum order quantity', 'yay-wholesale')}</span>}
       />
@@ -152,9 +154,10 @@ export const RolesColumn: ColumnDef<RolesListValues & { count: number }>[] = [
     header: () => (
       <WholeSaleToolTip
         trigger={
-          <div className="border-foreground/45 inline-block border-b-2 border-dotted pb-0">
+          <span className="inline-block p-0">
             {__('MOA', 'yay-wholesale')}
-          </div>
+            <div className="text-foreground/45 h-0.25 -translate-y-0.5 bg-[radial-gradient(circle,currentColor_0.5px,transparent_0.8px)] bg-size-[2.25px_2px] bg-repeat-x"></div>
+          </span>
         }
         content={<span>{__('Minimum order amount', 'yay-wholesale')}</span>}
       />

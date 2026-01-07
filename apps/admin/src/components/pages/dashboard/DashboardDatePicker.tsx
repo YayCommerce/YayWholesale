@@ -1,7 +1,7 @@
 import { Dispatch, FC, SetStateAction, useMemo, useState } from 'react';
 import { PopoverClose } from '@radix-ui/react-popover';
 import { __ } from '@wordpress/i18n';
-import { CalendarIcon } from 'lucide-react';
+import { CalendarIcon, ChevronDown } from 'lucide-react';
 import { DateRange } from 'react-day-picker';
 
 import { Button } from '@/components/ui/button';
@@ -50,10 +50,13 @@ const DashboardDatePicker: FC<DashboardDatePickerProps> = ({ dateRange, setDateR
         <PopoverTrigger asChild>
           <Button
             variant="outline"
-            className="text-foreground flex h-8.5 min-w-67.5 items-center justify-start gap-2 rounded-md border bg-white text-sm font-normal shadow-xs"
+            className="text-foreground flex h-8.5 min-w-71.5 items-center justify-between rounded-md border bg-white px-2.5! text-[14px] font-medium shadow-xs"
           >
-            <CalendarIcon />
-            {displayDateRange}
+            <div className="flex items-center gap-2">
+              <CalendarIcon />
+              {displayDateRange}
+            </div>
+            <ChevronDown className="pt-0.5" />
           </Button>
         </PopoverTrigger>
         <PopoverContent

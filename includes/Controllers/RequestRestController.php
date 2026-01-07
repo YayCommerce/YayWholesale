@@ -370,6 +370,7 @@ class RequestRestController extends BaseRestController {
                     ++$failed_partially;
                 } else {
                     ++$updated;
+                    do_action( 'yhs_account_registration_approved', $id );
                 }
             }
         } elseif ( RequestsHelper::REJECTED === $status ) {
@@ -385,6 +386,7 @@ class RequestRestController extends BaseRestController {
                     ++$failed_partially;
                 } else {
                     ++$updated;
+                    do_action( 'yhs_account_registration_rejected', $id );
                 }
             }
         } else {

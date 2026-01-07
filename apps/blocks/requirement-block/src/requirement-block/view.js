@@ -1,5 +1,5 @@
 
-import { store, getConfig, subcribe } from '@wordpress/interactivity';
+import { store, getConfig } from '@wordpress/interactivity';
 
 
 let wcState = null;
@@ -39,6 +39,13 @@ try {
     }
   );
   wcState = wcStore?.state;
+
+  if (! wcState.cart) {
+    wcState = {
+      cart : wp.data.select('wc/store/cart').getCartData(),
+      restUrl: wcSettings.homeUrl + "wp-json",
+    }
+  }
 } catch (e) {
     console.log(e);
   // WooCommerce store not available
