@@ -93,13 +93,7 @@ export default function DashboardSummary(props: {
                 )}
                 <p className="text-xs">
                   {c.percent && c.percent < 0 ? '' : '+'}
-                  {c.overPercent ? (
-                    <>
-                      100<sup className="text-[10px]">+</sup>%
-                    </>
-                  ) : (
-                    <>{parseWPDecimal(c.percent)}%</>
-                  )}
+                  {parseWPDecimal(c.percent)}%
                 </p>
               </Badge>
             </div>

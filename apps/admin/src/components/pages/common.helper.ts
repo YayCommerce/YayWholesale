@@ -114,6 +114,8 @@ export function parseWPCurrency(price: string | number) {
 export function parseWPDecimal(number: number) {
   const formattedNumber = number
     .toFixed(2)
+    .replace(/\.00$/, '')
+    .replace(/\B(?=(\d{3})+(?!\d))/g, window.yayWholesale.currency_data.thousand_sep)
     .replace(/(\d+)\.(\d{2})$/, `$1${window.yayWholesale.currency_data.decimal_sep}$2`);
 
   return formattedNumber;

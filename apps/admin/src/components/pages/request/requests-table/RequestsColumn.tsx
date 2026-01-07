@@ -129,7 +129,7 @@ export const RequestsColumn: ColumnDef<RequestFormValues>[] = [
       return (
         <AlertDialog open={openDialog} onOpenChange={setOpenDialog}>
           <div className="flex w-10 items-center justify-end gap-2">
-            <div className="peer flex gap-1.5 opacity-0 group-hover:opacity-100 has-data-[state='delayed-open']:opacity-100">
+            <div className="peer flex gap-1.5 opacity-0 group-hover:opacity-100 has-data-[state='delayed-open']:opacity-100 has-data-[state='instant-open']:opacity-100">
               <WholeSaleToolTip
                 trigger={
                   <Button
@@ -169,7 +169,7 @@ export const RequestsColumn: ColumnDef<RequestFormValues>[] = [
             <Button
               size="icon"
               variant="ghost"
-              className="text-muted-foreground absolute z-1 flex h-8 w-8 group-hover:-z-10 peer-has-data-[state='delayed-open']:-z-10"
+              className="text-muted-foreground absolute z-1 flex h-8 w-8 group-hover:-z-10 peer-has-data-[state='delayed-open']:-z-10 peer-has-data-[state='instant-open']:-z-10"
             >
               <Ellipsis className="h-4 w-4" />
             </Button>

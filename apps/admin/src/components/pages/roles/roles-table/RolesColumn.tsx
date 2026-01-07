@@ -198,7 +198,7 @@ export const RolesColumn: ColumnDef<RolesListValues & { count: number }>[] = [
       return (
         <AlertDialog open={openDialog} onOpenChange={setOpenDialog}>
           <div className="flex w-10 items-center justify-end gap-2">
-            <div className="peer flex justify-end gap-1.5 opacity-0 group-hover:opacity-100 has-data-[state='delayed-open']:opacity-100">
+            <div className="peer flex justify-end gap-1.5 opacity-0 group-hover:opacity-100 has-data-[state='delayed-open']:opacity-100 has-data-[state='instant-open']:opacity-100">
               <WholeSaleToolTip
                 trigger={
                   <Button
@@ -254,7 +254,7 @@ export const RolesColumn: ColumnDef<RolesListValues & { count: number }>[] = [
             <Button
               size="icon"
               variant="ghost"
-              className="text-muted-foreground absolute z-1 mr-0.5 flex h-8 w-8 duration-75 group-hover:-z-10 peer-has-data-[state='delayed-open']:-z-10"
+              className="text-muted-foreground absolute z-1 mr-0.5 flex h-8 w-8 duration-75 group-hover:-z-10 peer-has-data-[state='delayed-open']:-z-10 peer-has-data-[state='instant-open']:-z-10"
             >
               <Ellipsis className="h-4 w-4" />
             </Button>

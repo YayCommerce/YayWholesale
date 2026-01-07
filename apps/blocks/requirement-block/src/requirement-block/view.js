@@ -43,7 +43,7 @@ try {
   if (! wcState.cart) {
     wcState = {
       cart : wp.data.select('wc/store/cart').getCartData(),
-      restUrl: wcSettings.homeUrl + "wp-json",
+      restUrl: wcSettings.homeUrl + "wp-json/",
     }
   }
 } catch (e) {
