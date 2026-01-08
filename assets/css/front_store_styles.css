@@ -157,7 +157,7 @@
     flex: 1;
 }
 
-.ywhs_requirement_notice {
+.ywhs_requirement_notice, .ywhs_requirement_notice_block {
     font-size: 12px;
     font-weight: 400;
 }
@@ -219,7 +219,7 @@
     transition: transform 0.6s;
 }
 
-.ywhs_icon_holder {
+.ywhs_icon_holder, .ywhs_icon_holder_block {
     height: 28px;
     width: 28px;
     border-radius: 50%;
@@ -230,7 +230,7 @@
     align-items: center;
 }
 
-.ywhs_icon_holder > svg {
+.ywhs_icon_holder > svg, .ywhs_icon_holder_block > svg {
     margin-left: 1px;
     margin-top: 1px;
 }

@@ -69,8 +69,8 @@ const Render = () => {
         else {
             lackOfAmt = wholesale.minOrderAmount - actualSubtotal;
             lackOfQty = wholesale.minOrderQuantity - actualCount;
-            let progressOfAmt = Math.min(100, actualSubtotal / wholesale.minOrderAmount * 100);
-            let progressOfQty = Math.min(100, actualCount / wholesale.minOrderQuantity * 100);
+            let progressOfAmt = Math.min(100, actualSubtotal / Math.max(wholesale.minOrderAmount, 1) * 100);
+            let progressOfQty = Math.min(100, actualCount / Math.max(wholesale.minOrderQuantity, 1) * 100);
 
             progress = ((progressOfAmt + progressOfQty) / 2).toFixed(2);
 
@@ -96,7 +96,7 @@ const Render = () => {
                 /* translators: 1: amount remaining, 2: discount percentage */
                 notice = sprintf(
                     __(
-                        "You're almost there! Add %1$s more to your order and enjoy <span class='ywhs_r_notice'>%2$d%% Off</span> each product.",
+                        "You're almost there! Add %1$s more to receive wholesale pricing with <span class='ywhs_r_notice'>%2$d%% Off</span> value.",
                         'yay-wholesale'
                     ),
                     lack,
@@ -169,7 +169,7 @@ const Render = () => {
                     <div className="ywhs_requirement_item">
                         <span>{__('Min order quantity:', 'yay-wholesale')}</span>
                         <span className="ywhs_r_base_notice">
-                            <span className={actualCount > 0 ? 'ywhs_r_notice' : ''}>
+                            <span className={isDiscounted ? 'ywhs_r_notice' : ''}>
                                 {actualCount}
                             </span>
                             /{wholesale.minOrderQuantity}
@@ -180,7 +180,7 @@ const Render = () => {
                     <div className="ywhs_requirement_item">
                         <span>{__('Min order amount:', 'yay-wholesale')}</span>
                         <span className="ywhs_r_base_notice">
-                            <span className={actualSubtotal > 0 ? 'ywhs_r_notice' : ''}>
+                            <span className={isDiscounted ? 'ywhs_r_notice' : ''}>
                                 {parseWPCurrency(actualSubtotal)}
                             </span>
                             /{parseWPCurrency(wholesale.minOrderAmount)}
