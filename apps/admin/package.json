@@ -41,6 +41,7 @@
     "@tanstack/react-query": "^5.90.5",
     "@tanstack/react-table": "^8.21.3",
     "@wordpress/components": "^30.6.0",
+    "@wordpress/element": "^6.37.0",
     "@wordpress/i18n": "^6.6.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",

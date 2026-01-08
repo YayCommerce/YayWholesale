@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { createInterpolateElement } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 import { markReviewed } from '@/lib/queries/mark-reviewed';
@@ -72,7 +73,7 @@ export default function Footer({
 
       <footer
         className={cn(
-          'border-border text-foreground fixed bottom-0 z-50 flex flex-col items-center justify-center gap-2 border-t bg-[#F5F5F5] px-4 py-1 text-xs md:flex-row md:justify-between',
+          'border-input text-foreground bg-muted fixed bottom-0 z-50 flex flex-col items-center justify-center gap-2 border-t px-4 py-1 text-xs md:flex-row md:justify-between',
         )}
         style={{
           left: `${containerRect.left}px`,
@@ -126,27 +127,38 @@ export default function Footer({
         {/* review text */}
         {!hasReviewed ? (
           <p className="text-center text-xs">
-            {__('We need your support to keep updating and improving the plugin. Please,')}{' '}
-            <button
-              type="button"
-              onClick={handleReviewClick}
-              className="text-primary cursor-pointer hover:text-[#1b5f97]"
-            >
-              {__('help us by leaving a good review')}
-            </button>{' '}
-            :) {__('Thanks!')}
+            {createInterpolateElement(
+              __(
+                'We need your support to keep updating and improving the plugin. Please <review>help us by leaving a good review</review>. Thanks!',
+                'yay-wholesale',
+              ),
+              {
+                review: (
+                  <button
+                    type="button"
+                    onClick={handleReviewClick}
+                    className="text-primary cursor-pointer underline hover:text-[#1b5f97]"
+                  />
+                ),
+              },
+            )}
           </p>
         ) : (
           <p className="text-right text-xs">
-            {__('Thank you for using YayWholesale from')}{' '}
-            <a
-              href="https://yaycommerce.com/"
-              target="_blank"
-              className="text-primary cursor-pointer hover:text-[#1b5f97] focus:shadow-none"
-            >
-              YayCommerce
-            </a>
-            .
+            {createInterpolateElement(
+              __('Thank you for using YayWholesale from <link/>.', 'yay-wholesale'),
+              {
+                link: (
+                  <a
+                    href="https://yaycommerce.com/"
+                    target="_blank"
+                    className="text-primary cursor-pointer hover:text-[#1b5f97] focus:shadow-none"
+                  >
+                    YayCommerce
+                  </a>
+                ),
+              },
+            )}
           </p>
         )}
       </footer>

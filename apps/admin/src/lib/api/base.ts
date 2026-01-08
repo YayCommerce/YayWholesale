@@ -152,12 +152,12 @@ export async function handleResponse<T>(
   errorMessage: string,
 ): Promise<ApiResponse<T>> {
   if (!response.ok) {
-    throw new Error(__(errorMessage));
+    throw new Error(__(errorMessage, 'yay-wholesale'));
   }
 
   const result = await response.json();
   if (!result.success) {
-    throw new Error(__(result.message || errorMessage));
+    throw new Error(__(result.message || errorMessage, 'yay-wholesale'));
   }
 
   return result;

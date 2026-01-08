@@ -125,6 +125,21 @@ class Orders {
         bool $is_force_tax_exempt,
         array &$items
     ) {
+        $coupons = $order->get_items( 'coupon' );
+
+        $discounted_coupon = 0;
+        if ( $is_discounted && $is_disabled_coupon ) {
+            $order->remove_order_items( 'coupon' );
+        } else {
+            foreach ( $coupons as $coupon_item ) {
+                /** @var WC_Order_Item_Coupon $coupon_item */
+
+                $code   = $coupon_item->get_code();
+                $amount = $coupon_item->get_discount();
+
+                $discounted_coupon += $amount;
+            }
+        }
 
         // Handeling price and tax
         foreach ( $order->get_items() as $item ) {
@@ -142,11 +157,7 @@ class Orders {
 
             $quantity = $item->get_quantity();
             $item->set_subtotal( $new_price * $quantity );
-
-            // Set directly to total skip the coupon
-            if ( $is_discounted && $is_disabled_coupon ) {
-                $item->set_total( $new_price * $quantity );
-            }
+            $item->set_total( $new_price * $quantity - $discounted_coupon );
 
             $items[] = $item->get_name() . ' x ' . $quantity;
 

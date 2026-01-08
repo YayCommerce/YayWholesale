@@ -10,15 +10,15 @@ export default function NotFoundPage() {
         <h1 className="text-primary mb-2 text-8xl font-bold">404</h1>
         <h2 className="text-primary mb-4 text-2xl font-semibold">Page Not Found</h2>
         <p className="text-primary">
-          The page you are looking for doesn&apos;t exist or has been moved.
+          {__("The page you are looking for doesn't exist or has been moved.", 'yay-wholesale')}
         </p>
       </div>
 
       <button
         onClick={() => navigate('/dashboard')}
-        className="bg-primary hover:bg-primary/90 rounded-md px-4 py-2 text-sm font-medium text-white transition-colors"
+        className="bg-primary hover:bg-primary/90 text-primary-foreground rounded-md px-4 py-2 text-sm font-medium transition-colors"
       >
-        {__('Back to Dashboard')}
+        {__('Back to Dashboard', 'yay-wholesale')}
       </button>
     </div>
   );

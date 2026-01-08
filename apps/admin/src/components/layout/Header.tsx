@@ -149,7 +149,7 @@ export default function Header() {
           className="relative cursor-pointer"
         >
           <span className={isSavingSettings ? 'opacity-0' : 'opacity-100'}>
-            {__('Save Changes')}
+            {__('Save Changes', 'yay-wholesale')}
           </span>
           {isSavingSettings && (
             <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">

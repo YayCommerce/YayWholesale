@@ -26,9 +26,9 @@ class PricesRestController extends BaseRestController {
             '/prices',
             [
                 [
-                    'methods'  => 'POST',
-                    'callback' => [ $this, 'get_original_prices' ],
-                    // 'permission_callback' => [ $this, 'prices_permission_callback' ],
+                    'methods'             => 'POST',
+                    'callback'            => [ $this, 'get_original_prices' ],
+                    'permission_callback' => [ $this, 'prices_permission_callback' ],
                 ],
             ]
         );
@@ -40,7 +40,7 @@ class PricesRestController extends BaseRestController {
      * @return bool|WP_Error True if the user has the necessary permissions, otherwise a WP_Error object.
      */
     public function prices_permission_callback() {
-        if ( ! current_user_can( 'manage_options' ) || ! current_user_can( 'manage_woocommerce' ) ) {
+        if ( ! is_user_logged_in() ) {
             return new \WP_Error( 'rest_forbidden', esc_html__( 'Forbidden.', 'yay-wholesale' ), [ 'status' => 401 ] );
         }
 

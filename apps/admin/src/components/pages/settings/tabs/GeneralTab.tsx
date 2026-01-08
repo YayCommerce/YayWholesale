@@ -31,20 +31,20 @@ export default function GeneralTab() {
   // const roleSlugs = useMemo(() => new Set(rolesList.map((r) => r.slug)), [rolesList]);
 
   return (
-    <div className="space-y-4">
+    <div className="flex flex-col gap-4">
       {/* Default role for new user */}
       <FormField
         control={control}
         name={`general.default_role`}
         render={({ field }) => (
-          <FormItem className="w-full">
-            <FormLabel className="space-y-2.5 text-xs font-medium">
-              {__('Default role for new user')}
+          <FormItem className="flex w-full flex-col gap-2.5">
+            <FormLabel className="text-xs font-medium">
+              {__('Default role for new user', 'yay-wholesale')}
             </FormLabel>
             <FormControl>
               <Select value={field.value ? field.value : ''} onValueChange={field.onChange}>
-                <SelectTrigger className="w-[160px] text-sm font-normal">
-                  <SelectValue placeholder={__('Select a role')} />
+                <SelectTrigger className="min-w-40 text-sm font-normal">
+                  <SelectValue placeholder={__('Select a role', 'yay-wholesale')} />
                 </SelectTrigger>
                 <SelectContent>
                   {rolesList.map((role) => (
@@ -63,13 +63,13 @@ export default function GeneralTab() {
         control={control}
         name={`general.show_wholesale_price`}
         render={({ field }) => (
-          <div className="base-base-border flex items-center justify-between rounded-md border p-4">
+          <div className="flex items-center justify-between rounded-md border p-4">
             <div>
-              <h2 className="text-base-secondary text-sm font-normal">
-                Show Wholesale Price to non-wholesale users
+              <h2 className="text-foreground-400 text-sm font-normal">
+                {__('Show Wholesale Price to non-wholesale users', 'yay-wholesale')}
               </h2>
-              <p className="text-base-muted-foreground mt-1 text-xs font-normal">
-                If enable, wholesale price will display for all users.
+              <p className="text-muted-foreground mt-1 text-xs font-normal">
+                {__('If enable, wholesale price will display for all users.', 'yay-wholesale')}
               </p>
             </div>
             <Switch
@@ -86,11 +86,13 @@ export default function GeneralTab() {
         control={control}
         name={`general.disable_coupon`}
         render={({ field }) => (
-          <div className="base-base-border flex items-center justify-between rounded-lg border p-4">
+          <div className="flex items-center justify-between rounded-lg border p-4">
             <div>
-              <h2 className="text-base-secondary text-sm font-normal">Disable coupon</h2>
-              <p className="text-base-muted-foreground mt-1 text-xs font-normal">
-                Hide coupon field for wholesale users.
+              <h2 className="text-foreground-400 text-sm font-normal">
+                {__('Disable coupon', 'yay-wholesale')}
+              </h2>
+              <p className="text-muted-foreground mt-1 text-xs font-normal">
+                {__("Hide coupon field for wholesale users., 'yay-wholesale'")}
               </p>
             </div>
             <Switch size="md" checked={field.value} onCheckedChange={field.onChange} />
@@ -104,11 +106,13 @@ export default function GeneralTab() {
         control={control}
         name={`general.disable_tax`}
         render={({ field }) => (
-          <div className="base-base-border flex items-center justify-between rounded-md border p-4">
+          <div className="flex items-center justify-between rounded-md border p-4">
             <div>
-              <h2 className="text-base-secondary text-sm font-normal">Disable tax</h2>
-              <p className="text-base-muted-foreground mt-1 text-xs font-normal">
-                Don't charge tax for wholesale users.
+              <h2 className="text-foreground-400 text-sm font-normal">
+                {__('Disable tax', 'yay-wholesale')}
+              </h2>
+              <p className="text-muted-foreground mt-1 text-xs font-normal">
+                {__("Don't charge tax for wholesale users.", 'yay-wholesale')}
               </p>
             </div>
             <Switch size="md" checked={field.value} onCheckedChange={field.onChange} />

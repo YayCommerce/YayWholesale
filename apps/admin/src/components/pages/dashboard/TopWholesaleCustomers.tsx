@@ -26,7 +26,7 @@ export default function TopWholesaleCustomers(props: {
       <CardContent className="flex min-h-0 flex-1 flex-col gap-5 p-5">
         {/* Header */}
         <div className="flex items-center justify-between">
-          <h3 className="text-base-foreground text-[16px] font-semibold">
+          <h3 className="text-foreground text-[16px] font-semibold">
             {__('Top Wholesale Customers', 'yay-wholesale')}
           </h3>
         </div>
@@ -38,30 +38,30 @@ export default function TopWholesaleCustomers(props: {
             isFetching && 'relative opacity-50',
           )}
         >
-          <Table className="divide-muted min-w-full divide-y">
-            <TableHeader className="text-base-foreground bg-base-muted h-10">
-              <TableRow className="text-base-foreground text-[14px] font-semibold">
-                <TableHead className="text-base-foreground text-[14px]">
+          <Table className="min-w-full">
+            <TableHeader className="text-foreground bg-muted-400 h-10">
+              <TableRow className="text-foreground border-border border-b text-[14px] font-semibold">
+                <TableHead className="text-foreground text-[14px]">
                   <span className="flex items-center justify-center font-medium">
                     {__('No', 'yay-wholesale')}
                   </span>
                 </TableHead>
-                <TableHead className="text-base-foreground text-[14px]">
+                <TableHead className="text-foreground text-[14px]">
                   {__('Customer', 'yay-wholesale')}
                 </TableHead>
-                <TableHead className="text-base-foreground text-[14px]">
+                <TableHead className="text-foreground text-[14px]">
                   <span className="flex items-center justify-center font-medium">
                     {__('Orders', 'yay-wholesale')}
                   </span>
                 </TableHead>
-                <TableHead className="text-base-foreground text-[14px]">
+                <TableHead className="text-foreground text-[14px]">
                   <span className="flex items-center justify-center font-medium">
                     {__('Role', 'yay-wholesale')}
                   </span>
                 </TableHead>
               </TableRow>
             </TableHeader>
-            <TableBody className="divide-muted border-muted divide-y border-b">
+            <TableBody className="border-border border-b">
               {isLoading ? (
                 <TableRow>
                   <TableCell colSpan={4} className="h-32 text-center align-middle">
@@ -72,13 +72,13 @@ export default function TopWholesaleCustomers(props: {
                 </TableRow>
               ) : reportData?.topProducts && reportData?.topProducts.length > 0 ? (
                 reportData.topWholesalers.map((data) => (
-                  <TableRow>
-                    <TableCell className="text-base-foreground py-3 text-[14px]">
+                  <TableRow className="border-border border-b">
+                    <TableCell className="text-foreground py-3 text-[14px]">
                       <span className="flex justify-center">
                         {reportData.topWholesalers.indexOf(data) + 1}
                       </span>
                     </TableCell>
-                    <TableCell className="text-base-foreground py-3 text-[14px]">
+                    <TableCell className="text-foreground py-3 text-[14px]">
                       <div className="flex items-center gap-3">
                         <div className="h-8 w-8">
                           <img
@@ -92,7 +92,7 @@ export default function TopWholesaleCustomers(props: {
                           />
                         </div>
                         <div className="flex w-40 items-center gap-1 md:w-15 md:flex-wrap lg:w-40 lg:flex-nowrap">
-                          <span className="text-base-foreground text-[14px] font-medium whitespace-normal md:text-[13px] lg:text-[14px]">
+                          <span className="text-foreground text-[14px] font-medium whitespace-normal md:text-[13px] lg:text-[14px]">
                             {data.name}
                           </span>
                           {reportData.topWholesalers.indexOf(data) < 3 && (
@@ -101,14 +101,14 @@ export default function TopWholesaleCustomers(props: {
                         </div>
                       </div>
                     </TableCell>
-                    <TableCell className="text-base-foreground py-3 text-[14px]">
+                    <TableCell className="text-foreground py-3 text-[14px]">
                       <span className="flex justify-center">{data.orderCount}</span>
                     </TableCell>
-                    <TableCell className="text-base-foreground py-3 text-[14px]">
+                    <TableCell className="text-foreground py-3 text-[14px]">
                       <div className="flex justify-center">
                         <Badge
                           variant="muted"
-                          className="text-base-foreground bg-base-muted cursor-default rounded-md text-xs font-semibold shadow-xs"
+                          className="text-foreground bg-muted-400 cursor-default rounded-md text-xs font-semibold shadow-xs"
                         >
                           {data.role}
                         </Badge>

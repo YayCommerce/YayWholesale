@@ -15,7 +15,7 @@ class Frontend {
     }
 
     public function enqueue_scripts() {
-        $dep           = [ 'jquery' ];
+        $dep           = [ 'jquery', 'wp-i18n' ];
         $script_handle = 'yay-wholesale-scripts';
 
         wp_enqueue_script( $script_handle, YAY_WHOLESALE_PLUGIN_URL . 'assets/js/request-form-script.js', $dep, YAY_WHOLESALE_VERSION, false );

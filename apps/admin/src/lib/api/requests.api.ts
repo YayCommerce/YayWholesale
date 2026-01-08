@@ -2,8 +2,8 @@ import { __ } from '@wordpress/i18n';
 
 import {
   PaginatedRequestListValues,
-  PendingCountValues,
   RequestFormValues,
+  RequestsCountValues,
 } from '../schema/requests';
 import { api, handleResponse } from './base';
 
@@ -101,9 +101,19 @@ export async function bulkDeleteRequest(requestIds: number[]) {
 
 export async function getPendingCount() {
   const response = await api.get('requests/pending');
-  const result = await handleResponse<PendingCountValues>(
+  const result = await handleResponse<RequestsCountValues>(
     response,
     __('Failed to get the pending requests count', 'yay-wholesale'),
+  );
+
+  return result.data;
+}
+
+export async function getTotalCount() {
+  const response = await api.get('requests/total');
+  const result = await handleResponse<RequestsCountValues>(
+    response,
+    __('Failed to get the requests count', 'yay-wholesale'),
   );
 
   return result.data;

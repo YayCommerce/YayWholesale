@@ -11,6 +11,7 @@ import {
   useBulkDeleteRequestMutation,
   useBulkUpdateRequestStatusMutation,
   useRequestsQuery,
+  useTotalCountQuery,
 } from '@/lib/queries/requests';
 import { useActiveRolesQuery } from '@/lib/queries/roles';
 import { RequestFormValues } from '@/lib/schema/requests';
@@ -25,6 +26,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import { Badge } from '@/components/ui/badge';
 import {
   BulkActionButton,
   BulkActionMenu,
@@ -86,6 +88,7 @@ export default function RequestsList() {
   } = useRequestsQuery(keyword, pagination, statusFilter);
 
   const { data: activeRoles } = useActiveRolesQuery();
+  const { data: totalCount } = useTotalCountQuery();
 
   const columns = RequestsColumn;
   const defaultData = useMemo(() => [], []);
@@ -139,7 +142,29 @@ export default function RequestsList() {
     <Card className="gap-4 rounded-lg p-6 shadow-sm">
       {/* Header */}
       <div className="flex flex-nowrap items-center justify-between gap-3">
-        <h1 className="text-2xl font-bold">{__('Wholesaler Requests', 'yay-wholesale')}</h1>
+        <div className="flex items-center gap-2">
+          <h1 className="text-2xl font-bold">{__('Wholesaler Requests', 'yay-wholesale')}</h1>
+          {totalCount && totalCount.count > 0 && (
+            <WholeSaleToolTip
+              trigger={
+                <div>
+                  <Badge
+                    variant="muted"
+                    className="text-foreground h-5 min-w-5 rounded-full border-none px-1 tabular-nums"
+                  >
+                    {totalCount.count}
+                  </Badge>
+                </div>
+              }
+              content={
+                totalCount.count > 1
+                  ? sprintf(__('%d requests in total', 'yay-wholesale'), totalCount.count)
+                  : __('1 request in total', 'yay-wholesale')
+              }
+              side="bottom"
+            />
+          )}
+        </div>
         <div className="flex flex-col items-end gap-4 md:flex-row">
           <Select value={statusFilter} onValueChange={setStatusFilter}>
             <SelectTrigger className="w-40">
@@ -187,15 +212,15 @@ export default function RequestsList() {
             <Spinner className="text-muted-foreground size-6 animate-spin" />
           </div>
         )}
-        <Table className="min-w-full divide-y">
-          <TableHeader className="text-base-foreground bg-base-muted h-[46px]">
+        <Table className="min-w-full">
+          <TableHeader className="text-foreground bg-muted-400 h-[46px]">
             {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
+              <TableRow key={headerGroup.id} className="border-border border-b">
                 {headerGroup.headers.map((header) => (
                   <TableHead
                     key={header.id}
                     className={cn(
-                      'text-base-secondary py-2 text-sm font-medium',
+                      'text-foreground-400 py-2 text-sm font-medium',
                       header.column.columnDef.meta?.align === 'center'
                         ? 'text-center'
                         : 'text-left',
@@ -208,7 +233,7 @@ export default function RequestsList() {
               </TableRow>
             ))}
           </TableHeader>
-          <TableBody className="divide-y">
+          <TableBody>
             {isLoadingRequests ? (
               <TableRow>
                 <TableCell colSpan={columns.length} className="h-32 text-center align-middle">
@@ -222,7 +247,7 @@ export default function RequestsList() {
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && 'selected'}
-                  className="group"
+                  className="group not-last:border-border not-last:border-b"
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell
@@ -249,7 +274,7 @@ export default function RequestsList() {
         </Table>
       </div>
       {/* Footer */}
-      {data != undefined && data.data.length > 0 && (
+      {(table.getPageCount() > 1 || selectedCount > 1) && (
         <div
           className={cn(
             'relative flex flex-col items-center gap-3 sm:flex-row',
@@ -261,8 +286,8 @@ export default function RequestsList() {
         >
           {!(useBulkUpdateMutation.isPending || useBulkDeleteMutation.isPending) && (
             <BulkActionBox selected={selectedCount} onClose={() => table.resetRowSelection()}>
-              <span className="text-sm font-normal text-[#151619]">
-                {sprintf(__('%d selected'), selectedCount)}
+              <span className="text-foreground text-sm font-normal">
+                {sprintf(__('%d selected', 'yay-wholesale'), selectedCount)}
               </span>
               <Separator orientation="vertical" className="ml-2 h-5!" />
               <Popover>
@@ -271,7 +296,7 @@ export default function RequestsList() {
                     variant="ghost"
                     className="hover:text-primary hover:bg-primary/6 group bold flex cursor-pointer items-center gap-1.5 px-2.5"
                   >
-                    <span className="text-sm font-normal">{__('Status')}</span>
+                    <span className="text-sm font-normal">{__('Status', 'yay-wholesale')}</span>
                     <span className="group-hover:text-primary text-icon flex items-center">
                       <CaretUpDownIcon size={12} weight="bold" />
                     </span>
@@ -283,7 +308,7 @@ export default function RequestsList() {
                     <BulkActionMenu>
                       <BulkMenuButtonAndTrigger onClick={() => handleBulkStatusChange('approved')}>
                         <RequestsStatusIcon status="approved" className="mt-0.5" />
-                        {__('Approve')}
+                        {__('Approve', 'yay-wholesale')}
                       </BulkMenuButtonAndTrigger>
                       <BulkActionMenuContent>
                         {activeRoles?.map((role) => (
@@ -291,7 +316,7 @@ export default function RequestsList() {
                             onClick={() => handleBulkStatusChange('approved', role.id)}
                           >
                             <RequestsStatusIcon status="approved" />
-                            {sprintf(__('Approve to %s'), role.name)}
+                            {sprintf(__('Approve to %s', 'yay-wholesale'), role.name)}
                           </BulkActionButton>
                         ))}
                       </BulkActionMenuContent>
@@ -299,7 +324,7 @@ export default function RequestsList() {
 
                     <BulkActionButton onClick={() => handleBulkStatusChange('rejected')}>
                       <RequestsStatusIcon status="rejected" />
-                      {__('Reject')}
+                      {__('Reject', 'yay-wholesale')}
                     </BulkActionButton>
                   </div>
                 </PopoverContent>
@@ -311,7 +336,7 @@ export default function RequestsList() {
                     <Button
                       size="icon"
                       variant="ghost"
-                      className="hover:text-destructive text-base-muted-foreground h-8 w-8 hover:bg-transparent hover:shadow-sm"
+                      className="hover:text-destructive text-muted-foreground h-8 w-8 hover:bg-transparent hover:shadow-sm"
                       onClick={() => setOpenDeleteDialog(true)}
                     >
                       <DeleteIcon className="size-4" />
@@ -350,9 +375,9 @@ export default function RequestsList() {
 
           {table.getPageCount() > 1 && (
             <div className="flex items-center gap-4">
-              <span className="text-base-secondary text-sm font-normal">
+              <span className="text-foreground-400 text-sm font-normal">
                 {sprintf(
-                  __('Page %d of %d'),
+                  __('Page %d of %d', 'yay-wholesale'),
                   table.getState().pagination.pageIndex + 1,
                   table.getPageCount(),
                 )}
@@ -380,7 +405,9 @@ export default function RequestsList() {
               </div>
 
               <div className="flex items-center gap-2">
-                <span className="text-base-secondary text-sm font-normal">{__('Go to')}</span>
+                <span className="text-foreground-400 text-sm font-normal">
+                  {__('Go to', 'yay-wholesale')}
+                </span>
                 <InputNumberRoot
                   min={1}
                   max={table.getPageCount()}
@@ -392,10 +419,10 @@ export default function RequestsList() {
                       table.setPageIndex(page);
                     }
                   }}
-                  className="text-base-secondary h-9 w-15 rounded-sm text-sm font-normal focus-visible:ring-0"
+                  className="text-foreground-400 h-9 w-15 rounded-sm text-sm font-normal focus-visible:ring-0"
                   disabled={isFetchingRequests || table.getPageCount() <= 1}
                 >
-                  <InputNumberInput className="disabled:bg-base-muted w-full shadow-xs disabled:text-black" />
+                  <InputNumberInput className="disabled:bg-muted-400 w-full shadow-xs disabled:text-black" />
                 </InputNumberRoot>
               </div>
             </div>

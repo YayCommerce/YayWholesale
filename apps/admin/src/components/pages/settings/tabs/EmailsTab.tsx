@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { __ } from '@wordpress/i18n';
 
 import { useUpdateEmailStatusMutation, useWholesaleEmailsQuery } from '@/lib/queries/emails';
 import { Switch } from '@/components/ui/switch';
@@ -17,10 +18,10 @@ export default function EmailsTab() {
   const { mutate } = useUpdateEmailStatusMutation();
 
   return (
-    <div className="overflow-x-auto rounded-lg border bg-white shadow-sm">
+    <div className="overflow-x-auto rounded-lg border bg-white shadow-xs">
       <Table>
         <TableHeader>
-          <TableRow className="bg-[#f6f6f7] hover:bg-[#f6f6f7]">
+          <TableRow className="bg-muted-400 hover:bg-muted-400 border-border border-b">
             <TableHead className="w-12"></TableHead>
             <TableHead className="text-sm font-medium">Emails</TableHead>
             <TableHead className="text-sm font-medium">Description</TableHead>
@@ -31,7 +32,7 @@ export default function EmailsTab() {
 
         <TableBody>
           {emails?.map((email) => (
-            <TableRow key={email.id} className="h-[52px] border-b last:border-0">
+            <TableRow key={email.id} className="border-border h-[52px] border-b last:border-0">
               <TableCell className="px-4">
                 <Switch
                   disabled={loadingId === email.id}
@@ -53,18 +54,18 @@ export default function EmailsTab() {
                 </a>
               </TableCell>
 
-              <TableCell className="text-base-foreground">{email.description}</TableCell>
+              <TableCell className="text-foreground">{email.description}</TableCell>
 
-              <TableCell className="text-base-foreground">
-                {email.recipients || 'Customer'}
+              <TableCell className="text-foreground">
+                {email.recipients || __('Customer', 'yay-wholesale')}
               </TableCell>
 
               <TableCell className="px-4 text-center">
                 <a
                   href={email.url}
-                  className="bg-background hover:bg-accent hover:text-accent-foreground inline-flex h-8 items-center justify-center rounded-md border px-3 py-1 text-sm font-medium"
+                  className="bg-background hover:bg-accent hover:text-accent-foreground inline-flex h-8 items-center justify-center rounded-md border px-3 py-1 text-sm font-medium shadow-xs"
                 >
-                  Manage
+                  {__('Manage', 'yay-wholesale')}
                 </a>
               </TableCell>
             </TableRow>

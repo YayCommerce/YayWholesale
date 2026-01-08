@@ -4,13 +4,15 @@ import { cn } from '@/lib/utils';
 
 import { focusVariants } from '../variants/focus.variants';
 
-function Textarea({ className, ...props }: React.ComponentProps<'textarea'>) {
+function Textarea({ className, readOnly, ...props }: React.ComponentProps<'textarea'>) {
   return (
     <textarea
       data-slot="textarea"
       className={cn(
         'border-input placeholder:text-muted-foreground focus-visible:border-foreground dark:bg-input/30 flex field-sizing-content min-h-16 w-full rounded-md border bg-transparent px-3 py-2 text-sm shadow-xs transition-[color,box-shadow] outline-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
         'hover:border-foreground transition-colors duration-300 hover:border',
+        'aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive',
+        readOnly && 'border-input bg-muted-400 hover:border-input cursor-default shadow-xs',
         className,
       )}
       {...props}

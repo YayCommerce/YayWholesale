@@ -20,6 +20,12 @@ const paginatedWholesalerSchema = z.object({
   data: z.array(wholesalerSchema),
 });
 
+const totalWholesalersSchema = z.object({
+  count: z.number(),
+});
+
 export type WholesalerFormValues = z.infer<typeof wholesalerSchema>;
 
 export type PaginatedWholesalerListValues = z.infer<typeof paginatedWholesalerSchema>;
+
+export type TotalWholesalersValues = z.infer<typeof totalWholesalersSchema>;

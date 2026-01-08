@@ -7,7 +7,7 @@ export default function WholesalersIcon({ className = '', ...props }) {
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
-      stroke-width="1.75"
+      strokeWidth="1.75"
       className={className}
       {...props}
     >

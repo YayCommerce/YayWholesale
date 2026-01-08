@@ -54,55 +54,55 @@ export default function RegistrationFieldsTab() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="flex flex-col gap-4">
       {/* Custom Fields */}
-      <div>
-        <div className="mb-3 flex justify-between">
-          <h3 className="mb-4 text-base font-medium text-[#000000]">{__('Registration Fields')}</h3>
-          {/* Add new field */}
-          <Button
-            variant="primary-outline"
-            onClick={addNewField}
-            className="rounded-1.5 hover:bg-primary/10 gap-2 p-3 text-sm font-medium"
-          >
-            <Plus className="h-4 w-4" />
-            {__('Add New Field')}
-          </Button>
-        </div>
-        <Card className="m-0 rounded-md p-0 shadow-none">
-          <CardContent className="w-full overflow-x-auto px-0">
-            <div
-              className="relative"
-              style={{
-                overflow: 'hidden',
-              }}
-            >
-              <DndContext
-                sensors={sensors}
-                collisionDetection={closestCenter}
-                onDragEnd={handleDragEnd}
-                autoScroll={false}
-              >
-                <SortableContext
-                  items={fields.map((f) => f.id)}
-                  strategy={verticalListSortingStrategy}
-                >
-                  {fields.map((field, index) => (
-                    <FieldRow
-                      key={field.id}
-                      field={field}
-                      index={index}
-                      update={update}
-                      remove={remove}
-                      append={addNewField}
-                    />
-                  ))}
-                </SortableContext>
-              </DndContext>
-            </div>
-          </CardContent>
-        </Card>
+      <div className="flex items-center justify-between">
+        <span className="text-foreground-400 text-2xl leading-[100%] font-bold tracking-[-2%]">
+          {__('Registration Fields', 'yay-wholesale')}
+        </span>
+        {/* Add new field */}
+        <Button
+          variant="primary-outline"
+          onClick={addNewField}
+          className="rounded-1.5 hover:bg-primary hover:text-primary-foreground gap-2 p-3 text-sm font-medium shadow-xs"
+        >
+          <Plus className="h-4 w-4" />
+          {__('Add New Field', 'yay-wholesale')}
+        </Button>
       </div>
+      <Card className="m-0 rounded-md p-0 shadow-none">
+        <CardContent className="w-full overflow-x-auto px-0">
+          <div
+            className="relative"
+            style={{
+              overflow: 'hidden',
+            }}
+          >
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragEnd={handleDragEnd}
+              autoScroll={false}
+            >
+              <SortableContext
+                items={fields.map((f) => f.id)}
+                strategy={verticalListSortingStrategy}
+              >
+                {fields.map((field, index) => (
+                  <FieldRow
+                    key={field.id}
+                    field={field}
+                    index={index}
+                    update={update}
+                    remove={remove}
+                    append={addNewField}
+                  />
+                ))}
+              </SortableContext>
+            </DndContext>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }

@@ -49,7 +49,7 @@ export const BulkActionButton: FC<BulkActionButtonProps> = ({
         if (context) context.setOpen(false);
       }}
       className={cn(
-        'flex w-full cursor-pointer items-center justify-start gap-2 rounded-sm px-2.5 py-2 text-sm hover:bg-[#F4F4F5]',
+        'hover:bg-muted flex w-full cursor-pointer items-center justify-start gap-2 rounded-sm px-2.5 py-2 text-sm',
         className,
       )}
       disabled={disabled}
@@ -71,7 +71,7 @@ export const BulkMenuButtonAndTrigger: FC<BulkActionButtonProps> = ({
       <Button
         variant="ghost"
         className={cn(
-          'flex w-35 cursor-pointer items-center justify-between gap-10 rounded-sm px-2.5 py-2 text-sm hover:bg-[#F4F4F5]',
+          'hover:bg-muted flex w-35 cursor-pointer items-center justify-between gap-10 rounded-sm px-2.5 py-2 text-sm',
           className,
         )}
         disabled={disabled}

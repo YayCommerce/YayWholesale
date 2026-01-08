@@ -42,7 +42,7 @@ export default function RegistrationDateField() {
 
         return (
           <FormItem className="w-full gap-2.5">
-            <FormLabel className="text-base-secondary text-xs font-medium">
+            <FormLabel className="text-foreground-400 text-xs font-medium">
               {__('Registration Date', 'yay-wholesale')}
             </FormLabel>
             <div className="flex gap-3">

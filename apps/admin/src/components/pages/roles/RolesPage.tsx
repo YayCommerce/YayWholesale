@@ -5,7 +5,7 @@ import RolesList from './RolesList';
 
 export default function RolesPage() {
   return (
-    <div className="mx-auto mt-[84px] max-w-7xl space-y-6 px-6">
+    <div className="mx-auto mt-[84px] max-w-7xl px-6">
       <RolesList />
       <RoleForm />
     </div>

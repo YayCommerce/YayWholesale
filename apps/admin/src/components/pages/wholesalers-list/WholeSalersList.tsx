@@ -10,9 +10,11 @@ import { ChevronLeft, ChevronRight, ChevronsUpDown, Plus, Search } from 'lucide-
 import { useActiveRolesQuery } from '@/lib/queries/roles';
 import {
   useBulkUpdateWholesalersRoleMutation,
+  useTotalCountQuery,
   useWholesalersQuery,
 } from '@/lib/queries/wholesalers';
 import { cn } from '@/lib/utils';
+import { Badge } from '@/components/ui/badge';
 import { BulkActionButton } from '@/components/ui/bulk-actions';
 import BulkActionBox from '@/components/ui/bulk-actions-box';
 import { Button } from '@/components/ui/button';
@@ -39,6 +41,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { WholeSaleToolTip } from '@/components/custom/WholeSaleToolTip';
 import RolesIcon from '@/components/icons/RolesIcon';
 
 import { WholesalersColumn } from './wholesalers-table/WholesalersColumn';
@@ -66,6 +69,7 @@ export default function WholeSalersList() {
   } = useWholesalersQuery(keyword, pagination, roleFilter);
 
   const { data: activeRoles } = useActiveRolesQuery();
+  const { data: totalCount } = useTotalCountQuery();
 
   const table = useReactTable({
     data: wholesalersData?.data ?? [],
@@ -104,7 +108,29 @@ export default function WholeSalersList() {
     <Card className="gap-4 rounded-lg p-6 shadow-sm">
       {/* Header */}
       <div className="flex flex-nowrap items-center justify-between gap-3">
-        <h1 className="text-2xl font-bold">{__('Wholesalers List', 'yay-wholesale')}</h1>
+        <div className="flex items-center gap-2">
+          <h1 className="text-2xl font-bold">{__('Wholesalers List', 'yay-wholesale')}</h1>
+          {totalCount && totalCount.count > 0 && (
+            <WholeSaleToolTip
+              trigger={
+                <div>
+                  <Badge
+                    variant="muted"
+                    className="text-foreground h-5 min-w-5 rounded-full border-none px-1 tabular-nums"
+                  >
+                    {totalCount.count}
+                  </Badge>
+                </div>
+              }
+              content={
+                totalCount.count > 1
+                  ? sprintf(__('%d wholesalers in total', 'yay-wholesale'), totalCount.count)
+                  : __('1 wholesaler in total', 'yay-wholesale')
+              }
+              side="bottom"
+            />
+          )}
+        </div>
         <div className="flex flex-col-reverse items-end gap-4 lg:flex-row">
           {(table.getPageCount() > 1 || keyword !== '') && (
             <InputGroup className="w-full sm:w-80">
@@ -139,11 +165,11 @@ export default function WholeSalersList() {
           <a href={window.yayWholesale.user_urls.add_new} target="_blank" rel="noopener noreferrer">
             <Button
               variant="primary-outline"
-              className="hover:bg-primary/10 gap-2 rounded-sm px-4 text-sm font-medium"
+              className="hover:bg-primary hover:text-primary-foreground gap-2 rounded-sm px-4 text-sm font-medium shadow-xs"
             >
               <Plus className="h-4 w-4" />
               <span className="text-[12px] text-nowrap sm:text-[14px]">
-                {__('Add New Wholesaler')}
+                {__('Add New Wholesaler', 'yay-wholesale')}
               </span>
             </Button>
           </a>
@@ -163,15 +189,15 @@ export default function WholeSalersList() {
             <Spinner className="text-muted-foreground size-6 animate-spin" />
           </div>
         )}
-        <Table className="min-w-full divide-y">
-          <TableHeader className="text-base-foreground bg-base-muted h-[46px]">
+        <Table className="min-w-full">
+          <TableHeader className="text-foreground bg-muted-400 h-[46px]">
             {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
+              <TableRow key={headerGroup.id} className="border-border border-b">
                 {headerGroup.headers.map((header) => (
                   <TableHead
                     key={header.id}
                     className={cn(
-                      'text-base-secondary py-2 text-sm font-medium',
+                      'text-foreground-400 py-2 text-sm font-medium',
                       header.column.columnDef.meta?.align === 'center'
                         ? 'text-center'
                         : 'text-left',
@@ -184,7 +210,7 @@ export default function WholeSalersList() {
               </TableRow>
             ))}
           </TableHeader>
-          <TableBody className="divide-y">
+          <TableBody>
             {isLoadingWholesalers ? (
               <TableRow>
                 <TableCell
@@ -198,7 +224,11 @@ export default function WholeSalersList() {
               </TableRow>
             ) : table.getRowModel().rows.length > 0 ? (
               table.getRowModel().rows.map((row) => (
-                <TableRow key={row.id} data-state={row.getIsSelected() && 'selected'}>
+                <TableRow
+                  key={row.id}
+                  data-state={row.getIsSelected() && 'selected'}
+                  className="not-last:border-border not-last:border-b"
+                >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell
                       key={cell.id}
@@ -226,7 +256,7 @@ export default function WholeSalersList() {
         </Table>
       </div>
       {/* Footer */}
-      {wholesalersData != undefined && wholesalersData?.data?.length > 0 && (
+      {(table.getPageCount() > 1 || selectedCount > 1) && (
         <div
           className={cn(
             'relative flex flex-col items-center gap-3 sm:flex-row',
@@ -237,8 +267,8 @@ export default function WholeSalersList() {
         >
           {!isBulkUpdateWholesalersPending && (
             <BulkActionBox selected={selectedCount} onClose={() => table.resetRowSelection()}>
-              <span className="text-sm font-normal text-[#151619]">
-                {sprintf(__('%d selected'), selectedCount)}
+              <span className="text-foreground text-sm font-normal">
+                {sprintf(__('%d selected', 'yay-wholesale'), selectedCount)}
               </span>
               <Separator orientation="vertical" className="ml-2 h-5!" />
               <Popover>
@@ -247,7 +277,9 @@ export default function WholeSalersList() {
                     variant="ghost"
                     className="hover:text-primary hover:bg-primary/6 group bold flex cursor-pointer items-center gap-1.5 px-2.5"
                   >
-                    <span className="text-sm font-normal">{__('Wholesaler Role')}</span>
+                    <span className="text-sm font-normal">
+                      {__('Wholesaler Role', 'yay-wholesale')}
+                    </span>
                     <span className="group-hover:text-primary text-icon flex items-center">
                       <CaretUpDownIcon size={12} weight="bold" />
                     </span>
@@ -281,9 +313,9 @@ export default function WholeSalersList() {
 
           {table.getPageCount() > 1 && (
             <div className="flex items-center gap-4">
-              <span className="text-base-secondary text-sm font-normal">
+              <span className="text-foreground-400 text-sm font-normal">
                 {sprintf(
-                  __('Page %d of %d'),
+                  __('Page %d of %d', 'yay-wholesale'),
                   table.getState().pagination.pageIndex + 1,
                   table.getPageCount(),
                 )}
@@ -311,7 +343,9 @@ export default function WholeSalersList() {
               </div>
 
               <div className="flex items-center gap-2">
-                <span className="text-base-secondary text-sm font-normal">{__('Go to')}</span>
+                <span className="text-foreground-400 text-sm font-normal">
+                  {__('Go to', 'yay-wholesale')}
+                </span>
                 <InputNumberRoot
                   min={1}
                   max={table.getPageCount()}
@@ -322,10 +356,10 @@ export default function WholeSalersList() {
                       table.setPageIndex(page);
                     }
                   }}
-                  className="text-base-secondary h-9 w-15 rounded-sm text-sm font-normal focus-visible:ring-0"
+                  className="text-foreground-400 h-9 w-15 rounded-sm text-sm font-normal focus-visible:ring-0"
                   disabled={isFetchingWholesalers || table.getPageCount() <= 1}
                 >
-                  <InputNumberInput className="disabled:bg-base-muted w-full shadow-xs disabled:text-black" />
+                  <InputNumberInput className="disabled:bg-muted-400 w-full shadow-xs disabled:text-black" />
                 </InputNumberRoot>
               </div>
             </div>

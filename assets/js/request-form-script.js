@@ -1,10 +1,9 @@
 jQuery(document).ready(() => {
     jQuery(".ywhs_request_form_error").hide();
 
-    const {__} = window.wp.i18n;
-
     jQuery("#ywhs_request_form").on("submit", function (e) {
         e.preventDefault();
+        const {__} = window.wp.i18n;
 
         var formData = jQuery(this).serialize();
         var yayWholesale = window.yayWholesale;

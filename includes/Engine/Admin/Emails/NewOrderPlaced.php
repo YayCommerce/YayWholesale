@@ -10,9 +10,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Wholesale New Order Placed Email
  *
- * @method static New_Order_Placed get_instance()
+ * @method static NewOrderPlaced get_instance()
  */
-class New_Order_Placed extends Wholesale_Email_Base {
+class NewOrderPlaced extends WholesaleEmailBase {
 
     public function __construct() {
         $this->id             = 'yay_wholesale_new_order_placed';
@@ -146,7 +146,7 @@ class New_Order_Placed extends Wholesale_Email_Base {
             $this->placeholders['{customer_name}'] = $this->object->get_formatted_billing_full_name();
             if ( $this->is_enabled() && $this->get_recipient() ) {
                 // Wholesale order
-                if ( $order->get_meta( '_ywhs_wholesale_role' ) && 'checkout-draft' !== $order->get_status() ) {
+                if ( $order->get_meta( '_ywhs_wholesale_role' ) ) {
                         $this->send( $this->get_recipient(), $this->get_subject(), $this->get_content(), $this->get_headers(), $this->get_attachments() );
                 }
             }

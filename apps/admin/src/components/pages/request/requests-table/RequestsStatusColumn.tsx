@@ -55,17 +55,17 @@ export default function RequestsStatusColumn({
         <DropdownMenuTrigger asChild>
           <Button
             variant="outline"
-            className="pointer-events-auto flex w-40 items-center justify-between font-normal"
+            className="pointer-events-auto flex w-40 items-center justify-between pr-1.5! font-normal"
             disabled={
               updateStatusMutation.isPending ||
               queryClient.isMutating({ mutationKey: ['requests'] }) > 0
             }
           >
-            <span className="flex gap-2">
+            <span className="flex items-center gap-2">
               <RequestsStatusIcon status={status} className="mt-0.5 min-h-4 min-w-4" />
               {currentText}
             </span>
-            <ChevronDown className="text-muted-foreground/70 h-6 w-6 cursor-pointer" />
+            <ChevronDown className="text-muted-foreground/70 mt-0.5 h-6 w-6 cursor-pointer" />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent className="w-40">

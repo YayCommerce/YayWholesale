@@ -48,8 +48,8 @@ class Requirement {
         } else {
             $lack_of_amt     = $wholesale['minOrderAmount'] - $actual_subtotal;
             $lack_of_qty     = $wholesale['minOrderQuantity'] - $count;
-            $progress_of_amt = min( 100, $actual_subtotal / $wholesale['minOrderAmount'] * 100 );
-            $progress_of_qty = min( 100, $count / $wholesale['minOrderQuantity'] * 100 );
+            $progress_of_amt = min( 100, $actual_subtotal / max( $wholesale['minOrderAmount'], 1 ) * 100 );
+            $progress_of_qty = min( 100, $count / max( $wholesale['minOrderQuantity'], 1 ) * 100 );
 
             $progress = number_format( ( ( $progress_of_amt + $progress_of_qty ) / 2 ), 2 );
 
@@ -80,7 +80,7 @@ class Requirement {
                 $notice = sprintf(
                     // translators: %1: the lack of quantity
                     __(
-                        'You\'re almost there! Add %1$s more to your order and enjoy %2$s each products.',
+                        'You\'re almost there! Add %1$s more to receive wholesale pricing with %2$s value.',
                         'yay-wholesale'
                     ),
                     $lack,
@@ -136,14 +136,14 @@ class Requirement {
                 <div class="ywhs_requirement_item">
                     <span><?php echo esc_attr_e( 'Min order quantity:', 'yay-wholesale' ); ?></span>
                     <span class="ywhs_r_base_notice">
-                        <span <?php echo wp_kses_post( $count > 0 ? 'class="ywhs_r_notice"' : '' ); ?>>
+                        <span <?php echo wp_kses_post( $is_discounted ? 'class="ywhs_r_notice"' : '' ); ?>>
                             <?php echo esc_html( $count ); ?>
                         </span> /<?php echo esc_html( $wholesale['minOrderQuantity'] ); ?> </span>
                 </div>
                 <div class="ywhs_requirement_item">
                     <span><?php echo esc_attr_e( 'Min order amount:', 'yay-wholesale' ); ?></span>
                     <span class="ywhs_r_base_notice">
-                        <span <?php echo wp_kses_post( $actual_subtotal > 0 ? 'class="ywhs_r_notice"' : '' ); ?>>
+                        <span <?php echo wp_kses_post( $is_discounted ? 'class="ywhs_r_notice"' : '' ); ?>>
                             <?php echo wp_kses_post( wc_price( $actual_subtotal ) ); ?>
                         </span> /<?php echo wp_kses_post( wc_price( $wholesale['minOrderAmount'] ) ); ?> </span>
                 </div>

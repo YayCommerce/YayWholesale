@@ -20,11 +20,11 @@ class Emails {
     }
 
     public function yay_wholesale_register_email_classes( $email_classes ) {
-        $email_classes['Yay_Wholesale_New_Order_Placed']              = new New_Order_Placed();
-        $email_classes['Yay_Wholesale_New_Account_Registered']        = new New_Account_Registered();
-        $email_classes['Yay_Wholesale_Account_Registration_Approved'] = new Account_Registration_Approved();
-        $email_classes['Yay_Wholesale_Account_Registration_Rejected'] = new Account_Registration_Rejected();
-        $email_classes['Yay_Wholesale_Account_Registration_Pending']  = new Account_Registration_Pending();
+        $email_classes['Yay_Wholesale_New_Order_Placed']              = new NewOrderPlaced();
+        $email_classes['Yay_Wholesale_New_Account_Registered']        = new NewAccountRegistered();
+        $email_classes['Yay_Wholesale_Account_Registration_Approved'] = new AccountRegistrationApproved();
+        $email_classes['Yay_Wholesale_Account_Registration_Rejected'] = new AccountRegistrationRejected();
+        $email_classes['Yay_Wholesale_Account_Registration_Pending']  = new AccountRegistrationPending();
 
         return $email_classes;
     }

@@ -168,6 +168,7 @@ const InputNumberInput = forwardRef<HTMLInputElement, InputNumberInputProps>(
         className={cn(
           'peer/input-number-input [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none',
           'focus:border-foreground focus:shadow-none focus:outline-none',
+          'aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive',
           className,
         )}
         min={min}

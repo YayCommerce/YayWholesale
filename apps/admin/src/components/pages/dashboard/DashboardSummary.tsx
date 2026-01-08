@@ -28,7 +28,7 @@ export default function DashboardSummary(props: {
           <Button
             variant="outline"
             size="sm"
-            className="text-base-foreground h-8 w-fit text-sm font-medium"
+            className="text-foreground h-8 w-fit text-sm font-medium"
             onClick={() => navigate('/wholesalers-list')}
           >
             {__('View all wholesalers', 'yay-wholesale')}
@@ -45,11 +45,7 @@ export default function DashboardSummary(props: {
         desc: 'Total Orders',
         button: () => (
           <a href={window.yayWholesale.order_urls.list} target="_blank" rel="noopener noreferrer">
-            <Button
-              variant="outline"
-              size="sm"
-              className="text-base-foreground h-8 text-sm font-medium"
-            >
+            <Button variant="outline" size="sm" className="text-foreground h-8 text-sm font-medium">
               {__('View all orders', 'yay-wholesale')}
             </Button>
           </a>
@@ -64,11 +60,7 @@ export default function DashboardSummary(props: {
         desc: 'Total Revenue',
         button: () => (
           <a href={window.yayWholesale.order_urls.list} target="_blank" rel="noopener noreferrer">
-            <Button
-              variant="outline"
-              size="sm"
-              className="text-base-foreground h-8 text-sm font-medium"
-            >
+            <Button variant="outline" size="sm" className="text-foreground h-8 text-sm font-medium">
               {__('View all revenue', 'yay-wholesale')}
             </Button>
           </a>
@@ -89,7 +81,7 @@ export default function DashboardSummary(props: {
         <Card key={i} className="mt-0 rounded-lg py-0 shadow-none">
           <CardContent className="flex flex-col gap-4 p-6">
             <div className="flex items-center justify-between">
-              <h3 className="text-base-foreground text-base font-medium">{c.title}</h3>
+              <h3 className="text-foreground text-base font-medium">{c.title}</h3>
               <Badge
                 variant="outline"
                 className="flex h-[24px] gap-1 rounded-md px-2 py-1.5 text-xs font-semibold shadow-xs hover:bg-white"
@@ -101,18 +93,12 @@ export default function DashboardSummary(props: {
                 )}
                 <p className="text-xs">
                   {c.percent && c.percent < 0 ? '' : '+'}
-                  {c.overPercent ? (
-                    <>
-                      100<sup className="text-[10px]">+</sup>%
-                    </>
-                  ) : (
-                    <>{parseWPDecimal(c.percent)}%</>
-                  )}
+                  {parseWPDecimal(c.percent)}%
                 </p>
               </Badge>
             </div>
             <div className="flex flex-col gap-2">
-              <p className="text-base-foreground text-3xl font-semibold">
+              <p className="text-foreground text-3xl font-semibold">
                 {isLoading ? (
                   <Spinner className="text-muted-foreground size-6 animate-spin" />
                 ) : (

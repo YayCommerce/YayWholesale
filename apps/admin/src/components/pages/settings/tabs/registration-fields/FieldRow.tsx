@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { __ } from '@wordpress/i18n';
-import { CirclePlus, Ellipsis, Eye, EyeOff, GripVertical, Info, Trash2 } from 'lucide-react';
+import { CirclePlus, Eye, EyeOff, GripVertical, Info, Trash2 } from 'lucide-react';
 import { useFormContext } from 'react-hook-form';
 
 import { SettingsFormData } from '@/lib/schema/settings';
@@ -29,6 +29,7 @@ import {
 import { Switch } from '@/components/ui/switch';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { WholeSaleToolTip } from '@/components/custom/WholeSaleToolTip';
+import EllipsisIcon from '@/components/icons/EllipsisIcon';
 
 export function FieldRow({
   field,
@@ -76,7 +77,7 @@ export function FieldRow({
                 type="button"
                 variant="ghost"
                 size="icon"
-                className="hover:text-foreground text-base-muted-foreground h-[36px] w-[18px] cursor-grab hover:bg-transparent active:cursor-grabbing"
+                className="hover:text-foreground text-muted-foreground h-[36px] w-[18px] cursor-grab hover:bg-transparent active:cursor-grabbing"
               >
                 <EyeOff className="h-5 w-5 cursor-default" />
               </Button>
@@ -84,7 +85,7 @@ export function FieldRow({
             content={
               <div className="flex items-center gap-2">
                 <Info className="mt-6/7 h-3.5 w-3.5" />
-                {__('Field is hidden')}
+                {__('Field is hidden', 'yay-wholesale')}
               </div>
             }
           />
@@ -93,7 +94,7 @@ export function FieldRow({
             type="button"
             variant="ghost"
             size="icon"
-            className="hover:text-foreground text-base-muted-foreground h-[36px] w-[18px] cursor-grab hover:bg-transparent active:cursor-grabbing"
+            className="hover:text-foreground text-muted-foreground hover:bg-muted h-9 w-9 cursor-grab rounded-sm active:cursor-grabbing"
             {...attributes}
             {...listeners}
           >
@@ -109,8 +110,8 @@ export function FieldRow({
             control={control}
             name={`registration_fields.fields.${index}.label`}
             render={({ field, fieldState }) => (
-              <FormItem className="w-full">
-                <FormLabel className="text-base-secondary space-y-2.5 text-xs font-medium">
+              <FormItem className="flex w-full flex-col gap-2.5">
+                <FormLabel className="text-foreground-400 text-xs font-medium">
                   {__('Label', 'yay-wholesale')}
                   {isRequired && <div className="text-destructive">*</div>}
                 </FormLabel>
@@ -121,7 +122,7 @@ export function FieldRow({
                     defaultValue={field.value}
                     onChange={field.onChange}
                     aria-invalid={fieldState.invalid}
-                    className={cn('h-9 w-full', fieldState.invalid && 'border-destructive')}
+                    className="h-9 w-full"
                     disabled={isHidden}
                   />
                 </FormControl>
@@ -139,8 +140,8 @@ export function FieldRow({
             control={control}
             name={`registration_fields.fields.${index}.type`}
             render={({ field }) => (
-              <FormItem className="w-full">
-                <FormLabel className="text-base-secondary space-y-2.5 text-xs font-medium">
+              <FormItem className="flex w-full flex-col gap-2.5">
+                <FormLabel className="text-foreground-400 text-xs font-medium">
                   {__('Type', 'yay-wholesale')}
                 </FormLabel>
                 <FormControl>
@@ -174,8 +175,8 @@ export function FieldRow({
             control={control}
             name={`registration_fields.fields.${index}.placeholder`}
             render={({ field }) => (
-              <FormItem className="w-full">
-                <FormLabel className="text-base-secondary space-y-2.5 text-xs font-medium">
+              <FormItem className="flex w-full flex-col gap-2.5">
+                <FormLabel className="text-foreground-400 text-xs font-medium">
                   {__('Placeholder', 'yay-wholesale')}
                 </FormLabel>
                 <FormControl>
@@ -198,13 +199,13 @@ export function FieldRow({
             control={control}
             name={`registration_fields.fields.${index}.columnWidth`}
             render={({ field }) => (
-              <FormItem className="w-full">
-                <FormLabel className="text-base-secondary space-y-2.5 text-xs font-medium">
+              <FormItem className="flex w-full flex-col gap-2.5">
+                <FormLabel className="text-foreground-400 text-xs font-medium">
                   {__('Column Width', 'yay-wholesale')}
                 </FormLabel>
                 <FormControl>
                   <ToggleGroup
-                    className="flex h-9 w-full gap-1 rounded-[8px] border border-[#E5E5E5] bg-white p-[3px]"
+                    className="border-input flex h-9 w-full gap-0.75 rounded-[8px] border bg-white p-[3px]"
                     type="single"
                     value={field.value}
                     onValueChange={(val) => {
@@ -230,30 +231,32 @@ export function FieldRow({
       <div className="flex shrink-0 items-center justify-center">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" disabled={isDefault}>
-              <Ellipsis />
+            <Button variant="ghost" size="icon" disabled={isDefault} className="hover:bg-muted">
+              <EllipsisIcon />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-48" align="end">
-            <FormField
-              control={control}
-              name={`registration_fields.fields.${index}.isRequired`}
-              render={({ field }) => (
-                <div className="flex items-center justify-between p-2">
-                  <Label>{__('Set as required', 'yay-wholesale')}</Label>
-                  <Switch
-                    className="translate-y-0.5 scale-70"
-                    checked={field.value}
-                    onCheckedChange={field.onChange}
-                    disabled={isHidden}
-                  />
-                </div>
-              )}
-            />
-            <DropdownMenuSeparator className="text-base-foreground w-[95%]" />
+          <DropdownMenuContent className="w-48 p-1" align="end">
             <DropdownMenuGroup>
-              <DropdownMenuItem onClick={append} disabled={isHidden}>
-                <CirclePlus />
+              <FormField
+                control={control}
+                name={`registration_fields.fields.${index}.isRequired`}
+                render={({ field }) => (
+                  <div className="flex items-center justify-between p-2">
+                    <Label>{__('Set as required', 'yay-wholesale')}</Label>
+                    <Switch
+                      className="translate-y-0.5 scale-70"
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                      disabled={isHidden}
+                    />
+                  </div>
+                )}
+              />
+            </DropdownMenuGroup>
+            <DropdownMenuSeparator className="mx-0.25 mt-1" />
+            <DropdownMenuGroup>
+              <DropdownMenuItem onClick={append} disabled={isHidden} className="mt-1">
+                <CirclePlus className="translate-y-0.5" />
                 {__('Add new field', 'yay-wholesale')}
               </DropdownMenuItem>
               <FormField
@@ -264,15 +267,16 @@ export function FieldRow({
                     onClick={() => {
                       field.onChange(!field.value); // Toggle
                     }}
+                    className="mt-1"
                   >
                     {isHidden ? (
                       <>
-                        <Eye />
+                        <Eye className="translate-y-0.5" />
                         {__('Show field', 'yay-wholesale')}
                       </>
                     ) : (
                       <>
-                        <EyeOff />
+                        <EyeOff className="translate-y-0.5" />
                         {__('Hide field', 'yay-wholesale')}
                       </>
                     )}
@@ -280,7 +284,7 @@ export function FieldRow({
                 )}
               />
             </DropdownMenuGroup>
-            <DropdownMenuSeparator />
+            <DropdownMenuSeparator className="mx-0.25 mt-1" />
             <DropdownMenuGroup>
               <DropdownMenuItem
                 variant="destructive"
@@ -290,6 +294,7 @@ export function FieldRow({
                   }
                 }}
                 disabled={field.isHidden || !field.deletable}
+                className="mt-1"
               >
                 <Trash2 />
                 {__('Delete', 'yay-wholesale')}

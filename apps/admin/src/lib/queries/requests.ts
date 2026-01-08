@@ -9,6 +9,7 @@ import {
   fetchRequestById,
   fetchRequests,
   getPendingCount,
+  getTotalCount,
   updateRequestById,
   updateRequestStatusById,
 } from '../api/requests.api';
@@ -136,5 +137,12 @@ export function usePendingCountQuery() {
   return useQuery({
     queryKey: ['requests', 'pending-count'],
     queryFn: () => getPendingCount(),
+  });
+}
+
+export function useTotalCountQuery() {
+  return useQuery({
+    queryKey: ['requests', 'total-count'],
+    queryFn: () => getTotalCount(),
   });
 }

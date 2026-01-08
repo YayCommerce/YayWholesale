@@ -167,14 +167,18 @@ class PricingHelper {
      * @param array     $wholesale_role the wholesale role.
      * @param bool      $is_discounted the discounted flag.
      */
-    public static function handle_order( $order, $wholesale_role, $is_discounted ) {
+    public static function handle_order( $order, $wholesale_role, $is_discounted, $is_checkout_from_block = true ) {
         if ( $is_discounted ) {
             $order->update_meta_data( '_ywhs_wholesale_role', $wholesale_role['name'] );
 
             // Send email when new wholesale order has just been placed
             $email_trigger = (int) $order->get_meta( '_ywhs_wholesale_email_trigger' );
-            // This hook runs twice, check the trigger <= 1
-            if ( ( ! isset( $email_trigger ) || $email_trigger <= 1 ) ) {
+
+            if ( ! $is_checkout_from_block ) {
+                ++$email_trigger;
+            }
+            // This hook runs twice, check the trigger <= 2
+            if ( ( ! isset( $email_trigger ) || $email_trigger <= 2 ) ) {
                 do_action( 'yhs_new_wholesale_order_placed', $order->get_id(), $order );
                 $order->update_meta_data( '_ywhs_wholesale_email_trigger', ++$email_trigger );
             }

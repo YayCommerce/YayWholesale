@@ -47,7 +47,7 @@ export default function SettingsPage() {
   return (
     <FormProvider {...form}>
       <form id="settings-form" onSubmit={form.handleSubmit(onSubmit)}>
-        <div className="mx-auto mt-[84px] max-w-7xl space-y-6 px-6">
+        <div className="mx-auto mt-[84px] flex max-w-7xl flex-col gap-6 px-6">
           <div className="flex w-full flex-col gap-8 sm:flex-row">
             {/* Left Sidebar - Tab List */}
             <div className="shrink-0 sm:w-[176px]">
@@ -59,7 +59,8 @@ export default function SettingsPage() {
                         key={tab.path}
                         to={`/settings/${tab.path}`}
                         className={cn(
-                          'justify-start rounded-none border-none p-4 py-2.5 text-left text-sm font-normal text-nowrap text-[#333333] ring-0 outline-none focus:ring-0 focus:outline-none sm:text-wrap',
+                          'text-foreground-400 justify-start rounded-none border-none p-4 py-2.5 text-left text-sm font-normal text-nowrap ring-0 outline-none focus:ring-0 focus:outline-none sm:text-wrap',
+                          'hover:text-primary hover:rounded-md hover:bg-white',
                           tab.path === subMenu &&
                             'text-primary rounded-md bg-white font-medium shadow-none',
                         )}
@@ -75,7 +76,7 @@ export default function SettingsPage() {
             {/* Right Content Area - Tab Contents */}
             <div className="flex-1">
               <Card className="rounded-lg p-6 shadow-none">
-                <CardContent className="w-full overflow-x-auto px-0">
+                <CardContent className="w-full overflow-x-visible px-0">
                   {/* Other Tab Contents */}
                   {tabs.map((tab) => (
                     <div key={tab.path} className="mt-0 px-0">
