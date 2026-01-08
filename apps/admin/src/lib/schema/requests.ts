@@ -29,7 +29,7 @@ const paginatedRequestSchema = z.object({
   data: z.array(requestSchema),
 });
 
-const pendingCountSchema = z.object({
+const requestsCountSchema = z.object({
   count: z.number(),
 });
 
@@ -37,4 +37,6 @@ export type RequestFormValues = z.infer<typeof requestSchema>;
 
 export type PaginatedRequestListValues = z.infer<typeof paginatedRequestSchema>;
 
-export type PendingCountValues = z.infer<typeof pendingCountSchema>;
+export type RequestsCountValues = z.infer<typeof requestsCountSchema>;
+
+export type RequestFieldValues = z.infer<typeof requestFieldsSchema>;

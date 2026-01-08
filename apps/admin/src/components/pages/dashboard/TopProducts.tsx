@@ -38,9 +38,9 @@ export default function TopProducts(props: { reportQuery: ReturnType<typeof useR
             isFetching && 'relative opacity-50',
           )}
         >
-          <Table className="divide-muted min-w-full divide-y">
+          <Table className="min-w-full">
             <TableHeader className="text-foreground bg-muted-400 h-10">
-              <TableRow className="text-foreground text-[14px] font-semibold">
+              <TableRow className="text-foreground border-border border-b text-[14px] font-semibold">
                 <TableHead className="text-foreground text-[14px]">
                   <span className="flex items-center justify-center font-medium">
                     {__('No', 'yay-wholesale')}
@@ -61,18 +61,18 @@ export default function TopProducts(props: { reportQuery: ReturnType<typeof useR
                 </TableHead>
               </TableRow>
             </TableHeader>
-            <TableBody className="divide-muted border-muted divide-y border-b">
+            <TableBody>
               {isLoading ? (
-                <TableRow>
+                <TableRow className="border-border border-b">
                   <TableCell colSpan={4} className="h-32 text-center align-middle">
                     <div className="flex items-center justify-center gap-2">
                       <Spinner className="text-muted-foreground size-6 animate-spin" />
                     </div>
                   </TableCell>
                 </TableRow>
-              ) : reportData ? (
+              ) : reportData && reportData.topProducts.length > 0 ? (
                 reportData.topProducts.map((data) => (
-                  <TableRow>
+                  <TableRow className="border-border border-b">
                     <TableCell className="text-foreground py-3 text-[14px]">
                       <span className="flex items-center justify-center">
                         {reportData.topProducts.indexOf(data) + 1}

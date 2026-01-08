@@ -94,7 +94,7 @@ export function FieldRow({
             type="button"
             variant="ghost"
             size="icon"
-            className="hover:text-foreground text-muted-foreground hover:bg-muted h-[36px] w-[20px] cursor-grab rounded-sm active:cursor-grabbing"
+            className="hover:text-foreground text-muted-foreground hover:bg-muted h-9 w-9 cursor-grab rounded-sm active:cursor-grabbing"
             {...attributes}
             {...listeners}
           >
@@ -110,8 +110,8 @@ export function FieldRow({
             control={control}
             name={`registration_fields.fields.${index}.label`}
             render={({ field, fieldState }) => (
-              <FormItem className="w-full">
-                <FormLabel className="text-foreground-400 space-y-2.5 text-xs font-medium">
+              <FormItem className="flex w-full flex-col gap-2.5">
+                <FormLabel className="text-foreground-400 text-xs font-medium">
                   {__('Label', 'yay-wholesale')}
                   {isRequired && <div className="text-destructive">*</div>}
                 </FormLabel>
@@ -140,8 +140,8 @@ export function FieldRow({
             control={control}
             name={`registration_fields.fields.${index}.type`}
             render={({ field }) => (
-              <FormItem className="w-full">
-                <FormLabel className="text-foreground-400 space-y-2.5 text-xs font-medium">
+              <FormItem className="flex w-full flex-col gap-2.5">
+                <FormLabel className="text-foreground-400 text-xs font-medium">
                   {__('Type', 'yay-wholesale')}
                 </FormLabel>
                 <FormControl>
@@ -175,8 +175,8 @@ export function FieldRow({
             control={control}
             name={`registration_fields.fields.${index}.placeholder`}
             render={({ field }) => (
-              <FormItem className="w-full">
-                <FormLabel className="text-foreground-400 space-y-2.5 text-xs font-medium">
+              <FormItem className="flex w-full flex-col gap-2.5">
+                <FormLabel className="text-foreground-400 text-xs font-medium">
                   {__('Placeholder', 'yay-wholesale')}
                 </FormLabel>
                 <FormControl>
@@ -199,13 +199,13 @@ export function FieldRow({
             control={control}
             name={`registration_fields.fields.${index}.columnWidth`}
             render={({ field }) => (
-              <FormItem className="w-full">
-                <FormLabel className="text-foreground-400 space-y-2.5 text-xs font-medium">
+              <FormItem className="flex w-full flex-col gap-2.5">
+                <FormLabel className="text-foreground-400 text-xs font-medium">
                   {__('Column Width', 'yay-wholesale')}
                 </FormLabel>
                 <FormControl>
                   <ToggleGroup
-                    className="border-border flex h-9 w-full gap-1 rounded-[8px] border bg-white p-[3px]"
+                    className="border-input flex h-9 w-full gap-0.75 rounded-[8px] border bg-white p-[3px]"
                     type="single"
                     value={field.value}
                     onValueChange={(val) => {

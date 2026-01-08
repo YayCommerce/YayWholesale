@@ -100,7 +100,7 @@ export default function RoleForm() {
                 <Spinner className="text-muted-foreground size-6 animate-spin" />
               </div>
             )}
-            <SheetHeader className="border-muted border-b p-5">
+            <SheetHeader className="border-border border-b p-5">
               <div className="flex items-start justify-between">
                 <div>
                   <SheetTitle className="text-foreground text-[18px] font-semibold">
@@ -262,7 +262,7 @@ export default function RoleForm() {
                 render={({ field: { ref, ...field }, fieldState: { error } }) => (
                   <FormItem className="w-full gap-2.5">
                     <FormControl>
-                      <div className="border-border flex items-center justify-between rounded-md border p-3">
+                      <div className="border-input flex items-center justify-between rounded-md border p-3">
                         <span className="text-foreground-400 text-sm font-medium">
                           {__('Apply wholesale discounts to sale prices', 'yay-wholesale')}
                         </span>
@@ -276,11 +276,11 @@ export default function RoleForm() {
             </div>
 
             <SheetFooter className="p-0">
-              <div className="border-muted flex justify-end gap-4 border-t bg-white p-5">
+              <div className="border-border flex justify-end gap-4 border-t bg-white p-5">
                 <SheetClose asChild>
                   <Button
                     variant="outline"
-                    className="border-border text-foreground-400 hover:bg-muted border bg-white px-4.5"
+                    className="border-input text-foreground-400 hover:bg-muted border bg-white px-4.5"
                   >
                     {__('Cancel', 'yay-wholesale')}
                   </Button>
@@ -288,7 +288,7 @@ export default function RoleForm() {
                 <Button
                   type="submit"
                   form="role-form"
-                  className="bg-primary hover:bg-primary-accent px-5 font-medium text-white"
+                  className="bg-primary hover:bg-primary-accent text-primary-foreground px-5 font-medium"
                   disabled={isAddingRolePending || isUpdatingRolePending}
                 >
                   {isAddingRole

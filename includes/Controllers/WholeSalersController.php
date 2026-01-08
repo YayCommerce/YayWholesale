@@ -71,6 +71,18 @@ class WholeSalersController extends BaseRestController {
                 ],
             ]
         );
+
+        register_rest_route(
+            $this->namespace,
+            '/wholesalers/total',
+            [
+                [
+                    'methods'             => 'GET',
+                    'callback'            => [ $this, 'get_total_count' ],
+                    'permission_callback' => [ $this,'wholesalers_permission_callback' ],
+                ],
+            ]
+        );
     }
 
     /**
@@ -164,5 +176,17 @@ class WholeSalersController extends BaseRestController {
         }
 
         return $this->success( [], __( 'Wholesalers role updated successfully', 'yay-wholesale' ) );
+    }
+
+    /**
+     * Get the count of wholesalers.
+     *
+     * @param WP_REST_Request $request The request object.
+     * @return WP_REST_Response The response object.
+     */
+    public function get_total_count( WP_REST_Request $request ): WP_REST_Response {
+        $count = WholeSalersHelper::count_total_wholesalers();
+
+        return $this->success( [ 'count' => $count ], __( 'Total of Wholesaler is successfully counted', 'yay-wholesale' ) );
     }
 }

@@ -38,9 +38,9 @@ export default function TopWholesaleCustomers(props: {
             isFetching && 'relative opacity-50',
           )}
         >
-          <Table className="divide-muted min-w-full divide-y">
+          <Table className="min-w-full">
             <TableHeader className="text-foreground bg-muted-400 h-10">
-              <TableRow className="text-foreground text-[14px] font-semibold">
+              <TableRow className="text-foreground border-border border-b text-[14px] font-semibold">
                 <TableHead className="text-foreground text-[14px]">
                   <span className="flex items-center justify-center font-medium">
                     {__('No', 'yay-wholesale')}
@@ -61,7 +61,7 @@ export default function TopWholesaleCustomers(props: {
                 </TableHead>
               </TableRow>
             </TableHeader>
-            <TableBody className="divide-muted border-muted divide-y border-b">
+            <TableBody className="border-border border-b">
               {isLoading ? (
                 <TableRow>
                   <TableCell colSpan={4} className="h-32 text-center align-middle">
@@ -72,7 +72,7 @@ export default function TopWholesaleCustomers(props: {
                 </TableRow>
               ) : reportData?.topProducts && reportData?.topProducts.length > 0 ? (
                 reportData.topWholesalers.map((data) => (
-                  <TableRow>
+                  <TableRow className="border-border border-b">
                     <TableCell className="text-foreground py-3 text-[14px]">
                       <span className="flex justify-center">
                         {reportData.topWholesalers.indexOf(data) + 1}

@@ -31,19 +31,19 @@ export default function GeneralTab() {
   // const roleSlugs = useMemo(() => new Set(rolesList.map((r) => r.slug)), [rolesList]);
 
   return (
-    <div className="space-y-4">
+    <div className="flex flex-col gap-4">
       {/* Default role for new user */}
       <FormField
         control={control}
         name={`general.default_role`}
         render={({ field }) => (
-          <FormItem className="w-full">
-            <FormLabel className="space-y-2.5 text-xs font-medium">
+          <FormItem className="flex w-full flex-col gap-2.5">
+            <FormLabel className="text-xs font-medium">
               {__('Default role for new user', 'yay-wholesale')}
             </FormLabel>
             <FormControl>
               <Select value={field.value ? field.value : ''} onValueChange={field.onChange}>
-                <SelectTrigger className="w-[160px] text-sm font-normal">
+                <SelectTrigger className="min-w-40 text-sm font-normal">
                   <SelectValue placeholder={__('Select a role', 'yay-wholesale')} />
                 </SelectTrigger>
                 <SelectContent>
@@ -63,7 +63,7 @@ export default function GeneralTab() {
         control={control}
         name={`general.show_wholesale_price`}
         render={({ field }) => (
-          <div className="base-border flex items-center justify-between rounded-md border p-4">
+          <div className="flex items-center justify-between rounded-md border p-4">
             <div>
               <h2 className="text-foreground-400 text-sm font-normal">
                 {__('Show Wholesale Price to non-wholesale users', 'yay-wholesale')}
@@ -86,7 +86,7 @@ export default function GeneralTab() {
         control={control}
         name={`general.disable_coupon`}
         render={({ field }) => (
-          <div className="base-border flex items-center justify-between rounded-lg border p-4">
+          <div className="flex items-center justify-between rounded-lg border p-4">
             <div>
               <h2 className="text-foreground-400 text-sm font-normal">
                 {__('Disable coupon', 'yay-wholesale')}
@@ -106,7 +106,7 @@ export default function GeneralTab() {
         control={control}
         name={`general.disable_tax`}
         render={({ field }) => (
-          <div className="base-border flex items-center justify-between rounded-md border p-4">
+          <div className="flex items-center justify-between rounded-md border p-4">
             <div>
               <h2 className="text-foreground-400 text-sm font-normal">
                 {__('Disable tax', 'yay-wholesale')}

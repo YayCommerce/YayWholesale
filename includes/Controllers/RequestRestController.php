@@ -115,9 +115,21 @@ class RequestRestController extends BaseRestController {
             '/requests/pending',
             [
                 [
-                    'methods'  => 'GET',
-                    'callback' => [ $this, 'get_pending_count' ],
-                    // 'permission_callback' => [ $this,'request_permission_callback' ],
+                    'methods'             => 'GET',
+                    'callback'            => [ $this, 'get_pending_count' ],
+                    'permission_callback' => [ $this,'request_permission_callback' ],
+                ],
+            ]
+        );
+
+        register_rest_route(
+            $this->namespace,
+            '/requests/total',
+            [
+                [
+                    'methods'             => 'GET',
+                    'callback'            => [ $this, 'get_total_count' ],
+                    'permission_callback' => [ $this,'request_permission_callback' ],
                 ],
             ]
         );
@@ -454,5 +466,17 @@ class RequestRestController extends BaseRestController {
         $count = RequestsHelper::count_pending_requests();
 
         return $this->success( [ 'count' => $count ], __( 'Pending Requests are successfully counted', 'yay-wholesale' ) );
+    }
+
+    /**
+     * Get the count of requests.
+     *
+     * @param WP_REST_Request $request The request object.
+     * @return WP_REST_Response The response object.
+     */
+    public function get_total_count( WP_REST_Request $request ): WP_REST_Response {
+        $count = RequestsHelper::count_total_requests();
+
+        return $this->success( [ 'count' => $count ], __( 'Requests are successfully counted', 'yay-wholesale' ) );
     }
 }

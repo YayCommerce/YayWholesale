@@ -29,6 +29,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import { Badge } from '@/components/ui/badge';
 import { BulkActionButton } from '@/components/ui/bulk-actions';
 import BulkActionBox from '@/components/ui/bulk-actions-box';
 import { Button } from '@/components/ui/button';
@@ -76,6 +77,8 @@ export default function RolesList() {
     [roles, search],
   );
 
+  const totalCount = useMemo(() => filteredData.length, [filteredData]);
+
   const columns = RolesColumn;
 
   const table = useReactTable({
@@ -106,7 +109,29 @@ export default function RolesList() {
     <Card className="gap-4 rounded-lg p-6 shadow-sm">
       {/* Header */}
       <div className="flex flex-nowrap items-center justify-between gap-3">
-        <h1 className="text-2xl font-bold">{__('Roles', 'yay-wholesale')}</h1>
+        <div className="flex items-center gap-2">
+          <h1 className="text-2xl font-bold">{__('Roles', 'yay-wholesale')}</h1>
+          {filteredData && totalCount > 0 && (
+            <WholeSaleToolTip
+              trigger={
+                <div>
+                  <Badge
+                    variant="muted"
+                    className="text-foreground h-5 min-w-5 rounded-full border-none px-1 tabular-nums"
+                  >
+                    {totalCount}
+                  </Badge>
+                </div>
+              }
+              content={
+                totalCount > 1
+                  ? sprintf(__('%d roles in total', 'yay-wholesale'), totalCount)
+                  : __('1 role in total', 'yay-wholesale')
+              }
+              side="bottom"
+            />
+          )}
+        </div>
         <div className="flex flex-col-reverse flex-nowrap items-end gap-4 sm:flex-row sm:items-center">
           {roles.length > 10 && (
             <InputGroup className="w-full sm:w-80">
@@ -122,7 +147,7 @@ export default function RolesList() {
           )}
           <Button
             variant="primary-outline"
-            className="hover:bg-primary gap-2 rounded-sm px-4 text-sm font-medium hover:text-white"
+            className="hover:bg-primary hover:text-primary-foreground gap-2 rounded-sm px-4 text-sm font-medium shadow-xs"
             onClick={() => navigate('/roles/new')}
           >
             <Plus className="h-4 w-4" />
@@ -145,10 +170,10 @@ export default function RolesList() {
           </div>
         )}
 
-        <Table className="divide-muted min-w-full divide-y">
+        <Table className="min-w-full">
           <TableHeader className="text-foreground bg-muted-400 h-[46px]">
             {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
+              <TableRow key={headerGroup.id} className="border-border border-b">
                 {headerGroup.headers.map((header) => (
                   <TableHead
                     key={header.id}
@@ -167,7 +192,7 @@ export default function RolesList() {
             ))}
           </TableHeader>
 
-          <TableBody className="divide-muted divide-y">
+          <TableBody>
             {isLoadingRoles ? (
               <TableRow>
                 <TableCell
@@ -181,7 +206,7 @@ export default function RolesList() {
               </TableRow>
             ) : table.getRowModel().rows.length > 0 ? (
               table.getRowModel().rows.map((row) => (
-                <TableRow key={row.id} className="group">
+                <TableRow key={row.id} className="group not-last:border-border not-last:border-b">
                   {row.getVisibleCells().map((cell) => (
                     <TableCell
                       key={cell.id}
@@ -222,7 +247,7 @@ export default function RolesList() {
       {/* Footer */}
 
       {/* Pagination Footer */}
-      {filteredData.length > 0 && (
+      {(table.getPageCount() > 1 || selectedCount > 1) && (
         <div
           className={cn(
             'relative flex flex-col items-center gap-3 sm:flex-row',
@@ -285,7 +310,7 @@ export default function RolesList() {
                   </div>
                 </PopoverContent>
               </Popover>
-              <span className="border-muted h-5 w-px border-r border-solid" aria-hidden />
+              <span className="border-border h-5 w-px border-r border-solid" aria-hidden />
               <AlertDialog open={openBulkDeleteDialog} onOpenChange={setOpenDeleteDialog}>
                 <WholeSaleToolTip
                   trigger={

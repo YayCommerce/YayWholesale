@@ -5,6 +5,7 @@ import { showToast } from '@/components/custom/showToast';
 import {
   bulkUpdateWholesalerRole,
   fetchWholesalersList,
+  getTotalCountWholesalers,
   updateWholesalerRole,
 } from '../api/wholesalers';
 
@@ -57,5 +58,12 @@ export function useBulkUpdateWholesalersRoleMutation(userIds: number[]) {
     onError: (error: Error) => {
       showToast.error(error.message);
     },
+  });
+}
+
+export function useTotalCountQuery() {
+  return useQuery({
+    queryKey: ['wholesalers', 'total-count'],
+    queryFn: () => getTotalCountWholesalers(),
   });
 }

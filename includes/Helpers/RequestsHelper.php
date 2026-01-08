@@ -468,4 +468,28 @@ class RequestsHelper {
 
         return $query->post_count;
     }
+
+    /**
+     * Count the pending/rejected requests
+     *
+     * @return int count of the pending requests.
+     */
+    public static function count_total_requests(): int {
+        $args  = [
+            'post_type'              => self::REQUEST_POST_TYPE,
+            'update_post_meta_cache' => true,
+            'meta_query'             => [
+                'relation' => 'AND',
+                [
+                    'key'     => self::REQUEST_META_STATUS,
+                    'value'   => self::APPROVED,
+                    'compare' => '!=',
+                    'type'    => 'CHAR',
+                ],
+            ],
+        ];
+        $query = new WP_Query( $args );
+
+        return $query->post_count;
+    }
 }

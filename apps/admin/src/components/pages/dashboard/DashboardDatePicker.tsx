@@ -45,12 +45,12 @@ const DashboardDatePicker: FC<DashboardDatePickerProps> = ({ dateRange, setDateR
   };
 
   return (
-    <div className="z-1 flex items-center space-x-2">
+    <div className="z-1 flex items-center">
       <Popover open={openPopover} onOpenChange={(open) => onClose(open)}>
         <PopoverTrigger asChild>
           <Button
             variant="outline"
-            className="text-foreground flex h-9 min-w-67.5 items-center justify-between rounded-md border bg-white px-1.5! pl-2! text-[14px] font-medium shadow-xs"
+            className="text-foreground flex h-9 min-w-67.5 items-center justify-between rounded-md border bg-white px-1.5! pl-2! text-[14px] font-medium shadow-xs not-last:ms-2 not-last:me-2"
           >
             <div className="mr-4 flex items-center gap-2">
               <CalendarIcon />

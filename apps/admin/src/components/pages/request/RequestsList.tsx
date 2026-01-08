@@ -11,6 +11,7 @@ import {
   useBulkDeleteRequestMutation,
   useBulkUpdateRequestStatusMutation,
   useRequestsQuery,
+  useTotalCountQuery,
 } from '@/lib/queries/requests';
 import { useActiveRolesQuery } from '@/lib/queries/roles';
 import { RequestFormValues } from '@/lib/schema/requests';
@@ -25,6 +26,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import { Badge } from '@/components/ui/badge';
 import {
   BulkActionButton,
   BulkActionMenu,
@@ -86,6 +88,7 @@ export default function RequestsList() {
   } = useRequestsQuery(keyword, pagination, statusFilter);
 
   const { data: activeRoles } = useActiveRolesQuery();
+  const { data: totalCount } = useTotalCountQuery();
 
   const columns = RequestsColumn;
   const defaultData = useMemo(() => [], []);
@@ -139,7 +142,29 @@ export default function RequestsList() {
     <Card className="gap-4 rounded-lg p-6 shadow-sm">
       {/* Header */}
       <div className="flex flex-nowrap items-center justify-between gap-3">
-        <h1 className="text-2xl font-bold">{__('Wholesaler Requests', 'yay-wholesale')}</h1>
+        <div className="flex items-center gap-2">
+          <h1 className="text-2xl font-bold">{__('Wholesaler Requests', 'yay-wholesale')}</h1>
+          {totalCount && totalCount.count > 0 && (
+            <WholeSaleToolTip
+              trigger={
+                <div>
+                  <Badge
+                    variant="muted"
+                    className="text-foreground h-5 min-w-5 rounded-full border-none px-1 tabular-nums"
+                  >
+                    {totalCount.count}
+                  </Badge>
+                </div>
+              }
+              content={
+                totalCount.count > 1
+                  ? sprintf(__('%d requests in total', 'yay-wholesale'), totalCount.count)
+                  : __('1 request in total', 'yay-wholesale')
+              }
+              side="bottom"
+            />
+          )}
+        </div>
         <div className="flex flex-col items-end gap-4 md:flex-row">
           <Select value={statusFilter} onValueChange={setStatusFilter}>
             <SelectTrigger className="w-40">
@@ -187,10 +212,10 @@ export default function RequestsList() {
             <Spinner className="text-muted-foreground size-6 animate-spin" />
           </div>
         )}
-        <Table className="divide-muted min-w-full divide-y">
+        <Table className="min-w-full">
           <TableHeader className="text-foreground bg-muted-400 h-[46px]">
             {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
+              <TableRow key={headerGroup.id} className="border-border border-b">
                 {headerGroup.headers.map((header) => (
                   <TableHead
                     key={header.id}
@@ -208,7 +233,7 @@ export default function RequestsList() {
               </TableRow>
             ))}
           </TableHeader>
-          <TableBody className="divide-muted divide-y">
+          <TableBody>
             {isLoadingRequests ? (
               <TableRow>
                 <TableCell colSpan={columns.length} className="h-32 text-center align-middle">
@@ -222,7 +247,7 @@ export default function RequestsList() {
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && 'selected'}
-                  className="group"
+                  className="group not-last:border-border not-last:border-b"
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell
@@ -249,7 +274,7 @@ export default function RequestsList() {
         </Table>
       </div>
       {/* Footer */}
-      {data != undefined && data.data.length > 0 && (
+      {(table.getPageCount() > 1 || selectedCount > 1) && (
         <div
           className={cn(
             'relative flex flex-col items-center gap-3 sm:flex-row',

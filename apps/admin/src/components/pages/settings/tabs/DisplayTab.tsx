@@ -16,7 +16,7 @@ import {
 export default function DisplayTab() {
   const { control, watch } = useFormContext<SettingsFormData>();
   return (
-    <div className="space-y-6">
+    <div className="flex flex-col gap-6">
       {/* Two column layout */}
       <div className="grid grid-cols-2 gap-6">
         {/* Wholesale registration page */}
@@ -24,8 +24,8 @@ export default function DisplayTab() {
           control={control}
           name={`display.price_format`}
           render={({ field }) => (
-            <FormItem className="w-full">
-              <FormLabel className="text-foreground-400 space-y-2.5 text-xs font-medium">
+            <FormItem className="flex w-full flex-col gap-2.5">
+              <FormLabel className="text-foreground-400 text-xs font-medium">
                 {__('Display price format', 'yay-wholesale')}
               </FormLabel>
               <FormControl>
@@ -56,8 +56,8 @@ export default function DisplayTab() {
           control={control}
           name={`display.wholesale_price_label`}
           render={({ field }) => (
-            <FormItem className="w-full">
-              <FormLabel className="text-foreground-400 space-y-2.5 text-xs font-medium">
+            <FormItem className="flex w-full flex-col gap-2.5">
+              <FormLabel className="text-foreground-400 text-xs font-medium">
                 {__('Wholesale price label', 'yay-wholesale')}
               </FormLabel>
               <FormControl>
@@ -80,8 +80,8 @@ export default function DisplayTab() {
         control={control}
         name={`display.wholesale_price_color`}
         render={({ field }) => (
-          <FormItem className="w-full">
-            <FormLabel className="text-foreground-400 space-y-2.5 text-xs font-medium">
+          <FormItem className="flex w-full flex-col gap-2.5">
+            <FormLabel className="text-foreground-400 text-xs font-medium">
               {__('Wholesale price color', 'yay-wholesale')}
             </FormLabel>
             <FormControl>

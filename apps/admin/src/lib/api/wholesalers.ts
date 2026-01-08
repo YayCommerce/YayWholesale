@@ -1,6 +1,6 @@
 import { __ } from '@wordpress/i18n';
 
-import { PaginatedWholesalerListValues } from '../schema/wholesalers';
+import { PaginatedWholesalerListValues, TotalWholesalersValues } from '../schema/wholesalers';
 import { api, handleResponse } from './base';
 
 export async function fetchWholesalersList(
@@ -45,4 +45,13 @@ export async function bulkUpdateWholesalerRole(userIds: number[], roleSlug: stri
   );
 
   return result;
+}
+
+export async function getTotalCountWholesalers() {
+  const response = await api.get('wholesalers/total');
+  const result = await handleResponse<TotalWholesalersValues>(
+    response,
+    __('Failed to count the totals of wholesalers', 'yay-wholesale'),
+  );
+  return result.data;
 }
