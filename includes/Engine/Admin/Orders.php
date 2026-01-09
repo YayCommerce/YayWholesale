@@ -47,6 +47,10 @@ class Orders {
         $is_disabled_coupon = $setting['general']['disable_coupon'] ?? false;
         $items              = [];
 
+        if ( ! isset( $wholesale_role ) ) {
+            return;
+        }
+
         remove_filter( 'woocommerce_order_is_vat_exempt', [ $this, 'tax_enabled_handler' ], 999, 2 );
         remove_filter( 'woocommerce_calc_tax', [ Tax::get_instance(), 'maybe_disable_tax_calc' ], 9999 );
 
@@ -96,6 +100,10 @@ class Orders {
         $wholesale_role  = RolesHelper::is_wholesale_user( $customer_id );
         $setting         = SettingsHelper::get_settings();
         $is_disabled_tax = $setting['general']['disable_tax'] ?? false;
+
+        if ( ! isset( $wholesale_role ) ) {
+            return $is_exempt;
+        }
 
         $is_discounted = PricingHelper::check_is_discounted( $order, $wholesale_role );
         if ( $is_discounted && $is_disabled_tax ) {

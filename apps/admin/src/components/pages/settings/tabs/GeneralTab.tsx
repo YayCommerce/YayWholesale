@@ -65,10 +65,10 @@ export default function GeneralTab() {
         render={({ field }) => (
           <div className="flex items-center justify-between rounded-md border p-4">
             <div>
-              <h2 className="text-foreground-400 text-sm font-normal">
+              <h2 className="text-foreground-400 text-sm leading-3.5 font-medium">
                 {__('Show Wholesale Price to non-wholesale users', 'yay-wholesale')}
               </h2>
-              <p className="text-muted-foreground mt-1 text-xs font-normal">
+              <p className="text-muted-foreground mt-2 text-xs font-normal">
                 {__('If enable, wholesale price will display for all users.', 'yay-wholesale')}
               </p>
             </div>
@@ -88,10 +88,10 @@ export default function GeneralTab() {
         render={({ field }) => (
           <div className="flex items-center justify-between rounded-lg border p-4">
             <div>
-              <h2 className="text-foreground-400 text-sm font-normal">
+              <h2 className="text-foreground-400 text-sm leading-3.5 font-medium">
                 {__('Disable coupon', 'yay-wholesale')}
               </h2>
-              <p className="text-muted-foreground mt-1 text-xs font-normal">
+              <p className="text-muted-foreground mt-2 text-xs font-normal">
                 {__("Hide coupon field for wholesale users., 'yay-wholesale'")}
               </p>
             </div>
@@ -108,10 +108,10 @@ export default function GeneralTab() {
         render={({ field }) => (
           <div className="flex items-center justify-between rounded-md border p-4">
             <div>
-              <h2 className="text-foreground-400 text-sm font-normal">
+              <h2 className="text-foreground-400 text-sm leading-3.5 font-medium">
                 {__('Disable tax', 'yay-wholesale')}
               </h2>
-              <p className="text-muted-foreground mt-1 text-xs font-normal">
+              <p className="text-muted-foreground mt-2 text-xs font-normal">
                 {__("Don't charge tax for wholesale users.", 'yay-wholesale')}
               </p>
             </div>

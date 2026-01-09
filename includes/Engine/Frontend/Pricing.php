@@ -325,6 +325,10 @@ class Pricing {
         $customer_id    = $order->get_customer_id();
         $wholesale_role = RolesHelper::is_wholesale_user( $customer_id );
 
+        if ( ! isset( $wholesale_role ) ) {
+            return;
+        }
+
         $is_discounted = PricingHelper::check_is_discounted( $order, $wholesale_role );
 
         PricingHelper::handle_order( $order, $wholesale_role, $is_discounted, false );
