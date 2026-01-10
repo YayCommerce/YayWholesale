@@ -64,6 +64,7 @@ const currencyData = config?.currency_data ?? {
     decimal_sep: ',',
     num_decimals: 2
 };
+const isCheckoutPage = config?.is_checkout_page ?? false;
 
 export function parseWPCurrency(price) {
     if (typeof price === 'string') {
@@ -103,10 +104,20 @@ const { state, callbacks } = store('ywhs_wholesale_requirement', {
         discountText: sprintf(__('%d%% Off', 'yay-wholesale'), wholesaleRole.discount)
     },
     callbacks: {
-        async CheckMetRequired() {
+        async getPriceMap() {
+          let priceMap = JSON.parse(localStorage.getItem("ywhs_origin_prices_map"));
+
+          if (priceMap && isCheckoutPage !== priceMap["isCheckoutPage"]) {
+            localStorage.removeItem('ywhs_origin_prices_map');
+          }
+        },
+        async checkMetRequired() {
             const cart = wcState?.cart;
             
             if (! cart) return;
+            if (cart.items.length == 0) {
+              localStorage.removeItem('ywhs_origin_prices_map');
+            }
 
             let refetch = false;
             let bodyToFetch = [];
@@ -132,24 +143,24 @@ const { state, callbacks } = store('ywhs_wholesale_requirement', {
             }
 
             if (refetch) {
-                const url = wcState.restUrl + restBase + "/prices";
-                const nonce = window.yayWholesale.rest_nonce;
-                if (!nonce) return;
-                const response = await fetch(url, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-WP-Nonce': nonce 
-                    },
-                    body: JSON.stringify({ productIds: bodyToFetch }),
-                });
-
-                if (!response.ok) return;
-                
-                const data = await response.json();
-                priceMap = {...priceMap, ...data.data};
-
-                localStorage.setItem("ywhs_origin_prices_map", JSON.stringify(priceMap));
+              const url = wcState.restUrl + restBase + "/prices";
+              const nonce = window.yayWholesale.rest_nonce;
+              if (!nonce) return;
+              const response = await fetch(url, {
+                  method: 'POST',
+                  headers: {
+                      'Content-Type': 'application/json',
+                      'X-WP-Nonce': nonce 
+                  },
+                  body: JSON.stringify({ productIds: bodyToFetch, isCheckoutPage }),
+              });
+    
+              if (!response.ok) return;
+              
+              const data = await response.json();
+              priceMap = {...priceMap, ...data.data, isCheckoutPage};
+    
+              localStorage.setItem("ywhs_origin_prices_map", JSON.stringify(priceMap));
             }
 
             let actualSubtotal = 0;
@@ -215,7 +226,6 @@ const { state, callbacks } = store('ywhs_wholesale_requirement', {
             state.subtotal =  parseWPCurrency(actualSubtotal);
             state.isDiscounted= isDiscounted ? 'ywhs_r_notice' : 'ywhs_r_base_notice';
             state.icon= isDiscounted ? 'ywhs_icon_discounted' : 'ywhs_icon_cart';
-            console.log(notice);
             jQuery('.ywhs_requirement_notice_block').html(notice);
             
             if (isDiscounted) {
@@ -248,6 +258,6 @@ if (isNeedSubcribing) {
     const currentCart = wp.data.select('wc/store/cart').getCartData();
     // Re-run check whenever cart changes
     wcState.cart = currentCart;
-    callbacks.CheckMetRequired();
+    callbacks.checkMetRequired();
   });
 }

@@ -3,12 +3,10 @@ namespace Yay_Wholesale\Engine\Admin;
 
 use WC_Data_Store;
 use WC_Tax;
-use Yay_Wholesale\Engine\Frontend\Pricing;
 use Yay_Wholesale\Engine\Frontend\Tax;
 use Yay_Wholesale\Helpers\RolesHelper;
 use Yay_Wholesale\Helpers\SettingsHelper;
 use Yay_Wholesale\Helpers\PricingHelper;
-use Yay_Wholesale\Helpers\ReportsHelper;
 use Yay_Wholesale\Utils\SingletonTrait;
 
 defined( 'ABSPATH' ) || exit;
@@ -156,7 +154,7 @@ class Orders {
             }
 
             $product         = $item->get_product();
-            $new_price       = $product->get_price();
+            $new_price       = apply_filters( 'ywhs_price_handle_processed', $product->get_price( 'edit' ) );
             $is_removing_tax = false;
 
             if ( $is_discounted ) {

@@ -29,6 +29,9 @@ class RolesHelper {
             return null;
         }
 
+        // Handle price (Compatible to other price-related plugins)
+        $role['minOrderAmount'] = apply_filters( 'ywhs_price_handle_processed', $role['minOrderAmount'] );
+
         return $role;
     }
 

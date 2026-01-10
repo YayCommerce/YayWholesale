@@ -29,6 +29,7 @@ $wholesale = RolesHelper::is_wholesale_user();
 		'rest_url'   => esc_url_raw( rest_url() ),
 		'rest_nonce' => wp_create_nonce( 'wp_rest' ),
 		'rest_base'  => 'yay-wholesale/v1',
+		'is_checkout_page' => apply_filters("ywhs_ajax_refetch_prices_from_checkout", false),
     ]
     );
 
@@ -37,7 +38,8 @@ $wholesale = RolesHelper::is_wholesale_user();
 <div 
 <?php echo get_block_wrapper_attributes( [ 'class' => 'ywhs_requirement_section' ] ); ?>
 	data-wp-interactive="ywhs_wholesale_requirement"
-	data-wp-watch="callbacks.CheckMetRequired"
+	data-wp-init = "callbacks.getPriceMap"
+	data-wp-watch="callbacks.checkMetRequired"
 	>
 	<div class="ywhs_requirement_header">
 		<div class="ywhs_requirement_title">

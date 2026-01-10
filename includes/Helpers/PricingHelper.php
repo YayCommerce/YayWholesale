@@ -26,6 +26,8 @@ class PricingHelper {
             if ( ! $role || empty( $role['status'] ) ) {
                 return null;
             }
+            // Handle price (Compatible to other price-related plugins)
+            $role['minOrderAmount'] = apply_filters( 'ywhs_price_handle_processed', $role['minOrderAmount'] );
         }
         return $role;
     }
@@ -109,6 +111,7 @@ class PricingHelper {
 
         $base = ( $apply_to_sale && $sale > 0 ) ? $sale : $regular;
         $new  = max( 0, $base * ( 1 - $discount ) );
+        $new  = apply_filters( 'ywhs_price_handle_processed', $new );
 
         return wc_format_decimal( $new, wc_get_price_decimals() );
     }
@@ -122,14 +125,12 @@ class PricingHelper {
         $cart     = WC()->cart->get_cart();
         $subtotal = 0;
 
-        remove_filter( 'woocommerce_product_get_price', [ Pricing::get_instance(), 'get_price' ], 99, 2 );
         // Calculate the subtotal (in this action, subtotal is not calculated)
         foreach ( $cart as $cart_item ) {
             $product   = wc_get_product( $cart_item['product_id'] );
-            $subtotal += $product->get_price() * $cart_item['quantity'];
+            $price     = apply_filters( 'ywhs_price_handle_processed', $product->get_price( 'edit' ) );
+            $subtotal += $price * $cart_item['quantity'];
         }
-
-        add_filter( 'woocommerce_product_get_price', [ Pricing::get_instance(), 'get_price' ], 99, 2 );
 
         return $subtotal;
     }
@@ -145,17 +146,16 @@ class PricingHelper {
         $quantity = $order->get_item_count();
         $subtotal = 0;
 
-        remove_filter( 'woocommerce_product_get_price', [ Pricing::get_instance(), 'get_price' ], 99, 2 );
         // Calculate the subtotal with original unit price
         foreach ( $order->get_items() as $item ) {
             if ( ! $item instanceof \WC_Order_Item_Product ) {
                 continue;
             }
             $product   = $item->get_product();
-            $subtotal += $product->get_price() * $item->get_quantity();
+            $price     = apply_filters( 'ywhs_price_handle_processed', $product->get_price( 'edit' ) );
+            $subtotal += $price * $item->get_quantity();
         }
         $is_discounted = isset( $wholesale_role ) && self::meets_discount_conditions( $wholesale_role, $quantity, $subtotal );
-        add_filter( 'woocommerce_product_get_price', [ Pricing::get_instance(), 'get_price' ], 99, 2 );
 
         return $is_discounted;
     }

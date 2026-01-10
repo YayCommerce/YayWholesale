@@ -173,21 +173,13 @@ class Requirement {
                 true
             );
 
-            remove_filter( 'woocommerce_product_get_price', [ Pricing::get_instance(), 'get_price' ], 99, 2 );
-            remove_filter( 'woocommerce_product_variation_get_price', [ Pricing::get_instance(), 'get_price' ], 99, 2 );
-            remove_filter( 'woocommerce_variation_prices_price', [ Pricing::get_instance(), 'get_price' ], 99, 2 );
-
             $price_map = [];
             $cart      = WC()->cart->get_cart();
             foreach ( $cart as $cart_item ) {
                 $product_id               = ! empty( $cart_item['variation_id'] ) ? $cart_item['variation_id'] : $cart_item['product_id'];
                 $product                  = wc_get_product( $product_id );
-                $price_map[ $product_id ] = $product->get_price();
+                $price_map[ $product_id ] = apply_filters( 'ywhs_price_handle_processed', $product->get_price( 'edit' ) );
             }
-
-            add_filter( 'woocommerce_product_get_price', [ Pricing::get_instance(), 'get_price' ], 99, 2 );
-            add_filter( 'woocommerce_product_variation_get_price', [ Pricing::get_instance(), 'get_price' ], 99, 2 );
-            add_filter( 'woocommerce_variation_prices_price', [ Pricing::get_instance(), 'get_price' ], 99, 2 );
 
             wp_localize_script(
                 $slug,
