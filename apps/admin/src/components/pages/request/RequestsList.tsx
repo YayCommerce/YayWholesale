@@ -1,10 +1,8 @@
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import { CaretUpDownIcon } from '@phosphor-icons/react';
-import { useQueryClient } from '@tanstack/react-query';
 import { flexRender, getCoreRowModel, PaginationState, useReactTable } from '@tanstack/react-table';
 import { Spinner } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
-import { debounce } from 'lodash';
 import { ChevronLeft, ChevronRight, Search } from 'lucide-react';
 
 import {
@@ -73,13 +71,17 @@ export default function RequestsList() {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [openBulkDeleteDialog, setOpenDeleteDialog] = useState(false);
-  const clientQuery = useQueryClient();
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const debouncedSearch = useMemo(() => {
-    return debounce((value) => {
+  const debouncedSearch = useCallback((value: string) => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+
+    timeoutRef.current = setTimeout(() => {
       setKeyword(value);
     }, 500);
-  }, [clientQuery]);
+  }, []);
 
   const {
     data,

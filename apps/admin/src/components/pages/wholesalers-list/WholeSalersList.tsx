@@ -1,11 +1,9 @@
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import { CaretUpDownIcon } from '@phosphor-icons/react';
-import { useQueryClient } from '@tanstack/react-query';
 import { flexRender, getCoreRowModel, PaginationState, useReactTable } from '@tanstack/react-table';
 import { Spinner } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
-import { debounce } from 'lodash';
-import { ChevronLeft, ChevronRight, ChevronsUpDown, Plus, Search } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Plus, Search } from 'lucide-react';
 
 import { useActiveRolesQuery } from '@/lib/queries/roles';
 import {
@@ -19,7 +17,6 @@ import { BulkActionButton } from '@/components/ui/bulk-actions';
 import BulkActionBox from '@/components/ui/bulk-actions-box';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
 import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group';
 import { InputNumberInput, InputNumberRoot } from '@/components/ui/input-number';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
@@ -55,12 +52,17 @@ export default function WholeSalersList() {
   });
   const [roleFilter, setRoleFilter] = useState('all');
 
-  const clientQuery = useQueryClient();
-  const debouncedSearch = useMemo(() => {
-    return debounce((value) => {
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const debouncedSearch = useCallback((value: string) => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+
+    timeoutRef.current = setTimeout(() => {
       setKeyword(value);
     }, 500);
-  }, [clientQuery]);
+  }, []);
 
   const {
     data: wholesalersData,

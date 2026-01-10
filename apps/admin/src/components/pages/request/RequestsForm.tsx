@@ -70,7 +70,7 @@ export default function RequestsForm() {
   const { data: rolesData } = useActiveRolesQuery();
   const updateStatusMutation = useUpdateRequestStatusMutation(editRequestId);
 
-  const [dataDisplay, setDataDisplay] = useState(DEFAULT_REQUEST);
+  const dataDisplay = useMemo(() => (data ? data : DEFAULT_REQUEST), [data]);
   const { icon, text } = useMemo(() => {
     return requestsStatusMap[dataDisplay?.status ?? 'pending'];
   }, [dataDisplay?.status]);
@@ -106,10 +106,6 @@ export default function RequestsForm() {
 
     return phoneFields;
   }, [dataDisplay]);
-
-  useUpdateEffect(() => {
-    if (data?.id) setDataDisplay(data);
-  }, [data]);
 
   return (
     <Sheet
@@ -203,7 +199,7 @@ export default function RequestsForm() {
             <Textarea
               className="h-fit min-h-25 resize-none"
               readOnly
-              defaultValue={dataDisplay.message}
+              defaultValue={dataDisplay?.message}
             />
           </div>
 
