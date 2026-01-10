@@ -172,7 +172,7 @@ class Orders {
             $items[] = $item->get_name() . ' x ' . $quantity;
 
             if ( ( $is_discounted && $is_disabled_tax ) ||
-            ( ! $is_discounted && $is_force_tax_exempt ) ) {
+            ( $is_force_tax_exempt ) ) {
                 $item->set_taxes(
                     [
                         'total'    => [],
@@ -220,7 +220,7 @@ class Orders {
             }
 
             if ( ( $is_discounted && $is_disabled_tax ) ||
-            ( ! $is_discounted && $is_force_tax_exempt ) ) {
+            ( $is_force_tax_exempt ) ) {
                 $shipping->set_taxes( [] );
             } else {
                 $tax_rates = WC_Tax::get_shipping_tax_rates( $shipping->get_tax_class() );
@@ -255,7 +255,7 @@ class Orders {
             }
 
             if ( ( $is_discounted && $is_disabled_tax ) ||
-            ( ! $is_discounted && $is_force_tax_exempt ) ) {
+            ( $is_force_tax_exempt ) ) {
                 $fee->set_taxes( [] );
             } else {
                 $tax_rates = WC_Tax::get_rates( $fee->get_tax_class() );
