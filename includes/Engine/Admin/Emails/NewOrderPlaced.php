@@ -30,7 +30,7 @@ class NewOrderPlaced extends WholesaleEmailBase {
         ];
 
         // Trigger the email when a new order is placed.
-        add_action( 'yhs_new_wholesale_order_placed', [ $this, 'trigger' ], 10, 2 );
+        add_action( 'ywhs_new_wholesale_order_placed', [ $this, 'trigger' ], 10, 2 );
 
         parent::__construct();
 

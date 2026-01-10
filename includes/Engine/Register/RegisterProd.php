@@ -1,6 +1,10 @@
 <?php
 namespace Yay_Wholesale\Engine\Register;
 
+if ( ! defined( 'ABSPATH' ) ) {
+    exit;
+}
+
 use Yay_Wholesale\Utils\SingletonTrait;
 use Yay_Wholesale\Engine\Register\ScriptName;
 

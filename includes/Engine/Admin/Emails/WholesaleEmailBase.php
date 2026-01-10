@@ -65,7 +65,7 @@ abstract class WholesaleEmailBase extends WC_Email {
          * @param object|bool $object The object the email is for (e.g customer).
          * @param \WC_Email $email The email object.
          */
-        return apply_filters( 'yhs_email_content_' . $this->id, $this->format_string( $content ), $this->object, $this );
+        return apply_filters( 'ywhs_email_content_' . $this->id, $this->format_string( $content ), $this->object, $this );
     }
 
     /*

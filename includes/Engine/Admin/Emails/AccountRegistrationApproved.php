@@ -44,7 +44,7 @@ class AccountRegistrationApproved extends WholesaleEmailBase {
             '{set_password_url}' => '{set_password_url}',
         ];
         // Trigger the email when a new wholesale account is registered.
-        add_action( 'yhs_account_registration_approved', [ $this, 'trigger' ], 10, 1 );
+        add_action( 'ywhs_account_registration_approved', [ $this, 'trigger' ], 10, 1 );
 
         // Call parent constructor
         parent::__construct();

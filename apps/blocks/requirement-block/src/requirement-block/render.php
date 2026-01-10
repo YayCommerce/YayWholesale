@@ -10,14 +10,16 @@
  * @see https://github.com/WordPress/gutenberg/blob/trunk/docs/reference-guides/block-api/block-metadata.md#render
  */
 
+if ( ! defined( 'ABSPATH' ) ) exit;
+
 use Yay_Wholesale\Helpers\RolesHelper;
 
-$wholesale = RolesHelper::is_wholesale_user();
+$ywhs_wholesale = RolesHelper::is_wholesale_user();
 
  wp_interactivity_config(
     'ywhs_wholesale_requirement',
     [
-		'wholesale'     => $wholesale,
+		'wholesale'     => $ywhs_wholesale,
 		'currency_data' => [
 			'currency'     => get_woocommerce_currency(),
 			'symbol'       => html_entity_decode( \get_woocommerce_currency_symbol(), ENT_COMPAT ),
@@ -34,9 +36,9 @@ $wholesale = RolesHelper::is_wholesale_user();
     );
 
 ?>
-<?php if ($wholesale) : ?>
+<?php if ($ywhs_wholesale) : ?>
 <div 
-<?php echo get_block_wrapper_attributes( [ 'class' => 'ywhs_requirement_section' ] ); ?>
+<?php echo esc_attr(get_block_wrapper_attributes( [ 'class' => 'ywhs_requirement_section' ] )); ?>
 	data-wp-interactive="ywhs_wholesale_requirement"
 	data-wp-init = "callbacks.getPriceMap"
 	data-wp-watch="callbacks.checkMetRequired"

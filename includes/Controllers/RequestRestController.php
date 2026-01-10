@@ -158,27 +158,27 @@ class RequestRestController extends BaseRestController {
             $role_slug    = $settings['general']['default_role'];
             $role         = array_values( array_filter( $active_roles, fn( $r ) => $r['slug'] === $role_slug ) )[0] ?? null;
             if ( ! isset( $role ) ) {
-                do_action( 'yhs_account_registration_pending', $wholesale_id );
+                do_action( 'ywhs_account_registration_pending', $wholesale_id );
                 return $this->error( __( 'The default role is inactive, your request is changed to pending', 'yay-wholesale' ), 404 );
             }
 
             try {
                 RequestsHelper::add_role_to_ywhs_request_author( $wholesale_id, $role_slug );
             } catch ( Exception $e ) {
-                do_action( 'yhs_account_registration_pending', $wholesale_id );
+                do_action( 'ywhs_account_registration_pending', $wholesale_id );
                 return $this->error( $e->getMessage(), 404 );
             }
 
             if ( ! RequestsHelper::update_whs_request( $wholesale_id, [ 'status' => RequestsHelper::APPROVED ] ) ) {
-                do_action( 'yhs_account_registration_pending', $wholesale_id );
+                do_action( 'ywhs_account_registration_pending', $wholesale_id );
                 return $this->error( __( 'Role has been applied, but your request is still pending', 'yay-wholesale' ), 404 );
             }
 
             // Trigger the email when a new wholesale account is approved.
-            do_action( 'yhs_account_registration_approved', $wholesale_id );
+            do_action( 'ywhs_account_registration_approved', $wholesale_id );
         } else {
             // Trigger the email when a new wholesale account is pending.
-            do_action( 'yhs_account_registration_pending', $wholesale_id );
+            do_action( 'ywhs_account_registration_pending', $wholesale_id );
         }//end if
 
         return $this->success( [], __( 'Request Saved', 'yay-wholesale' ) );
@@ -312,7 +312,7 @@ class RequestRestController extends BaseRestController {
             }
 
             // Trigger the email when a wholesale account is approved.
-            do_action( 'yhs_account_registration_approved', $id );
+            do_action( 'ywhs_account_registration_approved', $id );
 
         } elseif ( RequestsHelper::REJECTED === $json_data['status'] ) {
             RequestsHelper::remove_role_from_ywhs_request_author( $id );
@@ -322,7 +322,7 @@ class RequestRestController extends BaseRestController {
             }
 
             // Trigger the email when a wholesale account is rejected.
-            do_action( 'yhs_account_registration_rejected', $id );
+            do_action( 'ywhs_account_registration_rejected', $id );
 
         } else {
             return $this->error( __( 'You just can approve/reject this request', 'yay-wholesale' ), 404 );
@@ -382,7 +382,7 @@ class RequestRestController extends BaseRestController {
                     ++$failed_partially;
                 } else {
                     ++$updated;
-                    do_action( 'yhs_account_registration_approved', $id );
+                    do_action( 'ywhs_account_registration_approved', $id );
                 }
             }
         } elseif ( RequestsHelper::REJECTED === $status ) {
@@ -398,7 +398,7 @@ class RequestRestController extends BaseRestController {
                     ++$failed_partially;
                 } else {
                     ++$updated;
-                    do_action( 'yhs_account_registration_rejected', $id );
+                    do_action( 'ywhs_account_registration_rejected', $id );
                 }
             }
         } else {

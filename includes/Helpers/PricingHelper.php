@@ -179,7 +179,7 @@ class PricingHelper {
             }
             // This hook runs twice, check the trigger <= 2
             if ( ( ! isset( $email_trigger ) || $email_trigger <= 2 ) ) {
-                do_action( 'yhs_new_wholesale_order_placed', $order->get_id(), $order );
+                do_action( 'ywhs_new_wholesale_order_placed', $order->get_id(), $order );
                 $order->update_meta_data( '_ywhs_wholesale_email_trigger', ++$email_trigger );
             }
         } else {

@@ -30,7 +30,7 @@ class AccountRegistrationPending extends WholesaleEmailBase {
             '{account_name}' => '{account_name}',
         ];
         // Trigger the email when a new wholesale account is registered.
-        add_action( 'yhs_account_registration_pending', [ $this, 'trigger' ], 10, 1 );
+        add_action( 'ywhs_account_registration_pending', [ $this, 'trigger' ], 10, 1 );
 
         // Call parent constructor
         parent::__construct();

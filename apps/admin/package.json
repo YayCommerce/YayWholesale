@@ -47,7 +47,6 @@
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
     "dayjs": "^1.11.19",
-    "dialog": "link:@/registry/new-york-v4/ui/dialog",
     "ky": "^1.8.1",
     "lucide-react": "^0.503.0",
     "react": "^18.3.1",

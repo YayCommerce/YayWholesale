@@ -335,6 +335,6 @@ class Pricing {
 
         PricingHelper::handle_order( $order, $wholesale_role, $is_discounted, false );
 
-        do_action( 'yhs_new_wholesale_order_placed', $order->get_id(), $order );
+        do_action( 'ywhs_new_wholesale_order_placed', $order->get_id(), $order );
     }
 }

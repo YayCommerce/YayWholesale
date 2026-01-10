@@ -6,6 +6,8 @@
  * Version:           1.0.0
  * Author:            YayCommerce
  * Author URI:        https://yaycommerce.com
+ * License:     GPLv2 or later
+ * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain:       yay-wholesale
  * Domain Path:       /languages
  * Requires at least: 4.7

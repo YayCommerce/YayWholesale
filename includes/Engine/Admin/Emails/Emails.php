@@ -45,11 +45,11 @@ class Emails {
         $new_actions = array_merge(
             $actions,
             [
-                'yhs_new_wholesale_order_placed',
-                'yhs_new_account_registered',
-                'yhs_account_registration_pending',
-                'yhs_account_registration_rejected',
-                'yhs_account_registration_approved',
+                'ywhs_new_wholesale_order_placed',
+                'ywhs_new_account_registered',
+                'ywhs_account_registration_pending',
+                'ywhs_account_registration_rejected',
+                'ywhs_account_registration_approved',
 
             ]
         );

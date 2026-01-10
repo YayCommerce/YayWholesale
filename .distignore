@@ -19,3 +19,5 @@ yay-wholesale-lite.zip
 /tools
 /blocks/src
 /build
+.prettierrc
+.prettierignore

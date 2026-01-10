@@ -107,9 +107,6 @@ importers:
       dayjs:
         specifier: ^1.11.19
         version: 1.11.19
-      dialog:
-        specifier: link:@/registry/new-york-v4/ui/dialog
-        version: link:@/registry/new-york-v4/ui/dialog
       ky:
         specifier: ^1.8.1
         version: 1.12.0
@@ -5266,7 +5263,6 @@ snapshots:
   uuid@13.0.0: {}
 
   uuid@9.0.1: {}
-
 
   vite-plugin-external@6.2.2:
     dependencies:
