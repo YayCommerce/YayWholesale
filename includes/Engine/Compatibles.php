@@ -13,4 +13,12 @@ class Compatibles {
     protected function __construct() {
         YayCurrency::get_instance();
     }
+
+    public function remove_price_related_hooks() {
+        remove_filter( 'ywhs_price_handle_processed', [ YayCurrency::get_instance(), 'convert_currency_price' ], 10, 1 );
+    }
+
+    public function add_price_related_hooks() {
+        add_filter( 'ywhs_price_handle_processed', [ YayCurrency::get_instance(), 'convert_currency_price' ], 10, 1 );
+    }
 }

@@ -3,6 +3,7 @@ namespace Yay_Wholesale\Engine\Admin;
 
 use WC_Data_Store;
 use WC_Tax;
+use Yay_Wholesale\Engine\Compatibles;
 use Yay_Wholesale\Engine\Frontend\Tax;
 use Yay_Wholesale\Helpers\RolesHelper;
 use Yay_Wholesale\Helpers\SettingsHelper;
@@ -38,6 +39,11 @@ class Orders {
      * @param \WC_Order $order The order object.
      */
     public function admin_recalculate_order( $and_taxes, \WC_Order $order ) {
+
+        remove_filter( 'woocommerce_order_is_vat_exempt', [ $this, 'tax_enabled_handler' ], 999, 2 );
+        remove_filter( 'woocommerce_calc_tax', [ Tax::get_instance(), 'maybe_disable_tax_calc' ], 9999 );
+        Compatibles::get_instance()->remove_price_related_hooks();
+
         $customer_id        = $order->get_customer_id();
         $wholesale_role     = RolesHelper::is_wholesale_user( $customer_id );
         $setting            = SettingsHelper::get_settings();
@@ -48,9 +54,6 @@ class Orders {
         if ( ! isset( $wholesale_role ) ) {
             return;
         }
-
-        remove_filter( 'woocommerce_order_is_vat_exempt', [ $this, 'tax_enabled_handler' ], 999, 2 );
-        remove_filter( 'woocommerce_calc_tax', [ Tax::get_instance(), 'maybe_disable_tax_calc' ], 9999 );
 
         $is_discounted = PricingHelper::check_is_discounted( $order, $wholesale_role );
 
@@ -81,6 +84,7 @@ class Orders {
 
         add_filter( 'woocommerce_order_is_vat_exempt', [ $this, 'tax_enabled_handler' ], 999, 2 );
         add_filter( 'woocommerce_calc_tax', [ Tax::get_instance(), 'maybe_disable_tax_calc' ], 9999 );
+        Compatibles::get_instance()->add_price_related_hooks();
     }//end admin_recalculate_order()
 
     /**
