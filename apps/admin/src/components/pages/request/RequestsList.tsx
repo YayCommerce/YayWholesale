@@ -145,7 +145,7 @@ export default function RequestsList() {
       {/* Header */}
       <div className="flex flex-nowrap items-center justify-between gap-3">
         <div className="flex items-center gap-2">
-          <h1 className="text-2xl font-bold">{__('Wholesaler Requests', 'yay-wholesale')}</h1>
+          <h1 className="text-2xl font-bold">{__('Wholesaler Requests', 'yay-wholesale-b2b')}</h1>
           {totalCount && totalCount.count > 0 && (
             <WholeSaleToolTip
               trigger={
@@ -160,8 +160,8 @@ export default function RequestsList() {
               }
               content={
                 totalCount.count > 1
-                  ? sprintf(__('%d requests in total', 'yay-wholesale'), totalCount.count)
-                  : __('1 request in total', 'yay-wholesale')
+                  ? sprintf(__('%d requests in total', 'yay-wholesale-b2b'), totalCount.count)
+                  : __('1 request in total', 'yay-wholesale-b2b')
               }
               side="bottom"
             />
@@ -174,8 +174,8 @@ export default function RequestsList() {
             </SelectTrigger>
             <SelectContent>
               <SelectGroup>
-                <SelectLabel>{__('Status Filter', 'yay-wholesale')}</SelectLabel>
-                <SelectItem value="all">{__('All status', 'yay-wholesale')}</SelectItem>
+                <SelectLabel>{__('Status Filter', 'yay-wholesale-b2b')}</SelectLabel>
+                <SelectItem value="all">{__('All status', 'yay-wholesale-b2b')}</SelectItem>
                 {Object.entries(requestsStatusMap).map((status) => {
                   const { icon, text } = status[1];
                   return (
@@ -268,7 +268,7 @@ export default function RequestsList() {
             ) : (
               <TableRow>
                 <TableCell colSpan={columns.length} className="h-24 text-center">
-                  {__('No requests found.', 'yay-wholesale')}
+                  {__('No requests found.', 'yay-wholesale-b2b')}
                 </TableCell>
               </TableRow>
             )}
@@ -289,7 +289,7 @@ export default function RequestsList() {
           {!(useBulkUpdateMutation.isPending || useBulkDeleteMutation.isPending) && (
             <BulkActionBox selected={selectedCount} onClose={() => table.resetRowSelection()}>
               <span className="text-foreground text-sm font-normal">
-                {sprintf(__('%d selected', 'yay-wholesale'), selectedCount)}
+                {sprintf(__('%d selected', 'yay-wholesale-b2b'), selectedCount)}
               </span>
               <Separator orientation="vertical" className="ml-2 h-5!" />
               <Popover>
@@ -298,7 +298,7 @@ export default function RequestsList() {
                     variant="ghost"
                     className="hover:text-primary hover:bg-primary/6 group bold flex cursor-pointer items-center gap-1.5 px-2.5"
                   >
-                    <span className="text-sm font-normal">{__('Status', 'yay-wholesale')}</span>
+                    <span className="text-sm font-normal">{__('Status', 'yay-wholesale-b2b')}</span>
                     <span className="group-hover:text-primary text-icon flex items-center">
                       <CaretUpDownIcon size={12} weight="bold" />
                     </span>
@@ -310,7 +310,7 @@ export default function RequestsList() {
                     <BulkActionMenu>
                       <BulkMenuButtonAndTrigger onClick={() => handleBulkStatusChange('approved')}>
                         <RequestsStatusIcon status="approved" className="mt-0.5" />
-                        {__('Approve', 'yay-wholesale')}
+                        {__('Approve', 'yay-wholesale-b2b')}
                       </BulkMenuButtonAndTrigger>
                       <BulkActionMenuContent>
                         {activeRoles?.map((role) => (
@@ -318,7 +318,7 @@ export default function RequestsList() {
                             onClick={() => handleBulkStatusChange('approved', role.id)}
                           >
                             <RequestsStatusIcon status="approved" />
-                            {sprintf(__('Approve to %s', 'yay-wholesale'), role.name)}
+                            {sprintf(__('Approve to %s', 'yay-wholesale-b2b'), role.name)}
                           </BulkActionButton>
                         ))}
                       </BulkActionMenuContent>
@@ -326,7 +326,7 @@ export default function RequestsList() {
 
                     <BulkActionButton onClick={() => handleBulkStatusChange('rejected')}>
                       <RequestsStatusIcon status="rejected" />
-                      {__('Reject', 'yay-wholesale')}
+                      {__('Reject', 'yay-wholesale-b2b')}
                     </BulkActionButton>
                   </div>
                 </PopoverContent>
@@ -344,30 +344,30 @@ export default function RequestsList() {
                       <DeleteIcon className="size-4" />
                     </Button>
                   }
-                  content={<span>{__('Delete', 'yay-wholesale')}</span>}
+                  content={<span>{__('Delete', 'yay-wholesale-b2b')}</span>}
                 />
                 <AlertDialogContent>
                   <AlertDialogHeader>
                     <AlertDialogTitle>
                       {sprintf(
-                        __(`Are you sure you want to delete %d requests ?`, 'yay-wholesale'),
+                        __(`Are you sure you want to delete %d requests ?`, 'yay-wholesale-b2b'),
                         selectedCount,
                       )}
                     </AlertDialogTitle>
                     <AlertDialogDescription>
                       {__(
                         'This action cannot be undone. This will permanently delete these request and remove data from servers',
-                        'yay-wholesale',
+                        'yay-wholesale-b2b',
                       )}
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>
-                    <AlertDialogCancel>{__('Cancel', 'yay-wholesale')}</AlertDialogCancel>
+                    <AlertDialogCancel>{__('Cancel', 'yay-wholesale-b2b')}</AlertDialogCancel>
                     <AlertDialogAction
                       className="bg-destructive text-destructive-foreground hover:bg-destructive/80"
                       onClick={() => handleBulkDelete()}
                     >
-                      {__('Continue', 'yay-wholesale')}
+                      {__('Continue', 'yay-wholesale-b2b')}
                     </AlertDialogAction>
                   </AlertDialogFooter>
                 </AlertDialogContent>
@@ -379,7 +379,7 @@ export default function RequestsList() {
             <div className="flex items-center gap-4">
               <span className="text-foreground-400 text-sm font-normal">
                 {sprintf(
-                  __('Page %d of %d', 'yay-wholesale'),
+                  __('Page %d of %d', 'yay-wholesale-b2b'),
                   table.getState().pagination.pageIndex + 1,
                   table.getPageCount(),
                 )}
@@ -408,7 +408,7 @@ export default function RequestsList() {
 
               <div className="flex items-center gap-2">
                 <span className="text-foreground-400 text-sm font-normal">
-                  {__('Go to', 'yay-wholesale')}
+                  {__('Go to', 'yay-wholesale-b2b')}
                 </span>
                 <InputNumberRoot
                   min={1}

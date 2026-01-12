@@ -289,7 +289,7 @@ class Pricing {
      * @return string The wholesale price HTML.
      */
     protected function get_wholesale_price_html( string $discounted_price_html ): string {
-        $label = $this->settings['display']['wholesale_price_label'] ?? __( 'Wholesale price', 'yay-wholesale' );
+        $label = $this->settings['display']['wholesale_price_label'] ?? __( 'Wholesale price', 'yay-wholesale-b2b' );
         $color = $this->settings['display']['wholesale_price_color'] ?? '#333333';
         return '<span class="yay-wholesale-label">' . esc_html( $label ) . ':</span> '
                 . '<span style="color:' . esc_attr( $color ) . '">' . $discounted_price_html . '</span>';

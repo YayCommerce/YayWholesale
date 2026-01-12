@@ -21,9 +21,9 @@ class AccountRegistrationPending extends WholesaleEmailBase {
 
         $this->id             = 'yay_wholesale_account_registration_pending';
         $this->customer_email = true;
-        $this->title          = __( 'Wholesale account is pending', 'yay-wholesale' );
+        $this->title          = __( 'Wholesale account is pending', 'yay-wholesale-b2b' );
         $this->email_group    = 'wholesale_account';
-        $this->description    = __( 'Notify when a wholesale account is pending', 'yay-wholesale' );
+        $this->description    = __( 'Notify when a wholesale account is pending', 'yay-wholesale-b2b' );
         $this->template_html  = 'account-registration-pending.php';
         $this->template_plain = 'plain/account-registration-pending.php';
         $this->placeholders   = [
@@ -42,7 +42,7 @@ class AccountRegistrationPending extends WholesaleEmailBase {
      * @return string
      */
     public function get_default_subject() {
-        return __( '[{site_title}]: Your wholesale account is pending', 'yay-wholesale' );
+        return __( '[{site_title}]: Your wholesale account is pending', 'yay-wholesale-b2b' );
     }
 
     /**
@@ -51,7 +51,7 @@ class AccountRegistrationPending extends WholesaleEmailBase {
      * @return string
      */
     public function get_default_heading() {
-        return __( 'Thank You for Registering Your Wholesale Account', 'yay-wholesale' );
+        return __( 'Thank You for Registering Your Wholesale Account', 'yay-wholesale-b2b' );
     }
 
     /**
@@ -60,13 +60,13 @@ class AccountRegistrationPending extends WholesaleEmailBase {
      * @return string
      */
     public function get_default_email_content() {
-        $content  = sprintf( '%s {account_name}', __( 'Hi', 'yay-wholesale' ) );
+        $content  = sprintf( '%s {account_name}', __( 'Hi', 'yay-wholesale-b2b' ) );
         $content .= "\n\n";
-        $content .= __( 'Thank you for registering a wholesale account on our store.', 'yay-wholesale' );
+        $content .= __( 'Thank you for registering a wholesale account on our store.', 'yay-wholesale-b2b' );
         $content .= "\n\n";
-        $content .= __( 'We have received your application and our team is currently reviewing your information to ensure it meets our wholesale program requirements.', 'yay-wholesale' );
+        $content .= __( 'We have received your application and our team is currently reviewing your information to ensure it meets our wholesale program requirements.', 'yay-wholesale-b2b' );
         $content .= "\n\n";
-        $content .= sprintf( '<strong>%s</strong>', __( 'What happens next?', 'yay-wholesale' ) );
+        $content .= sprintf( '<strong>%s</strong>', __( 'What happens next?', 'yay-wholesale-b2b' ) );
         $content .= "\n\n";
         $content .= sprintf(
             '<ul>
@@ -74,12 +74,12 @@ class AccountRegistrationPending extends WholesaleEmailBase {
                 <li>%s</li>
                 <li>%s</li>
             </ul>',
-            __( 'Your account will be reviewed within 24-48 hours.', 'yay-wholesale' ),
-            __( 'If additional information or documentation is required, we will contact you.', 'yay-wholesale' ),
-            __( 'We will notify you as soon as your wholesale account has been approved or if your application cannot be accepted.', 'yay-wholesale' )
+            __( 'Your account will be reviewed within 24-48 hours.', 'yay-wholesale-b2b' ),
+            __( 'If additional information or documentation is required, we will contact you.', 'yay-wholesale-b2b' ),
+            __( 'We will notify you as soon as your wholesale account has been approved or if your application cannot be accepted.', 'yay-wholesale-b2b' )
         );
         $content .= "\n\n";
-        $content .= __( 'Thank you for your interest in partnering with us. We look forward to working with you!', 'yay-wholesale' );
+        $content .= __( 'Thank you for your interest in partnering with us. We look forward to working with you!', 'yay-wholesale-b2b' );
         $content .= "\n\n";
 
         return $content;
@@ -91,7 +91,7 @@ class AccountRegistrationPending extends WholesaleEmailBase {
      * @return string
      */
     public function get_default_additional_content() {
-        return __( 'We look forward to seeing you soon.', 'yay-wholesale' );
+        return __( 'We look forward to seeing you soon.', 'yay-wholesale-b2b' );
     }
 
     /**

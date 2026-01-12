@@ -1,9 +1,9 @@
 {
-  "name": "plugin-yay-wholesale",
+  "name": "plugin-yay-wholesale-b2b",
   "title": "Yay Wholesale Plugin",
   "private": true,
   "scripts": {
-    "makepot": "wp i18n make-pot . languages/yay-wholesale.pot --exclude=vendor,node_modules,apps,tests --domain=yay-wholesale",
+    "makepot": "wp i18n make-pot . languages/yay-wholesale-b2b.pot --exclude=vendor,node_modules,apps,tests --domain=yay-wholesale-b2b",
     "release": "bash ./release.sh"
   },
   "keywords": [],

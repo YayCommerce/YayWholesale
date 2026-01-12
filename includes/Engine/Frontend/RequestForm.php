@@ -42,7 +42,7 @@ class RequestForm {
     public function ywhs_request_form_shortcode( array $attr = [] ): string {
         $attr = shortcode_atts(
             [
-                'title' => __( 'Request Registration', 'yay-wholesale' ),
+                'title' => __( 'Request Registration', 'yay-wholesale-b2b' ),
             ],
             $attr,
             $this->shortcode_name
@@ -92,7 +92,7 @@ class RequestForm {
                         <line x1="12" x2="12.01" y1="16" y2="16"/>
                     </svg>
                     <div class="ywhs_form_error_content">
-                        <div><strong><?php echo esc_html( __( 'Unable to send your request', 'yay-wholesale' ) ); ?></strong></div>
+                        <div><strong><?php echo esc_html( __( 'Unable to send your request', 'yay-wholesale-b2b' ) ); ?></strong></div>
                         <span class="ywhs_form_error_msg"></span>
                     </div>
                 </div>
@@ -124,9 +124,9 @@ class RequestForm {
                                 <?php echo( $field['isDefault'] && 'email' === $field['type'] && $is_autofill ? 'readonly' : '' ); ?>
                                 <?php if ( $field['isDefault'] && 'email' === $field['type'] ) : ?>
                                 value="<?php echo esc_html( trim( $email_autofill ) ); ?>" 
-                                <?php elseif ( $field['isDefault'] && 'text' === $field['type'] && str_contains( $field['label'], __( 'First Name', 'yay-wholesale' ) ) ) : ?>
+                                <?php elseif ( $field['isDefault'] && 'text' === $field['type'] && str_contains( $field['label'], __( 'First Name', 'yay-wholesale-b2b' ) ) ) : ?>
                                     value="<?php echo esc_html( trim( $first_name_autofill ) ); ?>" 
-                                <?php elseif ( $field['isDefault'] && 'text' === $field['type'] && str_contains( $field['label'], __( 'Last Name', 'yay-wholesale' ) ) ) : ?>    
+                                <?php elseif ( $field['isDefault'] && 'text' === $field['type'] && str_contains( $field['label'], __( 'Last Name', 'yay-wholesale-b2b' ) ) ) : ?>    
                                     value="<?php echo esc_html( trim( $last_name_autofill ) ); ?>"
                                 <?php endif ?>                                
                                 />

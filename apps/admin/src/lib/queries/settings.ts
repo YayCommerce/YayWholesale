@@ -12,14 +12,14 @@ export function useSaveSettingsMutation() {
     mutationKey: ['settings'],
     mutationFn: async (data: SettingsFormData) => postSettings(data),
     onSuccess: () => {
-      showToast.success(__('Settings saved!', 'yay-wholesale'));
+      showToast.success(__('Settings saved!', 'yay-wholesale-b2b'));
       queryClient.invalidateQueries({ queryKey: ['settings'] });
       if (!queryClient.isFetching({ queryKey: ['roles'] })) {
         queryClient.invalidateQueries({ queryKey: ['roles'] });
       }
     },
     onError: () => {
-      showToast.error(__('Oops! Something went wrong!', 'yay-wholesale'));
+      showToast.error(__('Oops! Something went wrong!', 'yay-wholesale-b2b'));
     },
   });
 }

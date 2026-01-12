@@ -74,7 +74,7 @@ export const RolesColumn: ColumnDef<RolesListValues & { count: number }>[] = [
   },
   {
     accessorKey: 'name',
-    header: __('Name', 'yay-wholesale'),
+    header: __('Name', 'yay-wholesale-b2b'),
     cell: ({ row }) => {
       return row.original.isDefault ? (
         <div className="flex gap-2">
@@ -85,7 +85,7 @@ export const RolesColumn: ColumnDef<RolesListValues & { count: number }>[] = [
                 <div className="text-foreground/45 h-0.25 bg-[radial-gradient(circle,currentColor_0.5px,transparent_0.8px)] bg-size-[2.25px_2px] bg-repeat-x"></div>
               </div>
             }
-            content={<span>{__('Default role', 'yay-wholesale')}</span>}
+            content={<span>{__('Default role', 'yay-wholesale-b2b')}</span>}
           />
         </div>
       ) : (
@@ -103,7 +103,7 @@ export const RolesColumn: ColumnDef<RolesListValues & { count: number }>[] = [
   },
   {
     accessorKey: 'count',
-    header: __('Count', 'yay-wholesale'),
+    header: __('Count', 'yay-wholesale-b2b'),
     cell: (column) => {
       const count = column.row.original.count;
       return (
@@ -127,7 +127,7 @@ export const RolesColumn: ColumnDef<RolesListValues & { count: number }>[] = [
   },
   {
     accessorKey: 'discount',
-    header: __('Discount', 'yay-wholesale'),
+    header: __('Discount', 'yay-wholesale-b2b'),
     cell: (column) => <div className="text-center">{column.row.original.discount}%</div>,
     meta: { align: 'center' },
     size: 80,
@@ -138,11 +138,11 @@ export const RolesColumn: ColumnDef<RolesListValues & { count: number }>[] = [
       <WholeSaleToolTip
         trigger={
           <span className="inline-block p-0">
-            {__('MOQ', 'yay-wholesale')}
+            {__('MOQ', 'yay-wholesale-b2b')}
             <div className="text-foreground/45 h-0.25 -translate-y-0.5 bg-[radial-gradient(circle,currentColor_0.5px,transparent_0.8px)] bg-size-[2.25px_2px] bg-repeat-x"></div>
           </span>
         }
-        content={<span>{__('Minimum order quantity', 'yay-wholesale')}</span>}
+        content={<span>{__('Minimum order quantity', 'yay-wholesale-b2b')}</span>}
       />
     ),
     cell: (column) => <div className="text-center">{column.row.original.minOrderQuantity}</div>,
@@ -155,11 +155,11 @@ export const RolesColumn: ColumnDef<RolesListValues & { count: number }>[] = [
       <WholeSaleToolTip
         trigger={
           <span className="inline-block p-0">
-            {__('MOA', 'yay-wholesale')}
+            {__('MOA', 'yay-wholesale-b2b')}
             <div className="text-foreground/45 h-0.25 -translate-y-0.5 bg-[radial-gradient(circle,currentColor_0.5px,transparent_0.8px)] bg-size-[2.25px_2px] bg-repeat-x"></div>
           </span>
         }
-        content={<span>{__('Minimum order amount', 'yay-wholesale')}</span>}
+        content={<span>{__('Minimum order amount', 'yay-wholesale-b2b')}</span>}
       />
     ),
     cell: (column) => (
@@ -174,7 +174,7 @@ export const RolesColumn: ColumnDef<RolesListValues & { count: number }>[] = [
 
   {
     accessorKey: 'status',
-    header: __('Status', 'yay-wholesale'),
+    header: __('Status', 'yay-wholesale-b2b'),
     cell: ({ row }) => (
       <RoleStatusSwitch
         id={row.original.id}
@@ -213,7 +213,7 @@ export const RolesColumn: ColumnDef<RolesListValues & { count: number }>[] = [
                     <PencilLine className="size-4" />
                   </Button>
                 }
-                content={<span>{__('Edit role', 'yay-wholesale')}</span>}
+                content={<span>{__('Edit role', 'yay-wholesale-b2b')}</span>}
               />
 
               {!row.original.isDefault ? (
@@ -232,7 +232,7 @@ export const RolesColumn: ColumnDef<RolesListValues & { count: number }>[] = [
                       <DeleteIcon className="size-4" />
                     </Button>
                   }
-                  content={<span>{__('Delete role', 'yay-wholesale')}</span>}
+                  content={<span>{__('Delete role', 'yay-wholesale-b2b')}</span>}
                 />
               ) : (
                 <WholeSaleToolTip
@@ -246,7 +246,7 @@ export const RolesColumn: ColumnDef<RolesListValues & { count: number }>[] = [
                       <EditIcon className="size-4" />
                     </Button>
                   }
-                  content={<span>{__('Setting', 'yay-wholesale')}</span>}
+                  content={<span>{__('Setting', 'yay-wholesale-b2b')}</span>}
                 />
               )}
             </div>
@@ -262,22 +262,22 @@ export const RolesColumn: ColumnDef<RolesListValues & { count: number }>[] = [
           <AlertDialogContent>
             <AlertDialogHeader>
               <AlertDialogTitle>
-                {__('Are you sure you want to delete this role?', 'yay-wholesale')}
+                {__('Are you sure you want to delete this role?', 'yay-wholesale-b2b')}
               </AlertDialogTitle>
               <AlertDialogDescription>
                 {__(
                   'This action cannot be undone. This will permanently delete this request and remove data from servers',
-                  'yay-wholesale',
+                  'yay-wholesale-b2b',
                 )}
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel>{__('Cancel', 'yay-wholesale')}</AlertDialogCancel>
+              <AlertDialogCancel>{__('Cancel', 'yay-wholesale-b2b')}</AlertDialogCancel>
               <AlertDialogAction
                 className="bg-destructive text-destructive-foreground hover:bg-destructive/80"
                 onClick={() => deleteRoleById()}
               >
-                {__('Continue', 'yay-wholesale')}
+                {__('Continue', 'yay-wholesale-b2b')}
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>

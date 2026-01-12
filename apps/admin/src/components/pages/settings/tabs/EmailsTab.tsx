@@ -57,7 +57,7 @@ export default function EmailsTab() {
               <TableCell className="text-foreground">{email.description}</TableCell>
 
               <TableCell className="text-foreground">
-                {email.recipients || __('Customer', 'yay-wholesale')}
+                {email.recipients || __('Customer', 'yay-wholesale-b2b')}
               </TableCell>
 
               <TableCell className="px-4 text-center">
@@ -65,7 +65,7 @@ export default function EmailsTab() {
                   href={email.url}
                   className="bg-background hover:bg-accent hover:text-accent-foreground inline-flex h-8 items-center justify-center rounded-md border px-3 py-1 text-sm font-medium shadow-xs"
                 >
-                  {__('Manage', 'yay-wholesale')}
+                  {__('Manage', 'yay-wholesale-b2b')}
                 </a>
               </TableCell>
             </TableRow>

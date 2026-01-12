@@ -130,7 +130,7 @@ export default function Footer({
             {createInterpolateElement(
               __(
                 'We need your support to keep updating and improving the plugin. Please <review>help us by leaving a good review</review>. Thanks!',
-                'yay-wholesale',
+                'yay-wholesale-b2b',
               ),
               {
                 review: (
@@ -146,7 +146,7 @@ export default function Footer({
         ) : (
           <p className="text-right text-xs">
             {createInterpolateElement(
-              __('Thank you for using YayWholesale from <link/>.', 'yay-wholesale'),
+              __('Thank you for using YayWholesale from <link/>.', 'yay-wholesale-b2b'),
               {
                 link: (
                   <a

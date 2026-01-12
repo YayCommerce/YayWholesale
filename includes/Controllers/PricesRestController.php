@@ -41,7 +41,7 @@ class PricesRestController extends BaseRestController {
      */
     public function prices_permission_callback() {
         if ( ! is_user_logged_in() ) {
-            return new \WP_Error( 'rest_forbidden', esc_html__( 'Forbidden.', 'yay-wholesale' ), [ 'status' => 401 ] );
+            return new \WP_Error( 'rest_forbidden', esc_html__( 'Forbidden.', 'yay-wholesale-b2b' ), [ 'status' => 401 ] );
         }
 
         return true;
@@ -68,6 +68,6 @@ class PricesRestController extends BaseRestController {
             }
         }
 
-        return $this->success( $price_map, __( 'Price map fetched successfully!', 'yay-wholesale' ) );
+        return $this->success( $price_map, __( 'Price map fetched successfully!', 'yay-wholesale-b2b' ) );
     }
 }

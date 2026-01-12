@@ -35,7 +35,7 @@ export default function Edit() {
 			<div className="ywhs_requirement_section" >
 				<div className="ywhs_requirement_header">
 					<div className="ywhs_requirement_title">
-						<span>{__('Wholesale Requirement', 'yay-wholesale' )}</span>
+						<span>{__('Wholesale Requirement', 'yay-wholesale-b2b' )}</span>
 						<span className="ywhs_badge">YayWholesale</span>
 					</div>
 
@@ -54,7 +54,7 @@ export default function Edit() {
 					</div>
 					<div className="ywhs_requirement_progress_bar">
 						<div className="ywhs_requirement_notice">
-							<span dangerouslySetInnerHTML={{__html: __( "Great news — You’ve received the <span class='ywhs_r_notice'>wholesale price</span> 🎉", 'yay-wholesale' )}} />
+							<span dangerouslySetInnerHTML={{__html: __( "Great news — You’ve received the <span class='ywhs_r_notice'>wholesale price</span> 🎉", 'yay-wholesale-b2b' )}} />
 						</div>
 						<div className="ywhs_r_base_bar">
 							<div className="ywhs_r_value_bar"></div>

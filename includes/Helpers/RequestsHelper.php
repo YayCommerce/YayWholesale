@@ -205,8 +205,8 @@ class RequestsHelper {
             'lastName'  => '',
         ];
 
-        $last_name_phrase  = __( 'Last Name', 'yay-wholesale' );
-        $first_name_phrase = __( 'First Name', 'yay-wholesale' );
+        $last_name_phrase  = __( 'Last Name', 'yay-wholesale-b2b' );
+        $first_name_phrase = __( 'First Name', 'yay-wholesale-b2b' );
         if ( $is_extra_fields ) {
             foreach ( $post_meta as $key => $field ) {
                 if ( ! $field['is_default'] ) {

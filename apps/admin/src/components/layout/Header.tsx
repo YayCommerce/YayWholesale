@@ -49,8 +49,8 @@ const NAV_ITEMS = [
             }
             content={
               data.count > 1
-                ? sprintf(__('%d requests are pending', 'yay-wholesale'), data.count)
-                : __('1 request is pending', 'yay-wholesale')
+                ? sprintf(__('%d requests are pending', 'yay-wholesale-b2b'), data.count)
+                : __('1 request is pending', 'yay-wholesale-b2b')
             }
             side="bottom"
           />
@@ -149,7 +149,7 @@ export default function Header() {
           className="relative cursor-pointer"
         >
           <span className={isSavingSettings ? 'opacity-0' : 'opacity-100'}>
-            {__('Save Changes', 'yay-wholesale')}
+            {__('Save Changes', 'yay-wholesale-b2b')}
           </span>
           {isSavingSettings && (
             <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">

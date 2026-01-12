@@ -1,6 +1,10 @@
 <?php
 namespace Yay_Wholesale\Engine;
 
+if ( ! defined( 'ABSPATH' ) ) {
+    exit;
+}
+
 use Yay_Wholesale\Engine\Compatibles\YayCurrency;
 use Yay_Wholesale\Utils\SingletonTrait;
 

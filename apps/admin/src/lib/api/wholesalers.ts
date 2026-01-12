@@ -19,7 +19,7 @@ export async function fetchWholesalersList(
   const response = await api.get('wholesalers', { searchParams });
   const result = await handleResponse<PaginatedWholesalerListValues>(
     response,
-    __('Failed to fetch wholesalers', 'yay-wholesale'),
+    __('Failed to fetch wholesalers', 'yay-wholesale-b2b'),
   );
   return result.data ?? {};
 }
@@ -29,7 +29,7 @@ export async function updateWholesalerRole(userId: number, roleSlug: string) {
   const response = await api.put(`wholesalers/${userId}`, { json: data });
   const result = await handleResponse<{ message: string }>(
     response,
-    __('Failed to update wholesaler role', 'yay-wholesale'),
+    __('Failed to update wholesaler role', 'yay-wholesale-b2b'),
   );
 
   return result;
@@ -41,7 +41,7 @@ export async function bulkUpdateWholesalerRole(userIds: number[], roleSlug: stri
   const response = await api.put('wholesalers/bulk-role', { json: data });
   const result = await handleResponse<{ message: string }>(
     response,
-    __('Failed to update wholesaler role', 'yay-wholesale'),
+    __('Failed to update wholesaler role', 'yay-wholesale-b2b'),
   );
 
   return result;
@@ -51,7 +51,7 @@ export async function getTotalCountWholesalers() {
   const response = await api.get('wholesalers/total');
   const result = await handleResponse<TotalWholesalersValues>(
     response,
-    __('Failed to count the totals of wholesalers', 'yay-wholesale'),
+    __('Failed to count the totals of wholesalers', 'yay-wholesale-b2b'),
   );
   return result.data;
 }

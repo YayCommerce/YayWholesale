@@ -75,7 +75,7 @@ class RegisterMenu {
     public function get_submenus() {
         $submenus['yaycommerce-help'] = [
             'parent'             => 'yaycommerce',
-            'name'               => __( 'Help', 'yay-wholesale' ),
+            'name'               => __( 'Help', 'yay-wholesale-b2b' ),
             'capability'         => 'manage_options',
             'render_callback'    => false,
             'load_data_callback' => false,
@@ -109,7 +109,7 @@ class RegisterMenu {
         if ( ! empty( $licensing_plugins_yay_mail ) || ! empty( $licensing_plugins_yay_pricing ) || ! empty( $licensing_plugins_yay_swatches ) || ! empty( $licensing_plugins_yay_extra ) || ! empty( $licensing_plugins_yay_smtp ) || ! empty( $yay_licensing_plugins ) ) {
             $submenus['yaycommerce-licenses'] = [
                 'parent'             => 'yaycommerce',
-                'name'               => __( 'Licenses', 'yay-wholesale' ),
+                'name'               => __( 'Licenses', 'yay-wholesale-b2b' ),
                 'capability'         => 'manage_options',
                 'render_callback'    => [ '\Yay_Wholesale\YayCommerceMenu\LicensesMenu', 'render' ],
                 'load_data_callback' => [ '\Yay_Wholesale\YayCommerceMenu\LicensesMenu', 'load_data' ],
@@ -118,7 +118,7 @@ class RegisterMenu {
 
         $submenus['yaycommerce-other-plugins'] = [
             'parent'             => 'yaycommerce',
-            'name'               => __( 'Other plugins', 'yay-wholesale' ),
+            'name'               => __( 'Other plugins', 'yay-wholesale-b2b' ),
             'capability'         => 'manage_options',
             'render_callback'    => [ '\Yay_Wholesale\YayCommerceMenu\OtherPluginsMenu', 'render' ],
             'load_data_callback' => [ '\Yay_Wholesale\YayCommerceMenu\OtherPluginsMenu', 'load_data' ],
@@ -169,7 +169,7 @@ class RegisterMenu {
             }
         }
         if ( ! $has_plugin_menu ) {
-            $page_id = add_submenu_page( 'yaycommerce', __( 'YayWholesale', 'yay-wholesale' ), __( 'YayWholesale', 'yay-wholesale' ), 'manage_woocommerce', 'yay_wholesale', '__return_false', 0 );
+            $page_id = add_submenu_page( 'yaycommerce', __( 'YayWholesale', 'yay-wholesale-b2b' ), __( 'YayWholesale', 'yay-wholesale-b2b' ), 'manage_woocommerce', 'yay_wholesale', '__return_false', 0 );
             add_action( 'load-' . $page_id, [ $this, 'redirect_to_licenses' ] );
         }
     }

@@ -43,7 +43,7 @@ export default function RegistrationDateField() {
         return (
           <FormItem className="w-full gap-2.5">
             <FormLabel className="text-foreground-400 text-xs font-medium">
-              {__('Registration Date', 'yay-wholesale')}
+              {__('Registration Date', 'yay-wholesale-b2b')}
             </FormLabel>
             <div className="flex gap-3">
               <Popover>

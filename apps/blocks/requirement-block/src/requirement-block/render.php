@@ -45,7 +45,7 @@ $ywhs_wholesale = RolesHelper::is_wholesale_user();
 	>
 	<div class="ywhs_requirement_header">
 		<div class="ywhs_requirement_title">
-			<span><?php echo esc_attr_e( 'Wholesale Requirement', 'yay-wholesale' ); ?></span>
+			<span><?php echo esc_attr_e( 'Wholesale Requirement', 'yay-wholesale-b2b' ); ?></span>
 			<span class="ywhs_badge" data-wp-text="state.wholesaleName"></span>
 		</div>
 
@@ -71,7 +71,7 @@ $ywhs_wholesale = RolesHelper::is_wholesale_user();
 	</div>
 	<div class="ywhs_requirement_content" style="display: none;">
 		<div class="ywhs_requirement_item">
-			<span><?php echo esc_attr_e( 'Min order quantity:', 'yay-wholesale' ); ?></span>
+			<span><?php echo esc_attr_e( 'Min order quantity:', 'yay-wholesale-b2b' ); ?></span>
 			<span class="ywhs_r_base_notice">
 				<span
 					data-wp-bind--class="state.qtyMet"
@@ -80,7 +80,7 @@ $ywhs_wholesale = RolesHelper::is_wholesale_user();
 			</span>
 		</div>
 		<div class="ywhs_requirement_item">
-			<span><?php echo esc_attr_e( 'Min order amount:', 'yay-wholesale' ); ?></span>
+			<span><?php echo esc_attr_e( 'Min order amount:', 'yay-wholesale-b2b' ); ?></span>
 			<span class="ywhs_r_base_notice">
 				<span
 					data-wp-bind--class="state.amountMet"
@@ -88,7 +88,7 @@ $ywhs_wholesale = RolesHelper::is_wholesale_user();
 				></span> /<span data-wp-text="state.minAmount"></span></span>
 		</div>
 		<div class="ywhs_requirement_item">
-			<span><?php esc_html_e( 'Get discount:', 'yay-wholesale' ); ?></span>
+			<span><?php esc_html_e( 'Get discount:', 'yay-wholesale-b2b' ); ?></span>
 			<div
 				data-wp-bind--class="state.isDiscounted"
 				data-wp-text="state.discountText"

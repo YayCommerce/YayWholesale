@@ -111,7 +111,7 @@ export default function WholeSalersList() {
       {/* Header */}
       <div className="flex flex-nowrap items-center justify-between gap-3">
         <div className="flex items-center gap-2">
-          <h1 className="text-2xl font-bold">{__('Wholesalers List', 'yay-wholesale')}</h1>
+          <h1 className="text-2xl font-bold">{__('Wholesalers List', 'yay-wholesale-b2b')}</h1>
           {totalCount && totalCount.count > 0 && (
             <WholeSaleToolTip
               trigger={
@@ -126,8 +126,8 @@ export default function WholeSalersList() {
               }
               content={
                 totalCount.count > 1
-                  ? sprintf(__('%d wholesalers in total', 'yay-wholesale'), totalCount.count)
-                  : __('1 wholesaler in total', 'yay-wholesale')
+                  ? sprintf(__('%d wholesalers in total', 'yay-wholesale-b2b'), totalCount.count)
+                  : __('1 wholesaler in total', 'yay-wholesale-b2b')
               }
               side="bottom"
             />
@@ -152,8 +152,8 @@ export default function WholeSalersList() {
             </SelectTrigger>
             <SelectContent>
               <SelectGroup>
-                <SelectLabel>{__('Wholesaler Role Filter', 'yay-wholesale')}</SelectLabel>
-                <SelectItem value="all">{__('All Roles', 'yay-wholesale')}</SelectItem>
+                <SelectLabel>{__('Wholesaler Role Filter', 'yay-wholesale-b2b')}</SelectLabel>
+                <SelectItem value="all">{__('All Roles', 'yay-wholesale-b2b')}</SelectItem>
                 {activeRoles?.map((role) => {
                   return (
                     <SelectItem key={role.id} value={role.slug}>
@@ -171,7 +171,7 @@ export default function WholeSalersList() {
             >
               <Plus className="h-4 w-4" />
               <span className="text-[12px] text-nowrap sm:text-[14px]">
-                {__('Add New Wholesaler', 'yay-wholesale')}
+                {__('Add New Wholesaler', 'yay-wholesale-b2b')}
               </span>
             </Button>
           </a>
@@ -250,7 +250,7 @@ export default function WholeSalersList() {
             ) : (
               <TableRow>
                 <TableCell colSpan={WholesalersColumn.length} className="h-24 text-center">
-                  {__('No Wholesalers found.', 'yay-wholesale')}
+                  {__('No Wholesalers found.', 'yay-wholesale-b2b')}
                 </TableCell>
               </TableRow>
             )}
@@ -270,7 +270,7 @@ export default function WholeSalersList() {
           {!isBulkUpdateWholesalersPending && (
             <BulkActionBox selected={selectedCount} onClose={() => table.resetRowSelection()}>
               <span className="text-foreground text-sm font-normal">
-                {sprintf(__('%d selected', 'yay-wholesale'), selectedCount)}
+                {sprintf(__('%d selected', 'yay-wholesale-b2b'), selectedCount)}
               </span>
               <Separator orientation="vertical" className="ml-2 h-5!" />
               <Popover>
@@ -280,7 +280,7 @@ export default function WholeSalersList() {
                     className="hover:text-primary hover:bg-primary/6 group bold flex cursor-pointer items-center gap-1.5 px-2.5"
                   >
                     <span className="text-sm font-normal">
-                      {__('Wholesaler Role', 'yay-wholesale')}
+                      {__('Wholesaler Role', 'yay-wholesale-b2b')}
                     </span>
                     <span className="group-hover:text-primary text-icon flex items-center">
                       <CaretUpDownIcon size={12} weight="bold" />
@@ -317,7 +317,7 @@ export default function WholeSalersList() {
             <div className="flex items-center gap-4">
               <span className="text-foreground-400 text-sm font-normal">
                 {sprintf(
-                  __('Page %d of %d', 'yay-wholesale'),
+                  __('Page %d of %d', 'yay-wholesale-b2b'),
                   table.getState().pagination.pageIndex + 1,
                   table.getPageCount(),
                 )}
@@ -346,7 +346,7 @@ export default function WholeSalersList() {
 
               <div className="flex items-center gap-2">
                 <span className="text-foreground-400 text-sm font-normal">
-                  {__('Go to', 'yay-wholesale')}
+                  {__('Go to', 'yay-wholesale-b2b')}
                 </span>
                 <InputNumberRoot
                   min={1}

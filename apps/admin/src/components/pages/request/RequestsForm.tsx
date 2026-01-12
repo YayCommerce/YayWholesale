@@ -50,7 +50,7 @@ export const DEFAULT_REQUEST: RequestFormValues = {
 
 const isPhoneField = (field: RequestFieldValues) => {
   return (
-    field.label.toLowerCase().includes(__('phone', 'yay-wholesale')) ||
+    field.label.toLowerCase().includes(__('phone', 'yay-wholesale-b2b')) ||
     field.type.toLowerCase() === 'phone'
   );
 };
@@ -146,7 +146,7 @@ export default function RequestsForm() {
               <SheetDescription className="text-muted-foreground mt-[4px] text-sm leading-[20px] font-normal">
                 {__(
                   "Use the button below to approve or reject this user's wholesale user request",
-                  'yay-wholesale',
+                  'yay-wholesale-b2b',
                 )}
               </SheetDescription>
             </div>
@@ -160,20 +160,20 @@ export default function RequestsForm() {
         <div className="flex cursor-default flex-col gap-5 overflow-auto p-5">
           <div className="grid cursor-default grid-cols-2 gap-5">
             <div className="flex flex-col gap-2">
-              <Label htmlFor="firstName">{__('First Name', 'yay-wholesale')}</Label>
+              <Label htmlFor="firstName">{__('First Name', 'yay-wholesale-b2b')}</Label>
               <Input id="firstName" readOnly defaultValue={dataDisplay?.firstName} />
             </div>
             <div className="flex cursor-default flex-col gap-2">
-              <Label htmlFor="lastName">{__('Last Name', 'yay-wholesale')}</Label>
+              <Label htmlFor="lastName">{__('Last Name', 'yay-wholesale-b2b')}</Label>
               <Input id="lastName" readOnly defaultValue={dataDisplay?.lastName} />
             </div>
           </div>
           <div className="flex cursor-default flex-col gap-2">
-            <Label htmlFor="email">{__('Email address', 'yay-wholesale')}</Label>
+            <Label htmlFor="email">{__('Email address', 'yay-wholesale-b2b')}</Label>
             <Input id="email" readOnly defaultValue={dataDisplay?.email} />
           </div>
           <div className="flex cursor-default flex-col gap-2">
-            <Label htmlFor="registrationDate">{__('Registration date', 'yay-wholesale')}</Label>
+            <Label htmlFor="registrationDate">{__('Registration date', 'yay-wholesale-b2b')}</Label>
             <Input
               id="registrationDate"
               readOnly
@@ -195,7 +195,7 @@ export default function RequestsForm() {
           })}
 
           <div className="flex flex-col gap-2">
-            <Label htmlFor="message">{__('Message', 'yay-wholesale')}</Label>
+            <Label htmlFor="message">{__('Message', 'yay-wholesale-b2b')}</Label>
             <Textarea
               className="h-fit min-h-25 resize-none"
               readOnly
@@ -250,7 +250,7 @@ export default function RequestsForm() {
                 onClick={onReject}
               >
                 <RequestsStatusIcon status="rejected" />
-                {__('Reject', 'yay-wholesale')}
+                {__('Reject', 'yay-wholesale-b2b')}
               </Button>
 
               <ButtonGroup>
@@ -261,7 +261,7 @@ export default function RequestsForm() {
                   onClick={onApprove}
                 >
                   <RequestsStatusIcon status="approved" className="text-foreground" />
-                  {__('Approve', 'yay-wholesale')}
+                  {__('Approve', 'yay-wholesale-b2b')}
                 </Button>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
@@ -275,7 +275,7 @@ export default function RequestsForm() {
                         return (
                           <DropdownMenuItem onClick={() => onApproveWithRole(role.id)}>
                             <RequestsStatusIcon status="approved" />{' '}
-                            {sprintf(__('Approve to %s', 'yay-wholesale'), role.name)}
+                            {sprintf(__('Approve to %s', 'yay-wholesale-b2b'), role.name)}
                           </DropdownMenuItem>
                         );
                       })}

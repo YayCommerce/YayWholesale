@@ -38,7 +38,7 @@ if ( $ywhs_is_autofill ) {
 				<line x1="12" x2="12.01" y1="16" y2="16"/>
 			</svg>
 			<div class="ywhs_form_error_content">
-				<div><strong><?php echo esc_html( __( 'Unable to send your request', 'yay-wholesale' ) ); ?></strong></div>
+				<div><strong><?php echo esc_html( __( 'Unable to send your request', 'yay-wholesale-b2b' ) ); ?></strong></div>
 				<span class="ywhs_form_error_msg"></span>
 			</div>
 		</div>
@@ -70,9 +70,9 @@ if ( $ywhs_is_autofill ) {
 						<?php echo( $ywhs_field['isDefault'] && 'email' === $ywhs_field['type'] && $ywhs_is_autofill ? 'readonly' : '' ); ?>
 						<?php if ( $ywhs_field['isDefault'] && 'email' === $ywhs_field['type'] ) : ?>
 						value="<?php echo esc_html( trim( $ywhs_email_autofill ) ); ?>" 
-						<?php elseif ( $ywhs_field['isDefault'] && 'text' === $ywhs_field['type'] && str_contains( $ywhs_field['label'], __( 'First Name', 'yay-wholesale' ) ) ) : ?>
+						<?php elseif ( $ywhs_field['isDefault'] && 'text' === $ywhs_field['type'] && str_contains( $ywhs_field['label'], __( 'First Name', 'yay-wholesale-b2b' ) ) ) : ?>
 							value="<?php echo esc_html( trim( $ywhs_first_name_autofill ) ); ?>" 
-						<?php elseif ( $ywhs_field['isDefault'] && 'text' === $ywhs_field['type'] && str_contains( $ywhs_field['label'], __( 'Last Name', 'yay-wholesale' ) ) ) : ?>    
+						<?php elseif ( $ywhs_field['isDefault'] && 'text' === $ywhs_field['type'] && str_contains( $ywhs_field['label'], __( 'Last Name', 'yay-wholesale-b2b' ) ) ) : ?>    
 							value="<?php echo esc_html( trim( $ywhs_last_name_autofill ) ); ?>"
 						<?php endif ?>                                
 					/>

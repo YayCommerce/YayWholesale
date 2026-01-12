@@ -77,22 +77,22 @@ foreach ( (array) $recommendedPlugins as $recommendedPlugin ) {
                                 esc_attr( $downloadLink ),
                                 esc_attr( $downloadLink ),
                                 /* translators: %s: Plugin name and version. */
-                                esc_attr( sprintf( _x( 'Install %s now', 'plugin', 'yay-wholesale' ), $name ) ),
-                                __( 'Install Now', 'yay-wholesale' )
+                                esc_attr( sprintf( _x( 'Install %s now', 'plugin', 'yay-wholesale-b2b' ), $name ) ),
+                                __( 'Install Now', 'yay-wholesale-b2b' )
                             );
                         } else {
                             $actionLinks[] = sprintf(
                                 '<button class="install-now button button-primary" data-install-url="%s" aria-label="%s">%s</button>',
                                 esc_attr( $downloadLink ),
                                 /* translators: %s: Plugin name and version. */
-                                esc_attr( sprintf( _x( 'Install %s now', 'plugin', 'yay-wholesale' ), $name ) ),
-                                __( 'Install Now', 'yay-wholesale' )
+                                esc_attr( sprintf( _x( 'Install %s now', 'plugin', 'yay-wholesale-b2b' ), $name ) ),
+                                __( 'Install Now', 'yay-wholesale-b2b' )
                             );
                         }
                     } else {
                         $actionLinks[] = sprintf(
                             '<button type="button" class="button button-disabled" disabled="disabled">%s</button>',
-                            _x( 'Cannot Install', 'plugin', 'yay-wholesale' )
+                            _x( 'Cannot Install', 'plugin', 'yay-wholesale-b2b' )
                         );
                     }//end if
                 }//end if
@@ -109,9 +109,9 @@ foreach ( (array) $recommendedPlugins as $recommendedPlugin ) {
                                 esc_attr( $recommendedPlugin['slug'] ),
                                 esc_url( $installStatus['url'] ),
                                 /* translators: %s: Plugin name and version. */
-                                esc_attr( sprintf( _x( 'Update %s now', 'plugin', 'yay-wholesale' ), $name ) ),
+                                esc_attr( sprintf( _x( 'Update %s now', 'plugin', 'yay-wholesale-b2b' ), $name ) ),
                                 esc_attr( $name ),
-                                __( 'Update Now', 'yay-wholesale' )
+                                __( 'Update Now', 'yay-wholesale-b2b' )
                             );
                         } else {
                             $actionLinks[] = sprintf(
@@ -120,15 +120,15 @@ foreach ( (array) $recommendedPlugins as $recommendedPlugin ) {
                                 esc_attr( $recommendedPlugin['slug'] ),
                                 esc_url( $installStatus['url'] ),
                                 /* translators: %s: Plugin name and version. */
-                                esc_attr( sprintf( _x( 'Update %s now', 'plugin', 'yay-wholesale' ), $name ) ),
+                                esc_attr( sprintf( _x( 'Update %s now', 'plugin', 'yay-wholesale-b2b' ), $name ) ),
                                 esc_attr( $name ),
-                                __( 'Update Now', 'yay-wholesale' )
+                                __( 'Update Now', 'yay-wholesale-b2b' )
                             );
                         }//end if
                     } else {
                         $actionLinks[] = sprintf(
                             '<button type="button" class="button button-disabled" disabled="disabled">%s</button>',
-                            _x( 'Cannot Update', 'plugin', 'yay-wholesale' )
+                            _x( 'Cannot Update', 'plugin', 'yay-wholesale-b2b' )
                         );
                     }//end if
                 }//end if
@@ -145,14 +145,14 @@ foreach ( (array) $recommendedPlugins as $recommendedPlugin ) {
                     $pluginStatus  = '<span class="plugin-status-active">Active</span>';
                     $actionLinks[] = sprintf(
                         '<button type="button" class="button button-disabled" disabled="disabled">%s</button>',
-                        _x( 'Activated', 'plugin', 'yay-wholesale' )
+                        _x( 'Activated', 'plugin', 'yay-wholesale-b2b' )
                     );
                 } elseif ( current_user_can( 'activate_plugin', $installStatus['file'] ) ) {
                     $pluginStatus = '<span class="plugin-status-inactive" data-plugin-file="' . esc_attr( $installStatus['file'] ) . '">Inactive</span>';
                     if ( $compatible_php && $compatible_wp ) {
-                        $buttonText = __( 'Activate', 'yay-wholesale' );
+                        $buttonText = __( 'Activate', 'yay-wholesale-b2b' );
                         /* translators: %s: Plugin name. */
-                        $buttonLabel = _x( 'Activate %s', 'plugin', 'yay-wholesale' );
+                        $buttonLabel = _x( 'Activate %s', 'plugin', 'yay-wholesale-b2b' );
                         $activateUrl = add_query_arg(
                             [
                                 '_wpnonce' => wp_create_nonce( 'activate-plugin_' . $installStatus['file'] ),
@@ -163,9 +163,9 @@ foreach ( (array) $recommendedPlugins as $recommendedPlugin ) {
                         );
 
                         if ( is_network_admin() ) {
-                            $buttonText = __( 'Network Activate', 'yay-wholesale' );
+                            $buttonText = __( 'Network Activate', 'yay-wholesale-b2b' );
                             /* translators: %s: Plugin name. */
-                            $buttonLabel = _x( 'Network Activate %s', 'plugin', 'yay-wholesale' );
+                            $buttonLabel = _x( 'Network Activate %s', 'plugin', 'yay-wholesale-b2b' );
                             $activateUrl = add_query_arg( [ 'networkwide' => 1 ], $activateUrl );
                         }
 
@@ -178,13 +178,13 @@ foreach ( (array) $recommendedPlugins as $recommendedPlugin ) {
                     } else {
                         $actionLinks[] = sprintf(
                             '<button type="button" class="button button-disabled" disabled="disabled">%s</button>',
-                            _x( 'Cannot Activate', 'plugin', 'yay-wholesale' )
+                            _x( 'Cannot Activate', 'plugin', 'yay-wholesale-b2b' )
                         );
                     }//end if
                 } else {
                     $actionLinks[] = sprintf(
                         '<button type="button" class="button button-disabled" disabled="disabled">%s</button>',
-                        _x( 'Installed', 'plugin', 'yay-wholesale' )
+                        _x( 'Installed', 'plugin', 'yay-wholesale-b2b' )
                     );
                 }//end if
                 break;
@@ -214,11 +214,11 @@ foreach ( (array) $recommendedPlugins as $recommendedPlugin ) {
         if ( ! $compatible_php || ! $compatible_wp ) {
             echo '<div class="notice inline notice-error notice-alt"><p>';
             if ( ! $compatible_php && ! $compatible_wp ) {
-                echo esc_html__( 'This plugin doesn&#8217;t work with your versions of WordPress and PHP.', 'yay-wholesale' );
+                echo esc_html__( 'This plugin doesn&#8217;t work with your versions of WordPress and PHP.', 'yay-wholesale-b2b' );
                 if ( current_user_can( 'update_core' ) && current_user_can( 'update_php' ) ) {
                     printf(
                         /* translators: 1: URL to WordPress Updates screen, 2: URL to Update PHP page. */
-                        ' ' . esc_html__( '<a href="%1$s">Please update WordPress</a>, and then <a href="%2$s">learn more about updating PHP</a>.', 'yay-wholesale' ),
+                        ' ' . esc_html__( '<a href="%1$s">Please update WordPress</a>, and then <a href="%2$s">learn more about updating PHP</a>.', 'yay-wholesale-b2b' ),
                         esc_url( self_admin_url( 'update-core.php' ) ),
                         esc_url( wp_get_update_php_url() )
                     );
@@ -226,32 +226,32 @@ foreach ( (array) $recommendedPlugins as $recommendedPlugin ) {
                 } elseif ( current_user_can( 'update_core' ) ) {
                     printf(
                         /* translators: %s: URL to WordPress Updates screen. */
-                        ' ' . esc_html__( '<a href="%s">Please update WordPress</a>.', 'yay-wholesale' ),
+                        ' ' . esc_html__( '<a href="%s">Please update WordPress</a>.', 'yay-wholesale-b2b' ),
                         esc_url( self_admin_url( 'update-core.php' ) )
                     );
                 } elseif ( current_user_can( 'update_php' ) ) {
                     printf(
                         /* translators: %s: URL to Update PHP page. */
-                        ' ' . esc_html__( '<a href="%s">Learn more about updating PHP</a>.', 'yay-wholesale' ),
+                        ' ' . esc_html__( '<a href="%s">Learn more about updating PHP</a>.', 'yay-wholesale-b2b' ),
                         esc_url( wp_get_update_php_url() )
                     );
                     wp_update_php_annotation( '</p><p><em>', '</em>' );
                 }//end if
             } elseif ( ! $compatible_wp ) {
-                echo esc_html__( 'This plugin doesn&#8217;t work with your version of WordPress.', 'yay-wholesale' );
+                echo esc_html__( 'This plugin doesn&#8217;t work with your version of WordPress.', 'yay-wholesale-b2b' );
                 if ( current_user_can( 'update_core' ) ) {
                     printf(
                         /* translators: %s: URL to WordPress Updates screen. */
-                        ' ' . esc_html__( '<a href="%s">Please update WordPress</a>.', 'yay-wholesale' ),
+                        ' ' . esc_html__( '<a href="%s">Please update WordPress</a>.', 'yay-wholesale-b2b' ),
                         esc_url( self_admin_url( 'update-core.php' ) )
                     );
                 }
             } elseif ( ! $compatible_php ) {
-                echo esc_html__( 'This plugin doesn&#8217;t work with your version of PHP.', 'yay-wholesale' );
+                echo esc_html__( 'This plugin doesn&#8217;t work with your version of PHP.', 'yay-wholesale-b2b' );
                 if ( current_user_can( 'update_php' ) ) {
                     printf(
                         /* translators: %s: URL to Update PHP page. */
-                        ' ' . esc_html__( '<a href="%s">Learn more about updating PHP</a>.', 'yay-wholesale' ),
+                        ' ' . esc_html__( '<a href="%s">Learn more about updating PHP</a>.', 'yay-wholesale-b2b' ),
                         esc_url( wp_get_update_php_url() )
                     );
                     wp_update_php_annotation( '</p><p><em>', '</em>' );

@@ -31,7 +31,7 @@ export default function DashboardSummary(props: {
             className="text-foreground h-8 w-fit text-sm font-medium"
             onClick={() => navigate('/wholesalers-list')}
           >
-            {__('View all wholesalers', 'yay-wholesale')}
+            {__('View all wholesalers', 'yay-wholesale-b2b')}
           </Button>
         ),
         overPercent:
@@ -46,7 +46,7 @@ export default function DashboardSummary(props: {
         button: () => (
           <a href={window.yayWholesale.order_urls.list} target="_blank" rel="noopener noreferrer">
             <Button variant="outline" size="sm" className="text-foreground h-8 text-sm font-medium">
-              {__('View all orders', 'yay-wholesale')}
+              {__('View all orders', 'yay-wholesale-b2b')}
             </Button>
           </a>
         ),
@@ -61,7 +61,7 @@ export default function DashboardSummary(props: {
         button: () => (
           <a href={window.yayWholesale.order_urls.list} target="_blank" rel="noopener noreferrer">
             <Button variant="outline" size="sm" className="text-foreground h-8 text-sm font-medium">
-              {__('View all revenue', 'yay-wholesale')}
+              {__('View all revenue', 'yay-wholesale-b2b')}
             </Button>
           </a>
         ),

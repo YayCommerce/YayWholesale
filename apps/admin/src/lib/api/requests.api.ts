@@ -23,7 +23,7 @@ export async function fetchRequests(
   const response = await api.get('requests', { searchParams });
   const result = await handleResponse<PaginatedRequestListValues>(
     response,
-    __('Failed to fetch requests', 'yay-wholesale'),
+    __('Failed to fetch requests', 'yay-wholesale-b2b'),
   );
   return result.data ?? {};
 }
@@ -32,7 +32,7 @@ export async function fetchRequestById(requestId: number) {
   const response = await api.get(`requests/${requestId}`);
   const result = await handleResponse<RequestFormValues>(
     response,
-    __('Failed to fetch request', 'yay-wholesale'),
+    __('Failed to fetch request', 'yay-wholesale-b2b'),
   );
   return result.data;
 }
@@ -41,7 +41,7 @@ export async function updateRequestById(data: RequestFormValues, requestId: numb
   const response = await api.put(`requests/${requestId}`, { json: data });
   const result = await handleResponse<RequestFormValues>(
     response,
-    __('Failed to update request', 'yay-wholesale'),
+    __('Failed to update request', 'yay-wholesale-b2b'),
   );
   return result;
 }
@@ -50,7 +50,7 @@ export async function deleteRequestById(requestId: number) {
   const response = await api.delete(`requests/${requestId}`);
   const result = await handleResponse<RequestFormValues>(
     response,
-    __('Failed to delete request', 'yay-wholesale'),
+    __('Failed to delete request', 'yay-wholesale-b2b'),
   );
   return result;
 }
@@ -65,7 +65,7 @@ export async function updateRequestStatusById(
   const response = await api.put(`requests/${requestId}/status`, { json: data });
   const result = await handleResponse<RequestFormValues>(
     response,
-    __('Failed to update request status', 'yay-wholesale'),
+    __('Failed to update request status', 'yay-wholesale-b2b'),
   );
 
   return result;
@@ -81,7 +81,7 @@ export async function bulkUpdateRequestStatus(
   const response = await api.put('requests/bulk-status', { json: data });
   const result = await handleResponse<RequestFormValues>(
     response,
-    __('Failed to update request status', 'yay-wholesale'),
+    __('Failed to update request status', 'yay-wholesale-b2b'),
   );
 
   return result;
@@ -93,7 +93,7 @@ export async function bulkDeleteRequest(requestIds: number[]) {
   const response = await api.delete('requests/bulk-delete', { json: data });
   const result = await handleResponse<RequestFormValues>(
     response,
-    __('Failed to update request status', 'yay-wholesale'),
+    __('Failed to update request status', 'yay-wholesale-b2b'),
   );
 
   return result;
@@ -103,7 +103,7 @@ export async function getPendingCount() {
   const response = await api.get('requests/pending');
   const result = await handleResponse<RequestsCountValues>(
     response,
-    __('Failed to get the pending requests count', 'yay-wholesale'),
+    __('Failed to get the pending requests count', 'yay-wholesale-b2b'),
   );
 
   return result.data;
@@ -113,7 +113,7 @@ export async function getTotalCount() {
   const response = await api.get('requests/total');
   const result = await handleResponse<RequestsCountValues>(
     response,
-    __('Failed to get the requests count', 'yay-wholesale'),
+    __('Failed to get the requests count', 'yay-wholesale-b2b'),
   );
 
   return result.data;

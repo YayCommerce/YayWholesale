@@ -32,9 +32,9 @@ class AccountRegistrationApproved extends WholesaleEmailBase {
 
         $this->id             = 'yay_wholesale_account_registration_approved';
         $this->customer_email = true;
-        $this->title          = __( 'Wholesale account is approved', 'yay-wholesale' );
+        $this->title          = __( 'Wholesale account is approved', 'yay-wholesale-b2b' );
         $this->email_group    = 'wholesale_account';
-        $this->description    = __( 'Notify when a wholesale account is approved', 'yay-wholesale' );
+        $this->description    = __( 'Notify when a wholesale account is approved', 'yay-wholesale-b2b' );
         $this->template_html  = 'account-registration-approved.php';
         $this->template_plain = 'plain/account-registration-approved.php';
 
@@ -56,7 +56,7 @@ class AccountRegistrationApproved extends WholesaleEmailBase {
      * @return string
      */
     public function get_default_subject() {
-        return __( '[{site_title}]: Your wholesale account is approved', 'yay-wholesale' );
+        return __( '[{site_title}]: Your wholesale account is approved', 'yay-wholesale-b2b' );
     }
 
     /**
@@ -65,7 +65,7 @@ class AccountRegistrationApproved extends WholesaleEmailBase {
      * @return string
      */
     public function get_default_heading() {
-        return __( 'Your Wholesale Account Application has been Approved', 'yay-wholesale' );
+        return __( 'Your Wholesale Account Application has been Approved', 'yay-wholesale-b2b' );
     }
 
     /**
@@ -74,13 +74,13 @@ class AccountRegistrationApproved extends WholesaleEmailBase {
      * @return string
      */
     public function get_default_email_content() {
-        $content  = sprintf( '%s {account_name}', __( 'Hi', 'yay-wholesale' ) );
+        $content  = sprintf( '%s {account_name}', __( 'Hi', 'yay-wholesale-b2b' ) );
         $content .= "\n\n";
-        $content .= __( 'Thanks for registering for the wholesale store. Your account has now been approved and you can login as follows:', 'yay-wholesale' );
+        $content .= __( 'Thanks for registering for the wholesale store. Your account has now been approved and you can login as follows:', 'yay-wholesale-b2b' );
         $content .= "\n\n";
-        $content .= sprintf( '%s {user_login}', __( 'Username:', 'yay-wholesale' ) );
+        $content .= sprintf( '%s {user_login}', __( 'Username:', 'yay-wholesale-b2b' ) );
         $content .= "\n\n";
-        $content .= sprintf( '<a href="{set_password_url}">%s</a>', __( 'Click here to set your password.', 'yay-wholesale' ) );
+        $content .= sprintf( '<a href="{set_password_url}">%s</a>', __( 'Click here to set your password.', 'yay-wholesale-b2b' ) );
 
         return $content;
     }
@@ -91,7 +91,7 @@ class AccountRegistrationApproved extends WholesaleEmailBase {
      * @return string
      */
     public function get_default_additional_content() {
-        return __( 'We look forward to seeing you soon.', 'yay-wholesale' );
+        return __( 'We look forward to seeing you soon.', 'yay-wholesale-b2b' );
     }
 
     /**

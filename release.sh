@@ -1,4 +1,4 @@
-PLUGIN_SLUG="yay-wholesale-pro"
+PLUGIN_SLUG="yay-wholesale-b2b"
 PROJECT_PATH=$(pwd)
 BUILD_PATH="${PROJECT_PATH}/build"
 DEST_PATH="$BUILD_PATH/$PLUGIN_SLUG"
@@ -62,7 +62,7 @@ fi
 #
 # 7) Remove development-only code
 #
-sed -i "/'YAY_WHOLESALE_IS_DEVELOPMENT', true/d" "$DEST_PATH/yay-wholesale.php"
+sed -i "/'YAY_WHOLESALE_IS_DEVELOPMENT', true/d" "$DEST_PATH/yay-wholesale-b2b.php"
 rm -rf "$DEST_PATH/includes/Engine/Register/RegisterDev.php"
 
 #

@@ -95,14 +95,14 @@ export const RequestsColumn: ColumnDef<RequestFormValues>[] = [
   },
   {
     accessorKey: 'name',
-    header: __('Name', 'yay-wholesale'),
+    header: __('Name', 'yay-wholesale-b2b'),
     cell: ({ row }) => {
       return <AvatarCell rowData={row.original} />;
     },
   },
   {
     accessorKey: 'date',
-    header: __('Registration Date', 'yay-wholesale'),
+    header: __('Registration Date', 'yay-wholesale-b2b'),
     cell: ({ row }) => {
       return parseWPDate(row.original.date) + ' ' + parseWPTime(row.original.date);
     },
@@ -110,7 +110,7 @@ export const RequestsColumn: ColumnDef<RequestFormValues>[] = [
   // { accessorKey: 'role', header: 'Role' },
   {
     accessorKey: 'status',
-    header: __('Status', 'yay-wholesale'),
+    header: __('Status', 'yay-wholesale-b2b'),
     cell: ({ row }) => (
       <RequestsStatusColumn requestId={row.original.id} defaultValue={row.original.status} />
     ),
@@ -144,7 +144,7 @@ export const RequestsColumn: ColumnDef<RequestFormValues>[] = [
                     <SettingsIcon className="h-4 w-4" />
                   </Button>
                 }
-                content={<span>{__('Edit request', 'yay-wholesale')}</span>}
+                content={<span>{__('Edit request', 'yay-wholesale-b2b')}</span>}
               />
 
               <WholeSaleToolTip
@@ -162,7 +162,7 @@ export const RequestsColumn: ColumnDef<RequestFormValues>[] = [
                     <Trash2 className="h-4 w-4" />
                   </Button>
                 }
-                content={<span>{__('Delete request', 'yay-wholesale')}</span>}
+                content={<span>{__('Delete request', 'yay-wholesale-b2b')}</span>}
               />
             </div>
 
@@ -177,22 +177,22 @@ export const RequestsColumn: ColumnDef<RequestFormValues>[] = [
           <AlertDialogContent>
             <AlertDialogHeader>
               <AlertDialogTitle>
-                {__('Are you sure you want to delete this request?', 'yay-wholesale')}
+                {__('Are you sure you want to delete this request?', 'yay-wholesale-b2b')}
               </AlertDialogTitle>
               <AlertDialogDescription>
                 {__(
                   'This action cannot be undone. This will permanently delete this request and remove data from servers',
-                  'yay-wholesale',
+                  'yay-wholesale-b2b',
                 )}
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel>{__('Cancel', 'yay-wholesale')}</AlertDialogCancel>
+              <AlertDialogCancel>{__('Cancel', 'yay-wholesale-b2b')}</AlertDialogCancel>
               <AlertDialogAction
                 className="bg-destructive text-destructive-foreground hover:bg-destructive/80"
                 onClick={() => deleteRequest()}
               >
-                {__('Continue', 'yay-wholesale')}
+                {__('Continue', 'yay-wholesale-b2b')}
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>

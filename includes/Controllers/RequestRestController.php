@@ -28,7 +28,7 @@ class RequestRestController extends BaseRestController {
      */
     public function request_permission_callback() {
         if ( ! current_user_can( 'edit_posts' ) || ! current_user_can( 'manage_woocommerce' ) ) {
-            return new WP_Error( 'rest_forbidden', esc_html__( 'Forbidden.', 'yay-wholesale' ), [ 'status' => 401 ] );
+            return new WP_Error( 'rest_forbidden', esc_html__( 'Forbidden.', 'yay-wholesale-b2b' ), [ 'status' => 401 ] );
         }
 
         return true;
@@ -148,7 +148,7 @@ class RequestRestController extends BaseRestController {
         $wholesale_id = RequestsHelper::insert_whs_request( $current_user, $params );
 
         if ( $wholesale_id < 0 ) {
-            return $this->error( __( 'Failed to register this request', 'yay-wholesale' ) );
+            return $this->error( __( 'Failed to register this request', 'yay-wholesale-b2b' ) );
         }
 
         $settings = SettingsHelper::get_settings();
@@ -159,19 +159,19 @@ class RequestRestController extends BaseRestController {
             $role         = array_values( array_filter( $active_roles, fn( $r ) => $r['slug'] === $role_slug ) )[0] ?? null;
             if ( ! isset( $role ) ) {
                 do_action( 'ywhs_account_registration_pending', $wholesale_id );
-                return $this->error( __( 'The default role is inactive, your request is changed to pending', 'yay-wholesale' ), 404 );
+                return $this->error( __( 'The default role is inactive, your request is changed to pending', 'yay-wholesale-b2b' ), 400 );
             }
 
             try {
                 RequestsHelper::add_role_to_ywhs_request_author( $wholesale_id, $role_slug );
             } catch ( Exception $e ) {
                 do_action( 'ywhs_account_registration_pending', $wholesale_id );
-                return $this->error( $e->getMessage(), 404 );
+                return $this->error( $e->getMessage(), 400 );
             }
 
             if ( ! RequestsHelper::update_whs_request( $wholesale_id, [ 'status' => RequestsHelper::APPROVED ] ) ) {
                 do_action( 'ywhs_account_registration_pending', $wholesale_id );
-                return $this->error( __( 'Role has been applied, but your request is still pending', 'yay-wholesale' ), 404 );
+                return $this->error( __( 'Role has been applied, but your request is still pending', 'yay-wholesale-b2b' ), 400 );
             }
 
             // Trigger the email when a new wholesale account is approved.
@@ -181,7 +181,7 @@ class RequestRestController extends BaseRestController {
             do_action( 'ywhs_account_registration_pending', $wholesale_id );
         }//end if
 
-        return $this->success( [], __( 'Request Saved', 'yay-wholesale' ) );
+        return $this->success( [], __( 'Request Saved', 'yay-wholesale-b2b' ) );
     }
 
     /**
@@ -214,7 +214,7 @@ class RequestRestController extends BaseRestController {
 
         $response = RequestsHelper::get_paginated_request_post( $keyword, $status, $page, $per_page );
 
-        return $this->success( $response, __( 'Fetched successfully', 'yay-wholesale' ) );
+        return $this->success( $response, __( 'Fetched successfully', 'yay-wholesale-b2b' ) );
     }
 
     /**
@@ -228,7 +228,7 @@ class RequestRestController extends BaseRestController {
         $request = RequestsHelper::get_request_by_id( $id );
 
         if ( empty( $request ) ) {
-            return $this->error( __( 'Request not found', 'yay-wholesale' ), 404 );
+            return $this->error( __( 'Request not found', 'yay-wholesale-b2b' ) );
         }
 
         return $this->success( $request );
@@ -246,9 +246,9 @@ class RequestRestController extends BaseRestController {
 
         $result = RequestsHelper::update_whs_request( $id, $form_data );
         if ( ! $result ) {
-            return $this->error( __( 'Cannot save the request', 'yay-wholesale' ), 404 );
+            return $this->error( __( 'Cannot save the request', 'yay-wholesale-b2b' ) );
         }
-        return $this->success( [], __( 'Request has been updated successfully', 'yay-wholesale' ) );
+        return $this->success( [], __( 'Request has been updated successfully', 'yay-wholesale-b2b' ) );
     }
 
     /**
@@ -262,9 +262,9 @@ class RequestRestController extends BaseRestController {
         $result = RequestsHelper::delete_whs_request( $id );
 
         if ( ! $result ) {
-            return $this->error( __( 'Cannot delete the request', 'yay-wholesale' ), 404 );
+            return $this->error( __( 'Cannot delete the request', 'yay-wholesale-b2b' ) );
         }
-        return $this->success( [], __( 'Request has been deleted successfully', 'yay-wholesale' ) );
+        return $this->success( [], __( 'Request has been deleted successfully', 'yay-wholesale-b2b' ) );
     }
 
     /**
@@ -286,17 +286,17 @@ class RequestRestController extends BaseRestController {
                 $settings  = SettingsHelper::get_settings();
                 $role_slug = $settings['general']['default_role'];
                 if ( empty( $role_slug ) ) {
-                    return $this->error( __( 'Cannot find the default role', 'yay-wholesale' ), 404 );
+                    return $this->error( __( 'Cannot find the default role', 'yay-wholesale-b2b' ) );
                 }
 
                 $role = array_values( array_filter( $active_roles, fn( $r ) => $r['slug'] === $role_slug ) )[0] ?? null;
                 if ( ! isset( $role ) ) {
-                    return $this->error( __( 'The default role is inactive, please set the default active or change the default role to continue', 'yay-wholesale' ), 404 );
+                    return $this->error( __( 'The default role is inactive, please set the default active or change the default role to continue', 'yay-wholesale-b2b' ) );
                 }
             } else {
                 $role = array_values( array_filter( $active_roles, fn( $r ) => (int) ( $r['id'] ?? 0 ) === $json_data['role_id'] ) )[0] ?? null;
                 if ( ! isset( $role ) ) {
-                    return $this->error( __( 'Cannot find the specified role', 'yay-wholesale' ), 404 );
+                    return $this->error( __( 'Cannot find the specified role', 'yay-wholesale-b2b' ) );
                 }
                 $role_slug = $role['slug'];
             }
@@ -304,11 +304,11 @@ class RequestRestController extends BaseRestController {
             try {
                 RequestsHelper::add_role_to_ywhs_request_author( $id, $role_slug );
             } catch ( Exception $e ) {
-                return $this->error( $e->getMessage(), 404 );
+                return $this->error( $e->getMessage() );
             }
 
             if ( ! RequestsHelper::update_whs_request( $id, [ 'status' => $json_data['status'] ] ) ) {
-                return $this->error( __( 'Role has been added to the request author, but cannot change the status', 'yay-wholesale' ), 404 );
+                return $this->error( __( 'Role has been added to the request author, but cannot change the status', 'yay-wholesale-b2b' ) );
             }
 
             // Trigger the email when a wholesale account is approved.
@@ -318,17 +318,17 @@ class RequestRestController extends BaseRestController {
             RequestsHelper::remove_role_from_ywhs_request_author( $id );
 
             if ( ! RequestsHelper::update_whs_request( $id, [ 'status' => $json_data['status'] ] ) ) {
-                return $this->error( __( 'Role has been removed from the request author, but cannot change the status', 'yay-wholesale' ), 404 );
+                return $this->error( __( 'Role has been removed from the request author, but cannot change the status', 'yay-wholesale-b2b' ) );
             }
 
             // Trigger the email when a wholesale account is rejected.
             do_action( 'ywhs_account_registration_rejected', $id );
 
         } else {
-            return $this->error( __( 'You just can approve/reject this request', 'yay-wholesale' ), 404 );
+            return $this->error( __( 'You just can approve/reject this request', 'yay-wholesale-b2b' ) );
         }//end if
 
-        return $this->success( [], __( 'Request status has been updated successfully', 'yay-wholesale' ) );
+        return $this->success( [], __( 'Request status has been updated successfully', 'yay-wholesale-b2b' ) );
     }
 
     /**
@@ -355,17 +355,17 @@ class RequestRestController extends BaseRestController {
                 $settings  = SettingsHelper::get_settings();
                 $role_slug = $settings['general']['default_role'];
                 if ( empty( $role_slug ) ) {
-                    return $this->error( __( 'Cannot find the default role', 'yay-wholesale' ), 404 );
+                    return $this->error( __( 'Cannot find the default role', 'yay-wholesale-b2b' ) );
                 }
 
                 $role = array_values( array_filter( $active_roles, fn( $r ) => $r['slug'] === $role_slug ) )[0] ?? null;
                 if ( ! isset( $role ) ) {
-                    return $this->error( __( 'The default role is inactive, please set the default active or change the default role to continue', 'yay-wholesale' ), 404 );
+                    return $this->error( __( 'The default role is inactive, please set the default active or change the default role to continue', 'yay-wholesale-b2b' ) );
                 }
             } else {
                 $role = array_values( array_filter( $active_roles, fn( $r ) => (int) ( $r['id'] ?? 0 ) === $role_id ) )[0] ?? null;
                 if ( ! isset( $role ) ) {
-                    return $this->error( __( 'Cannot find the specified role', 'yay-wholesale' ), 404 );
+                    return $this->error( __( 'Cannot find the specified role', 'yay-wholesale-b2b' ) );
                 }
                 $role_slug = $role['slug'];
             }
@@ -402,19 +402,19 @@ class RequestRestController extends BaseRestController {
                 }
             }
         } else {
-            return $this->error( __( 'You just can approve/reject requests', 'yay-wholesale' ), 404 );
+            return $this->error( __( 'You just can approve/reject requests', 'yay-wholesale-b2b' ) );
         }//end if
 
         if ( count( $ids ) === $failed_partially || count( $ids ) === $failed_totally ) {
-            return $this->error( __( 'Can not update these requests', 'yay-wholesale' ), 404 );
+            return $this->error( __( 'Can not update these requests', 'yay-wholesale-b2b' ) );
         }
 
         if ( count( $ids ) === $updated ) {
-            return $this->success( [], __( 'Requests status have been updated successfully', 'yay-wholesale' ) );
+            return $this->success( [], __( 'Requests status have been updated successfully', 'yay-wholesale-b2b' ) );
         }
 
         // Translators: 1: number of requests successfully updated; 2: number of requests that have add/remove role; 3: number of requests that failed.
-        $message = __( '%1$d request(s) updated, %2$d request(s) changed role but failed updated status, %3$d request(s) failed', 'yay-wholesale' );
+        $message = __( '%1$d request(s) updated, %2$d request(s) changed role but failed updated status, %3$d request(s) failed', 'yay-wholesale-b2b' );
         $message = sprintf( $message, $updated, $failed_partially, $failed_totally );
 
         return $this->success( [], $message );
@@ -442,15 +442,15 @@ class RequestRestController extends BaseRestController {
         }
 
         if ( count( $ids ) === $failed ) {
-            return $this->error( __( 'Can not delete these requests', 'yay-wholesale' ), 404 );
+            return $this->error( __( 'Can not delete these requests', 'yay-wholesale-b2b' ) );
         }
 
         if ( count( $ids ) === $deleted ) {
-            return $this->success( [], __( 'Requests have been deleted successfully', 'yay-wholesale' ) );
+            return $this->success( [], __( 'Requests have been deleted successfully', 'yay-wholesale-b2b' ) );
         }
 
         // Translators: 1: number of requests successfully deleted; 2: number of requests that failed.
-        $message = __( '%1$d request(s) deleted, %2$d request(s) failed', 'yay-wholesale' );
+        $message = __( '%1$d request(s) deleted, %2$d request(s) failed', 'yay-wholesale-b2b' );
         $message = sprintf( $message, $deleted, $failed );
 
         return $this->success( [], $message );
@@ -465,7 +465,7 @@ class RequestRestController extends BaseRestController {
     public function get_pending_count( WP_REST_Request $request ): WP_REST_Response {
         $count = RequestsHelper::count_pending_requests();
 
-        return $this->success( [ 'count' => $count ], __( 'Pending Requests are successfully counted', 'yay-wholesale' ) );
+        return $this->success( [ 'count' => $count ], __( 'Pending Requests are successfully counted', 'yay-wholesale-b2b' ) );
     }
 
     /**
@@ -477,6 +477,6 @@ class RequestRestController extends BaseRestController {
     public function get_total_count( WP_REST_Request $request ): WP_REST_Response {
         $count = RequestsHelper::count_total_requests();
 
-        return $this->success( [ 'count' => $count ], __( 'Requests are successfully counted', 'yay-wholesale' ) );
+        return $this->success( [ 'count' => $count ], __( 'Requests are successfully counted', 'yay-wholesale-b2b' ) );
     }
 }

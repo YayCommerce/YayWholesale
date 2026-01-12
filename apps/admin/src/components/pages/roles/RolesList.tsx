@@ -110,7 +110,7 @@ export default function RolesList() {
       {/* Header */}
       <div className="flex flex-nowrap items-center justify-between gap-3">
         <div className="flex items-center gap-2">
-          <h1 className="text-2xl font-bold">{__('Roles', 'yay-wholesale')}</h1>
+          <h1 className="text-2xl font-bold">{__('Roles', 'yay-wholesale-b2b')}</h1>
           {filteredData && totalCount > 0 && (
             <WholeSaleToolTip
               trigger={
@@ -125,8 +125,8 @@ export default function RolesList() {
               }
               content={
                 totalCount > 1
-                  ? sprintf(__('%d roles in total', 'yay-wholesale'), totalCount)
-                  : __('1 role in total', 'yay-wholesale')
+                  ? sprintf(__('%d roles in total', 'yay-wholesale-b2b'), totalCount)
+                  : __('1 role in total', 'yay-wholesale-b2b')
               }
               side="bottom"
             />
@@ -136,7 +136,7 @@ export default function RolesList() {
           {roles.length > 10 && (
             <InputGroup className="w-full sm:w-80">
               <InputGroupInput
-                placeholder={__('Search', 'yay-wholesale')}
+                placeholder={__('Search', 'yay-wholesale-b2b')}
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
               />
@@ -151,7 +151,7 @@ export default function RolesList() {
             onClick={() => navigate('/roles/new')}
           >
             <Plus className="h-4 w-4" />
-            {__('Add New Role', 'yay-wholesale')}
+            {__('Add New Role', 'yay-wholesale-b2b')}
           </Button>
         </div>
       </div>
@@ -236,7 +236,7 @@ export default function RolesList() {
                   colSpan={table.getAllColumns().length}
                   className="h-32 text-center align-middle"
                 >
-                  {__('No roles found.', 'yay-wholesale')}
+                  {__('No roles found.', 'yay-wholesale-b2b')}
                 </TableCell>
               </TableRow>
             )}
@@ -259,7 +259,7 @@ export default function RolesList() {
           {!(isDeletingManyRolesPending || isBulkUpdatingRoleStatusPending) && (
             <BulkActionBox selected={selectedCount} onClose={() => table.resetRowSelection()}>
               <span className="text-foreground text-sm font-normal">
-                {sprintf(__('%d selected', 'yay-wholesale'), selectedCount)}
+                {sprintf(__('%d selected', 'yay-wholesale-b2b'), selectedCount)}
               </span>
               <Separator orientation="vertical" className="ml-2 h-5!" />
               <Popover>
@@ -268,7 +268,7 @@ export default function RolesList() {
                     variant="ghost"
                     className="hover:text-primary hover:bg-primary/6 group bold flex cursor-pointer items-center gap-1.5 px-2.5"
                   >
-                    <span className="text-sm font-normal">{__('Status', 'yay-wholesale')}</span>
+                    <span className="text-sm font-normal">{__('Status', 'yay-wholesale-b2b')}</span>
                     <span className="group-hover:text-primary text-icon flex items-center">
                       <CaretUpDownIcon size={12} weight="bold" />
                     </span>
@@ -289,7 +289,7 @@ export default function RolesList() {
                         )
                       }
                     >
-                      {__('Active', 'yay-wholesale')}
+                      {__('Active', 'yay-wholesale-b2b')}
                     </BulkActionButton>
 
                     <BulkActionButton
@@ -305,7 +305,7 @@ export default function RolesList() {
                         )
                       }
                     >
-                      {__('Inactive', 'yay-wholesale')}
+                      {__('Inactive', 'yay-wholesale-b2b')}
                     </BulkActionButton>
                   </div>
                 </PopoverContent>
@@ -324,30 +324,30 @@ export default function RolesList() {
                       <DeleteIcon className="size-4" />
                     </Button>
                   }
-                  content={<span>{__('Delete', 'yay-wholesale')}</span>}
+                  content={<span>{__('Delete', 'yay-wholesale-b2b')}</span>}
                 />
                 <AlertDialogContent>
                   <AlertDialogHeader>
                     <AlertDialogTitle>
                       {sprintf(
-                        __(`Are you sure you want to delete %d roles ?`, 'yay-wholesale'),
+                        __(`Are you sure you want to delete %d roles ?`, 'yay-wholesale-b2b'),
                         selectedCount,
                       )}
                     </AlertDialogTitle>
                     <AlertDialogDescription>
                       {__(
                         'This action cannot be undone. This will permanently delete these request and remove data from servers',
-                        'yay-wholesale',
+                        'yay-wholesale-b2b',
                       )}
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>
-                    <AlertDialogCancel>{__('Cancel', 'yay-wholesale')}</AlertDialogCancel>
+                    <AlertDialogCancel>{__('Cancel', 'yay-wholesale-b2b')}</AlertDialogCancel>
                     <AlertDialogAction
                       className="bg-destructive text-destructive-foreground hover:bg-destructive/80"
                       onClick={() => handleBulkDelete()}
                     >
-                      {__('Continue', 'yay-wholesale')}
+                      {__('Continue', 'yay-wholesale-b2b')}
                     </AlertDialogAction>
                   </AlertDialogFooter>
                 </AlertDialogContent>
@@ -360,7 +360,7 @@ export default function RolesList() {
             <div className="flex items-center gap-4">
               <span className="text-foreground-400 text-sm font-normal">
                 {sprintf(
-                  __('Page %d of %d', 'yay-wholesale'),
+                  __('Page %d of %d', 'yay-wholesale-b2b'),
                   table.getState().pagination.pageIndex + 1,
                   table.getPageCount(),
                 )}
@@ -389,7 +389,7 @@ export default function RolesList() {
 
               <div className="flex items-center gap-2">
                 <span className="text-foreground-400 text-sm font-normal">
-                  {__('Go to', 'yay-wholesale')}
+                  {__('Go to', 'yay-wholesale-b2b')}
                 </span>
                 <InputNumberRoot
                   min={1}

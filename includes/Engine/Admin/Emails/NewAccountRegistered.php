@@ -21,9 +21,9 @@ class NewAccountRegistered extends WholesaleEmailBase {
 
         $this->id             = 'yay_wholesale_new_account_registered';
         $this->customer_email = false;
-        $this->title          = __( 'New wholesale account register', 'yay-wholesale' );
+        $this->title          = __( 'New wholesale account register', 'yay-wholesale-b2b' );
         $this->email_group    = 'wholesale_account';
-        $this->description    = __( 'Notify when a user registers a wholesale account', 'yay-wholesale' );
+        $this->description    = __( 'Notify when a user registers a wholesale account', 'yay-wholesale-b2b' );
         $this->template_html  = 'new-account-registered.php';
         $this->template_plain = 'plain/new-account-registered.php';
         $this->placeholders   = [
@@ -45,7 +45,7 @@ class NewAccountRegistered extends WholesaleEmailBase {
      * @return string
      */
     public function get_default_subject() {
-        return __( '[{site_title}]: New wholesale account registration', 'yay-wholesale' );
+        return __( '[{site_title}]: New wholesale account registration', 'yay-wholesale-b2b' );
     }
 
     /**
@@ -54,7 +54,7 @@ class NewAccountRegistered extends WholesaleEmailBase {
      * @return string
      */
     public function get_default_heading() {
-        return __( 'Welcome to Our Wholesale Program!', 'yay-wholesale' );
+        return __( 'Welcome to Our Wholesale Program!', 'yay-wholesale-b2b' );
     }
 
     /**
@@ -63,24 +63,24 @@ class NewAccountRegistered extends WholesaleEmailBase {
      * @return string
      */
     public function get_default_email_content() {
-        $content  = sprintf( '%s {account_name}', __( 'Hi', 'yay-wholesale' ) );
+        $content  = sprintf( '%s {account_name}', __( 'Hi', 'yay-wholesale-b2b' ) );
         $content .= "\n\n";
-        $content .= __( 'Thank you for registering a wholesale account on our store.', 'yay-wholesale' );
+        $content .= __( 'Thank you for registering a wholesale account on our store.', 'yay-wholesale-b2b' );
         $content .= "\n\n";
-        $content .= __( 'We have received your application and our team is currently reviewing your information.', 'yay-wholesale' );
+        $content .= __( 'We have received your application and our team is currently reviewing your information.', 'yay-wholesale-b2b' );
         $content .= "\n\n";
-        $content .= sprintf( '<strong>%s</strong>', __( 'What happens next?', 'yay-wholesale' ) );
+        $content .= sprintf( '<strong>%s</strong>', __( 'What happens next?', 'yay-wholesale-b2b' ) );
         $content .= "\n\n";
         $content .= sprintf(
             '<ul>
                 <li>%s</li>
                 <li>%s</li>
             </ul>',
-            __( 'Your account will be reviewed within 24-48 hours.', 'yay-wholesale' ),
-            __( 'We will notify you once your wholesale account has been approved or if more information is needed.', 'yay-wholesale' )
+            __( 'Your account will be reviewed within 24-48 hours.', 'yay-wholesale-b2b' ),
+            __( 'We will notify you once your wholesale account has been approved or if more information is needed.', 'yay-wholesale-b2b' )
         );
         $content .= "\n\n";
-        $content .= __( 'Thank you for your interest in partnering with us. We look forward to working with you!', 'yay-wholesale' );
+        $content .= __( 'Thank you for your interest in partnering with us. We look forward to working with you!', 'yay-wholesale-b2b' );
         $content .= "\n\n";
 
         return $content;
@@ -92,7 +92,7 @@ class NewAccountRegistered extends WholesaleEmailBase {
      * @return string
      */
     public function get_default_additional_content() {
-        return __( 'We look forward to seeing you soon.', 'yay-wholesale' );
+        return __( 'We look forward to seeing you soon.', 'yay-wholesale-b2b' );
     }
 
     /**

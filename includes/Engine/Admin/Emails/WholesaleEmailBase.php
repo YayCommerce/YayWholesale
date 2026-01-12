@@ -81,25 +81,25 @@ abstract class WholesaleEmailBase extends WC_Email {
     */
     public function init_form_fields() {
         /* translators: %s: list of placeholders */
-        $placeholder_text = sprintf( __( 'Available placeholders: %s', 'yay-wholesale' ), '<code>' . implode( '</code>, <code>', array_keys( $this->placeholders ) ) . '</code>' );
+        $placeholder_text = sprintf( __( 'Available placeholders: %s', 'yay-wholesale-b2b' ), '<code>' . implode( '</code>, <code>', array_keys( $this->placeholders ) ) . '</code>' );
         $form_fields      = [
             'enabled'            => [
-                'title'   => __( 'Enable/Disable', 'yay-wholesale' ),
+                'title'   => __( 'Enable/Disable', 'yay-wholesale-b2b' ),
                 'type'    => 'checkbox',
-                'label'   => __( 'Enable this email notification', 'yay-wholesale' ),
+                'label'   => __( 'Enable this email notification', 'yay-wholesale-b2b' ),
                 'default' => 'yes',
             ],
             'recipient'          => [
-                'title'       => __( 'Recipient(s)', 'yay-wholesale' ),
+                'title'       => __( 'Recipient(s)', 'yay-wholesale-b2b' ),
                 'type'        => 'text',
                 /* translators: %s: WP admin email */
-                'description' => sprintf( __( 'Enter recipients (comma separated) for this email. Defaults to %s.', 'yay-wholesale' ), '<code>' . esc_attr( get_option( 'admin_email' ) ) . '</code>' ),
+                'description' => sprintf( __( 'Enter recipients (comma separated) for this email. Defaults to %s.', 'yay-wholesale-b2b' ), '<code>' . esc_attr( get_option( 'admin_email' ) ) . '</code>' ),
                 'placeholder' => '',
                 'default'     => '',
                 'desc_tip'    => true,
             ],
             'subject'            => [
-                'title'       => __( 'Subject', 'yay-wholesale' ),
+                'title'       => __( 'Subject', 'yay-wholesale-b2b' ),
                 'type'        => 'text',
                 'desc_tip'    => true,
                 'description' => $placeholder_text,
@@ -107,7 +107,7 @@ abstract class WholesaleEmailBase extends WC_Email {
                 'default'     => '',
             ],
             'heading'            => [
-                'title'       => __( 'Email heading', 'yay-wholesale' ),
+                'title'       => __( 'Email heading', 'yay-wholesale-b2b' ),
                 'type'        => 'text',
                 'desc_tip'    => true,
                 'description' => $placeholder_text,
@@ -115,27 +115,27 @@ abstract class WholesaleEmailBase extends WC_Email {
                 'default'     => '',
             ],
             'email_content'      => [
-                'title'       => __( 'Email content', 'yay-wholesale' ),
-                'description' => __( 'Text to appear as the main email content.', 'yay-wholesale' ) . ' ' . $placeholder_text,
+                'title'       => __( 'Email content', 'yay-wholesale-b2b' ),
+                'description' => __( 'Text to appear as the main email content.', 'yay-wholesale-b2b' ) . ' ' . $placeholder_text,
                 'css'         => 'width:400px; height: 200px;',
-                'placeholder' => __( 'N/A', 'yay-wholesale' ),
+                'placeholder' => __( 'N/A', 'yay-wholesale-b2b' ),
                 'type'        => 'textarea',
                 'default'     => $this->get_default_email_content(),
                 'desc_tip'    => true,
             ],
             'additional_content' => [
-                'title'       => __( 'Additional content', 'yay-wholesale' ),
-                'description' => __( 'Text to appear below the main email content.', 'yay-wholesale' ) . ' ' . $placeholder_text,
+                'title'       => __( 'Additional content', 'yay-wholesale-b2b' ),
+                'description' => __( 'Text to appear below the main email content.', 'yay-wholesale-b2b' ) . ' ' . $placeholder_text,
                 'css'         => 'width:400px; height: 75px;',
-                'placeholder' => __( 'N/A', 'yay-wholesale' ),
+                'placeholder' => __( 'N/A', 'yay-wholesale-b2b' ),
                 'type'        => 'textarea',
                 'default'     => $this->get_default_additional_content(),
                 'desc_tip'    => true,
             ],
             'email_type'         => [
-                'title'       => __( 'Email type', 'yay-wholesale' ),
+                'title'       => __( 'Email type', 'yay-wholesale-b2b' ),
                 'type'        => 'select',
-                'description' => __( 'Choose which format of email to send.', 'yay-wholesale' ),
+                'description' => __( 'Choose which format of email to send.', 'yay-wholesale-b2b' ),
                 'default'     => 'html',
                 'class'       => 'email_type wc-enhanced-select',
                 'options'     => $this->get_email_type_options(),

@@ -27,7 +27,7 @@ export default function TopWholesaleCustomers(props: {
         {/* Header */}
         <div className="flex items-center justify-between">
           <h3 className="text-foreground text-[16px] font-semibold">
-            {__('Top Wholesale Customers', 'yay-wholesale')}
+            {__('Top Wholesale Customers', 'yay-wholesale-b2b')}
           </h3>
         </div>
 
@@ -43,20 +43,20 @@ export default function TopWholesaleCustomers(props: {
               <TableRow className="text-foreground border-border border-b text-[14px] font-semibold">
                 <TableHead className="text-foreground text-[14px]">
                   <span className="flex items-center justify-center font-medium">
-                    {__('No', 'yay-wholesale')}
+                    {__('No', 'yay-wholesale-b2b')}
                   </span>
                 </TableHead>
                 <TableHead className="text-foreground text-[14px]">
-                  {__('Customer', 'yay-wholesale')}
+                  {__('Customer', 'yay-wholesale-b2b')}
                 </TableHead>
                 <TableHead className="text-foreground text-[14px]">
                   <span className="flex items-center justify-center font-medium">
-                    {__('Orders', 'yay-wholesale')}
+                    {__('Orders', 'yay-wholesale-b2b')}
                   </span>
                 </TableHead>
                 <TableHead className="text-foreground text-[14px]">
                   <span className="flex items-center justify-center font-medium">
-                    {__('Role', 'yay-wholesale')}
+                    {__('Role', 'yay-wholesale-b2b')}
                   </span>
                 </TableHead>
               </TableRow>
@@ -119,7 +119,7 @@ export default function TopWholesaleCustomers(props: {
               ) : (
                 <TableRow>
                   <TableCell colSpan={4} className="h-24 text-center">
-                    {__('No results.', 'yay-wholesale')}
+                    {__('No results.', 'yay-wholesale-b2b')}
                   </TableCell>
                 </TableRow>
               )}

@@ -104,7 +104,7 @@ class RolesHelper {
     }
 
     /**
-     * Delete all the yay-wholesale's roles from the user.
+     * Delete all the yay-wholesale-b2b's roles from the user.
      *
      * @param \WP_User $user The user object.
      * @return void

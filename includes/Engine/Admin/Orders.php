@@ -284,9 +284,9 @@ class Orders {
         $value  = isset( $filter ) ? $filter : 'all';
         ?>
         <select name="_ywhs_order_type">
-            <option value="all"><?php echo esc_html__( 'All Wholesale and Retail', 'yay-wholesale' ); ?></option>
-            <option value="wholesale" <?php selected( $value, 'wholesale' ); ?>><?php echo esc_html__( 'Only Wholesale', 'yay-wholesale' ); ?></option>
-            <option value="retail" <?php selected( $value, 'retail' ); ?>><?php echo esc_html__( 'Only Retail', 'yay-wholesale' ); ?></option>
+            <option value="all"><?php echo esc_html__( 'All Wholesale and Retail', 'yay-wholesale-b2b' ); ?></option>
+            <option value="wholesale" <?php selected( $value, 'wholesale' ); ?>><?php echo esc_html__( 'Only Wholesale', 'yay-wholesale-b2b' ); ?></option>
+            <option value="retail" <?php selected( $value, 'retail' ); ?>><?php echo esc_html__( 'Only Retail', 'yay-wholesale-b2b' ); ?></option>
         </select>
         <?php
     }
@@ -325,7 +325,7 @@ class Orders {
      * @return array The customized columns list.
      */
     public function edit_shop_order_columns( $columns ) {
-        $columns['ywhs_order_type'] = __( 'Order Type', 'yay-wholesale' );
+        $columns['ywhs_order_type'] = __( 'Order Type', 'yay-wholesale-b2b' );
         return $columns;
     }
 
@@ -346,9 +346,9 @@ class Orders {
             <span>
                 <?php
                 if ( $is_wholesale_order ) {
-                    echo esc_attr_e( 'Wholesale', 'yay-wholesale' );
+                    echo esc_attr_e( 'Wholesale', 'yay-wholesale-b2b' );
                 } else {
-                    echo esc_attr_e( 'Retail', 'yay-wholesale' );
+                    echo esc_attr_e( 'Retail', 'yay-wholesale-b2b' );
                 }
                 ?>
             </span>

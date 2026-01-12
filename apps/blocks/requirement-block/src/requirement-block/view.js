@@ -101,7 +101,7 @@ const { state, callbacks } = store('ywhs_wholesale_requirement', {
         subtotal: parseWPCurrency(0),
         minAmount: parseWPCurrency(wholesaleRole.minOrderAmount),
         isDiscounted: false,
-        discountText: sprintf(__('%d%% Off', 'yay-wholesale'), wholesaleRole.discount)
+        discountText: sprintf(__('%d%% Off', 'yay-wholesale-b2b'), wholesaleRole.discount)
     },
     callbacks: {
         async getPriceMap() {
@@ -175,7 +175,7 @@ const { state, callbacks } = store('ywhs_wholesale_requirement', {
             let progress = 0;
 
             if (isDiscounted) {
-                notice = __("Great news — You’ve received the <span class='ywhs_r_notice'>wholesale price</span> 🎉", 'yay-wholesale');
+                notice = __("Great news — You’ve received the <span class='ywhs_r_notice'>wholesale price</span> 🎉", 'yay-wholesale-b2b');
                 progress = 100;
             }
             else {
@@ -192,8 +192,8 @@ const { state, callbacks } = store('ywhs_wholesale_requirement', {
                 if ( lackOfQty > 0  && lackOfQty < wholesaleRole.minOrderQuantity) {
                     isEmpty  = false;
                     phrases.push(lackOfQty > 1
-                    ? sprintf(__('<strong>%d products</strong>', 'yay-wholesale'), lackOfQty)
-                    : __('<strong>1 product</strong>', 'yay-wholesale'));
+                    ? sprintf(__('<strong>%d products</strong>', 'yay-wholesale-b2b'), lackOfQty)
+                    : __('<strong>1 product</strong>', 'yay-wholesale-b2b'));
                 }
 
                 if ( lackOfAmt > 0 && lackOfAmt < wholesaleRole.minOrderAmount) {
@@ -203,19 +203,19 @@ const { state, callbacks } = store('ywhs_wholesale_requirement', {
                 }
 
                 if ( ! isEmpty ) {
-                    let lack   = phrases.join(__(' and ', 'yay-wholesale'));
+                    let lack   = phrases.join(__(' and ', 'yay-wholesale-b2b'));
                     let sale   = wholesaleRole.discount;
                     /* translators: 1: amount remaining, 2: discount percentage */
                     notice = sprintf(
                         __(
                             "You're almost there! Add %1$s more to receive wholesale pricing with <span class='ywhs_r_notice'>%2$d%% Off</span> value.",
-                            'yay-wholesale'
+                            'yay-wholesale-b2b'
                         ),
                         lack,
                         sale
                     );
                 } else {
-                    notice = __('Please add items to your cart to receive wholesale pricing.', 'yay-wholesale');
+                    notice = __('Please add items to your cart to receive wholesale pricing.', 'yay-wholesale-b2b');
                 }
             }
             

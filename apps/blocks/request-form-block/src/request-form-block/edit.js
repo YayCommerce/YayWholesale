@@ -18,7 +18,7 @@ export default function Edit({ attributes, setAttributes }) {
                     tagName="p"
                     value={formTitle}
                     onChange={(newContent) => setAttributes({ formTitle: newContent })}
-                    placeholder={__("Write your form title here...", "yay-wholesale")}
+                    placeholder={__("Write your form title here...", "yay-wholesale-b2b")}
                     style={{textAlign: titleAlign}}
                 />
                 <div className='ywhs_skeleton_container'>
