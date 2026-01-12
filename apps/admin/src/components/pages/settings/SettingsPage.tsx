@@ -9,7 +9,8 @@ import { SettingsFormData, settingsFormSchema } from '@/lib/schema/settings';
 import { cn, getSettings } from '@/lib/utils';
 import { Card, CardContent } from '@/components/ui/card';
 import { FormProvider } from '@/components/ui/form';
-import { Toaster } from '@/components/ui/sonner';
+import { UnsavedChangeDialog } from '@/components/ui/unsaved-changed-dialog';
+import { useRouteLeaveGuard } from '@/components/custom/UseRouteLeaveGuard';
 
 import DisplayTab from './tabs/DisplayTab';
 import EmailsTab from './tabs/EmailsTab';
@@ -43,6 +44,20 @@ export default function SettingsPage() {
     await saveMutation.mutateAsync(data);
     window.yayWholesale.settings = data;
   }
+
+  const { showDialog, confirmLeave, cancelLeave } = useRouteLeaveGuard(form.formState.isDirty, [
+    '/settings/*',
+  ]);
+
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (!form.formState.isDirty) return;
+      e.preventDefault();
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [form.formState.isDirty]);
 
   return (
     <FormProvider {...form}>
@@ -88,6 +103,19 @@ export default function SettingsPage() {
             </div>
           </div>
         </div>
+
+        <UnsavedChangeDialog
+          open={showDialog}
+          onDiscard={confirmLeave}
+          onSave={() => {
+            form.handleSubmit(onSubmit)();
+          }}
+          onOpenChange={(open) => {
+            if (!open) {
+              cancelLeave();
+            }
+          }}
+        />
       </form>
     </FormProvider>
   );
