@@ -27,7 +27,7 @@ function RadioGroupItem({
       data-slot="radio-group-item"
       className={cn(
         focusVariants(),
-        'border-input text-primary hover:border-ring dark:bg-input/30 disabled:border-input aspect-square size-4.5 shrink-0 rounded-full border shadow-xs transition-all outline-none disabled:cursor-not-allowed disabled:bg-[#f2f5f9] disabled:opacity-60',
+        'border-border text-primary hover:border-ring dark:bg-input/30 disabled:border-border aspect-square size-4.5 shrink-0 rounded-full border shadow-xs transition-all outline-none disabled:cursor-not-allowed disabled:bg-[#f2f5f9] disabled:opacity-60',
         'data-[state=checked]:border-primary data-[state=checked]:bg-primary data-[state=checked]:hover:bg-primary-accent data-[state=checked]:hover:border-primary-accent dark:data-[state=checked]:border-primary',
         className,
       )}

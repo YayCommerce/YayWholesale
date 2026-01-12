@@ -205,7 +205,7 @@ export function FieldRow({
                 </FormLabel>
                 <FormControl>
                   <ToggleGroup
-                    className="border-input flex h-9 w-full gap-0.75 rounded-[8px] border bg-white p-[3px]"
+                    className="border-border flex h-9 w-full gap-0.75 rounded-[8px] border bg-white p-[3px]"
                     type="single"
                     value={field.value}
                     onValueChange={(val) => {

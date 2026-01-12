@@ -14,7 +14,7 @@ const Input = React.forwardRef<HTMLInputElement, React.ComponentProps<'input'>>(
         className={cn(
           'file:text-foreground focus-visible:border-foreground focus-visible:hover:border-accent-foreground placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground dark:bg-input/30 border-input hover:border-foreground flex h-9 w-full min-w-0 rounded-sm border bg-transparent p-2 pl-3 text-sm shadow-xs transition-all outline-none file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
           'aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive',
-          readOnly && 'border-input bg-muted-400 hover:border-input cursor-default shadow-xs',
+          readOnly && 'border-border bg-muted-400 hover:border-border cursor-default shadow-xs',
           className,
         )}
         {...props}
@@ -38,7 +38,7 @@ function InputPrefix({
       className={cn(
         'text-muted-foreground absolute inset-y-px start-px flex items-center rounded-s-sm px-2.5',
         variant === 'transparent' && 'bg-transparent',
-        variant === 'muted' && 'bg-muted border-input border-e',
+        variant === 'muted' && 'bg-muted border-border border-e',
         className,
       )}
       {...props}
@@ -62,7 +62,7 @@ function InputSuffix({
       className={cn(
         'text-muted-foreground absolute inset-y-px end-px flex items-center rounded-e-sm px-2.5',
         variant === 'transparent' && 'bg-transparent',
-        variant === 'muted' && 'bg-muted border-input border-s',
+        variant === 'muted' && 'bg-muted border-border border-s',
         className,
       )}
       {...props}

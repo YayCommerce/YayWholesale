@@ -21,7 +21,7 @@ export default function EmailsTab() {
     <div className="overflow-x-auto rounded-lg border bg-white shadow-xs">
       <Table>
         <TableHeader>
-          <TableRow className="bg-muted-400 hover:bg-muted-400 border-border border-b">
+          <TableRow className="bg-muted-400 hover:bg-muted-400 border-divider border-b">
             <TableHead className="w-12"></TableHead>
             <TableHead className="text-sm font-medium">Emails</TableHead>
             <TableHead className="text-sm font-medium">Description</TableHead>
@@ -32,7 +32,7 @@ export default function EmailsTab() {
 
         <TableBody>
           {emails?.map((email) => (
-            <TableRow key={email.id} className="border-border h-[52px] border-b last:border-0">
+            <TableRow key={email.id} className="border-divider h-[52px] border-b last:border-0">
               <TableCell className="px-4">
                 <Switch
                   disabled={loadingId === email.id}

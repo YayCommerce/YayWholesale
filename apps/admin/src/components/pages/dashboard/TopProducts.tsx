@@ -40,7 +40,7 @@ export default function TopProducts(props: { reportQuery: ReturnType<typeof useR
         >
           <Table className="min-w-full">
             <TableHeader className="text-foreground bg-muted-400 h-10">
-              <TableRow className="text-foreground border-border border-b text-[14px] font-semibold">
+              <TableRow className="text-foreground border-divider border-b text-[14px] font-semibold">
                 <TableHead className="text-foreground text-[14px]">
                   <span className="flex items-center justify-center font-medium">
                     {__('No', 'yay-wholesale-b2b')}
@@ -63,7 +63,7 @@ export default function TopProducts(props: { reportQuery: ReturnType<typeof useR
             </TableHeader>
             <TableBody>
               {isLoading ? (
-                <TableRow className="border-border border-b">
+                <TableRow className="border-divider border-b">
                   <TableCell colSpan={4} className="h-32 text-center align-middle">
                     <div className="flex items-center justify-center gap-2">
                       <Spinner className="text-muted-foreground size-6 animate-spin" />
@@ -72,7 +72,7 @@ export default function TopProducts(props: { reportQuery: ReturnType<typeof useR
                 </TableRow>
               ) : reportData && reportData.topProducts.length > 0 ? (
                 reportData.topProducts.map((data) => (
-                  <TableRow className="border-border border-b">
+                  <TableRow className="border-divider border-b">
                     <TableCell className="text-foreground py-3 text-[14px]">
                       <span className="flex items-center justify-center">
                         {reportData.topProducts.indexOf(data) + 1}

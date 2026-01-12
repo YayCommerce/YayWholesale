@@ -217,7 +217,7 @@ export default function RequestsList() {
         <Table className="min-w-full">
           <TableHeader className="text-foreground bg-muted-400 h-[46px]">
             {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id} className="border-border border-b">
+              <TableRow key={headerGroup.id} className="border-divider border-b">
                 {headerGroup.headers.map((header) => (
                   <TableHead
                     key={header.id}
@@ -249,7 +249,7 @@ export default function RequestsList() {
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && 'selected'}
-                  className="group not-last:border-border not-last:border-b"
+                  className="group not-last:border-divider not-last:border-b"
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell

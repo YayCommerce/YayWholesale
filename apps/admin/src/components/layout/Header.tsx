@@ -109,7 +109,7 @@ export default function Header() {
       )}
     >
       {/* Logo */}
-      <div className="border-input flex h-full bg-[#FFF5DB] px-[3px] pt-[3px]">
+      <div className="border-border flex h-full bg-[#FFF5DB] px-[3px] pt-[3px]">
         <img
           src={`${window.yayWholesale.plugin_url}/assets/images/favicon.svg`}
           alt="YayWholesale"

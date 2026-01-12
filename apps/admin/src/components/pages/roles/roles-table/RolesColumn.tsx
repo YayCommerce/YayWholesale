@@ -82,7 +82,7 @@ export const RolesColumn: ColumnDef<RolesListValues & { count: number }>[] = [
             trigger={
               <div className="inline-block">
                 {row.original.name}
-                <div className="text-foreground/45 h-0.25 bg-[radial-gradient(circle,currentColor_0.5px,transparent_0.8px)] bg-size-[2.25px_2px] bg-repeat-x"></div>
+                <div className="text-foreground/45 h-0.25 -translate-y-0.5 bg-[radial-gradient(circle,currentColor_0.5px,transparent_0.8px)] bg-size-[2.25px_2px] bg-repeat-x"></div>
               </div>
             }
             content={<span>{__('Default role', 'yay-wholesale-b2b')}</span>}

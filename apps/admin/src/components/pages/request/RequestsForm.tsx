@@ -123,7 +123,7 @@ export default function RequestsForm() {
             <Spinner className="text-muted-foreground size-6 animate-spin" />
           </div>
         )}
-        <SheetHeader className="border-border border-b p-5">
+        <SheetHeader className="border-divider border-b p-5">
           <div className="flex items-start justify-between gap-2.5">
             <div>
               <SheetTitle className="text-foreground flex items-center gap-2 text-[18px] font-semibold">
@@ -241,7 +241,7 @@ export default function RequestsForm() {
         </div>
 
         <SheetFooter className="p-0">
-          <div className="border-border flex justify-end gap-2 border-t bg-white p-5">
+          <div className="border-divider flex justify-end gap-2 border-t bg-white p-5">
             <div className="flex gap-2">
               <Button
                 variant="destructive-soft"
