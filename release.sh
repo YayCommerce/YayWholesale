@@ -1,7 +1,57 @@
 PLUGIN_SLUG="yay-wholesale-b2b"
 PROJECT_PATH=$(pwd)
+IS_PRO="false"
 BUILD_PATH="${PROJECT_PATH}/build"
+
+for param in "$@"
+do
+    case $param in
+        IS_PRO=*)
+            IS_PRO="${param#*=}"
+            ;;
+        OUTPUT_PATH=*)
+            BUILD_PATH="${param#*=}"
+            # Detect OS
+            os=$(uname -s)
+
+            # Convert '\' to '/'
+            BUILD_PATH="${BUILD_PATH//\\//}"
+
+            # Adapt build path to runtime environment
+            if [ "${os#CYGWIN}" != "$os" ] || [ "${os#MINGW}" != "$os" ] || [ "${os#MSYS}" != "$os" ]; then
+                # Windows-like environments (Cygwin, Git Bash)
+                if command -v cygpath >/dev/null 2>&1; then
+                    # Use cygpath if available
+                    BUILD_PATH=$(cygpath "$BUILD_PATH")
+                else
+                    # Manual conversion: drive letter to lowercase + prepend /
+                    drive=$(echo "${BUILD_PATH%%:*}" | tr 'A-Z' 'a-z')
+                    rest="${BUILD_PATH#*:}"
+                    BUILD_PATH="/$drive$rest"
+                fi
+            else
+                # Linux/macOS: remove ':' if it has
+                BUILD_PATH="${BUILD_PATH//:/}"
+            fi
+            ;;
+        *)
+            echo "Unknown parameter: $param"
+            ;;
+    esac
+done
+
+if [ "$IS_PRO" = "true" ]; then
+    BUILD_PATH="${BUILD_PATH}/pro"
+else
+    BUILD_PATH="${BUILD_PATH}/lite"
+fi
+
 DEST_PATH="$BUILD_PATH/$PLUGIN_SLUG"
+
+if [ ! -d "$BUILD_PATH" ]; then
+    echo "directory $BUILD_PATH does not exist. Creating..."
+    mkdir -p "$BUILD_PATH"
+fi
 
 echo "Generating build directory..."
 rm -rf "$BUILD_PATH"
