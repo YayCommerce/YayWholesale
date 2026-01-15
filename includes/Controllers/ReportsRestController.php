@@ -40,7 +40,7 @@ class ReportsRestController extends BaseRestController {
      */
     public function reports_permission_callback() {
         if ( ! current_user_can( 'manage_options' ) || ! current_user_can( 'manage_woocommerce' ) ) {
-            return new \WP_Error( 'rest_forbidden', esc_html__( 'Forbidden.', 'yay-wholesale' ), [ 'status' => 401 ] );
+            return new \WP_Error( 'rest_forbidden', esc_html__( 'Forbidden.', 'yay-wholesale-b2b' ), [ 'status' => 401 ] );
         }
 
         return true;
@@ -101,7 +101,7 @@ class ReportsRestController extends BaseRestController {
 
         $transient = get_transient( $transient_key );
         if ( false !== $transient ) {
-            return $this->success( $transient, __( 'Reports generated!', 'yay-wholesale' ) );
+            return $this->success( $transient, __( 'Reports generated!', 'yay-wholesale-b2b' ) );
         }
 
         $statistic = ReportsHelper::statistic_data( $start_date, $end_date, $compare_start_date, $compare_end_date );
@@ -113,6 +113,6 @@ class ReportsRestController extends BaseRestController {
             set_transient( $transient_key, $statistic, 600 );
         }
 
-        return $this->success( $statistic, __( 'Reports generated!', 'yay-wholesale' ) );
+        return $this->success( $statistic, __( 'Reports generated!', 'yay-wholesale-b2b' ) );
     }
 }

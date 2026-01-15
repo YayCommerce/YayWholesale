@@ -63,7 +63,7 @@ const Render = () => {
         let progress = 0;
 
         if (isDiscounted) {
-            notice = __("Great news — You’ve received the <span class='ywhs_r_notice'>wholesale price</span> 🎉", 'yay-wholesale');
+            notice = __("Great news — You’ve received the <span class='ywhs_r_notice'>wholesale price</span> 🎉", 'yay-wholesale-b2b');
             progress = 100;
         }
         else {
@@ -80,8 +80,8 @@ const Render = () => {
             if ( lackOfQty > 0 && lackOfQty < wholesale.minOrderQuantity) {
                 isEmpty  = false;
                 phrases.push(lackOfQty > 1
-                ? sprintf(__('<strong>%d products</strong>', 'yay-wholesale'), lackOfQty)
-                : __('<strong>1 product</strong>', 'yay-wholesale'));
+                ? sprintf(__('<strong>%d products</strong>', 'yay-wholesale-b2b'), lackOfQty)
+                : __('<strong>1 product</strong>', 'yay-wholesale-b2b'));
             }
 
             if ( lackOfAmt > 0 && lackOfAmt < wholesale.minOrderAmount) {
@@ -91,19 +91,19 @@ const Render = () => {
             }
 
             if ( ! isEmpty ) {
-                let lack   = phrases.join(__(' and ', 'yay-wholesale'));
+                let lack   = phrases.join(__(' and ', 'yay-wholesale-b2b'));
                 let sale   = wholesale.discount;
                 /* translators: 1: amount remaining, 2: discount percentage */
                 notice = sprintf(
                     __(
                         "You're almost there! Add %1$s more to receive wholesale pricing with <span class='ywhs_r_notice'>%2$d%% Off</span> value.",
-                        'yay-wholesale'
+                        'yay-wholesale-b2b'
                     ),
                     lack,
                     sale
                 );
             } else {
-                notice = __('Please add items to your cart to receive wholesale pricing.', 'yay-wholesale');
+                notice = __('Please add items to your cart to receive wholesale pricing.', 'yay-wholesale-b2b');
             }
         }
         
@@ -118,7 +118,7 @@ const Render = () => {
                 {/* Header */}
                 <div className="ywhs_requirement_header">
                     <div className="ywhs_requirement_title">
-                        <span>{__('Wholesale Requirement', 'yay-wholesale')}</span>{' '}
+                        <span>{__('Wholesale Requirement', 'yay-wholesale-b2b')}</span>{' '}
                         <span className="ywhs_badge">{wholesale.name}</span>
                     </div>
                     <div className="ywhs_requirement_opener ywhs_rclosed"></div>
@@ -167,7 +167,7 @@ const Render = () => {
                 >
                     {/* Min order quantity */}
                     <div className="ywhs_requirement_item">
-                        <span>{__('Min order quantity:', 'yay-wholesale')}</span>
+                        <span>{__('Min order quantity:', 'yay-wholesale-b2b')}</span>
                         <span className="ywhs_r_base_notice">
                             <span className={isDiscounted ? 'ywhs_r_notice' : ''}>
                                 {actualCount}
@@ -178,7 +178,7 @@ const Render = () => {
     
                     {/* Min order amount */}
                     <div className="ywhs_requirement_item">
-                        <span>{__('Min order amount:', 'yay-wholesale')}</span>
+                        <span>{__('Min order amount:', 'yay-wholesale-b2b')}</span>
                         <span className="ywhs_r_base_notice">
                             <span className={isDiscounted ? 'ywhs_r_notice' : ''}>
                                 {parseWPCurrency(actualSubtotal)}
@@ -189,11 +189,11 @@ const Render = () => {
     
                     {/* Discount */}
                     <div className="ywhs_requirement_item">
-                        <span>{__('Get discount:', 'yay-wholesale')}</span>
+                        <span>{__('Get discount:', 'yay-wholesale-b2b')}</span>
                         <div
                             className={isDiscounted ? 'ywhs_r_notice' : 'ywhs_r_base_notice'}
                         >
-                            {sprintf(__('%d%% Off', 'yay-wholesale'), wholesale.discount)}
+                            {sprintf(__('%d%% Off', 'yay-wholesale-b2b'), wholesale.discount)}
                         </div>
                     </div>
                 </div>

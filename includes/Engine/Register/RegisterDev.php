@@ -32,6 +32,6 @@ class RegisterDev {
         $deps = [ 'react', 'react-dom', 'wp-hooks', 'wp-i18n' ];
 
         wp_register_script( ScriptName::PAGE_SETTINGS, 'http://localhost:3000/main.tsx', $deps, null, true );
-        wp_set_script_translations( ScriptName::PAGE_SETTINGS, 'yay-wholesale', YAY_WHOLESALE_PLUGIN_DIR . 'languages' );
+        wp_set_script_translations( ScriptName::PAGE_SETTINGS, 'yay-wholesale-b2b', YAY_WHOLESALE_PLUGIN_DIR . 'languages' );
     }
 }

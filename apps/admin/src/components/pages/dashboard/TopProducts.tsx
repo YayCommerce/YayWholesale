@@ -27,7 +27,7 @@ export default function TopProducts(props: { reportQuery: ReturnType<typeof useR
         {/* Header */}
         <div className="flex items-center justify-between">
           <h3 className="text-foreground text-[16px] font-semibold">
-            {__('Top Products', 'yay-wholesale')}
+            {__('Top Products', 'yay-wholesale-b2b')}
           </h3>
         </div>
 
@@ -43,20 +43,20 @@ export default function TopProducts(props: { reportQuery: ReturnType<typeof useR
               <TableRow className="text-foreground border-border border-b text-[14px] font-semibold">
                 <TableHead className="text-foreground text-[14px]">
                   <span className="flex items-center justify-center font-medium">
-                    {__('No', 'yay-wholesale')}
+                    {__('No', 'yay-wholesale-b2b')}
                   </span>
                 </TableHead>
                 <TableHead className="text-foreground text-[14px]">
-                  {__('Product', 'yay-wholesale')}
+                  {__('Product', 'yay-wholesale-b2b')}
                 </TableHead>
                 <TableHead className="text-foreground text-[14px]">
                   <span className="flex items-center justify-center font-medium">
-                    {__('Item Sold', 'yay-wholesale')}
+                    {__('Item Sold', 'yay-wholesale-b2b')}
                   </span>
                 </TableHead>
                 <TableHead className="text-foreground text-[14px]">
                   <span className="flex items-center justify-center font-medium">
-                    {__('Net Sales', 'yay-wholesale')}
+                    {__('Net Sales', 'yay-wholesale-b2b')}
                   </span>
                 </TableHead>
               </TableRow>
@@ -116,7 +116,7 @@ export default function TopProducts(props: { reportQuery: ReturnType<typeof useR
               ) : (
                 <TableRow>
                   <TableCell colSpan={4} className="h-24 text-center">
-                    {__('No results', 'yay-wholesale')}
+                    {__('No results', 'yay-wholesale-b2b')}
                   </TableCell>
                 </TableRow>
               )}

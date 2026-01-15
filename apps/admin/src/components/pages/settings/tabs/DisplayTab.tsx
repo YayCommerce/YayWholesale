@@ -26,22 +26,22 @@ export default function DisplayTab() {
           render={({ field }) => (
             <FormItem className="flex w-full flex-col gap-2.5">
               <FormLabel className="text-foreground-400 text-xs font-medium">
-                {__('Display price format', 'yay-wholesale')}
+                {__('Display price format', 'yay-wholesale-b2b')}
               </FormLabel>
               <FormControl>
                 <Select defaultValue={field.value} onValueChange={field.onChange}>
                   <SelectTrigger id="display-price-format" className="w-full font-normal">
-                    <SelectValue placeholder={__('Select a option', 'yay-wholesale')} />
+                    <SelectValue placeholder={__('Select a option', 'yay-wholesale-b2b')} />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="retail-and-wholesale">
-                      {__('Show retail and wholesale prices', 'yay-wholesale')}
+                      {__('Show retail and wholesale prices', 'yay-wholesale-b2b')}
                     </SelectItem>
                     <SelectItem value="wholesale-only">
-                      {__('Show only wholesale prices', 'yay-wholesale')}
+                      {__('Show only wholesale prices', 'yay-wholesale-b2b')}
                     </SelectItem>
                     <SelectItem value="retail-only">
-                      {__('Show only retail prices', 'yay-wholesale')}
+                      {__('Show only retail prices', 'yay-wholesale-b2b')}
                     </SelectItem>
                   </SelectContent>
                 </Select>
@@ -58,14 +58,14 @@ export default function DisplayTab() {
           render={({ field }) => (
             <FormItem className="flex w-full flex-col gap-2.5">
               <FormLabel className="text-foreground-400 text-xs font-medium">
-                {__('Wholesale price label', 'yay-wholesale')}
+                {__('Wholesale price label', 'yay-wholesale-b2b')}
               </FormLabel>
               <FormControl>
                 <Input
                   id="wholesale-price-label"
                   defaultValue={field.value}
                   onChange={field.onChange}
-                  placeholder={__('Wholesale price', 'yay-wholesale')}
+                  placeholder={__('Wholesale price', 'yay-wholesale-b2b')}
                   className="w-full font-normal"
                 />
               </FormControl>
@@ -82,7 +82,7 @@ export default function DisplayTab() {
         render={({ field }) => (
           <FormItem className="flex w-full flex-col gap-2.5">
             <FormLabel className="text-foreground-400 text-xs font-medium">
-              {__('Wholesale price color', 'yay-wholesale')}
+              {__('Wholesale price color', 'yay-wholesale-b2b')}
             </FormLabel>
             <FormControl>
               <ColorPicker

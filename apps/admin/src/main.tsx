@@ -12,7 +12,7 @@ import { showToast } from '@/components/custom/showToast';
 const queryClient = new QueryClient({
   queryCache: new QueryCache({
     onError: (error: Error) => {
-      showToast.error(sprintf(__('An error occurred: %s', 'yay-wholesale'), error.message));
+      showToast.error(sprintf(__('An error occurred: %s', 'yay-wholesale-b2b'), error.message));
     },
   }),
   defaultOptions: {
@@ -23,7 +23,7 @@ const queryClient = new QueryClient({
   },
 });
 
-createRoot(document.getElementById('yay-wholesale') as HTMLElement).render(
+createRoot(document.getElementById('yay-wholesale-b2b') as HTMLElement).render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
       <RouterProvider router={getManagerRouter()} />

@@ -3,12 +3,11 @@ namespace Yay_Wholesale\Engine\Admin;
 
 use WC_Data_Store;
 use WC_Tax;
-use Yay_Wholesale\Engine\Frontend\Pricing;
+use Yay_Wholesale\Engine\Compatibles;
 use Yay_Wholesale\Engine\Frontend\Tax;
 use Yay_Wholesale\Helpers\RolesHelper;
 use Yay_Wholesale\Helpers\SettingsHelper;
 use Yay_Wholesale\Helpers\PricingHelper;
-use Yay_Wholesale\Helpers\ReportsHelper;
 use Yay_Wholesale\Utils\SingletonTrait;
 
 defined( 'ABSPATH' ) || exit;
@@ -40,6 +39,11 @@ class Orders {
      * @param \WC_Order $order The order object.
      */
     public function admin_recalculate_order( $and_taxes, \WC_Order $order ) {
+
+        remove_filter( 'woocommerce_order_is_vat_exempt', [ $this, 'tax_enabled_handler' ], 999, 2 );
+        remove_filter( 'woocommerce_calc_tax', [ Tax::get_instance(), 'maybe_disable_tax_calc' ], 9999 );
+        Compatibles::get_instance()->remove_price_related_hooks();
+
         $customer_id        = $order->get_customer_id();
         $wholesale_role     = RolesHelper::is_wholesale_user( $customer_id );
         $setting            = SettingsHelper::get_settings();
@@ -47,8 +51,9 @@ class Orders {
         $is_disabled_coupon = $setting['general']['disable_coupon'] ?? false;
         $items              = [];
 
-        remove_filter( 'woocommerce_order_is_vat_exempt', [ $this, 'tax_enabled_handler' ], 999, 2 );
-        remove_filter( 'woocommerce_calc_tax', [ Tax::get_instance(), 'maybe_disable_tax_calc' ], 9999 );
+        if ( ! isset( $wholesale_role ) ) {
+            return;
+        }
 
         $is_discounted = PricingHelper::check_is_discounted( $order, $wholesale_role );
 
@@ -79,6 +84,7 @@ class Orders {
 
         add_filter( 'woocommerce_order_is_vat_exempt', [ $this, 'tax_enabled_handler' ], 999, 2 );
         add_filter( 'woocommerce_calc_tax', [ Tax::get_instance(), 'maybe_disable_tax_calc' ], 9999 );
+        Compatibles::get_instance()->add_price_related_hooks();
     }//end admin_recalculate_order()
 
     /**
@@ -96,6 +102,10 @@ class Orders {
         $wholesale_role  = RolesHelper::is_wholesale_user( $customer_id );
         $setting         = SettingsHelper::get_settings();
         $is_disabled_tax = $setting['general']['disable_tax'] ?? false;
+
+        if ( ! isset( $wholesale_role ) ) {
+            return $is_exempt;
+        }
 
         $is_discounted = PricingHelper::check_is_discounted( $order, $wholesale_role );
         if ( $is_discounted && $is_disabled_tax ) {
@@ -148,7 +158,7 @@ class Orders {
             }
 
             $product         = $item->get_product();
-            $new_price       = $product->get_price();
+            $new_price       = apply_filters( 'ywhs_price_handle_processed', $product->get_price( 'edit' ) );
             $is_removing_tax = false;
 
             if ( $is_discounted ) {
@@ -162,7 +172,7 @@ class Orders {
             $items[] = $item->get_name() . ' x ' . $quantity;
 
             if ( ( $is_discounted && $is_disabled_tax ) ||
-            ( ! $is_discounted && $is_force_tax_exempt ) ) {
+            ( $is_force_tax_exempt ) ) {
                 $item->set_taxes(
                     [
                         'total'    => [],
@@ -210,7 +220,7 @@ class Orders {
             }
 
             if ( ( $is_discounted && $is_disabled_tax ) ||
-            ( ! $is_discounted && $is_force_tax_exempt ) ) {
+            ( $is_force_tax_exempt ) ) {
                 $shipping->set_taxes( [] );
             } else {
                 $tax_rates = WC_Tax::get_shipping_tax_rates( $shipping->get_tax_class() );
@@ -245,7 +255,7 @@ class Orders {
             }
 
             if ( ( $is_discounted && $is_disabled_tax ) ||
-            ( ! $is_discounted && $is_force_tax_exempt ) ) {
+            ( $is_force_tax_exempt ) ) {
                 $fee->set_taxes( [] );
             } else {
                 $tax_rates = WC_Tax::get_rates( $fee->get_tax_class() );
@@ -274,9 +284,9 @@ class Orders {
         $value  = isset( $filter ) ? $filter : 'all';
         ?>
         <select name="_ywhs_order_type">
-            <option value="all"><?php echo esc_html__( 'All Wholesale and Retail', 'yay-wholesale' ); ?></option>
-            <option value="wholesale" <?php selected( $value, 'wholesale' ); ?>><?php echo esc_html__( 'Only Wholesale', 'yay-wholesale' ); ?></option>
-            <option value="retail" <?php selected( $value, 'retail' ); ?>><?php echo esc_html__( 'Only Retail', 'yay-wholesale' ); ?></option>
+            <option value="all"><?php echo esc_html__( 'All Wholesale and Retail', 'yay-wholesale-b2b' ); ?></option>
+            <option value="wholesale" <?php selected( $value, 'wholesale' ); ?>><?php echo esc_html__( 'Only Wholesale', 'yay-wholesale-b2b' ); ?></option>
+            <option value="retail" <?php selected( $value, 'retail' ); ?>><?php echo esc_html__( 'Only Retail', 'yay-wholesale-b2b' ); ?></option>
         </select>
         <?php
     }
@@ -315,7 +325,7 @@ class Orders {
      * @return array The customized columns list.
      */
     public function edit_shop_order_columns( $columns ) {
-        $columns['ywhs_order_type'] = __( 'Order Type', 'yay-wholesale' );
+        $columns['ywhs_order_type'] = __( 'Order Type', 'yay-wholesale-b2b' );
         return $columns;
     }
 
@@ -336,9 +346,9 @@ class Orders {
             <span>
                 <?php
                 if ( $is_wholesale_order ) {
-                    echo esc_attr_e( 'Wholesale', 'yay-wholesale' );
+                    echo esc_attr_e( 'Wholesale', 'yay-wholesale-b2b' );
                 } else {
-                    echo esc_attr_e( 'Retail', 'yay-wholesale' );
+                    echo esc_attr_e( 'Retail', 'yay-wholesale-b2b' );
                 }
                 ?>
             </span>

@@ -9,11 +9,11 @@ const requestFieldsSchema = z.object({
 
 export const requestSchema = z.object({
   id: z.number(),
-  name: z.string().min(1, __('Please fill in the name', 'yay-wholesale')),
+  name: z.string().min(1, __('Please fill in the name', 'yay-wholesale-b2b')),
   email: z
     .string()
-    .min(1, __('Please fill in the email', 'yay-wholesale'))
-    .regex(/^[\w\-\.]+@([\w-]+\.)+[\w-]{2,}$/, __('Invalid Email Format', 'yay-wholesale')),
+    .min(1, __('Please fill in the email', 'yay-wholesale-b2b'))
+    .regex(/^[\w\-\.]+@([\w-]+\.)+[\w-]{2,}$/, __('Invalid Email Format', 'yay-wholesale-b2b')),
   message: z.string(),
   firstName: z.string(),
   lastName: z.string(),

@@ -26,7 +26,7 @@ class WholeSalersController extends BaseRestController {
      */
     public function wholesalers_permission_callback() {
         if ( ! current_user_can( 'manage_options' ) || ! current_user_can( 'manage_woocommerce' ) ) {
-            return new \WP_Error( 'rest_forbidden', esc_html__( 'Forbidden.', 'yay-wholesale' ), [ 'status' => 401 ] );
+            return new \WP_Error( 'rest_forbidden', esc_html__( 'Forbidden.', 'yay-wholesale-b2b' ), [ 'status' => 401 ] );
         }
 
         return true;
@@ -115,7 +115,7 @@ class WholeSalersController extends BaseRestController {
 
         $response = WholeSalersHelper::get_wholesalers_list( $search, $page, $per_page, $role );
 
-        return $this->success( $response, __( 'Whole salers list fetched successfully', 'yay-wholesale' ) );
+        return $this->success( $response, __( 'Whole salers list fetched successfully', 'yay-wholesale-b2b' ) );
     }
 
     /**
@@ -129,19 +129,19 @@ class WholeSalersController extends BaseRestController {
         $role_slug = $request->get_param( 'role_slug' );
 
         if ( ! $role_slug || empty( $role_slug ) || ! get_role( $role_slug ) ) {
-            return $this->error( __( 'Missing role slug', 'yay-wholesale' ) );
+            return $this->error( __( 'Missing role slug', 'yay-wholesale-b2b' ) );
         }
 
         $user = get_user_by( 'ID', $user_id );
         if ( ! $user ) {
-            return $this->error( __( 'User not exists', 'yay-wholesale' ), 404 );
+            return $this->error( __( 'User not exists', 'yay-wholesale-b2b' ) );
         }
 
         RolesHelper::remove_ywhs_role_from_user( $user );
 
         $user->add_role( $role_slug );
 
-        return $this->success( [], __( 'Wholesaler role updated successfully', 'yay-wholesale' ) );
+        return $this->success( [], __( 'Wholesaler role updated successfully', 'yay-wholesale-b2b' ) );
     }
 
     /**
@@ -155,14 +155,14 @@ class WholeSalersController extends BaseRestController {
         $role_slug = $request->get_param( 'role_slug' );
 
         if ( empty( $user_ids ) || ! is_array( $user_ids ) ) {
-            return $this->error( __( 'Missing user ids', 'yay-wholesale' ) );
+            return $this->error( __( 'Missing user ids', 'yay-wholesale-b2b' ) );
         }
 
         if ( empty( $role_slug ) ) {
-            return $this->error( __( 'Missing role slug', 'yay-wholesale' ) );
+            return $this->error( __( 'Missing role slug', 'yay-wholesale-b2b' ) );
         }
         if ( empty( $role_slug ) || ! get_role( $role_slug ) ) {
-            return $this->error( __( 'Role slug is invalid', 'yay-wholesale' ) );
+            return $this->error( __( 'Role slug is invalid', 'yay-wholesale-b2b' ) );
         }
 
         $users = get_users( [ 'include' => $user_ids ] );
@@ -175,7 +175,7 @@ class WholeSalersController extends BaseRestController {
             $user->add_role( $role_slug );
         }
 
-        return $this->success( [], __( 'Wholesalers role updated successfully', 'yay-wholesale' ) );
+        return $this->success( [], __( 'Wholesalers role updated successfully', 'yay-wholesale-b2b' ) );
     }
 
     /**
@@ -187,6 +187,6 @@ class WholeSalersController extends BaseRestController {
     public function get_total_count( WP_REST_Request $request ): WP_REST_Response {
         $count = WholeSalersHelper::count_total_wholesalers();
 
-        return $this->success( [ 'count' => $count ], __( 'Total of Wholesaler is successfully counted', 'yay-wholesale' ) );
+        return $this->success( [ 'count' => $count ], __( 'Total of Wholesaler is successfully counted', 'yay-wholesale-b2b' ) );
     }
 }

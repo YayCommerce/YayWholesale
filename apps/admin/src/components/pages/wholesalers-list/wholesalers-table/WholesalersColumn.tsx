@@ -78,7 +78,7 @@ export const WholesalersColumn: ColumnDef<WholesalerFormValues>[] = [
   },
   {
     accessorKey: 'name',
-    header: __('Name', 'yay-wholesale'),
+    header: __('Name', 'yay-wholesale-b2b'),
     cell: ({ row }) => {
       return <AvatarCell rowData={row.original} />;
     },
@@ -86,7 +86,7 @@ export const WholesalersColumn: ColumnDef<WholesalerFormValues>[] = [
 
   {
     accessorKey: 'role',
-    header: __('Role', 'yay-wholesale'),
+    header: __('Role', 'yay-wholesale-b2b'),
     cell: ({ row }) => {
       return <WholesalersRoleColumn role={row.original.role} userId={row.original.id} />;
     },
@@ -94,7 +94,7 @@ export const WholesalersColumn: ColumnDef<WholesalerFormValues>[] = [
   {
     accessorKey: 'completedOrdersCount',
     header: () => (
-      <span className="flex justify-center">{__('Completed Orders', 'yay-wholesale')}</span>
+      <span className="flex justify-center">{__('Completed Orders', 'yay-wholesale-b2b')}</span>
     ),
     cell: ({ row }) => {
       const count = row.original.completedOrdersCount ?? 0;
@@ -104,7 +104,7 @@ export const WholesalersColumn: ColumnDef<WholesalerFormValues>[] = [
   {
     accessorKey: 'wholesaleRevenue',
     header: () => (
-      <span className="flex justify-center">{__('Wholesale Revenue', 'yay-wholesale')}</span>
+      <span className="flex justify-center">{__('Wholesale Revenue', 'yay-wholesale-b2b')}</span>
     ),
     cell: ({ row }) => {
       const revenue = row.original.wholesaleRevenue ?? 0;

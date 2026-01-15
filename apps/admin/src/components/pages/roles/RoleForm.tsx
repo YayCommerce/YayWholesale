@@ -105,13 +105,13 @@ export default function RoleForm() {
                 <div>
                   <SheetTitle className="text-foreground text-[18px] font-semibold">
                     {isAddingRole
-                      ? __('Add New Role', 'yay-wholesale')
-                      : __('Edit Role', 'yay-wholesale')}
+                      ? __('Add New Role', 'yay-wholesale-b2b')
+                      : __('Edit Role', 'yay-wholesale-b2b')}
                   </SheetTitle>
                   <SheetDescription className="text-muted-foreground mt-[4px] text-sm leading-[20px] font-normal">
                     {__(
                       'Enter the information below to add a new wholesale user role',
-                      'yay-wholesale',
+                      'yay-wholesale-b2b',
                     )}
                   </SheetDescription>
                 </div>
@@ -130,13 +130,13 @@ export default function RoleForm() {
                 render={({ field: { ref, ...field }, fieldState: { error, invalid } }) => (
                   <FormItem className="w-full gap-2.5">
                     <FormLabel className="text-foreground-400 text-xs font-medium">
-                      {__('Role Name', 'yay-wholesale')}
+                      {__('Role Name', 'yay-wholesale-b2b')}
                     </FormLabel>
                     <FormControl>
                       <Input
                         {...field}
                         value={field.value ?? ''}
-                        placeholder={__('e.g. Wholesale Customer', 'yay-wholesale')}
+                        placeholder={__('e.g. Wholesale Customer', 'yay-wholesale-b2b')}
                         className="h-9 rounded-md focus-visible:ring-0"
                         aria-invalid={invalid}
                       />
@@ -152,12 +152,12 @@ export default function RoleForm() {
                 render={({ field: { ref, ...field }, fieldState: { error, invalid } }) => (
                   <FormItem className="w-full gap-2.5">
                     <FormLabel className="text-foreground-400 text-xs font-medium">
-                      {__('Role description', 'yay-wholesale')}
+                      {__('Role description', 'yay-wholesale-b2b')}
                     </FormLabel>
                     <FormControl>
                       <Textarea
                         {...field}
-                        placeholder={__('Enter a wholesale role description', 'yay-wholesale')}
+                        placeholder={__('Enter a wholesale role description', 'yay-wholesale-b2b')}
                         className="h-24 rounded-md"
                         aria-invalid={invalid}
                       />
@@ -173,7 +173,7 @@ export default function RoleForm() {
                 render={({ field: { ref, ...field }, fieldState: { error, invalid } }) => (
                   <FormItem className="w-full gap-2.5">
                     <FormLabel className="text-foreground-400 text-xs font-medium">
-                      {__('Discount', 'yay-wholesale')}
+                      {__('Discount', 'yay-wholesale-b2b')}
                     </FormLabel>
                     <FormControl>
                       <InputNumberRoot
@@ -183,7 +183,7 @@ export default function RoleForm() {
                         max={100}
                       >
                         <InputNumberInput
-                          placeholder={__('Enter a percentage discount', 'yay-wholesale')}
+                          placeholder={__('Enter a percentage discount', 'yay-wholesale-b2b')}
                           className="h-9 w-full"
                           aria-invalid={invalid}
                         />
@@ -201,7 +201,7 @@ export default function RoleForm() {
                 render={({ field: { ref, ...field }, fieldState: { error, invalid } }) => (
                   <FormItem className="w-full gap-2.5">
                     <FormLabel className="text-foreground-400 text-xs font-medium">
-                      {__('Min Order Quantity', 'yay-wholesale')}
+                      {__('Min Order Quantity', 'yay-wholesale-b2b')}
                     </FormLabel>
                     <FormControl>
                       <InputNumberRoot
@@ -212,7 +212,7 @@ export default function RoleForm() {
                         <InputNumberInput
                           placeholder={__(
                             'e.g. 10 (min number of items required per order)',
-                            'yay-wholesale',
+                            'yay-wholesale-b2b',
                           )}
                           className="h-9 w-full"
                           aria-invalid={invalid}
@@ -231,7 +231,7 @@ export default function RoleForm() {
                 render={({ field: { ref, ...field }, fieldState: { error, invalid } }) => (
                   <FormItem className="w-full gap-2.5">
                     <FormLabel className="text-foreground-400 text-xs font-medium">
-                      {__('Min Order Amount', 'yay-wholesale')}
+                      {__('Min Order Amount', 'yay-wholesale-b2b')}
                     </FormLabel>
                     <FormControl>
                       <InputNumberRoot
@@ -243,7 +243,7 @@ export default function RoleForm() {
                         <InputNumberInput
                           placeholder={__(
                             'e.g. 200.00 (min total value required per order)',
-                            'yay-wholesale',
+                            'yay-wholesale-b2b',
                           )}
                           className="h-9 w-full"
                           aria-invalid={invalid}
@@ -264,7 +264,7 @@ export default function RoleForm() {
                     <FormControl>
                       <div className="border-input flex items-center justify-between rounded-md border p-3">
                         <span className="text-foreground-400 text-sm font-medium">
-                          {__('Apply wholesale discounts to sale prices', 'yay-wholesale')}
+                          {__('Apply wholesale discounts to sale prices', 'yay-wholesale-b2b')}
                         </span>
                         <Switch size="md" checked={field.value} onCheckedChange={field.onChange} />
                       </div>
@@ -282,7 +282,7 @@ export default function RoleForm() {
                     variant="outline"
                     className="border-input text-foreground-400 hover:bg-muted border bg-white px-4.5"
                   >
-                    {__('Cancel', 'yay-wholesale')}
+                    {__('Cancel', 'yay-wholesale-b2b')}
                   </Button>
                 </SheetClose>
                 <Button
@@ -292,8 +292,8 @@ export default function RoleForm() {
                   disabled={isAddingRolePending || isUpdatingRolePending}
                 >
                   {isAddingRole
-                    ? __('Add Role', 'yay-wholesale')
-                    : __('Save changes', 'yay-wholesale')}
+                    ? __('Add Role', 'yay-wholesale-b2b')
+                    : __('Save changes', 'yay-wholesale-b2b')}
                 </Button>
               </div>
             </SheetFooter>

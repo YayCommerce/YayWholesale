@@ -31,13 +31,13 @@ jQuery(document).ready(() => {
                 jQuery("#ywhs_request_form button[type='submit']").removeAttr("disabled");
                 jQuery("#ywhs_request_form button[type='submit']").css('opacity', '1');
                 jQuery(this).siblings(".ywhs_request_form_error").show();
-                const defautMsg  = __("Unexpected Error Occured", "yay-wholesale");
+                const defautMsg  = __("Unexpected Error Occured", "yay-wholesale-b2b");
                 try {
                     data = JSON.parse(jqXHR.responseText);
-                    jQuery(this).siblings(".ywhs_form_error_msg").text(data.message ? data.message : defautMsg);
+                    jQuery(this).siblings(".ywhs_request_form_error").find(".ywhs_form_error_msg").text(data.message ? data.message : defautMsg);
                 }
                 catch {
-                    jQuery(this).siblings(".ywhs_form_error_msg").text(defautMsg);
+                    jQuery(this).siblings(".ywhs_request_form_error").find(".ywhs_form_error_msg").text(defautMsg);
                 }
             }
         })

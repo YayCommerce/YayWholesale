@@ -58,7 +58,7 @@ class SettingsRestController extends BaseRestController {
      */
     public function settings_permission_callback() {
         if ( ! current_user_can( 'manage_options' ) || ! current_user_can( 'manage_woocommerce' ) ) {
-            return new \WP_Error( 'rest_forbidden', esc_html__( 'Forbidden.', 'yay-wholesale' ), [ 'status' => 401 ] );
+            return new \WP_Error( 'rest_forbidden', esc_html__( 'Forbidden.', 'yay-wholesale-b2b' ), [ 'status' => 401 ] );
         }
 
         return true;
@@ -74,12 +74,12 @@ class SettingsRestController extends BaseRestController {
         $params = $this->get_json_params( $request );
 
         if ( empty( $params ) ) {
-            return $this->error( __( 'Invalid settings data', 'yay-wholesale' ) );
+            return $this->error( __( 'Invalid settings data', 'yay-wholesale-b2b' ) );
         }
 
         update_option( 'yay_wholesale_settings', $params );
 
-        return $this->success( [], __( 'Settings saved!', 'yay-wholesale' ) );
+        return $this->success( [], __( 'Settings saved!', 'yay-wholesale-b2b' ) );
     }
 
     /**
@@ -115,7 +115,7 @@ class SettingsRestController extends BaseRestController {
         $status   = isset( $params['status'] ) ? filter_var( $params['status'], FILTER_VALIDATE_BOOLEAN ) : false;
 
         if ( empty( $email_id ) || ! is_bool( $status ) ) {
-            return $this->error( __( 'Invalid parameters', 'yay-wholesale' ) );
+            return $this->error( __( 'Invalid parameters', 'yay-wholesale-b2b' ) );
         }
 
         // Compose the option key used by WooCommerce for single-email settings
@@ -129,7 +129,7 @@ class SettingsRestController extends BaseRestController {
             $settings = $this->get_email_settings_by_id( $email_id );
 
             if ( empty( $settings ) ) {
-                return $this->error( __( 'Email settings not found for this email ID', 'yay-wholesale' ) );
+                return $this->error( __( 'Email settings not found for this email ID', 'yay-wholesale-b2b' ) );
             }
         }
 
@@ -140,7 +140,7 @@ class SettingsRestController extends BaseRestController {
                 $settings = (array) $settings;
             } else {
                 // Can't safely operate on non-array settings
-                return $this->error( __( 'Stored email settings are in an unsupported format.', 'yay-wholesale' ) );
+                return $this->error( __( 'Stored email settings are in an unsupported format.', 'yay-wholesale-b2b' ) );
             }
         }
 
@@ -148,6 +148,6 @@ class SettingsRestController extends BaseRestController {
         $settings['enabled'] = $status ? 'yes' : 'no';
         update_option( $option_key, $settings, 'yes' );
 
-        return $this->success( [], __( 'Email status updated!', 'yay-wholesale' ) );
+        return $this->success( [], __( 'Email status updated!', 'yay-wholesale-b2b' ) );
     }
 }

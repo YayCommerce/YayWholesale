@@ -2,11 +2,11 @@
 namespace Yay_Wholesale\Engine\Frontend;
 
 use WC_Tax;
+use Yay_Wholesale\Engine\Compatibles\YayCurrency;
 use Yay_Wholesale\Utils\SingletonTrait;
 use Yay_Wholesale\Helpers\RolesHelper;
 use Yay_Wholesale\Helpers\SettingsHelper;
 use Yay_Wholesale\Helpers\PricingHelper;
-use Yay_Wholesale\Helpers\ReportsHelper;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -35,7 +35,7 @@ class Pricing {
 
         add_filter( 'woocommerce_get_price_html', [ $this, 'display_wholesale_price_html' ], 999, 2 );
 
-        add_action( 'woocommerce_before_calculate_totals', [ $this, 'before_caculate_totals' ], 999, 1 );
+        // add_action( 'woocommerce_before_calculate_totals', [ $this, 'before_caculate_totals' ], 999, 1 );
         add_action( 'woocommerce_checkout_order_processed', [ $this, 'checkout_wholesale_order_handling' ], 999, 3 );
     }
 
@@ -166,7 +166,9 @@ class Pricing {
      */
     protected function format_retail_and_wholesale_price_html( \WC_Product $product ): string {
         $regular    = (float) $product->get_regular_price( 'edit' );
+        $regular    = apply_filters( 'ywhs_price_handle_processed', $regular );
         $sale       = (float) $product->get_sale_price( 'edit' );
+        $sale       = apply_filters( 'ywhs_price_handle_processed', $sale );
         $discounted = PricingHelper::apply_wholesale_discount( $sale > 0 ? $sale : $regular, $product, true );
 
         $html  = '<span class="yay-retail-price">Retail: ';
@@ -287,7 +289,7 @@ class Pricing {
      * @return string The wholesale price HTML.
      */
     protected function get_wholesale_price_html( string $discounted_price_html ): string {
-        $label = $this->settings['display']['wholesale_price_label'] ?? __( 'Wholesale price', 'yay-wholesale' );
+        $label = $this->settings['display']['wholesale_price_label'] ?? __( 'Wholesale price', 'yay-wholesale-b2b' );
         $color = $this->settings['display']['wholesale_price_color'] ?? '#333333';
         return '<span class="yay-wholesale-label">' . esc_html( $label ) . ':</span> '
                 . '<span style="color:' . esc_attr( $color ) . '">' . $discounted_price_html . '</span>';
@@ -302,7 +304,7 @@ class Pricing {
         // Set the discounted price of each product
         foreach ( $cart->get_cart() as $cart_item ) {
             $product   = wc_get_product( $cart_item['product_id'] );
-            $new_price = PricingHelper::apply_wholesale_discount( $product->get_price(), $product );
+            $new_price = $product->get_price();
 
             if ( $new_price < $product->get_price() ) {
                 WC()->customer->set_is_vat_exempt( true );
@@ -325,10 +327,14 @@ class Pricing {
         $customer_id    = $order->get_customer_id();
         $wholesale_role = RolesHelper::is_wholesale_user( $customer_id );
 
+        if ( ! isset( $wholesale_role ) ) {
+            return;
+        }
+
         $is_discounted = PricingHelper::check_is_discounted( $order, $wholesale_role );
 
         PricingHelper::handle_order( $order, $wholesale_role, $is_discounted, false );
 
-        do_action( 'yhs_new_wholesale_order_placed', $order->get_id(), $order );
+        do_action( 'ywhs_new_wholesale_order_placed', $order->get_id(), $order );
     }
 }

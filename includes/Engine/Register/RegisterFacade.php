@@ -1,6 +1,10 @@
 <?php
 namespace Yay_Wholesale\Engine\Register;
 
+if ( ! defined( 'ABSPATH' ) ) {
+    exit;
+}
+
 use Yay_Wholesale\Utils\SingletonTrait;
 use Yay_Wholesale\Engine\Register\ScriptName;
 
@@ -62,11 +66,11 @@ class RegisterFacade {
             ScriptName::PAGE_SETTINGS,
         ];
 
-        if ( 'yay-wholesale' !== $domain || ! in_array( $handle, $all_handles, true ) ) {
+        if ( 'yay-wholesale-b2b' !== $domain || ! in_array( $handle, $all_handles, true ) ) {
             return $json_translations;
         }
 
-        $translations = get_translations_for_domain( 'yay-wholesale' );
+        $translations = get_translations_for_domain( 'yay-wholesale-b2b' );
         $messages     = [
             '' => [
                 'domain' => 'messages',

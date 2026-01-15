@@ -35,7 +35,7 @@ export default function DashboardPage() {
   return (
     <div className="mx-auto mt-[84px] flex max-w-7xl flex-col gap-6 px-6">
       <div className="flex flex-col items-start gap-5 sm:flex-row sm:items-center sm:justify-between sm:gap-0">
-        <h1 className="text-2xl font-bold">{__('Dashboard', 'yay-wholesale')}</h1>
+        <h1 className="text-2xl font-bold">{__('Dashboard', 'yay-wholesale-b2b')}</h1>
         <DashboardDatePicker dateRange={dateRange} setDateRange={setDateRange} />
       </div>
 

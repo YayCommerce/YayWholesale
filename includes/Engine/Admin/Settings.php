@@ -39,13 +39,13 @@ class Settings {
 
     public function register_ywhs_request_post_type() {
         $labels                  = [
-            'name'          => __( 'Wholesale Manage', 'yay-wholesale' ),
-            'singular_name' => __( 'Wholesale Manage', 'yay-wholesale' ),
+            'name'          => __( 'Wholesale Manage', 'yay-wholesale-b2b' ),
+            'singular_name' => __( 'Wholesale Manage', 'yay-wholesale-b2b' ),
         ];
         $yay_wholesale_post_type = RequestsHelper::REQUEST_POST_TYPE;
         $args                    = [
             'labels'            => $labels,
-            'description'       => __( 'Wholesale Manage', 'yay-wholesale' ),
+            'description'       => __( 'Wholesale Manage', 'yay-wholesale-b2b' ),
             'public'            => false,
             'show_ui'           => false,
             'has_archive'       => true,
@@ -75,7 +75,7 @@ class Settings {
     public function add_action_links( $links ) {
         $links = array_merge(
             [
-                '<a href="' . esc_url( admin_url( '/admin.php?page=yay_wholesale' ) ) . '">' . __( 'Settings', 'yay-wholesale' ) . '</a>',
+                '<a href="' . esc_url( admin_url( '/admin.php?page=yay_wholesale' ) ) . '">' . __( 'Settings', 'yay-wholesale-b2b' ) . '</a>',
             ],
             $links
         );
@@ -86,8 +86,8 @@ class Settings {
     public function add_document_support_links( $links, $file ) {
         if ( strpos( $file, YAY_WHOLESALE_BASE_NAME ) !== false ) {
             $new_links = [
-                'doc'     => '<a href="https://yaycommerce.gitbook.io/yaywholesale/" target="_blank">' . __( 'Docs', 'yay-wholesale' ) . '</a>',
-                'support' => '<a href="https://yaycommerce.com/support/" target="_blank" aria-label="' . esc_attr__( 'Visit community forums', 'yay-wholesale' ) . '">' . esc_html__( 'Support', 'yay-wholesale' ) . '</a>',
+                'doc'     => '<a href="https://yaycommerce.gitbook.io/yaywholesale/" target="_blank">' . __( 'Docs', 'yay-wholesale-b2b' ) . '</a>',
+                'support' => '<a href="https://yaycommerce.com/support/" target="_blank" aria-label="' . esc_attr__( 'Visit community forums', 'yay-wholesale-b2b' ) . '">' . esc_html__( 'Support', 'yay-wholesale-b2b' ) . '</a>',
             ];
             $links     = array_merge( $links, $new_links );
         }
@@ -95,13 +95,13 @@ class Settings {
     }
 
     public function admin_menu() {
-        $page_title = __( 'YayWholesale', 'yay-wholesale' );
-        $menu_title = __( 'YayWholesale', 'yay-wholesale' );
+        $page_title = __( 'YayWholesale', 'yay-wholesale-b2b' );
+        $menu_title = __( 'YayWholesale', 'yay-wholesale-b2b' );
         add_submenu_page( 'yaycommerce', $page_title, $menu_title, 'manage_woocommerce', 'yay_wholesale', [ $this, 'submenu_page_callback' ], 0 );
     }
 
     public function submenu_page_callback() {
-        echo '<div id="yay-wholesale"></div>';
+        echo '<div id="yay-wholesale-b2b"></div>';
     }
 
     public function admin_enqueue_scripts( $hook_suffix ) {

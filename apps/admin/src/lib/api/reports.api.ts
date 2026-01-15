@@ -22,7 +22,7 @@ export async function fetchReports(
   });
   const result = await handleResponse<DashboardReportsValue>(
     response,
-    __('Failed to fetch reports', 'yay-wholesale'),
+    __('Failed to fetch reports', 'yay-wholesale-b2b'),
   );
   return result.data ?? {};
 }

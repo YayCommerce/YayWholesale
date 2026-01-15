@@ -18,8 +18,8 @@ class NewOrderPlaced extends WholesaleEmailBase {
         $this->id             = 'yay_wholesale_new_order_placed';
         $this->customer_email = false;
         $this->email_group    = 'wholesale_order';
-        $this->title          = __( 'New wholesale order is placed', 'yay-wholesale' );
-        $this->description    = __( 'Notify when a new wholesale order is placed', 'yay-wholesale' );
+        $this->title          = __( 'New wholesale order is placed', 'yay-wholesale-b2b' );
+        $this->description    = __( 'Notify when a new wholesale order is placed', 'yay-wholesale-b2b' );
         $this->template_html  = 'new-order-placed.php';
         $this->template_plain = 'plain/new-order-placed.php';
 
@@ -30,7 +30,7 @@ class NewOrderPlaced extends WholesaleEmailBase {
         ];
 
         // Trigger the email when a new order is placed.
-        add_action( 'yhs_new_wholesale_order_placed', [ $this, 'trigger' ], 10, 2 );
+        add_action( 'ywhs_new_wholesale_order_placed', [ $this, 'trigger' ], 10, 2 );
 
         parent::__construct();
 
@@ -45,7 +45,7 @@ class NewOrderPlaced extends WholesaleEmailBase {
      * @return string
      */
     public function get_default_subject() {
-        return __( '[{site_title}]: New wholesale order #{order_number} is placed', 'yay-wholesale' );
+        return __( '[{site_title}]: New wholesale order #{order_number} is placed', 'yay-wholesale-b2b' );
     }
 
     /**
@@ -55,7 +55,7 @@ class NewOrderPlaced extends WholesaleEmailBase {
      * @return string
      */
     public function get_default_heading() {
-        return __( 'New wholesale order: #{order_number}', 'yay-wholesale' );
+        return __( 'New wholesale order: #{order_number}', 'yay-wholesale-b2b' );
     }
 
     /**
@@ -64,7 +64,7 @@ class NewOrderPlaced extends WholesaleEmailBase {
      * @return string
      */
     public function get_default_email_content() {
-        $content  = sprintf( '%s {customer_name}', __( 'You’ve received a new wholesale order from', 'yay-wholesale' ) );
+        $content  = sprintf( '%s {customer_name}', __( 'You’ve received a new wholesale order from', 'yay-wholesale-b2b' ) );
         $content .= "\n\n";
 
         $content .= "{order_details}\n\n";
@@ -81,7 +81,7 @@ class NewOrderPlaced extends WholesaleEmailBase {
      * @return string
      */
     public function get_default_additional_content() {
-        return __( 'Congratulations on the sale!', 'yay-wholesale' );
+        return __( 'Congratulations on the sale!', 'yay-wholesale-b2b' );
     }
 
     /**

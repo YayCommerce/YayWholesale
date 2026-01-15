@@ -89,7 +89,7 @@ class RequestsHelper {
         update_post_meta( $new_request_id, self::REQUEST_META_STATUS, self::PENDING );
 
         // Trigger the email when a new wholesale account is registered.
-        do_action( 'yhs_new_account_registered', $new_request_id );
+        do_action( 'ywhs_new_account_registered', $new_request_id );
 
         return $new_request_id;
     }
@@ -205,8 +205,8 @@ class RequestsHelper {
             'lastName'  => '',
         ];
 
-        $last_name_phrase  = __( 'Last Name', 'yay-wholesale' );
-        $first_name_phrase = __( 'First Name', 'yay-wholesale' );
+        $last_name_phrase  = __( 'Last Name', 'yay-wholesale-b2b' );
+        $first_name_phrase = __( 'First Name', 'yay-wholesale-b2b' );
         if ( $is_extra_fields ) {
             foreach ( $post_meta as $key => $field ) {
                 if ( ! $field['is_default'] ) {
@@ -407,7 +407,7 @@ class RequestsHelper {
             );
 
             if ( is_wp_error( $request_user ) ) {
-                throw new Exception( $request_user->get_error_message() );
+                throw new Exception( esc_html( $request_user->get_error_message() ) );
             }
 
             $result = wp_update_post(
@@ -418,7 +418,7 @@ class RequestsHelper {
             );
 
             if ( is_wp_error( $result ) ) {
-                throw new Exception( $result->get_error_message() );
+                throw new Exception( esc_html( $result->get_error_message() ) );
             }
         } else {
             $current_user = new WP_User( $request->post_author );

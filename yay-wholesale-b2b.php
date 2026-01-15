@@ -6,9 +6,11 @@
  * Version:           1.0.0
  * Author:            YayCommerce
  * Author URI:        https://yaycommerce.com
- * Text Domain:       yay-wholesale
+ * License:     GPLv2 or later
+ * License URI: https://www.gnu.org/licenses/gpl-2.0.html
+ * Text Domain:       yay-wholesale-b2b
  * Domain Path:       /languages
- * Requires at least: 4.7
+ * Requires at least: 3.0
  * Requires PHP: 5.4
  * WC requires at least: 3.0.0
  * WC tested up to: 10.2.2
@@ -35,9 +37,9 @@ if ( ! defined( 'YAY_WHOLESALE_FILE' ) ) {
     define( 'YAY_WHOLESALE_FILE', __FILE__ );
 }
 
-if ( ! defined( 'YAY_WHOLESALE_VERSION' ) ) {
+// if ( ! defined( 'YAY_WHOLESALE_VERSION' ) ) {
     define( 'YAY_WHOLESALE_VERSION', '1.0.0' );
-}
+// }
 
 if ( ! defined( 'YAY_WHOLESALE_PLUGIN_URL' ) ) {
     define( 'YAY_WHOLESALE_PLUGIN_URL', plugin_dir_url( YAY_WHOLESALE_FILE ) );

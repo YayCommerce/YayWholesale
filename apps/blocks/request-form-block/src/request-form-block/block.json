@@ -21,7 +21,7 @@
         	"default": "left"
 		}
 	},
-	"textdomain": "yay-wholesale",
+	"textdomain": "yay-wholesale-b2b",
 	"editorScript": "file:./index.js",
 	"render": "file:./render.php",
 	"style": "file:./style-index.css",

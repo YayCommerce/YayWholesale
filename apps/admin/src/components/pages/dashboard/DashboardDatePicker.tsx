@@ -91,11 +91,11 @@ const DashboardDatePicker: FC<DashboardDatePickerProps> = ({ dateRange, setDateR
           <div className="mt-4 flex justify-end gap-2 bg-white px-2">
             <PopoverClose asChild>
               <Button className="px-3" variant="outline">
-                {__('Close', 'yay-wholesale')}
+                {__('Close', 'yay-wholesale-b2b')}
               </Button>
             </PopoverClose>
             <Button className="px-3" onClick={saveChanges}>
-              {__('Update Report', 'yay-wholesale')}
+              {__('Update Report', 'yay-wholesale-b2b')}
             </Button>
           </div>
         </PopoverContent>

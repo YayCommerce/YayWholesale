@@ -44,7 +44,7 @@ export function useUpdateEmailStatusMutation() {
     },
 
     onSuccess: () => {
-      showToast.success(__('Email status updated!', 'yay-wholesale'));
+      showToast.success(__('Email status updated!', 'yay-wholesale-b2b'));
     },
   });
 }

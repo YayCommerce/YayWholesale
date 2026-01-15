@@ -84,14 +84,14 @@ export default function RequestsStatusColumn({
                       <DropdownMenuPortal>
                         <DropdownMenuSubContent>
                           <DropdownMenuItem onClick={() => handleStatusChange(statusKey)}>
-                            {icon} {__('Approved (Default)', 'yay-wholesale')}
+                            {icon} {__('Approved (Default)', 'yay-wholesale-b2b')}
                           </DropdownMenuItem>
                           <DropdownMenuSeparator />
                           {roles?.map((role) => (
                             <DropdownMenuItem
                               onClick={() => handleStatusChange(statusKey, role.id)}
                             >
-                              {icon} {sprintf(__('Approved to %s', 'yay-wholesale'), role.name)}
+                              {icon} {sprintf(__('Approved to %s', 'yay-wholesale-b2b'), role.name)}
                             </DropdownMenuItem>
                           ))}
                         </DropdownMenuSubContent>

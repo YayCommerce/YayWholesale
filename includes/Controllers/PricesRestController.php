@@ -41,7 +41,7 @@ class PricesRestController extends BaseRestController {
      */
     public function prices_permission_callback() {
         if ( ! is_user_logged_in() ) {
-            return new \WP_Error( 'rest_forbidden', esc_html__( 'Forbidden.', 'yay-wholesale' ), [ 'status' => 401 ] );
+            return new \WP_Error( 'rest_forbidden', esc_html__( 'Forbidden.', 'yay-wholesale-b2b' ), [ 'status' => 401 ] );
         }
 
         return true;
@@ -56,21 +56,18 @@ class PricesRestController extends BaseRestController {
     public function get_original_prices( WP_REST_Request $request ): WP_REST_Response {
         $params      = $this->get_json_params( $request );
         $product_ids = $params['productIds'];
+        $is_checkout = $params['isCheckoutPage'];
 
-        remove_filter( 'woocommerce_product_get_price', [ Pricing::get_instance(), 'get_price' ], 99, 2 );
-            remove_filter( 'woocommerce_product_variation_get_price', [ Pricing::get_instance(), 'get_price' ], 99, 2 );
-            remove_filter( 'woocommerce_variation_prices_price', [ Pricing::get_instance(), 'get_price' ], 99, 2 );
-
-            $price_map = [];
+        $price_map = [];
         foreach ( $product_ids as $id ) {
-            $product          = wc_get_product( $id );
-            $price_map[ $id ] = $product->get_price();
+            $product = wc_get_product( $id );
+            if ( $is_checkout ) {
+                $price_map[ $id ] = $product->get_price( 'edit' );
+            } else {
+                $price_map[ $id ] = apply_filters( 'ywhs_price_handle_processed', $product->get_price( 'edit' ) );
+            }
         }
 
-            add_filter( 'woocommerce_product_get_price', [ Pricing::get_instance(), 'get_price' ], 99, 2 );
-            add_filter( 'woocommerce_product_variation_get_price', [ Pricing::get_instance(), 'get_price' ], 99, 2 );
-            add_filter( 'woocommerce_variation_prices_price', [ Pricing::get_instance(), 'get_price' ], 99, 2 );
-
-        return $this->success( $price_map, __( 'Price map fetched successfully!', 'yay-wholesale' ) );
+        return $this->success( $price_map, __( 'Price map fetched successfully!', 'yay-wholesale-b2b' ) );
     }
 }

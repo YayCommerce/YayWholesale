@@ -15,27 +15,27 @@ msgstr ""
 "X-Domain: yay-wholesale\n"
 
 #. Plugin Name of the plugin
-#: yay-wholesale.php
+#: yay-wholesale-b2b.php
 msgid "YayWholesale Pro"
 msgstr ""
 
 #. Plugin URI of the plugin
-#: yay-wholesale.php
+#: yay-wholesale-b2b.php
 msgid "https://yaycommerce.com/"
 msgstr ""
 
 #. Description of the plugin
-#: yay-wholesale.php
+#: yay-wholesale-b2b.php
 msgid "WooCommerce wholesale plugin for serving wholesale & B2B customers."
 msgstr ""
 
 #. Author of the plugin
-#: yay-wholesale.php
+#: yay-wholesale-b2b.php
 msgid "YayCommerce"
 msgstr ""
 
 #. Author URI of the plugin
-#: yay-wholesale.php
+#: yay-wholesale-b2b.php
 msgid "https://yaycommerce.com"
 msgstr ""
 

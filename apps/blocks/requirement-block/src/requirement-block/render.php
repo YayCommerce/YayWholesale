@@ -10,14 +10,16 @@
  * @see https://github.com/WordPress/gutenberg/blob/trunk/docs/reference-guides/block-api/block-metadata.md#render
  */
 
+if ( ! defined( 'ABSPATH' ) ) exit;
+
 use Yay_Wholesale\Helpers\RolesHelper;
 
-$wholesale = RolesHelper::is_wholesale_user();
+$ywhs_wholesale = RolesHelper::is_wholesale_user();
 
  wp_interactivity_config(
     'ywhs_wholesale_requirement',
     [
-		'wholesale'     => $wholesale,
+		'wholesale'     => $ywhs_wholesale,
 		'currency_data' => [
 			'currency'     => get_woocommerce_currency(),
 			'symbol'       => html_entity_decode( \get_woocommerce_currency_symbol(), ENT_COMPAT ),
@@ -29,19 +31,21 @@ $wholesale = RolesHelper::is_wholesale_user();
 		'rest_url'   => esc_url_raw( rest_url() ),
 		'rest_nonce' => wp_create_nonce( 'wp_rest' ),
 		'rest_base'  => 'yay-wholesale/v1',
+		'is_checkout_page' => apply_filters("ywhs_ajax_refetch_prices_from_checkout", false),
     ]
     );
 
 ?>
-<?php if ($wholesale) : ?>
+<?php if ($ywhs_wholesale) : ?>
 <div 
-<?php echo get_block_wrapper_attributes( [ 'class' => 'ywhs_requirement_section' ] ); ?>
+<?php echo esc_attr(get_block_wrapper_attributes( [ 'class' => 'ywhs_requirement_section' ] )); ?>
 	data-wp-interactive="ywhs_wholesale_requirement"
-	data-wp-watch="callbacks.CheckMetRequired"
+	data-wp-init = "callbacks.getPriceMap"
+	data-wp-watch="callbacks.checkMetRequired"
 	>
 	<div class="ywhs_requirement_header">
 		<div class="ywhs_requirement_title">
-			<span><?php echo esc_attr_e( 'Wholesale Requirement', 'yay-wholesale' ); ?></span>
+			<span><?php echo esc_attr_e( 'Wholesale Requirement', 'yay-wholesale-b2b' ); ?></span>
 			<span class="ywhs_badge" data-wp-text="state.wholesaleName"></span>
 		</div>
 
@@ -67,7 +71,7 @@ $wholesale = RolesHelper::is_wholesale_user();
 	</div>
 	<div class="ywhs_requirement_content" style="display: none;">
 		<div class="ywhs_requirement_item">
-			<span><?php echo esc_attr_e( 'Min order quantity:', 'yay-wholesale' ); ?></span>
+			<span><?php echo esc_attr_e( 'Min order quantity:', 'yay-wholesale-b2b' ); ?></span>
 			<span class="ywhs_r_base_notice">
 				<span
 					data-wp-bind--class="state.qtyMet"
@@ -76,7 +80,7 @@ $wholesale = RolesHelper::is_wholesale_user();
 			</span>
 		</div>
 		<div class="ywhs_requirement_item">
-			<span><?php echo esc_attr_e( 'Min order amount:', 'yay-wholesale' ); ?></span>
+			<span><?php echo esc_attr_e( 'Min order amount:', 'yay-wholesale-b2b' ); ?></span>
 			<span class="ywhs_r_base_notice">
 				<span
 					data-wp-bind--class="state.amountMet"
@@ -84,7 +88,7 @@ $wholesale = RolesHelper::is_wholesale_user();
 				></span> /<span data-wp-text="state.minAmount"></span></span>
 		</div>
 		<div class="ywhs_requirement_item">
-			<span><?php esc_html_e( 'Get discount:', 'yay-wholesale' ); ?></span>
+			<span><?php esc_html_e( 'Get discount:', 'yay-wholesale-b2b' ); ?></span>
 			<div
 				data-wp-bind--class="state.isDiscounted"
 				data-wp-text="state.discountText"

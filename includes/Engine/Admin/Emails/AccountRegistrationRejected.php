@@ -22,16 +22,16 @@ class AccountRegistrationRejected extends WholesaleEmailBase {
 
         $this->id             = 'yay_wholesale_account_registration_rejected';
         $this->customer_email = true;
-        $this->title          = __( 'Wholesale account is rejected', 'yay-wholesale' );
+        $this->title          = __( 'Wholesale account is rejected', 'yay-wholesale-b2b' );
         $this->email_group    = 'wholesale_account';
-        $this->description    = __( 'Notify when a wholesale account is rejected', 'yay-wholesale' );
+        $this->description    = __( 'Notify when a wholesale account is rejected', 'yay-wholesale-b2b' );
         $this->template_html  = 'account-registration-rejected.php';
         $this->template_plain = 'plain/account-registration-rejected.php';
         $this->placeholders   = [
             '{account_name}' => '{account_name}',
         ];
         // Trigger the email when a new wholesale account is registered.
-        add_action( 'yhs_account_registration_rejected', [ $this, 'trigger' ], 10, 1 );
+        add_action( 'ywhs_account_registration_rejected', [ $this, 'trigger' ], 10, 1 );
 
         // Call parent constructor
         parent::__construct();
@@ -43,7 +43,7 @@ class AccountRegistrationRejected extends WholesaleEmailBase {
      * @return string
      */
     public function get_default_subject() {
-        return __( '[{site_title}]: Your wholesale account is rejected', 'yay-wholesale' );
+        return __( '[{site_title}]: Your wholesale account is rejected', 'yay-wholesale-b2b' );
     }
 
     /**
@@ -52,7 +52,7 @@ class AccountRegistrationRejected extends WholesaleEmailBase {
      * @return string
      */
     public function get_default_heading() {
-        return __( 'Your Wholesale Account Application has been Rejected', 'yay-wholesale' );
+        return __( 'Your Wholesale Account Application has been Rejected', 'yay-wholesale-b2b' );
     }
 
     /**
@@ -61,15 +61,15 @@ class AccountRegistrationRejected extends WholesaleEmailBase {
      * @return string
      */
     public function get_default_email_content() {
-        $content  = sprintf( '%s {account_name}', __( 'Hi', 'yay-wholesale' ) );
+        $content  = sprintf( '%s {account_name}', __( 'Hi', 'yay-wholesale-b2b' ) );
         $content .= "\n\n";
         // translators: %s: the blog name
-        $content .= sprintf( __( 'Thank you for your interest in partnering with %s.', 'yay-wholesale' ), $this->get_blogname() );
+        $content .= sprintf( __( 'Thank you for your interest in partnering with %s.', 'yay-wholesale-b2b' ), $this->get_blogname() );
         $content .= "\n\n";
 
-        $content .= __( 'After careful review, we regret to inform you that your wholesale account application has not been approved at this time.', 'yay-wholesale' );
+        $content .= __( 'After careful review, we regret to inform you that your wholesale account application has not been approved at this time.', 'yay-wholesale-b2b' );
         $content .= "\n\n";
-        $content .= __( 'If you believe this decision is in error or would like more information, please feel free to contact our support team.', 'yay-wholesale' );
+        $content .= __( 'If you believe this decision is in error or would like more information, please feel free to contact our support team.', 'yay-wholesale-b2b' );
         $content .= "\n\n";
 
         return $content;
@@ -81,7 +81,7 @@ class AccountRegistrationRejected extends WholesaleEmailBase {
      * @return string
      */
     public function get_default_additional_content() {
-        return __( 'We look forward to seeing you soon.', 'yay-wholesale' );
+        return __( 'We look forward to seeing you soon.', 'yay-wholesale-b2b' );
     }
 
     /**

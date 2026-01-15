@@ -5,8 +5,11 @@ const fieldSchema = z.object({
   id: z.string(),
   label: z
     .string()
-    .min(1, __('Fill in the field label', 'yay-wholesale'))
-    .regex(/^[a-zA-Z0-9 ]+$/, __('Label must contain only letters and numbers', 'yay-wholesale')),
+    .min(1, __('Fill in the field label', 'yay-wholesale-b2b'))
+    .regex(
+      /^[a-zA-Z0-9 ]+$/,
+      __('Label must contain only letters and numbers', 'yay-wholesale-b2b'),
+    ),
   type: z.string(),
   placeholder: z.string(),
   columnWidth: z.string(),
@@ -42,7 +45,7 @@ export const settingsFormSchema = z.object({
         if (existedLabels.has(field.label.toLowerCase())) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
-            message: __('Label must be unique', 'yay-wholesale'),
+            message: __('Label must be unique', 'yay-wholesale-b2b'),
             path: [index, 'label'], // direct to the duplicate label and show error
           });
         } else {

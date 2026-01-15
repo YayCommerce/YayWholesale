@@ -92,7 +92,7 @@ class RolesRestController extends BaseRestController {
      */
     public function roles_permission_callback() {
         if ( ! current_user_can( 'manage_options' ) || ! current_user_can( 'manage_woocommerce' ) ) {
-            return new \WP_Error( 'rest_forbidden', esc_html__( 'Forbidden.', 'yay-wholesale' ), [ 'status' => 401 ] );
+            return new \WP_Error( 'rest_forbidden', esc_html__( 'Forbidden.', 'yay-wholesale-b2b' ), [ 'status' => 401 ] );
         }
 
         return true;
@@ -158,7 +158,7 @@ class RolesRestController extends BaseRestController {
         $role = array_values( array_filter( $roles, fn( $r ) => (int) ( $r['id'] ?? 0 ) === $id ) )[0] ?? null;
 
         if ( ! $role ) {
-            return $this->error( __( 'Role not found', 'yay-wholesale' ), 404 );
+            return $this->error( __( 'Role not found', 'yay-wholesale-b2b' ) );
         }
 
         return $this->success( $role );
@@ -175,7 +175,7 @@ class RolesRestController extends BaseRestController {
         $role_name = sanitize_text_field( $params['name'] ?? '' );
 
         if ( ! $role_name ) {
-            return $this->error( __( 'Missing role name', 'yay-wholesale' ) );
+            return $this->error( __( 'Missing role name', 'yay-wholesale-b2b' ) );
         }
 
         $roles = get_option( 'yay_wholesale_roles', [] );
@@ -196,7 +196,7 @@ class RolesRestController extends BaseRestController {
         $roles[] = $new_role;
         update_option( 'yay_wholesale_roles', $roles );
 
-        return $this->success( $new_role, __( 'Role created successfully', 'yay-wholesale' ) );
+        return $this->success( $new_role, __( 'Role created successfully', 'yay-wholesale-b2b' ) );
     }
 
     /**
@@ -218,7 +218,7 @@ class RolesRestController extends BaseRestController {
         }
         update_option( 'yay_wholesale_roles', $roles );
 
-        return $this->success( $params, __( 'Role updated successfully', 'yay-wholesale' ) );
+        return $this->success( $params, __( 'Role updated successfully', 'yay-wholesale-b2b' ) );
     }
 
     /**
@@ -244,7 +244,7 @@ class RolesRestController extends BaseRestController {
 
         update_option( 'yay_wholesale_roles', array_values( $roles ) );
 
-        return $this->success( $roles, __( 'Role deleted successfully', 'yay-wholesale' ) );
+        return $this->success( $roles, __( 'Role deleted successfully', 'yay-wholesale-b2b' ) );
     }
 
     /**
@@ -270,7 +270,7 @@ class RolesRestController extends BaseRestController {
 
         update_option( 'yay_wholesale_roles', array_values( $roles ) );
 
-        return $this->success( $roles, __( 'Roles deleted successfully', 'yay-wholesale' ) );
+        return $this->success( $roles, __( 'Roles deleted successfully', 'yay-wholesale-b2b' ) );
     }
 
     /**
@@ -285,7 +285,7 @@ class RolesRestController extends BaseRestController {
         $status = $params['status'] ?? null;
 
         if ( empty( $ids ) || ! is_bool( $status ) ) {
-            return $this->error( __( 'Invalid parameters', 'yay-wholesale' ) );
+            return $this->error( __( 'Invalid parameters', 'yay-wholesale-b2b' ) );
         }
 
         $roles = get_option( 'yay_wholesale_roles', [] );
@@ -296,6 +296,6 @@ class RolesRestController extends BaseRestController {
         }
 
         update_option( 'yay_wholesale_roles', $roles );
-        return $this->success( $roles, __( 'Statuses updated successfully', 'yay-wholesale' ) );
+        return $this->success( $roles, __( 'Statuses updated successfully', 'yay-wholesale-b2b' ) );
     }
 }

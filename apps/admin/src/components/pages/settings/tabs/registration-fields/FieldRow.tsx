@@ -85,7 +85,7 @@ export function FieldRow({
             content={
               <div className="flex items-center gap-2">
                 <Info className="mt-6/7 h-3.5 w-3.5" />
-                {__('Field is hidden', 'yay-wholesale')}
+                {__('Field is hidden', 'yay-wholesale-b2b')}
               </div>
             }
           />
@@ -112,7 +112,7 @@ export function FieldRow({
             render={({ field, fieldState }) => (
               <FormItem className="flex w-full flex-col gap-2.5">
                 <FormLabel className="text-foreground-400 text-xs font-medium">
-                  {__('Label', 'yay-wholesale')}
+                  {__('Label', 'yay-wholesale-b2b')}
                   {isRequired && <div className="text-destructive">*</div>}
                 </FormLabel>
                 <FormControl>
@@ -142,7 +142,7 @@ export function FieldRow({
             render={({ field }) => (
               <FormItem className="flex w-full flex-col gap-2.5">
                 <FormLabel className="text-foreground-400 text-xs font-medium">
-                  {__('Type', 'yay-wholesale')}
+                  {__('Type', 'yay-wholesale-b2b')}
                 </FormLabel>
                 <FormControl>
                   <Select
@@ -177,7 +177,7 @@ export function FieldRow({
             render={({ field }) => (
               <FormItem className="flex w-full flex-col gap-2.5">
                 <FormLabel className="text-foreground-400 text-xs font-medium">
-                  {__('Placeholder', 'yay-wholesale')}
+                  {__('Placeholder', 'yay-wholesale-b2b')}
                 </FormLabel>
                 <FormControl>
                   <Input
@@ -201,7 +201,7 @@ export function FieldRow({
             render={({ field }) => (
               <FormItem className="flex w-full flex-col gap-2.5">
                 <FormLabel className="text-foreground-400 text-xs font-medium">
-                  {__('Column Width', 'yay-wholesale')}
+                  {__('Column Width', 'yay-wholesale-b2b')}
                 </FormLabel>
                 <FormControl>
                   <ToggleGroup
@@ -242,7 +242,7 @@ export function FieldRow({
                 name={`registration_fields.fields.${index}.isRequired`}
                 render={({ field }) => (
                   <div className="flex items-center justify-between p-2">
-                    <Label>{__('Set as required', 'yay-wholesale')}</Label>
+                    <Label>{__('Set as required', 'yay-wholesale-b2b')}</Label>
                     <Switch
                       className="translate-y-0.5 scale-70"
                       checked={field.value}
@@ -257,7 +257,7 @@ export function FieldRow({
             <DropdownMenuGroup>
               <DropdownMenuItem onClick={append} disabled={isHidden} className="mt-1">
                 <CirclePlus className="translate-y-0.5" />
-                {__('Add new field', 'yay-wholesale')}
+                {__('Add new field', 'yay-wholesale-b2b')}
               </DropdownMenuItem>
               <FormField
                 control={control}
@@ -272,12 +272,12 @@ export function FieldRow({
                     {isHidden ? (
                       <>
                         <Eye className="translate-y-0.5" />
-                        {__('Show field', 'yay-wholesale')}
+                        {__('Show field', 'yay-wholesale-b2b')}
                       </>
                     ) : (
                       <>
                         <EyeOff className="translate-y-0.5" />
-                        {__('Hide field', 'yay-wholesale')}
+                        {__('Hide field', 'yay-wholesale-b2b')}
                       </>
                     )}
                   </DropdownMenuItem>
@@ -297,7 +297,7 @@ export function FieldRow({
                 className="mt-1"
               >
                 <Trash2 />
-                {__('Delete', 'yay-wholesale')}
+                {__('Delete', 'yay-wholesale-b2b')}
               </DropdownMenuItem>
             </DropdownMenuGroup>
           </DropdownMenuContent>

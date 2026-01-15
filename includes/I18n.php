@@ -14,8 +14,8 @@ class I18n {
         } else {
             $locale = is_admin() ? get_user_locale() : get_locale();
         }
-        unload_textdomain( 'yay-wholesale' );
-        load_textdomain( 'yay-wholesale', YAY_WHOLESALE_PLUGIN_DIR . '/languages/yay-wholesale-' . $locale . '.mo' );
-        load_plugin_textdomain( 'yay-wholesale', false, YAY_WHOLESALE_PLUGIN_DIR . '/languages/' );
+        unload_textdomain( 'yay-wholesale-b2b' );
+        load_textdomain( 'yay-wholesale-b2b', YAY_WHOLESALE_PLUGIN_DIR . '/languages/yay-wholesale-b2b-' . $locale . '.mo' );
+        load_plugin_textdomain( 'yay-wholesale-b2b', false, YAY_WHOLESALE_PLUGIN_DIR . '/languages/' );
     }
 }
