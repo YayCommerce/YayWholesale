@@ -135,7 +135,12 @@ class Orders {
         bool $is_force_tax_exempt,
         array &$items
     ) {
-        $coupons = $order->get_items( 'coupon' );
+        $coupons         = $order->get_items( 'coupon' );
+        $extra_price_map = $order->get_meta( '_ywhs_extra_price_map' );
+
+        if ( ! is_array( $extra_price_map ) ) {
+            $extra_price_map = [];
+        }
 
         $discounted_coupon = 0;
         if ( $is_discounted && $is_disabled_coupon ) {
@@ -157,17 +162,21 @@ class Orders {
                 continue;
             }
 
+            $quantity        = $item->get_quantity();
             $product         = $item->get_product();
-            $new_price       = apply_filters( 'ywhs_price_handle_processed', $product->get_price( 'edit' ) );
             $is_removing_tax = false;
+            if ( is_admin() ) {
+                $extra = $extra_price_map[ $item->get_id() ] ?? 0;
 
-            if ( $is_discounted ) {
-                $new_price = PricingHelper::calc_discounted_price( $new_price, $wholesale_role, $product );
+                $new_price = $product->get_price( 'edit' ) + $extra;
+
+                if ( $is_discounted ) {
+                    $new_price = PricingHelper::calc_discounted_price( $new_price, $wholesale_role, $product, $extra );
+                }
+
+                $item->set_subtotal( $new_price * $quantity );
+                $item->set_total( $new_price * $quantity - $discounted_coupon );
             }
-
-            $quantity = $item->get_quantity();
-            $item->set_subtotal( $new_price * $quantity );
-            $item->set_total( $new_price * $quantity - $discounted_coupon );
 
             $items[] = $item->get_name() . ' x ' . $quantity;
 
@@ -182,7 +191,7 @@ class Orders {
                 $is_removing_tax = true;
             } else {
                 $tax_rates = WC_Tax::get_rates( $item->get_tax_class() );
-                $taxes     = WC_Tax::calc_tax( $new_price * $quantity, $tax_rates, false );
+                $taxes     = WC_Tax::calc_tax( $item->get_subtotal(), $tax_rates, false );
                 $item->set_taxes(
                     [
                         'total'    => $taxes,

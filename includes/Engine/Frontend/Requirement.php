@@ -23,6 +23,9 @@ class Requirement {
         add_action( 'wp_enqueue_scripts', [ $this, 'enqueue_wholesale_requirement' ], 999 );
         add_action( 'init', [ $this, 'create_block_requirement_block_init' ], 999 );
         add_filter( 'render_block_woocommerce/mini-cart-footer-block', [ $this, 'automatically_add_to_mini_cart' ], 999 );
+
+        add_action( 'wp_ajax_get_original_price_in_cart', [ $this, 'get_original_price_in_cart' ] );
+        add_action( 'wp_ajax_nopriv_get_original_price_in_cart', [ $this, 'get_original_price_in_cart' ] );
     }
 
     /**
@@ -175,26 +178,17 @@ class Requirement {
 
             $price_map = [];
             $cart      = WC()->cart->get_cart();
-            foreach ( $cart as $cart_item ) {
-                $product_id               = ! empty( $cart_item['variation_id'] ) ? $cart_item['variation_id'] : $cart_item['product_id'];
-                $product                  = wc_get_product( $product_id );
-                $price_map[ $product_id ] = apply_filters( 'ywhs_price_handle_processed', $product->get_price( 'edit' ) );
+            foreach ( $cart as $cart_item_key => $cart_item ) {
+                $product                     = $cart_item['data'];
+                $price_map[ $cart_item_key ] = apply_filters( 'ywhs_price_handle_processed', $product->get_price( 'edit' ) );
             }
 
             wp_localize_script(
                 $slug,
                 'ywhsRequirement',
                 [
-                    'wholesale'     => $wholesale,
-                    'priceMap'      => $price_map,
-                    'currency_data' => [
-                        'currency'     => get_woocommerce_currency(),
-                        'symbol'       => html_entity_decode( \get_woocommerce_currency_symbol(), ENT_COMPAT ),
-                        'position'     => get_option( 'woocommerce_currency_pos' ),
-                        'thousand_sep' => get_option( 'woocommerce_price_thousand_sep' ),
-                        'decimal_sep'  => get_option( 'woocommerce_price_decimal_sep' ),
-                        'num_decimals' => intval( get_option( 'woocommerce_price_num_decimals' ) ),
-                    ],
+                    'wholesale' => $wholesale,
+                    'priceMap'  => $price_map,
                 ]
             );
         }//end if
@@ -225,5 +219,36 @@ class Requirement {
         $custom_block_content = do_blocks( $custom_block );
 
         return $custom_block_content . $block_content;
+    }
+
+    /**
+     * Return an originale price (before discount) map of each line item in cart
+     */
+    public function get_original_price_in_cart() {
+        $raw  = file_get_contents( 'php://input' );
+        $data = json_decode( $raw, true );
+
+        if ( ! wp_verify_nonce( $data['nonce'], 'get_original_price_in_cart' ) ) {
+            wp_send_json_error( 'Invalid nonce' );
+        }
+
+        if ( is_null( WC()->cart ) ) {
+            wc_load_cart();
+        }
+        WC()->cart->calculate_totals();
+
+        $cart = WC()->cart->get_cart();
+
+        $price_map = [];
+        foreach ( $cart as $key => $cart_item ) {
+            $product = $cart_item['data'];
+            if ( $data['default_currency'] ) {
+                $price_map[ $key ] = $product->get_price( 'edit' );
+            } else {
+                $price_map[ $key ] = apply_filters( 'ywhs_price_handle_processed', $product->get_price( 'edit' ) );
+            }
+        }
+
+        wp_send_json_success( $price_map );
     }
 }

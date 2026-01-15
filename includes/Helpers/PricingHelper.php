@@ -97,9 +97,10 @@ class PricingHelper {
      * @param float       $price The price.
      * @param array       $role The wholesale role.
      * @param \WC_Product $product The product object.
+     * @param float       $extra The extra price in order.
      * @return float The discounted price.
      */
-    public static function calc_discounted_price( $price, array $role, \WC_Product $product ) {
+    public static function calc_discounted_price( $price, array $role, \WC_Product $product, $extra = 0 ) {
         $discount = isset( $role['discount'] ) ? ( (float) $role['discount'] / 100 ) : 0;
         if ( $discount <= 0 ) {
             return $price;
@@ -107,11 +108,10 @@ class PricingHelper {
 
         $apply_to_sale = $role['applyToSalePrice'] ?? false;
         $regular       = (float) $product->get_regular_price( 'edit' );
-        $sale          = (float) $product->get_sale_price( 'edit' );
-
-        $base = ( $apply_to_sale && $sale > 0 ) ? $sale : $regular;
-        $new  = max( 0, $base * ( 1 - $discount ) );
-        $new  = apply_filters( 'ywhs_price_handle_processed', $new );
+        $sale          = (float) $product->get_price( 'edit' );
+        $base          = ( $apply_to_sale && $sale < $regular ) ? $sale : $regular;
+        $new           = max( 0, ( $base + $extra ) * ( 1 - $discount ) );
+        $new           = apply_filters( 'ywhs_price_handle_processed', $new );
 
         return wc_format_decimal( $new, wc_get_price_decimals() );
     }
@@ -127,7 +127,7 @@ class PricingHelper {
 
         // Calculate the subtotal (in this action, subtotal is not calculated)
         foreach ( $cart as $cart_item ) {
-            $product   = wc_get_product( $cart_item['product_id'] );
+            $product   = $cart_item['data'];
             $price     = apply_filters( 'ywhs_price_handle_processed', $product->get_price( 'edit' ) );
             $subtotal += $price * $cart_item['quantity'];
         }
@@ -200,5 +200,30 @@ class PricingHelper {
 
             delete_transient( $transient_key );
         }
+
+        if ( ! is_admin() ) {
+            $extra_price_map = [];
+            foreach ( $order->get_items() as $item ) {
+                if ( ! $item instanceof \WC_Order_Item_Product ) {
+                    continue;
+                }
+
+                $quantity = $item->get_quantity();
+                $product  = $item->get_product();
+
+                // Calculate the Extra price of current order items that is added or substracted
+                // Unit Price * quantity = subtotal
+                $unit_price    = $item->get_subtotal() / $quantity;
+                $initial_price = $unit_price;
+                if ( $is_discounted ) {
+                    // (initial price) * (1 - discount) = Unit Price
+                    $initial_price = $unit_price / ( 1 - ( $wholesale_role['discount'] / 100 ) );
+                }
+                $initial_price                      = round( $initial_price, wc_get_price_decimals() );
+                $extra_price_map[ $item->get_id() ] = $initial_price - $product->get_price( 'edit' );
+            }//end foreach
+
+            $order->update_meta_data( '_ywhs_extra_price_map', $extra_price_map );
+        }//end if
     }
 }

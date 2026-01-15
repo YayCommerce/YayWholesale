@@ -35,7 +35,6 @@ class Pricing {
 
         add_filter( 'woocommerce_get_price_html', [ $this, 'display_wholesale_price_html' ], 999, 2 );
 
-        // add_action( 'woocommerce_before_calculate_totals', [ $this, 'before_caculate_totals' ], 999, 1 );
         add_action( 'woocommerce_checkout_order_processed', [ $this, 'checkout_wholesale_order_handling' ], 999, 3 );
     }
 
@@ -293,27 +292,6 @@ class Pricing {
         $color = $this->settings['display']['wholesale_price_color'] ?? '#333333';
         return '<span class="yay-wholesale-label">' . esc_html( $label ) . ':</span> '
                 . '<span style="color:' . esc_attr( $color ) . '">' . $discounted_price_html . '</span>';
-    }
-
-    /**
-     * Set the discounted price for product before calculating totals
-     *
-     * @param \WC_Cart $cart The cart object.
-     */
-    public function before_caculate_totals( \WC_Cart $cart ) {
-        // Set the discounted price of each product
-        foreach ( $cart->get_cart() as $cart_item ) {
-            $product   = wc_get_product( $cart_item['product_id'] );
-            $new_price = $product->get_price();
-
-            if ( $new_price < $product->get_price() ) {
-                WC()->customer->set_is_vat_exempt( true );
-            } else {
-                WC()->customer->set_is_vat_exempt( false );
-            }
-
-            $cart_item['data']->set_price( $new_price );
-        }
     }
 
     /**
