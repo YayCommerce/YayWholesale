@@ -93,7 +93,7 @@ export default function RoleForm() {
         >
           <SheetContent
             side="right"
-            className="top-[32px] h-[calc(100%-32px)] w-full gap-0 overflow-x-auto pt-0 md:min-w-[490px]"
+            className="top-[32px] h-[calc(100%-32px)] w-full gap-0 overflow-x-auto pt-0 md:m-2.5 md:h-[calc(100%-52px)] md:min-w-[490px] md:rounded-md"
           >
             {(isLoadingRole || isErrorRole) && (
               <div className="absolute inset-0 z-50 flex items-center justify-center bg-white/70">
