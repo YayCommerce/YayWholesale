@@ -32,7 +32,10 @@ $ywhs_wholesale = RolesHelper::is_wholesale_user();
 ?>
 <?php if ($ywhs_wholesale) : ?>
 <div 
-<?php echo get_block_wrapper_attributes( [ 'class' => 'ywhs_requirement_section' ] ); ?>
+<?php
+// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped 
+echo get_block_wrapper_attributes( [ 'class' => 'ywhs_requirement_section' ] ); 
+?>
 	data-wp-interactive="ywhs_wholesale_requirement"
 	data-wp-init = "callbacks.getPriceMap"
 	data-wp-watch="callbacks.checkMetRequired"
