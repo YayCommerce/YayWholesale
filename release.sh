@@ -2,6 +2,8 @@ PLUGIN_SLUG="yay-wholesale-b2b"
 PROJECT_PATH=$(pwd)
 IS_PRO="false"
 BUILD_PATH="${PROJECT_PATH}/build"
+# Detect OS
+os=$(uname -s)
 
 for param in "$@"
 do
@@ -11,8 +13,6 @@ do
             ;;
         OUTPUT_PATH=*)
             BUILD_PATH="${param#*=}"
-            # Detect OS
-            os=$(uname -s)
 
             # Convert '\' to '/'
             BUILD_PATH="${BUILD_PATH//\\//}"
@@ -64,7 +64,15 @@ echo "Installing Admin App dependencies..."
 cd "$PROJECT_PATH/apps/admin"
 pnpm install
 echo "Running JS Build..."
-pnpm build
+if [ "$IS_PRO" = "true" ]; then
+    if [ "${os#CYGWIN}" != "$os" ] || [ "${os#MINGW}" != "$os" ] || [ "${os#MSYS}" != "$os" ]; then
+        pnpm build:window:pro
+    else
+        pnpm build:macos:pro
+    fi
+else
+    pnpm build
+fi
 cd "$PROJECT_PATH"
 
 #

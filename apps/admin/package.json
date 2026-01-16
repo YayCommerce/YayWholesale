@@ -11,6 +11,8 @@
   "scripts": {
     "preinstall": "npx only-allow pnpm",
     "build": "tsc --noEmit && vite build --outDir ../../../assets/dist/admin",
+    "build:window:pro": "set VITE_IS_PRO=true&& tsc --noEmit && vite build --outDir ../../../assets/dist/admin",
+    "build:macos:pro": "VITE_IS_PRO=true tsc --noEmit && vite build --outDir ../../../assets/dist/admin",
     "dev": "vite"
   },
   "dependencies": {

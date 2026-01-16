@@ -8,7 +8,8 @@ import { useUpdateEffect } from 'react-use';
 
 import { useAddRoleMutation, useRoleQuery, useUpdateRoleMutation } from '@/lib/queries/roles';
 import { createRoleSchema, RoleFormValues, roleSchema } from '@/lib/schema/roles';
-import { cn } from '@/lib/utils';
+import { cn, isPro } from '@/lib/utils';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
@@ -29,7 +30,7 @@ export const DEFAULT_ROLE = {
   name: '',
   description: '',
   discount: undefined,
-  minOrderQuantity: undefined,
+  minOrderQuantity: isPro ? undefined : 0,
   minOrderAmount: undefined,
   applyToSalePrice: false,
   status: true,
@@ -198,31 +199,50 @@ export default function RoleForm() {
               <FormField
                 control={form.control}
                 name={`minOrderQuantity`}
-                render={({ field: { ref, ...field }, fieldState: { error, invalid } }) => (
-                  <FormItem className="w-full gap-2.5">
-                    <FormLabel className="text-foreground-400 text-xs font-medium">
-                      {__('Min Order Quantity', 'yay-wholesale-b2b')}
-                    </FormLabel>
-                    <FormControl>
-                      <InputNumberRoot
-                        value={field.value}
-                        onValueChange={(value) => field.onChange(value)}
-                        min={0}
-                      >
-                        <InputNumberInput
-                          placeholder={__(
-                            'e.g. 10 (min number of items required per order)',
-                            'yay-wholesale-b2b',
-                          )}
+                render={({ field: { ref, ...field }, fieldState: { error, invalid } }) =>
+                  isPro ? (
+                    <FormItem className="w-full gap-2.5">
+                      <FormLabel className="text-foreground-400 text-xs font-medium">
+                        {__('Min Order Quantity', 'yay-wholesale-b2b')}
+                      </FormLabel>
+                      <FormControl>
+                        <InputNumberRoot
+                          value={field.value}
+                          onValueChange={(value) => field.onChange(value)}
+                          min={0}
+                        >
+                          <InputNumberInput
+                            placeholder={__(
+                              'e.g. 10 (min number of items required per order)',
+                              'yay-wholesale-b2b',
+                            )}
+                            className="h-9 w-full"
+                            aria-invalid={invalid}
+                          />
+                          <InputNumberCarets />
+                        </InputNumberRoot>
+                      </FormControl>
+                      {error && <FormMessage />}
+                    </FormItem>
+                  ) : (
+                    <FormItem className="w-full gap-2.5">
+                      <FormLabel className="text-foreground-400 text-xs font-medium">
+                        {__('Min Order Quantity', 'yay-wholesale-b2b')}
+                        <Badge variant="warning" className="text-white">
+                          {__('Pro', 'yay-wholesale-b2b')}
+                        </Badge>
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          value={__('Upgrade to PRO to unlock this feature.', 'yay-wholesale-b2b')}
+                          min={0}
+                          disabled
                           className="h-9 w-full"
-                          aria-invalid={invalid}
                         />
-                        <InputNumberCarets />
-                      </InputNumberRoot>
-                    </FormControl>
-                    {error && <FormMessage />}
-                  </FormItem>
-                )}
+                      </FormControl>
+                    </FormItem>
+                  )
+                }
               />
 
               <FormField

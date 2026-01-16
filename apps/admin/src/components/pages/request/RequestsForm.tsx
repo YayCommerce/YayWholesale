@@ -161,27 +161,28 @@ export default function RequestsForm() {
           <div className="grid cursor-default grid-cols-2 gap-5">
             <div className="flex flex-col gap-2">
               <Label htmlFor="firstName">{__('First Name', 'yay-wholesale-b2b')}</Label>
-              <Input id="firstName" readOnly defaultValue={dataDisplay?.firstName} />
+              <Input id="firstName" readOnly value={dataDisplay?.firstName} onChange={() => {}} />
             </div>
             <div className="flex cursor-default flex-col gap-2">
               <Label htmlFor="lastName">{__('Last Name', 'yay-wholesale-b2b')}</Label>
-              <Input id="lastName" readOnly defaultValue={dataDisplay?.lastName} />
+              <Input id="lastName" readOnly value={dataDisplay?.lastName} onChange={() => {}} />
             </div>
           </div>
           <div className="flex cursor-default flex-col gap-2">
             <Label htmlFor="email">{__('Email address', 'yay-wholesale-b2b')}</Label>
-            <Input id="email" readOnly defaultValue={dataDisplay?.email} />
+            <Input id="email" readOnly value={dataDisplay?.email} onChange={() => {}} />
           </div>
           <div className="flex cursor-default flex-col gap-2">
             <Label htmlFor="registrationDate">{__('Registration date', 'yay-wholesale-b2b')}</Label>
             <Input
               id="registrationDate"
               readOnly
-              defaultValue={
+              value={
                 dataDisplay?.date
                   ? parseWPDate(dataDisplay.date) + ' ' + parseWPTime(dataDisplay.date)
                   : ''
               }
+              onChange={() => {}}
             />
           </div>
 
@@ -189,7 +190,7 @@ export default function RequestsForm() {
             return (
               <div className="flex flex-col gap-2">
                 <Label>{field.label}</Label>
-                <Input readOnly defaultValue={field.value} />
+                <Input readOnly value={field.value} onChange={() => {}} />
               </div>
             );
           })}
@@ -199,7 +200,8 @@ export default function RequestsForm() {
             <Textarea
               className="h-fit min-h-25 resize-none"
               readOnly
-              defaultValue={dataDisplay?.message}
+              value={dataDisplay?.message}
+              onChange={() => {}}
             />
           </div>
 
@@ -229,10 +231,11 @@ export default function RequestsForm() {
                     <Textarea
                       className="h-fit min-h-25 resize-none"
                       readOnly
-                      defaultValue={handleDataByType()}
+                      value={handleDataByType()}
+                      onChange={() => {}}
                     />
                   ) : (
-                    <Input readOnly defaultValue={handleDataByType()} />
+                    <Input readOnly value={handleDataByType()} onChange={() => {}} />
                   )}
                 </div>
               )
