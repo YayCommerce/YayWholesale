@@ -115,7 +115,7 @@ class WholeSalersController extends BaseRestController {
 
         $response = WholeSalersHelper::get_wholesalers_list( $search, $page, $per_page, $role );
 
-        return $this->success( $response, __( 'Whole salers list fetched successfully', 'yay-wholesale-b2b' ) );
+        return $this->success( $response, __( 'Wholesalers list fetched successfully', 'yay-wholesale-b2b' ) );
     }
 
     /**

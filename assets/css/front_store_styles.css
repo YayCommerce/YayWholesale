@@ -14,11 +14,11 @@
 }
 
 .ywhs_half {
-    flex: 0 0 calc(50% - 10px);
+    flex: 0 0 calc(50% - 15px);
 }
 
 .ywhs_full {
-    flex: 0 0 calc(100% - 10px);
+    flex: 0 0 calc(100% - 15px);
 }
 
 #ywhs_form_fields_container textarea {

@@ -80,7 +80,9 @@ class Orders {
         $order->update_taxes();
 
         // Update meta data for filter
-        PricingHelper::handle_order( $order, $wholesale_role, $is_discounted );
+        if ( isset( $_SERVER['REQUEST_METHOD'] ) && 'POST' === $_SERVER['REQUEST_METHOD'] ) {
+            PricingHelper::handle_order( $order, $wholesale_role, $is_discounted );
+        }
 
         add_filter( 'woocommerce_order_is_vat_exempt', [ $this, 'tax_enabled_handler' ], 999, 2 );
         add_filter( 'woocommerce_calc_tax', [ Tax::get_instance(), 'maybe_disable_tax_calc' ], 9999 );

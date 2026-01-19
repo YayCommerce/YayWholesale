@@ -7,6 +7,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 use Yay_Wholesale\Engine\Compatibles\YayCurrency;
 use Yay_Wholesale\Engine\Compatibles\YayExtra;
+use Yay_Wholesale\Engine\Compatibles\YayMail;
 use Yay_Wholesale\Utils\SingletonTrait;
 
 /**
@@ -18,6 +19,7 @@ class Compatibles {
     protected function __construct() {
         YayCurrency::get_instance();
         YayExtra::get_instance();
+        YayMail::get_instance();
     }
 
     public function remove_price_related_hooks() {

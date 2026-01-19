@@ -14,6 +14,7 @@ import { Button } from '@/components/ui/button';
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { InputNumberCarets, InputNumberInput, InputNumberRoot } from '@/components/ui/input-number';
+import { Label } from '@/components/ui/label';
 import {
   Sheet,
   SheetClose,
@@ -226,12 +227,12 @@ export default function RoleForm() {
                     </FormItem>
                   ) : (
                     <FormItem className="w-full gap-2.5">
-                      <FormLabel className="text-foreground-400 text-xs font-medium">
+                      <Label className="text-foreground-400 text-xs font-medium">
                         {__('Min Order Quantity', 'yay-wholesale-b2b')}
                         <Badge variant="warning" className="text-white">
                           {__('Pro', 'yay-wholesale-b2b')}
                         </Badge>
-                      </FormLabel>
+                      </Label>
                       <FormControl>
                         <Input
                           value={__('Upgrade to PRO to unlock this feature.', 'yay-wholesale-b2b')}
