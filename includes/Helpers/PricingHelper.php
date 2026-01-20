@@ -1,10 +1,10 @@
 <?php
 
-namespace Yay_Wholesale\Helpers;
+namespace Yay_Wholesale_B2B\Helpers;
 
-use Yay_Wholesale\Engine\Frontend\Pricing;
-use Yay_Wholesale\Helpers\RolesHelper;
-use Yay_Wholesale\Helpers\SettingsHelper;
+use Yay_Wholesale_B2B\Engine\Frontend\Pricing;
+use Yay_Wholesale_B2B\Helpers\RolesHelper;
+use Yay_Wholesale_B2B\Helpers\SettingsHelper;
 
 /**
  * Common Helper
@@ -21,7 +21,7 @@ class PricingHelper {
         $role = RolesHelper::is_wholesale_user();
 
         if ( ! $role && $allow_default && ! empty( SettingsHelper::get_settings()['general']['default_role'] ) ) {
-            $roles = get_option( 'yay_wholesale_roles', [] );
+            $roles = get_option( 'yay_wholesale_b2b_roles', [] );
             $role  = RolesHelper::get_role_by_slug( $roles, SettingsHelper::get_settings()['general']['default_role'] );
             if ( ! $role || empty( $role['status'] ) ) {
                 return null;
@@ -167,18 +167,14 @@ class PricingHelper {
      * @param array     $wholesale_role the wholesale role.
      * @param bool      $is_discounted the discounted flag.
      */
-    public static function handle_order( $order, $wholesale_role, $is_discounted, $is_checkout_from_block = true ) {
+    public static function handle_order( $order, $wholesale_role, $is_discounted ) {
         if ( $is_discounted ) {
             $order->update_meta_data( '_ywhs_wholesale_role', $wholesale_role['name'] );
 
             // Send email when new wholesale order has just been placed
             $email_trigger = (int) $order->get_meta( '_ywhs_wholesale_email_trigger' );
 
-            if ( ! $is_checkout_from_block ) {
-                ++$email_trigger;
-            }
-            // This hook runs twice, check the trigger <= 2
-            if ( ( ! isset( $email_trigger ) || $email_trigger <= 2 ) ) {
+            if ( ( ! isset( $email_trigger ) || $email_trigger < 1 ) ) {
                 do_action( 'ywhs_new_wholesale_order_placed', $order->get_id(), $order );
                 $order->update_meta_data( '_ywhs_wholesale_email_trigger', ++$email_trigger );
             }
@@ -186,20 +182,7 @@ class PricingHelper {
             $order->delete_meta_data( '_ywhs_wholesale_role' );
         }
 
-        $default_range_transient = get_transient( ReportsHelper::REPORT_DATE_RANGE_TRANSIENT );
-        if ( false !== $default_range_transient ) {
-            $transient_key = ReportsHelper::REPORT_TRANSIENT
-                            . '_'
-                            . $default_range_transient['default_compare_start_date']
-                            . '_'
-                            . $default_range_transient['default_compare_end_date']
-                            . '_'
-                            . $default_range_transient['default_start_date']
-                            . '_'
-                            . $default_range_transient['default_end_date'];
-
-            delete_transient( $transient_key );
-        }
+        ReportsHelper::delete_ywhs_report_transient();
 
         if ( ! is_admin() ) {
             $extra_price_map = [];

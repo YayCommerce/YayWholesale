@@ -5,7 +5,7 @@
  * @package YayWholesale
  */
 
-namespace Yay_Wholesale\YayCommerceMenu;
+namespace Yay_Wholesale_B2B\YayCommerceMenu;
 
 defined( 'ABSPATH' ) || exit;
 

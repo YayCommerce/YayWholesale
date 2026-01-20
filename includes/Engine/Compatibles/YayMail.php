@@ -1,13 +1,13 @@
 <?php
-namespace Yay_Wholesale\Engine\Compatibles;
+namespace Yay_Wholesale_B2B\Engine\Compatibles;
 
-use Yay_Wholesale\Engine\Compatibles\YayMail\AccountRegistrationApproved;
-use Yay_Wholesale\Engine\Compatibles\YayMail\AccountRegistrationPending;
-use Yay_Wholesale\Engine\Compatibles\YayMail\AccountRegistrationRejected;
-use Yay_Wholesale\Engine\Compatibles\YayMail\NewAccountRegistered;
-use Yay_Wholesale\Engine\Compatibles\YayMail\NewOrderPlaced;
-use Yay_Wholesale\Engine\Compatibles\YayMail\RequestShortcode;
-use Yay_Wholesale\Utils\SingletonTrait;
+use Yay_Wholesale_B2B\Engine\Compatibles\YayMail\AccountRegistrationApproved;
+use Yay_Wholesale_B2B\Engine\Compatibles\YayMail\AccountRegistrationPending;
+use Yay_Wholesale_B2B\Engine\Compatibles\YayMail\AccountRegistrationRejected;
+use Yay_Wholesale_B2B\Engine\Compatibles\YayMail\NewAccountRegistered;
+use Yay_Wholesale_B2B\Engine\Compatibles\YayMail\NewOrderPlaced;
+use Yay_Wholesale_B2B\Engine\Compatibles\YayMail\RequestShortcode;
+use Yay_Wholesale_B2B\Utils\SingletonTrait;
 
 defined( 'ABSPATH' ) || exit;
 

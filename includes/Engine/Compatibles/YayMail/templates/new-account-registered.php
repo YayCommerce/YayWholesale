@@ -1,6 +1,6 @@
 <?php
 
-use Yay_Wholesale\Engine\Compatibles\YayMail\NewAccountRegistered;
+use Yay_Wholesale_B2B\Engine\Compatibles\YayMail\NewAccountRegistered;
 
 defined( 'ABSPATH' ) || exit;
 

@@ -1,8 +1,8 @@
 
 <?php
 
-use Yay_Wholesale\Helpers\RequestsHelper;
-use Yay_Wholesale\Helpers\SettingsHelper;
+use Yay_Wholesale_B2B\Helpers\RequestsHelper;
+use Yay_Wholesale_B2B\Helpers\SettingsHelper;
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 

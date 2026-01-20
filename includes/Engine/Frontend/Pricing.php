@@ -1,12 +1,12 @@
 <?php
-namespace Yay_Wholesale\Engine\Frontend;
+namespace Yay_Wholesale_B2B\Engine\Frontend;
 
 use WC_Tax;
-use Yay_Wholesale\Engine\Compatibles\YayCurrency;
-use Yay_Wholesale\Utils\SingletonTrait;
-use Yay_Wholesale\Helpers\RolesHelper;
-use Yay_Wholesale\Helpers\SettingsHelper;
-use Yay_Wholesale\Helpers\PricingHelper;
+use Yay_Wholesale_B2B\Engine\Compatibles\YayCurrency;
+use Yay_Wholesale_B2B\Utils\SingletonTrait;
+use Yay_Wholesale_B2B\Helpers\RolesHelper;
+use Yay_Wholesale_B2B\Helpers\SettingsHelper;
+use Yay_Wholesale_B2B\Helpers\PricingHelper;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -22,20 +22,20 @@ class Pricing {
         $this->settings = SettingsHelper::get_settings();
 
         // --- WooCommerce hooks ---
-        add_filter( 'woocommerce_product_get_price', [ $this, 'get_price' ], 99, 2 );
-        add_filter( 'woocommerce_product_variation_get_price', [ $this, 'get_price' ], 99, 2 );
-        add_filter( 'woocommerce_variation_prices_price', [ $this, 'get_price' ], 99, 2 );
+        add_filter( 'woocommerce_product_get_price', [ $this, 'ywhs_get_price' ], 99, 2 );
+        add_filter( 'woocommerce_product_variation_get_price', [ $this, 'ywhs_get_price' ], 99, 2 );
+        add_filter( 'woocommerce_variation_prices_price', [ $this, 'ywhs_get_price' ], 99, 2 );
 
-        add_filter( 'woocommerce_product_get_sale_price', [ $this, 'get_sale_price' ], 99, 2 );
-        add_filter( 'woocommerce_product_variation_get_sale_price', [ $this, 'get_sale_price' ], 99, 2 );
-        add_filter( 'woocommerce_variation_prices_sale_price', [ $this, 'get_sale_price' ], 99, 2 );
+        add_filter( 'woocommerce_product_get_sale_price', [ $this, 'ywhs_get_sale_price' ], 99, 2 );
+        add_filter( 'woocommerce_product_variation_get_sale_price', [ $this, 'ywhs_get_sale_price' ], 99, 2 );
+        add_filter( 'woocommerce_variation_prices_sale_price', [ $this, 'ywhs_get_sale_price' ], 99, 2 );
 
-        add_filter( 'woocommerce_variation_prices_array', [ $this, 'variation_prices' ], 99, 2 );
-        add_filter( 'woocommerce_get_variation_prices_hash', [ $this, 'variation_prices_hash' ], 99, 1 );
+        add_filter( 'woocommerce_variation_prices_array', [ $this, 'ywhs_variation_prices' ], 99, 2 );
+        add_filter( 'woocommerce_get_variation_prices_hash', [ $this, 'ywhs_variation_prices_hash' ], 99, 1 );
 
-        add_filter( 'woocommerce_get_price_html', [ $this, 'display_wholesale_price_html' ], 999, 2 );
+        add_filter( 'woocommerce_get_price_html', [ $this, 'ywhs_display_wholesale_price_html' ], 999, 2 );
 
-        add_action( 'woocommerce_checkout_order_processed', [ $this, 'checkout_wholesale_order_handling' ], 999, 3 );
+        add_action( 'woocommerce_checkout_order_processed', [ $this, 'ywhs_checkout_wholesale_order_handling' ], 999, 3 );
     }
 
     /**
@@ -45,7 +45,7 @@ class Pricing {
      * @param \WC_Product $product The product object.
      * @return float The price.
      */
-    public function get_price( $price, \WC_Product $product ) {
+    public function ywhs_get_price( $price, \WC_Product $product ) {
         return PricingHelper::apply_wholesale_discount( $price, $product, false );
     }
 
@@ -56,7 +56,7 @@ class Pricing {
      * @param \WC_Product $product The product object.
      * @return float The sale price.
      */
-    public function get_sale_price( $price, \WC_Product $product ) {
+    public function ywhs_get_sale_price( $price, \WC_Product $product ) {
         return PricingHelper::apply_wholesale_discount( $price, $product, false );
     }
 
@@ -67,7 +67,7 @@ class Pricing {
      * @param \WC_Product $product The product object.
      * @return array The variation prices.
      */
-    public function variation_prices( array $prices, \WC_Product $product ): array {
+    public function ywhs_variation_prices( array $prices, \WC_Product $product ): array {
         foreach ( $prices as $vid => $price ) {
             $variation = wc_get_product( $vid );
             if ( $variation ) {
@@ -83,7 +83,7 @@ class Pricing {
      * @param array $hash The hash array.
      * @return array The variation prices hash.
      */
-    public function variation_prices_hash( array $hash ): array {
+    public function ywhs_variation_prices_hash( array $hash ): array {
         $role = PricingHelper::get_effective_role();
         if ( $role ) {
             $hash[] = $role['slug'];
@@ -99,7 +99,7 @@ class Pricing {
      * @param \WC_Product $product The product object.
      * @return string The displayed HTML.
      */
-    public function display_wholesale_price_html( string $price_html, \WC_Product $product ): string {
+    public function ywhs_display_wholesale_price_html( string $price_html, \WC_Product $product ): string {
 
         $show_to_all  = $this->settings['general']['show_wholesale_price'] ?? false;
         $display_mode = $this->settings['display']['price_format'] ?? 'retail-and-wholesale';
@@ -215,19 +215,19 @@ class Pricing {
         $display_mode = $this->settings['display']['price_format'] ?? 'retail-and-wholesale';
 
         // Remove the filter to avoid recursion
-        remove_filter( 'woocommerce_get_price_html', [ $this, 'display_wholesale_price_html' ], 999 );
+        remove_filter( 'woocommerce_get_price_html', [ $this, 'ywhs_display_wholesale_price_html' ], 999 );
 
         // If format = retail-only => display retail price as WooCommerce standard
         if ( 'retail-only' === $display_mode ) {
             $html = $product->get_price_html();
-            add_filter( 'woocommerce_get_price_html', [ $this, 'display_wholesale_price_html' ], 999, 2 );
+            add_filter( 'woocommerce_get_price_html', [ $this, 'ywhs_display_wholesale_price_html' ], 999, 2 );
             return $html;
         }
 
         $discounted = $this->get_discounted_variation_prices( $product );
         if ( empty( $discounted ) ) {
             $html = $product->get_price_html();
-            add_filter( 'woocommerce_get_price_html', [ $this, 'display_wholesale_price_html' ], 999, 2 );
+            add_filter( 'woocommerce_get_price_html', [ $this, 'ywhs_display_wholesale_price_html' ], 999, 2 );
             return $html;
         }
 
@@ -247,7 +247,7 @@ class Pricing {
         // Wholesale-only mode
         if ( 'wholesale-only' === $display_mode || $is_wholesale_only ) {
             $html = $label . $product->get_price_suffix();
-            add_filter( 'woocommerce_get_price_html', [ $this, 'display_wholesale_price_html' ], 999, 2 );
+            add_filter( 'woocommerce_get_price_html', [ $this, 'ywhs_display_wholesale_price_html' ], 999, 2 );
             return $html;
         }
 
@@ -262,7 +262,7 @@ class Pricing {
         }
 
         if ( $price_html === $wholesale_price ) {
-            add_filter( 'woocommerce_get_price_html', [ $this, 'display_wholesale_price_html' ], 999, 2 );
+            add_filter( 'woocommerce_get_price_html', [ $this, 'ywhs_display_wholesale_price_html' ], 999, 2 );
             return $price_html . $product->get_price_suffix();
         }
 
@@ -276,7 +276,7 @@ class Pricing {
         $html = substr_replace( $sale_html, $label, $pos, strlen( $wholesale_price ) );
 
         // Add the filter again
-        add_filter( 'woocommerce_get_price_html', [ $this, 'display_wholesale_price_html' ], 999, 2 );
+        add_filter( 'woocommerce_get_price_html', [ $this, 'ywhs_display_wholesale_price_html' ], 999, 2 );
 
         return $html;
     }
@@ -301,7 +301,7 @@ class Pricing {
      * @param array     $posted_data the data object.
      * @param \WC_Order $order The order object.
      */
-    public function checkout_wholesale_order_handling( $order_id, $posted_data, $order ) {
+    public function ywhs_checkout_wholesale_order_handling( $order_id, $posted_data, $order ) {
         $customer_id    = $order->get_customer_id();
         $wholesale_role = RolesHelper::is_wholesale_user( $customer_id );
 
@@ -311,7 +311,7 @@ class Pricing {
 
         $is_discounted = PricingHelper::check_is_discounted( $order, $wholesale_role );
 
-        PricingHelper::handle_order( $order, $wholesale_role, $is_discounted, false );
+        PricingHelper::handle_order( $order, $wholesale_role, $is_discounted );
 
         do_action( 'ywhs_new_wholesale_order_placed', $order->get_id(), $order );
     }

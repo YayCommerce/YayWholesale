@@ -1,8 +1,8 @@
 <?php
-namespace Yay_Wholesale\Engine\Compatibles;
+namespace Yay_Wholesale_B2B\Engine\Compatibles;
 
-use Yay_Wholesale\Helpers\PricingHelper;
-use Yay_Wholesale\Utils\SingletonTrait;
+use Yay_Wholesale_B2B\Helpers\PricingHelper;
+use Yay_Wholesale_B2B\Utils\SingletonTrait;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -39,7 +39,7 @@ class YayExtra {
 
         $currency = apply_filters( 'ywhs_get_currency_by_third_party', [] );
 
-        wp_enqueue_script( $script_handle, YAY_WHOLESALE_PLUGIN_URL . 'assets/js/yay-extra-compatible.js', $dep, YAY_WHOLESALE_VERSION, false );
+        wp_enqueue_script( $script_handle, YAY_WHOLESALE_B2B_PLUGIN_URL . 'assets/js/yay-extra-compatible.js', $dep, YAY_WHOLESALE_B2B_VERSION, false );
         wp_localize_script(
             $script_handle,
             'yayWholesaleExtra',

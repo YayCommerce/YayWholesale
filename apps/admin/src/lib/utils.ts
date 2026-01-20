@@ -3,7 +3,8 @@ import { twMerge } from 'tailwind-merge';
 
 import { SettingsFormData } from './schema/settings';
 
-export const isPro = import.meta.env.VITE_IS_PRO === 'true';
+// export const isPro = import.meta.env.VITE_IS_PRO === 'true';
+export const isPro = true;
 export const isLite = !isPro;
 
 export function cn(...inputs: ClassValue[]) {

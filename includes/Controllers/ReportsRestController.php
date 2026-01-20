@@ -1,11 +1,11 @@
 <?php
-namespace Yay_Wholesale\Controllers;
+namespace Yay_Wholesale_B2B\Controllers;
 
 use DateTime;
-use Yay_Wholesale\Utils\SingletonTrait;
+use Yay_Wholesale_B2B\Utils\SingletonTrait;
 use WP_REST_Request;
 use WP_REST_Response;
-use Yay_Wholesale\Helpers\ReportsHelper;
+use Yay_Wholesale_B2B\Helpers\ReportsHelper;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -58,26 +58,7 @@ class ReportsRestController extends BaseRestController {
         $compare_start_date = $request['compareStartDate'];
         $compare_end_date   = $request['compareEndDate'];
 
-        $default_date_range = get_transient( ReportsHelper::REPORT_DATE_RANGE_TRANSIENT );
-        if ( false === $default_date_range ) {
-            $date = new DateTime();
-            $date->modify( '-30 days' );
-            $default_start_date         = $date->format( 'Y-m-d' );
-            $default_compare_start_date = $date->modify( '-31 days' )->format( 'Y-m-d' );
-
-            $now                      = new DateTime();
-            $default_end_date         = $now->format( 'Y-m-d' );
-            $default_compare_end_date = $now->modify( '-31 days' )->format( 'Y-m-d' );
-
-            $default_date_range = [
-                'default_start_date'         => $default_start_date,
-                'default_end_date'           => $default_end_date,
-                'default_compare_start_date' => $default_compare_start_date,
-                'default_compare_end_date'   => $default_compare_end_date,
-            ];
-
-            set_transient( ReportsHelper::REPORT_DATE_RANGE_TRANSIENT, $default_date_range, strtotime( 'tomorrow' ) - time() );
-        }
+        $default_date_range = ReportsHelper::get_ywhs_report_date_transient();
 
         if ( ! isset( $start_date ) ) {
             $start_date         = $default_date_range['default_start_date'];
@@ -89,30 +70,27 @@ class ReportsRestController extends BaseRestController {
             $compare_end_date = $default_date_range['default_compare_end_date'];
         }
 
-        $transient_key = ReportsHelper::REPORT_TRANSIENT
-                                . '_'
-                                . $compare_start_date
-                                . '_'
-                                . $compare_end_date
-                                . '_'
-                                . $start_date
-                                . '_'
-                                . $end_date;
+        $ywhs_transient_key = ReportsHelper::get_ywhs_default_report_key(
+            $compare_start_date,
+            $compare_end_date,
+            $start_date,
+            $end_date
+        );
 
-        $transient = get_transient( $transient_key );
-        if ( false !== $transient ) {
-            return $this->success( $transient, __( 'Reports generated!', 'yay-wholesale-b2b' ) );
+        $ywhs_transient = get_transient( $ywhs_transient_key );
+        if ( false !== $ywhs_transient ) {
+            return $this->success( $ywhs_transient, __( 'Reports generated!', 'yay-wholesale-b2b' ) );
         }
 
-        $statistic = ReportsHelper::statistic_data( $start_date, $end_date, $compare_start_date, $compare_end_date );
+        $ywhs_statistic = ReportsHelper::statistic_data( $start_date, $end_date, $compare_start_date, $compare_end_date );
 
         if ( $start_date === $default_date_range['default_start_date'] &&
             $end_date === $default_date_range['default_end_date'] &&
             $compare_start_date === $default_date_range['default_compare_start_date'] &&
             $compare_end_date === $default_date_range['default_compare_end_date'] ) {
-            set_transient( $transient_key, $statistic, 600 );
+            set_transient( $ywhs_transient_key, $ywhs_statistic, 600 );
         }
 
-        return $this->success( $statistic, __( 'Reports generated!', 'yay-wholesale-b2b' ) );
+        return $this->success( $ywhs_statistic, __( 'Reports generated!', 'yay-wholesale-b2b' ) );
     }
 }

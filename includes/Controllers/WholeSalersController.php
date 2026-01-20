@@ -1,11 +1,11 @@
 <?php
-namespace Yay_Wholesale\Controllers;
+namespace Yay_Wholesale_B2B\Controllers;
 
-use Yay_Wholesale\Utils\SingletonTrait;
+use Yay_Wholesale_B2B\Utils\SingletonTrait;
 use WP_REST_Request;
 use WP_REST_Response;
-use Yay_Wholesale\Helpers\RolesHelper;
-use Yay_Wholesale\Helpers\WholeSalersHelper;
+use Yay_Wholesale_B2B\Helpers\RolesHelper;
+use Yay_Wholesale_B2B\Helpers\WholeSalersHelper;
 
 defined( 'ABSPATH' ) || exit;
 

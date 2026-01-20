@@ -1,7 +1,8 @@
 <?php
 
-namespace Yay_Wholesale\Helpers;
+namespace Yay_Wholesale_B2B\Helpers;
 
+use DateTime;
 use WP_User_Query;
 
 /**
@@ -10,6 +11,56 @@ use WP_User_Query;
 class ReportsHelper {
     public const REPORT_TRANSIENT            = 'ywhs_report_statistic';
     public const REPORT_DATE_RANGE_TRANSIENT = 'ywhs_default_report_date_range';
+
+    public static function get_ywhs_default_report_key( string $compare_start_date, string $compare_end_date, string $start_date, string $end_date ) {
+        $transient_key = 'ywhs_report_statistic_'
+                                . $compare_start_date
+                                . '_'
+                                . $compare_end_date
+                                . '_'
+                                . $start_date
+                                . '_'
+                                . $end_date;
+        return $transient_key;
+    }
+
+    public static function delete_ywhs_report_transient() {
+        $default_range_transient = get_transient( 'ywhs_default_report_date_range' );
+        if ( false !== $default_range_transient ) {
+            $transient_key = self::get_ywhs_default_report_key(
+                $default_range_transient['default_compare_start_date'],
+                $default_range_transient['default_compare_end_date'],
+                $default_range_transient['default_start_date'],
+                $default_range_transient['default_end_date']
+            );
+
+            delete_transient( $transient_key );
+        }
+    }
+
+    public static function get_ywhs_report_date_transient() {
+        $default_date_range = get_transient( 'ywhs_default_report_date_range' );
+        if ( false === $default_date_range ) {
+            $date = new DateTime();
+            $date->modify( '-30 days' );
+            $default_start_date         = $date->format( 'Y-m-d' );
+            $default_compare_start_date = $date->modify( '-31 days' )->format( 'Y-m-d' );
+
+            $now                      = new DateTime();
+            $default_end_date         = $now->format( 'Y-m-d' );
+            $default_compare_end_date = $now->modify( '-31 days' )->format( 'Y-m-d' );
+
+            $default_date_range = [
+                'default_start_date'         => $default_start_date,
+                'default_end_date'           => $default_end_date,
+                'default_compare_start_date' => $default_compare_start_date,
+                'default_compare_end_date'   => $default_compare_end_date,
+            ];
+
+            set_transient( 'ywhs_default_report_date_range', $default_date_range, strtotime( 'tomorrow' ) - time() );
+        }
+        return $default_date_range;
+    }
 
     protected static function get_orders_to_statistic( $start_date, $end_date ) {
         $args = [
@@ -108,7 +159,7 @@ class ReportsHelper {
     }
 
     protected static function statistic_wholesaler( array $top_wholesaler ) {
-        $roles = get_option( 'yay_wholesale_roles', [] );
+        $roles = get_option( 'yay_wholesale_b2b_roles', [] );
 
         if ( empty( $roles ) ) {
             return [];

@@ -1,7 +1,7 @@
 <?php
-namespace Yay_Wholesale\Engine\Compatibles\YayMail;
+namespace Yay_Wholesale_B2B\Engine\Compatibles\YayMail;
 
-use Yay_Wholesale\Utils\SingletonTrait;
+use Yay_Wholesale_B2B\Utils\SingletonTrait;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -15,7 +15,7 @@ class AccountRegistrationApproved extends \YayMail\Abstracts\BaseEmail {
 
     protected function __construct() {
         $emails = \WC_Emails::instance()->get_emails();
-        $email  = $emails['Yay_Wholesale_Account_Registration_Approved'];
+        $email  = $emails['Yay_Wholesale_B2B_Account_Registration_Approved'];
         if ( ! $email ) {
             return;
         }
@@ -60,7 +60,7 @@ class AccountRegistrationApproved extends \YayMail\Abstracts\BaseEmail {
         $email_text_1      = sprintf( esc_html__( 'Username: %s', 'yay-wholesale-b2b' ), '[yaymail_customer_username]' );
         $email_end         = __( 'We look forward to seeing you soon.', 'yay-wholesale-b2b' );
         $password_generate = '[yaymail_set_password_link text_link="%text_link%"]';
-        $password_generate = str_replace( '%text_link%', __( 'Click here to set your password.' ), $password_generate );
+        $password_generate = str_replace( '%text_link%', __( 'Click here to set your password.', 'yay-wholesale-b2b' ), $password_generate );
 
         $default_elements = \YayMail\Elements\ElementsLoader::load_elements(
             [

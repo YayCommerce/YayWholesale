@@ -1,7 +1,7 @@
 <?php
-namespace Yay_Wholesale\Engine\Compatibles\YayMail;
+namespace Yay_Wholesale_B2B\Engine\Compatibles\YayMail;
 
-use Yay_Wholesale\Utils\SingletonTrait;
+use Yay_Wholesale_B2B\Utils\SingletonTrait;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -15,7 +15,7 @@ class AccountRegistrationRejected extends \YayMail\Abstracts\BaseEmail {
 
     protected function __construct() {
         $emails = \WC_Emails::instance()->get_emails();
-        $email  = $emails['Yay_Wholesale_Account_Registration_Rejected'];
+        $email  = $emails['Yay_Wholesale_B2B_Account_Registration_Rejected'];
         if ( ! $email ) {
             return;
         }
@@ -49,7 +49,7 @@ class AccountRegistrationRejected extends \YayMail\Abstracts\BaseEmail {
     public function get_default_elements() {
         $email_title = $this->title;
         // translators: customer name.
-        $email_hi = sprintf( esc_html__( 'Hi %s,', 'yay-wholesale-b2b' ), '[ywhs_reqeust_author_name]' );
+        $email_hi = sprintf( esc_html__( 'Hi %s,', 'yay-wholesale-b2b' ), '[yaymail_wholesale_request_author_name]' );
         // translators: %1$s: site name, %2$s: customer username, %3$s: account url .
         $email_text   = sprintf( esc_html__( 'Thank you for your interest in partnering with %s.', 'yay-wholesale-b2b' ), '[yaymail_site_name]' );
         $email_text_1 = __( 'After careful review, we regret to inform you that your wholesale account application has not been approved at this time.', 'yay-wholesale-b2b' );

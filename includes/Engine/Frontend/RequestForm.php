@@ -1,10 +1,10 @@
 <?php
 
-namespace Yay_Wholesale\Engine\Frontend;
+namespace Yay_Wholesale_B2B\Engine\Frontend;
 
-use Yay_Wholesale\Helpers\RequestsHelper;
-use Yay_Wholesale\Helpers\SettingsHelper;
-use Yay_Wholesale\Utils\SingletonTrait;
+use Yay_Wholesale_B2B\Helpers\RequestsHelper;
+use Yay_Wholesale_B2B\Helpers\SettingsHelper;
+use Yay_Wholesale_B2B\Utils\SingletonTrait;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -17,15 +17,15 @@ class RequestForm {
     protected $shortcode_name = 'ywhs_request_form';
 
     protected function __construct() {
-        add_action( 'init', [ $this, 'add_shortcode_form' ] );
+        add_action( 'init', [ $this, 'add_ywhs_shortcode_form' ] );
 
-        add_action( 'init', [ $this,'create_block_request_form_block_init' ] );
+        add_action( 'init', [ $this,'create_ywhs_block_request_form_block_init' ] );
     }
 
     /**
      * Add the shortcode of the form
      */
-    public function add_shortcode_form() {
+    public function add_ywhs_shortcode_form() {
         if ( ! shortcode_exists( $this->shortcode_name ) ) {
             add_shortcode( $this->shortcode_name, [ $this, 'ywhs_request_form_shortcode' ] );
         }
@@ -156,8 +156,8 @@ class RequestForm {
                     return ob_get_clean();
     }
 
-    public function create_block_request_form_block_init() {
-        $base_dir      = YAY_WHOLESALE_PLUGIN_DIR . 'assets/dist/blocks/request-form-block/';
+    public function create_ywhs_block_request_form_block_init() {
+        $base_dir      = YAY_WHOLESALE_B2B_PLUGIN_DIR . 'assets/dist/blocks/request-form-block/';
         $manifest_file = $base_dir . 'blocks-manifest.php';
 
         if ( ! file_exists( $manifest_file ) ) {

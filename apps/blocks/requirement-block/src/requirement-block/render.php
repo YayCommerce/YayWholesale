@@ -12,7 +12,7 @@
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-use Yay_Wholesale\Helpers\RolesHelper;
+use Yay_Wholesale_B2B\Helpers\RolesHelper;
 
 $ywhs_wholesale = RolesHelper::is_wholesale_user();
 

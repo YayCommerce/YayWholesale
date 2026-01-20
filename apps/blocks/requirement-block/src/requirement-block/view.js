@@ -3,7 +3,6 @@ import { store, getConfig } from '@wordpress/interactivity';
 
 
 let wcState = null;
-let quantityMap = {};
 let isNeedSubcribing = false;
 const i18n = window.wp?.i18n;
 
@@ -111,7 +110,7 @@ const { state, callbacks } = store('ywhs_wholesale_requirement', {
                 default_currency: isUsingDefaultCurrency,
               };
               try {
-                  const res = await fetch(`${adminUrl}?action=get_original_price_in_cart`, {
+                  const res = await fetch(`${adminUrl}?action=ywhs_get_original_price_in_cart`, {
                       method: 'POST',
                       headers: {
                           'Content-Type': 'application/json'

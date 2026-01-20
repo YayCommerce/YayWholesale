@@ -17,6 +17,8 @@ interface UnsavedChangeDialogProps {
   open: boolean;
   onDiscard: () => void;
   onSave: () => void;
+  disabledCancel?: boolean;
+  disabledSave?: boolean;
   onOpenChange: (open: boolean) => void;
   children?: React.ReactNode;
 }
@@ -25,6 +27,8 @@ export function UnsavedChangeDialog({
   open,
   onDiscard,
   onSave,
+  disabledCancel = false,
+  disabledSave = false,
   onOpenChange,
   children = (
     <DialogDescription>
@@ -45,10 +49,12 @@ export function UnsavedChangeDialog({
           </DialogHeader>
 
           <DialogFooter>
-            <Button variant="ghost" onClick={onDiscard}>
+            <Button variant="ghost" onClick={onDiscard} disabled={disabledCancel}>
               {__('Discard Changes', 'bookster')}
             </Button>
-            <Button onClick={onSave}>{__('Save Changes', 'bookster')}</Button>
+            <Button onClick={onSave} disabled={disabledSave}>
+              {__('Save Changes', 'bookster')}
+            </Button>
           </DialogFooter>
         </DialogContent>
       </DialogPortal>

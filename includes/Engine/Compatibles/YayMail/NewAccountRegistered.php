@@ -1,7 +1,7 @@
 <?php
-namespace Yay_Wholesale\Engine\Compatibles\YayMail;
+namespace Yay_Wholesale_B2B\Engine\Compatibles\YayMail;
 
-use Yay_Wholesale\Utils\SingletonTrait;
+use Yay_Wholesale_B2B\Utils\SingletonTrait;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -15,7 +15,7 @@ class NewAccountRegistered extends \YayMail\Abstracts\BaseEmail {
 
     protected function __construct() {
         $emails = \WC_Emails::instance()->get_emails();
-        $email  = $emails['Yay_Wholesale_New_Account_Registered'];
+        $email  = $emails['Yay_Wholesale_B2B_New_Account_Registered'];
         if ( ! $email ) {
             return;
         }

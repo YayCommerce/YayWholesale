@@ -1,10 +1,10 @@
 <?php
-namespace Yay_Wholesale\Engine\Frontend;
+namespace Yay_Wholesale_B2B\Engine\Frontend;
 
 use WC_Tax;
-use Yay_Wholesale\Utils\SingletonTrait;
-use Yay_Wholesale\Helpers\RolesHelper;
-use Yay_Wholesale\Helpers\PricingHelper;
+use Yay_Wholesale_B2B\Utils\SingletonTrait;
+use Yay_Wholesale_B2B\Helpers\RolesHelper;
+use Yay_Wholesale_B2B\Helpers\PricingHelper;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -16,22 +16,22 @@ class Requirement {
 
     protected function __construct() {
         // --- WooCommerce hooks ---
-        add_action( 'woocommerce_widget_shopping_cart_before_buttons', [ $this, 'add_wholesale_requirement' ], 999, 0 );
-        add_action( 'woocommerce_before_cart_totals', [ $this, 'add_wholesale_requirement' ], 999, 0 );
-        add_action( 'woocommerce_review_order_before_payment', [ $this, 'add_wholesale_requirement' ], 999, 0 );
+        add_action( 'woocommerce_widget_shopping_cart_before_buttons', [ $this, 'add_yay_wholesale_requirement' ], 999, 0 );
+        add_action( 'woocommerce_before_cart_totals', [ $this, 'add_yay_wholesale_requirement' ], 999, 0 );
+        add_action( 'woocommerce_review_order_before_payment', [ $this, 'add_yay_wholesale_requirement' ], 999, 0 );
 
-        add_action( 'wp_enqueue_scripts', [ $this, 'enqueue_wholesale_requirement' ], 999 );
-        add_action( 'init', [ $this, 'create_block_requirement_block_init' ], 999 );
-        add_filter( 'render_block_woocommerce/mini-cart-footer-block', [ $this, 'automatically_add_to_mini_cart' ], 999 );
+        add_action( 'wp_enqueue_scripts', [ $this, 'enqueue_yay_wholesale_requirement' ], 999 );
+        add_action( 'init', [ $this, 'create_ywhs_requirement_block_init' ], 999 );
+        add_filter( 'render_block_woocommerce/mini-cart-footer-block', [ $this, 'automatically_add_ywhs_to_mini_cart' ], 999 );
 
-        add_action( 'wp_ajax_get_original_price_in_cart', [ $this, 'get_original_price_in_cart' ] );
-        add_action( 'wp_ajax_nopriv_get_original_price_in_cart', [ $this, 'get_original_price_in_cart' ] );
+        add_action( 'wp_ajax_ywhs_get_original_price_in_cart', [ $this, 'ywhs_get_original_price_in_cart' ] );
+        add_action( 'wp_ajax_nopriv_ywhs_get_original_price_in_cart', [ $this, 'ywhs_get_original_price_in_cart' ] );
     }
 
     /**
      * Render the html of requirement to Frontend block (Mini cart) using action hook
      */
-    public function add_wholesale_requirement() {
+    public function add_yay_wholesale_requirement() {
 
         $wholesale = RolesHelper::is_wholesale_user();
 
@@ -162,17 +162,17 @@ class Requirement {
     /**
      * Enqueue the JSX of requirement to Frontend block (Cart, Checkout) using Fill/Slot
      */
-    public function enqueue_wholesale_requirement() {
+    public function enqueue_yay_wholesale_requirement() {
         if ( ( function_exists( 'is_checkout' ) && is_checkout() ) ||
             ( function_exists( 'is_cart' ) && is_cart() ) ) {
             $wholesale = RolesHelper::is_wholesale_user();
             $slug      = 'ywhs_wholesale_requirement';
-            $asset     = include YAY_WHOLESALE_PLUGIN_DIR . 'assets/dist/blocks/requirement-slot-fill/index.asset.php';
+            $asset     = include YAY_WHOLESALE_B2B_PLUGIN_DIR . 'assets/dist/blocks/requirement-slot-fill/index.asset.php';
             wp_enqueue_script(
                 $slug,
-                YAY_WHOLESALE_PLUGIN_URL . 'assets/dist/blocks/requirement-slot-fill/index.js',
+                YAY_WHOLESALE_B2B_PLUGIN_URL . 'assets/dist/blocks/requirement-slot-fill/index.js',
                 $asset['dependencies'],
-                YAY_WHOLESALE_VERSION,
+                YAY_WHOLESALE_B2B_VERSION,
                 true
             );
 
@@ -197,8 +197,8 @@ class Requirement {
     /**
      * Register new block type of Wholesale Requirement
      */
-    public function create_block_requirement_block_init() {
-        $block_json_path = YAY_WHOLESALE_PLUGIN_DIR . 'assets/dist/blocks/requirement-block/block.json';
+    public function create_ywhs_requirement_block_init() {
+        $block_json_path = YAY_WHOLESALE_B2B_PLUGIN_DIR . 'assets/dist/blocks/requirement-block/block.json';
 
         if ( ! file_exists( $block_json_path ) ) {
             return;
@@ -213,7 +213,7 @@ class Requirement {
     /**
      * Automatically add requirement block to mini cart block of woocommerce
      */
-    public function automatically_add_to_mini_cart( $block_content ) {
+    public function automatically_add_ywhs_to_mini_cart( $block_content ) {
         // Your custom block HTML
         $custom_block         = '<!-- wp:yay-wholesale/requirement-block /-->';
         $custom_block_content = do_blocks( $custom_block );
@@ -224,7 +224,7 @@ class Requirement {
     /**
      * Return an originale price (before discount) map of each line item in cart
      */
-    public function get_original_price_in_cart() {
+    public function ywhs_get_original_price_in_cart() {
         $raw  = file_get_contents( 'php://input' );
         $data = json_decode( $raw, true );
 

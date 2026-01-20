@@ -1,5 +1,5 @@
 <?php
-namespace Yay_Wholesale\Engine\Admin\Emails;
+namespace Yay_Wholesale_B2B\Engine\Admin\Emails;
 
 use WC_Email;
 
@@ -24,14 +24,14 @@ abstract class WholesaleEmailBase extends WC_Email {
      * Init hooks
      */
     public function init_hooks() {
-        add_filter( 'woocommerce_locate_core_template', [ $this, 'yay_wholesale_handle_locate_core_template' ], 10, 4 );
-        add_filter( 'woocommerce_locate_template', [ $this, 'yay_wholesale_handle_locate_template' ], 10, 3 );
+        add_filter( 'woocommerce_locate_core_template', [ $this, 'ywhs_handle_locate_core_template' ], 10, 4 );
+        add_filter( 'woocommerce_locate_template', [ $this, 'ywhs_handle_locate_template' ], 10, 3 );
     }
 
     /*
     * Handle locate core template
     */
-    public function yay_wholesale_handle_locate_core_template( $file, $template, $template_base, $template_id ) {
+    public function ywhs_handle_locate_core_template( $file, $template, $template_base, $template_id ) {
         if ( $template_id === $this->id ) {
             return $this->template_base . $template;
         }
@@ -42,7 +42,7 @@ abstract class WholesaleEmailBase extends WC_Email {
     /*
     * Handle locate template
     */
-    public function yay_wholesale_handle_locate_template( $template, $template_name, $template_path ) {
+    public function ywhs_handle_locate_template( $template, $template_name, $template_path ) {
         if ( in_array( $template_name, [ $this->template_html, $this->template_plain ], true ) ) {
             return $this->template_base . $template_name;
         }

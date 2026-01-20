@@ -43,6 +43,7 @@ export default function SettingsPage() {
   async function onSubmit(data: SettingsFormData) {
     await saveMutation.mutateAsync(data);
     window.yayWholesale.settings = data;
+    form.reset(data);
   }
 
   const { showDialog, confirmLeave, cancelLeave } = useRouteLeaveGuard(form.formState.isDirty, [
@@ -107,14 +108,16 @@ export default function SettingsPage() {
         <UnsavedChangeDialog
           open={showDialog}
           onDiscard={confirmLeave}
-          onSave={() => {
-            form.handleSubmit(onSubmit)();
+          onSave={async () => {
+            await form.handleSubmit(onSubmit)();
+            confirmLeave();
           }}
           onOpenChange={(open) => {
             if (!open) {
               cancelLeave();
             }
           }}
+          disabledSave={saveMutation.isPending}
         />
       </form>
     </FormProvider>

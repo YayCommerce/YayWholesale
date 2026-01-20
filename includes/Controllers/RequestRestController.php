@@ -1,13 +1,13 @@
 <?php
-namespace Yay_Wholesale\Controllers;
+namespace Yay_Wholesale_B2B\Controllers;
 
 use Exception;
 use WP_Error;
-use Yay_Wholesale\Utils\SingletonTrait;
+use Yay_Wholesale_B2B\Utils\SingletonTrait;
 use WP_REST_Request;
 use WP_REST_Response;
-use Yay_Wholesale\Helpers\RequestsHelper;
-use Yay_Wholesale\Helpers\SettingsHelper;
+use Yay_Wholesale_B2B\Helpers\RequestsHelper;
+use Yay_Wholesale_B2B\Helpers\SettingsHelper;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -153,7 +153,7 @@ class RequestRestController extends BaseRestController {
 
         $settings = SettingsHelper::get_settings();
         if ( ! $settings['registration']['moderate'] ) {
-            $roles        = get_option( 'yay_wholesale_roles', [] );
+            $roles        = get_option( 'yay_wholesale_b2b_roles', [] );
             $active_roles = array_values( array_filter( $roles, fn( $r ) => $r['status'] ) );
             $role_slug    = $settings['general']['default_role'];
             $role         = array_values( array_filter( $active_roles, fn( $r ) => $r['slug'] === $role_slug ) )[0] ?? null;
@@ -162,20 +162,20 @@ class RequestRestController extends BaseRestController {
                 return $this->error( __( 'The default role is inactive, your request is changed to pending', 'yay-wholesale-b2b' ), 400 );
             }
 
-            try {
-                RequestsHelper::add_role_to_ywhs_request_author( $wholesale_id, $role_slug );
-            } catch ( Exception $e ) {
-                do_action( 'ywhs_account_registration_pending', $wholesale_id );
-                return $this->error( $e->getMessage(), 400 );
-            }
+            $result = RequestsHelper::add_role_to_ywhs_request_author( $wholesale_id, $role_slug );
 
-            if ( ! RequestsHelper::update_whs_request( $wholesale_id, [ 'status' => RequestsHelper::APPROVED ] ) ) {
-                do_action( 'ywhs_account_registration_pending', $wholesale_id );
-                return $this->error( __( 'Role has been applied, but your request is still pending', 'yay-wholesale-b2b' ), 400 );
-            }
+            if ( $result ) {
+                if ( ! RequestsHelper::update_whs_request( $wholesale_id, [ 'status' => RequestsHelper::APPROVED ] ) ) {
+                    do_action( 'ywhs_account_registration_pending', $wholesale_id );
+                    return $this->error( __( 'Role has been applied, but your request is still pending', 'yay-wholesale-b2b' ), 400 );
+                }
 
-            // Trigger the email when a new wholesale account is approved.
-            do_action( 'ywhs_account_registration_approved', $wholesale_id );
+                // Trigger the email when a new wholesale account is approved.
+                do_action( 'ywhs_account_registration_approved', $wholesale_id );
+            } else {
+                // Trigger the email when a new wholesale account is pending.
+                do_action( 'ywhs_account_registration_pending', $wholesale_id );
+            }
         } else {
             // Trigger the email when a new wholesale account is pending.
             do_action( 'ywhs_account_registration_pending', $wholesale_id );
@@ -279,7 +279,7 @@ class RequestRestController extends BaseRestController {
 
         if ( RequestsHelper::APPROVED === $json_data['status'] ) {
             $role_slug    = '';
-            $roles        = get_option( 'yay_wholesale_roles', [] );
+            $roles        = get_option( 'yay_wholesale_b2b_roles', [] );
             $active_roles = array_values( array_filter( $roles, fn( $r ) => $r['status'] ) );
 
             if ( ! array_key_exists( 'role_id', $json_data ) || $json_data['role_id'] < 0 ) {
@@ -302,7 +302,7 @@ class RequestRestController extends BaseRestController {
             }
 
             try {
-                RequestsHelper::add_role_to_ywhs_request_author( $id, $role_slug );
+                RequestsHelper::handle_ywhs_request_author( $id, $role_slug );
             } catch ( Exception $e ) {
                 return $this->error( $e->getMessage() );
             }
@@ -348,7 +348,7 @@ class RequestRestController extends BaseRestController {
 
         if ( RequestsHelper::APPROVED === $status ) {
             $role_slug    = '';
-            $roles        = get_option( 'yay_wholesale_roles', [] );
+            $roles        = get_option( 'yay_wholesale_b2b_roles', [] );
             $active_roles = array_values( array_filter( $roles, fn( $r ) => $r['status'] ) );
 
             if ( ! isset( $role_id ) || $role_id < 0 ) {
@@ -372,7 +372,7 @@ class RequestRestController extends BaseRestController {
 
             foreach ( $ids as $id ) {
                 try {
-                    RequestsHelper::add_role_to_ywhs_request_author( $id, $role_slug );
+                    RequestsHelper::handle_ywhs_request_author( $id, $role_slug );
                 } catch ( Exception $e ) {
                     ++$failed_totally;
                     continue;

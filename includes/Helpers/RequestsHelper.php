@@ -1,5 +1,5 @@
 <?php
-namespace Yay_Wholesale\Helpers;
+namespace Yay_Wholesale_B2B\Helpers;
 
 use Exception;
 use WP_Query;
@@ -383,9 +383,32 @@ class RequestsHelper {
      *
      * @param int    $request_id The target request ID .
      * @param string $role_slug The target role slug .
+     * @return bool
+     */
+    public static function add_role_to_ywhs_request_author( int $request_id, string $role_slug ): bool {
+        $request = get_post( $request_id );
+
+        if ( $request->post_author < 1 ) {
+            return false;
+        }
+
+        $current_user = new WP_User( $request->post_author );
+
+        RolesHelper::remove_ywhs_role_from_user( $current_user );
+
+        $current_user->add_role( $role_slug );
+
+        return true;
+    }
+
+    /**
+     * Handle the process of add role/ new user with request
+     *
+     * @param int    $request_id The target request ID .
+     * @param string $role_slug The target role slug .
      * @return void
      */
-    public static function add_role_to_ywhs_request_author( int $request_id, string $role_slug ): void {
+    public static function handle_ywhs_request_author( int $request_id, string $role_slug ): void {
         $request = get_post( $request_id );
 
         if ( $request->post_author < 1 ) {
@@ -430,6 +453,7 @@ class RequestsHelper {
         }//end if
     }
 
+
     /**
      * Remove role from the the author of request
      *
@@ -454,6 +478,7 @@ class RequestsHelper {
         $args  = [
             'post_type'              => self::REQUEST_POST_TYPE,
             'update_post_meta_cache' => true,
+            'posts_per_page'         => -1,
             'meta_query'             => [
                 'relation' => 'AND',
                 [
@@ -478,8 +503,8 @@ class RequestsHelper {
         $args  = [
             'post_type'              => self::REQUEST_POST_TYPE,
             'update_post_meta_cache' => true,
+            'posts_per_page'         => -1,
             'meta_query'             => [
-                'relation' => 'AND',
                 [
                     'key'     => self::REQUEST_META_STATUS,
                     'value'   => self::APPROVED,

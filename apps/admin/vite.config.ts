@@ -59,8 +59,9 @@ export default defineConfig({
     },
   },
   build: {
-    minify: 'terser',
-    terserOptions: terserOptions,
+    // minify: 'terser',
+    // terserOptions: terserOptions,
+    minify: false,
     manifest: false,
     emptyOutDir: true,
     outDir: path.resolve('../assets', 'dist'),

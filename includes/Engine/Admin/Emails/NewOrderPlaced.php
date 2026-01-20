@@ -1,5 +1,5 @@
 <?php
-namespace Yay_Wholesale\Engine\Admin\Emails;
+namespace Yay_Wholesale_B2B\Engine\Admin\Emails;
 
 use WC_Order;
 
@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 class NewOrderPlaced extends WholesaleEmailBase {
 
     public function __construct() {
-        $this->id             = 'yay_wholesale_new_order_placed';
+        $this->id             = 'ywhs_new_order_placed';
         $this->customer_email = false;
         $this->email_group    = 'wholesale_order';
         $this->title          = __( 'New wholesale order is placed', 'yay-wholesale-b2b' );

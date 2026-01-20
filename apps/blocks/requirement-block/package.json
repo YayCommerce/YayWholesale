@@ -7,7 +7,7 @@
 	"main": "build/index.js",
 	"scripts": {
 		"dev": "wp-scripts start --experimental-modules --webpack-src-dir=src/ --output-path=../../../assets/dist/blocks/",
-		"build": "wp-scripts build --experimental-modules --webpack-src-dir=src/ --output-path=../../../assets/dist/blocks/",
+		"build": "wp-scripts build --config ../webpack.config.js --experimental-modules --webpack-src-dir=src/ --output-path=../../../assets/dist/blocks/",
 		"format": "wp-scripts format",
 		"lint:css": "wp-scripts lint-style",
 		"lint:js": "wp-scripts lint-js",

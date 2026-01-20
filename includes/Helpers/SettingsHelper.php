@@ -1,5 +1,5 @@
 <?php
-namespace Yay_Wholesale\Helpers;
+namespace Yay_Wholesale_B2B\Helpers;
 
 use WC_Email;
 
@@ -83,7 +83,7 @@ class SettingsHelper {
             ],
         ];
 
-        return get_option( 'yay_wholesale_settings', $data );
+        return get_option( 'yay_wholesale_b2b_settings', $data );
     }
 
     public static function get_email_content_type( $type ): string {
@@ -102,7 +102,7 @@ class SettingsHelper {
         $wholesale_emails = array_values(
             array_filter(
                 WC()->mailer()->get_emails(),
-                fn ( $email, $key ) => str_starts_with( $key, 'Yay_Wholesale_' ),
+                fn ( $email, $key ) => str_starts_with( $key, 'Yay_Wholesale_B2B_' ),
                 ARRAY_FILTER_USE_BOTH
             )
         );

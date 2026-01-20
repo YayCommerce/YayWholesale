@@ -1,5 +1,5 @@
 <?php
-namespace Yay_Wholesale\Utils;
+namespace Yay_Wholesale_B2B\Utils;
 
 trait SingletonTrait {
     protected static $instance = null;
