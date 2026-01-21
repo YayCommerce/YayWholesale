@@ -1,8 +1,8 @@
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { ColumnDef } from '@tanstack/react-table';
 import { __ } from '@wordpress/i18n';
-import { Ellipsis, Trash2 } from 'lucide-react';
+import { Ellipsis } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 import { useDeleteRequestMutation } from '@/lib/queries/requests';
@@ -22,6 +22,7 @@ import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { WholeSaleToolTip } from '@/components/custom/WholeSaleToolTip';
+import DeleteIcon from '@/components/icons/DeleteIcon';
 import SettingsIcon from '@/components/icons/SettingsIcon';
 
 import { parseWPDate, parseWPTime } from '../../common.helper';
@@ -144,7 +145,7 @@ export const RequestsColumn: ColumnDef<RequestFormValues>[] = [
                     <SettingsIcon className="h-4 w-4" />
                   </Button>
                 }
-                content={<span>{__('Edit request', 'yay-wholesale-b2b')}</span>}
+                content={<span>{__('See details', 'yay-wholesale-b2b')}</span>}
               />
 
               <WholeSaleToolTip
@@ -159,7 +160,7 @@ export const RequestsColumn: ColumnDef<RequestFormValues>[] = [
                       queryClient.isMutating({ mutationKey: ['requests'] }) > 0
                     }
                   >
-                    <Trash2 className="h-4 w-4" />
+                    <DeleteIcon className="h-4 w-4" />
                   </Button>
                 }
                 content={<span>{__('Delete request', 'yay-wholesale-b2b')}</span>}

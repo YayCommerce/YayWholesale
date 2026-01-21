@@ -1,3 +1,5 @@
+import { cn } from '@/lib/utils';
+
 export default function DeleteIcon({ className = '', ...props }) {
   return (
     <svg
@@ -6,7 +8,7 @@ export default function DeleteIcon({ className = '', ...props }) {
       viewBox="0 0 16 16"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
-      className={className}
+      className={cn('ml-0.25', className)}
       {...props}
     >
       <path

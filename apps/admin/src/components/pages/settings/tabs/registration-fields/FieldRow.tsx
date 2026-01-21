@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { __ } from '@wordpress/i18n';
-import { CirclePlus, Eye, EyeOff, GripVertical, Info, Trash2 } from 'lucide-react';
+import { CirclePlus, Eye, EyeOff, GripVertical, Info } from 'lucide-react';
 import { useFormContext } from 'react-hook-form';
 
 import { SettingsFormData } from '@/lib/schema/settings';
@@ -29,6 +29,7 @@ import {
 import { Switch } from '@/components/ui/switch';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { WholeSaleToolTip } from '@/components/custom/WholeSaleToolTip';
+import DeleteIcon from '@/components/icons/DeleteIcon';
 import EllipsisIcon from '@/components/icons/EllipsisIcon';
 
 export function FieldRow({
@@ -296,7 +297,7 @@ export function FieldRow({
                 disabled={field.isHidden || !field.deletable}
                 className="mt-1"
               >
-                <Trash2 />
+                <DeleteIcon />
                 {__('Delete', 'yay-wholesale-b2b')}
               </DropdownMenuItem>
             </DropdownMenuGroup>
