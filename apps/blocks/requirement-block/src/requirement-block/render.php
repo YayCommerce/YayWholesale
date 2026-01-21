@@ -12,7 +12,7 @@
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-use Yay_Wholesale\Helpers\RolesHelper;
+use Yay_Wholesale_B2B\Helpers\RolesHelper;
 
 $ywhs_wholesale = RolesHelper::is_wholesale_user();
 
@@ -20,25 +20,22 @@ $ywhs_wholesale = RolesHelper::is_wholesale_user();
     'ywhs_wholesale_requirement',
     [
 		'wholesale'     => $ywhs_wholesale,
-		'currency_data' => [
-			'currency'     => get_woocommerce_currency(),
-			'symbol'       => html_entity_decode( \get_woocommerce_currency_symbol(), ENT_COMPAT ),
-			'position'     => get_option( 'woocommerce_currency_pos' ),
-			'thousand_sep' => get_option( 'woocommerce_price_thousand_sep' ),
-			'decimal_sep'  => get_option( 'woocommerce_price_decimal_sep' ),
-			'num_decimals' => intval( get_option( 'woocommerce_price_num_decimals' ) ),
-		],
-		'rest_url'   => esc_url_raw( rest_url() ),
+		'admin_url' => admin_url('admin-ajax.php'),
 		'rest_nonce' => wp_create_nonce( 'wp_rest' ),
 		'rest_base'  => 'yay-wholesale/v1',
-		'is_checkout_page' => apply_filters("ywhs_ajax_refetch_prices_from_checkout", false),
+		'is_using_defaut_currency' => apply_filters("ywhs_ajax_using_default_currency", false),
+		'currency' => get_woocommerce_currency(),
+		'nonce' => wp_create_nonce("get_original_price_in_cart"),
     ]
     );
 
 ?>
 <?php if ($ywhs_wholesale) : ?>
 <div 
-<?php echo esc_attr(get_block_wrapper_attributes( [ 'class' => 'ywhs_requirement_section' ] )); ?>
+<?php
+// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped 
+echo get_block_wrapper_attributes( [ 'class' => 'ywhs_requirement_section' ] ); 
+?>
 	data-wp-interactive="ywhs_wholesale_requirement"
 	data-wp-init = "callbacks.getPriceMap"
 	data-wp-watch="callbacks.checkMetRequired"

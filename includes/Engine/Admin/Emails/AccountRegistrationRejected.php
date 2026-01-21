@@ -1,8 +1,8 @@
 <?php
-namespace Yay_Wholesale\Engine\Admin\Emails;
+namespace Yay_Wholesale_B2B\Engine\Admin\Emails;
 
 use Automattic\WooCommerce\Utilities\FeaturesUtil;
-use Yay_Wholesale\Helpers\RequestsHelper;
+use Yay_Wholesale_B2B\Helpers\RequestsHelper;
 
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
@@ -20,7 +20,7 @@ class AccountRegistrationRejected extends WholesaleEmailBase {
      */
     public function __construct() {
 
-        $this->id             = 'yay_wholesale_account_registration_rejected';
+        $this->id             = 'ywhs_account_registration_rejected';
         $this->customer_email = true;
         $this->title          = __( 'Wholesale account is rejected', 'yay-wholesale-b2b' );
         $this->email_group    = 'wholesale_account';

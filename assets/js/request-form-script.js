@@ -47,4 +47,29 @@ jQuery(document).ready(() => {
         this.style.height = 'auto';
         this.style.height = this.scrollHeight + 'px';
     })
-}) 
+})
+
+const parseWPCurrency = (price) => {
+    if (typeof price === 'string') {
+      price = parseFloat(price);
+    }
+  
+    const { symbol, position, thousand_sep, decimal_sep, num_decimals } =
+      window.yayWholesale.currency_data;
+  
+    const formattedPrice = price
+      .toFixed(num_decimals)
+      .replace(/\B(?=(\d{3})+(?!\d))/g, thousand_sep)
+      .replace(/(\d+)\.(\d{2})$/, `$1${decimal_sep}$2`);
+  
+    switch (position) {
+      case 'left':
+        return `${symbol}${formattedPrice}`;
+      case 'right':
+        return `${formattedPrice}${symbol}`;
+      case 'left_space':
+        return `${symbol} ${formattedPrice}`;
+      case 'right_space':
+        return `${formattedPrice} ${symbol}`;
+    }
+  }

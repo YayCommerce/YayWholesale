@@ -8,11 +8,13 @@ import { useUpdateEffect } from 'react-use';
 
 import { useAddRoleMutation, useRoleQuery, useUpdateRoleMutation } from '@/lib/queries/roles';
 import { createRoleSchema, RoleFormValues, roleSchema } from '@/lib/schema/roles';
-import { cn } from '@/lib/utils';
+import { cn, isPro } from '@/lib/utils';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { InputNumberCarets, InputNumberInput, InputNumberRoot } from '@/components/ui/input-number';
+import { Label } from '@/components/ui/label';
 import {
   Sheet,
   SheetClose,
@@ -29,7 +31,7 @@ export const DEFAULT_ROLE = {
   name: '',
   description: '',
   discount: undefined,
-  minOrderQuantity: undefined,
+  minOrderQuantity: isPro ? undefined : 0,
   minOrderAmount: undefined,
   applyToSalePrice: false,
   status: true,
@@ -93,14 +95,14 @@ export default function RoleForm() {
         >
           <SheetContent
             side="right"
-            className="top-[32px] h-[calc(100%-32px)] w-full gap-0 overflow-x-auto pt-0 md:min-w-[490px]"
+            className="top-[32px] h-[calc(100%-32px)] w-full gap-0 overflow-x-auto pt-0 md:m-2.5 md:h-[calc(100%-52px)] md:min-w-[490px] md:rounded-md"
           >
             {(isLoadingRole || isErrorRole) && (
               <div className="absolute inset-0 z-50 flex items-center justify-center bg-white/70">
                 <Spinner className="text-muted-foreground size-6 animate-spin" />
               </div>
             )}
-            <SheetHeader className="border-border border-b p-5">
+            <SheetHeader className="border-divider border-b p-5">
               <div className="flex items-start justify-between">
                 <div>
                   <SheetTitle className="text-foreground text-[18px] font-semibold">
@@ -136,7 +138,7 @@ export default function RoleForm() {
                       <Input
                         {...field}
                         value={field.value ?? ''}
-                        placeholder={__('e.g. Wholesale Customer', 'yay-wholesale-b2b')}
+                        placeholder={__('Enter a wholesale role name', 'yay-wholesale-b2b')}
                         className="h-9 rounded-md focus-visible:ring-0"
                         aria-invalid={invalid}
                       />
@@ -157,7 +159,7 @@ export default function RoleForm() {
                     <FormControl>
                       <Textarea
                         {...field}
-                        placeholder={__('Enter a wholesale role description', 'yay-wholesale-b2b')}
+                        placeholder={__('This is role description', 'yay-wholesale-b2b')}
                         className="h-24 rounded-md"
                         aria-invalid={invalid}
                       />
@@ -198,31 +200,51 @@ export default function RoleForm() {
               <FormField
                 control={form.control}
                 name={`minOrderQuantity`}
-                render={({ field: { ref, ...field }, fieldState: { error, invalid } }) => (
-                  <FormItem className="w-full gap-2.5">
-                    <FormLabel className="text-foreground-400 text-xs font-medium">
-                      {__('Min Order Quantity', 'yay-wholesale-b2b')}
-                    </FormLabel>
-                    <FormControl>
-                      <InputNumberRoot
-                        value={field.value}
-                        onValueChange={(value) => field.onChange(value)}
-                        min={0}
-                      >
-                        <InputNumberInput
-                          placeholder={__(
-                            'e.g. 10 (min number of items required per order)',
-                            'yay-wholesale-b2b',
-                          )}
+                render={({ field: { ref, ...field }, fieldState: { error, invalid } }) =>
+                  isPro ? (
+                    <FormItem className="w-full gap-2.5">
+                      <FormLabel className="text-foreground-400 text-xs font-medium">
+                        {__('Min Order Quantity', 'yay-wholesale-b2b')}
+                      </FormLabel>
+                      <FormControl>
+                        <InputNumberRoot
+                          value={field.value}
+                          onValueChange={(value) => field.onChange(value)}
+                          min={0}
+                        >
+                          <InputNumberInput
+                            placeholder={__(
+                              'e.g. 10 (min number of items required per order)',
+                              'yay-wholesale-b2b',
+                            )}
+                            className="h-9 w-full"
+                            aria-invalid={invalid}
+                          />
+                          <InputNumberCarets />
+                        </InputNumberRoot>
+                      </FormControl>
+                      {error && <FormMessage />}
+                    </FormItem>
+                  ) : (
+                    <FormItem className="w-full gap-2.5">
+                      <Label className="text-foreground-400 text-xs font-medium">
+                        {__('Min Order Quantity', 'yay-wholesale-b2b')}
+                        {/* <Badge variant="warning" className="text-white">
+                          {__('Pro', 'yay-wholesale-b2b')}
+                        </Badge> */}
+                      </Label>
+                      <FormControl>
+                        <Input
+                          // value={__('Upgrade to PRO to unlock this feature.', 'yay-wholesale-b2b')}
+                          value={0}
+                          min={0}
+                          disabled
                           className="h-9 w-full"
-                          aria-invalid={invalid}
                         />
-                        <InputNumberCarets />
-                      </InputNumberRoot>
-                    </FormControl>
-                    {error && <FormMessage />}
-                  </FormItem>
-                )}
+                      </FormControl>
+                    </FormItem>
+                  )
+                }
               />
 
               <FormField
@@ -262,7 +284,7 @@ export default function RoleForm() {
                 render={({ field: { ref, ...field }, fieldState: { error } }) => (
                   <FormItem className="w-full gap-2.5">
                     <FormControl>
-                      <div className="border-input flex items-center justify-between rounded-md border p-3">
+                      <div className="border-border flex items-center justify-between rounded-md border p-3">
                         <span className="text-foreground-400 text-sm font-medium">
                           {__('Apply wholesale discounts to sale prices', 'yay-wholesale-b2b')}
                         </span>
@@ -276,11 +298,11 @@ export default function RoleForm() {
             </div>
 
             <SheetFooter className="p-0">
-              <div className="border-border flex justify-end gap-4 border-t bg-white p-5">
+              <div className="border-divider flex justify-end gap-4 border-t bg-white p-5">
                 <SheetClose asChild>
                   <Button
                     variant="outline"
-                    className="border-input text-foreground-400 hover:bg-muted border bg-white px-4.5"
+                    className="border-border text-foreground-400 hover:bg-muted border bg-white px-4.5"
                   >
                     {__('Cancel', 'yay-wholesale-b2b')}
                   </Button>

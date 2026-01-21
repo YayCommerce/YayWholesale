@@ -1,7 +1,7 @@
 <?php
-namespace Yay_Wholesale\Engine\Admin\Emails;
+namespace Yay_Wholesale_B2B\Engine\Admin\Emails;
 
-use Yay_Wholesale\Helpers\RequestsHelper;
+use Yay_Wholesale_B2B\Helpers\RequestsHelper;
 
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
@@ -19,7 +19,7 @@ class NewAccountRegistered extends WholesaleEmailBase {
      */
     public function __construct() {
 
-        $this->id             = 'yay_wholesale_new_account_registered';
+        $this->id             = 'ywhs_new_account_registered';
         $this->customer_email = false;
         $this->title          = __( 'New wholesale account register', 'yay-wholesale-b2b' );
         $this->email_group    = 'wholesale_account';

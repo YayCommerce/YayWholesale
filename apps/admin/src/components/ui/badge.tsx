@@ -10,7 +10,7 @@ const badgeVariants = cva(
     variants: {
       variant: {
         outline:
-          'bg-background hover:bg-accent hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50',
+          'bg-background hover:bg-accent hover:text-accent-foreground dark:bg-input/30 dark:border-border dark:hover:bg-input/50',
         ghost: 'hover:bg-[#F2F5F9] text-foreground bg-transparent focus-visible:text-primary',
         link: 'text-foreground hover:text-primary underline-offset-4 hover:underline',
         muted: 'bg-muted text-muted-foreground hover:bg-muted-accent',

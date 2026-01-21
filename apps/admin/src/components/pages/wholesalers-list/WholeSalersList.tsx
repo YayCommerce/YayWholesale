@@ -167,10 +167,10 @@ export default function WholeSalersList() {
           <a href={window.yayWholesale.user_urls.add_new} target="_blank" rel="noopener noreferrer">
             <Button
               variant="primary-outline"
-              className="hover:bg-primary hover:text-primary-foreground gap-2 rounded-sm px-4 text-sm font-medium shadow-xs"
+              className="hover:bg-primary hover:text-primary-foreground gap-0.25 rounded-sm px-4 text-sm font-medium shadow-xs"
             >
               <Plus className="h-4 w-4" />
-              <span className="text-[12px] text-nowrap sm:text-[14px]">
+              <span className="px-0.75 text-[12px] text-nowrap sm:text-[14px]">
                 {__('Add New Wholesaler', 'yay-wholesale-b2b')}
               </span>
             </Button>
@@ -194,7 +194,7 @@ export default function WholeSalersList() {
         <Table className="min-w-full">
           <TableHeader className="text-foreground bg-muted-400 h-[46px]">
             {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id} className="border-border border-b">
+              <TableRow key={headerGroup.id} className="border-divider border-b">
                 {headerGroup.headers.map((header) => (
                   <TableHead
                     key={header.id}
@@ -229,7 +229,7 @@ export default function WholeSalersList() {
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && 'selected'}
-                  className="not-last:border-border not-last:border-b"
+                  className="not-last:border-divider not-last:border-b"
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell

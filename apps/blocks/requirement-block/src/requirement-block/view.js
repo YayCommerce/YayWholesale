@@ -3,7 +3,6 @@ import { store, getConfig } from '@wordpress/interactivity';
 
 
 let wcState = null;
-let quantityMap = {};
 let isNeedSubcribing = false;
 const i18n = window.wp?.i18n;
 
@@ -55,40 +54,10 @@ try {
 
 const config = getConfig("ywhs_wholesale_requirement");
 const wholesaleRole = config?.wholesale ?? null;
-const restBase = config?.rest_base ?? 'yay-wholesale/v1';
-const currencyData = config?.currency_data ?? {
-    currency: 'VND',
-    symbol: '$',
-    positon: '',
-    thousand_sep: '.',
-    decimal_sep: ',',
-    num_decimals: 2
-};
-const isCheckoutPage = config?.is_checkout_page ?? false;
-
-export function parseWPCurrency(price) {
-    if (typeof price === 'string') {
-      price = parseFloat(price);
-    }
-  
-    const { symbol, position, thousand_sep, decimal_sep, num_decimals } = currencyData;
-    
-    const formattedPrice = price
-    .toFixed(num_decimals)
-      .replace(/\B(?=(\d{3})+(?!\d))/g, thousand_sep)
-      .replace(/(\d+)\.(\d{2})$/, `$1${decimal_sep}$2`);
-  
-    switch (position) {
-      case 'left':
-        return `${symbol}${formattedPrice}`;
-      case 'right':
-        return `${formattedPrice}${symbol}`;
-      case 'left_space':
-        return `${symbol} ${formattedPrice}`;
-      case 'right_space':
-        return `${formattedPrice} ${symbol}`;
-    }
-}
+const adminUrl = config?.admin_url ?? '';
+const isUsingDefaultCurrency = config?.is_using_defaut_currency ?? false;
+const currency = config?.currency ?? "";
+const nonce = config?.nonce ?? "";
 
 const { state, callbacks } = store('ywhs_wholesale_requirement', {
     state: {
@@ -107,7 +76,7 @@ const { state, callbacks } = store('ywhs_wholesale_requirement', {
         async getPriceMap() {
           let priceMap = JSON.parse(localStorage.getItem("ywhs_origin_prices_map"));
 
-          if (priceMap && isCheckoutPage !== priceMap["isCheckoutPage"]) {
+          if (priceMap  && (isUsingDefaultCurrency !== priceMap["isUsingDefaultCurrency"] || currency !== priceMap["currency"])) {
             localStorage.removeItem('ywhs_origin_prices_map');
           }
         },
@@ -115,57 +84,55 @@ const { state, callbacks } = store('ywhs_wholesale_requirement', {
             const cart = wcState?.cart;
             
             if (! cart) return;
-            if (cart.items.length == 0) {
-              localStorage.removeItem('ywhs_origin_prices_map');
-            }
 
             let refetch = false;
-            let bodyToFetch = [];
-            let actualCount = 0;
 
             let priceMap = localStorage.getItem("ywhs_origin_prices_map");
             if (!priceMap) {
                 priceMap = {}
-                refetch = true;
             }else {
                 priceMap = JSON.parse(priceMap);
             }
 
             for (const item of cart.items) {
                 if (!refetch) {
-                    if (!(item.id in priceMap)) {
+                    if (!(item.key in priceMap)) {
                         refetch = true;
+                        break;
                     }
                 }
-                bodyToFetch.push(item.id);
-                quantityMap[item.id] = item.quantity;
-                actualCount += item.quantity;
             }
 
             if (refetch) {
-              const url = wcState.restUrl + restBase + "/prices";
-              const nonce = window.yayWholesale.rest_nonce;
               if (!nonce) return;
-              const response = await fetch(url, {
-                  method: 'POST',
-                  headers: {
-                      'Content-Type': 'application/json',
-                      'X-WP-Nonce': nonce 
-                  },
-                  body: JSON.stringify({ productIds: bodyToFetch, isCheckoutPage }),
-              });
-    
-              if (!response.ok) return;
-              
-              const data = await response.json();
-              priceMap = {...priceMap, ...data.data, isCheckoutPage};
-    
-              localStorage.setItem("ywhs_origin_prices_map", JSON.stringify(priceMap));
+              const payload = {
+                nonce: nonce,
+                default_currency: isUsingDefaultCurrency,
+              };
+              try {
+                  const res = await fetch(`${adminUrl}?action=ywhs_get_original_price_in_cart`, {
+                      method: 'POST',
+                      headers: {
+                          'Content-Type': 'application/json'
+                      },
+                      credentials: 'same-origin',
+                      body: JSON.stringify(payload)
+                  });
+      
+                  const data = await res.json();  
+                  priceMap = {...priceMap, ...data.data, isUsingDefaultCurrency, currency};
+        
+                  localStorage.setItem("ywhs_origin_prices_map", JSON.stringify(priceMap));
+              } catch (e) {
+                  console.error(e);
+              }
             }
-
+            
             let actualSubtotal = 0;
+            let actualCount = 0;
             for (const item of cart.items) {
-                actualSubtotal += quantityMap[item.id] * priceMap[item.id];
+                actualSubtotal += item.quantity * priceMap[item.key];
+                actualCount += item.quantity;
             }
 
             let isDiscounted = actualCount >= wholesaleRole.minOrderQuantity && actualSubtotal >= wholesaleRole.minOrderAmount;

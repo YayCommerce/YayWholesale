@@ -1,15 +1,100 @@
 <?php
 
-namespace Yay_Wholesale\Helpers;
+namespace Yay_Wholesale_B2B\Helpers;
 
+use DateTime;
 use WP_User_Query;
 
 /**
  * Common Helper
  */
 class ReportsHelper {
-    public const REPORT_TRANSIENT            = 'ywhs_report_statistic';
-    public const REPORT_DATE_RANGE_TRANSIENT = 'ywhs_default_report_date_range';
+
+    public static function get_statictis_data( string $compare_start_date, string $compare_end_date, string $start_date, string $end_date ) {
+        $default_date_range = self::get_default_report_date();
+
+        if ( ! isset( $start_date ) ) {
+            $start_date         = $default_date_range['default_start_date'];
+            $compare_start_date = $default_date_range['default_compare_start_date'];
+        }
+
+        if ( ! isset( $end_date ) ) {
+            $end_date         = $default_date_range['default_end_date'];
+            $compare_end_date = $default_date_range['default_compare_end_date'];
+        }
+
+        $ywhs_transient = get_transient(
+            'ywhs_report_statistic_'
+            . $compare_start_date
+            . '_'
+            . $compare_end_date
+            . '_'
+            . $start_date
+            . '_'
+            . $end_date
+        );
+
+        if ( false !== $ywhs_transient ) {
+            return $ywhs_transient;
+        }
+
+        $ywhs_statistic = self::statistic_data( $start_date, $end_date, $compare_start_date, $compare_end_date );
+
+        if ( $start_date === $default_date_range['default_start_date'] &&
+            $end_date === $default_date_range['default_end_date'] &&
+            $compare_start_date === $default_date_range['default_compare_start_date'] &&
+            $compare_end_date === $default_date_range['default_compare_end_date'] ) {
+            set_transient(
+                'ywhs_report_statistic_'
+                . $compare_start_date
+                . '_'
+                . $compare_end_date
+                . '_'
+                . $start_date
+                . '_'
+                . $end_date,
+                $ywhs_statistic,
+                600
+            );
+        }
+
+        return $ywhs_statistic;
+    }
+
+    public static function delete_ywhs_report_transient() {
+        $default_range_transient = self::get_default_report_date();
+
+        delete_transient(
+            'ywhs_report_statistic_'
+            . $default_range_transient['default_compare_start_date']
+            . '_'
+            . $default_range_transient['default_compare_end_date']
+            . '_'
+            . $default_range_transient['default_start_date']
+            . '_'
+            . $default_range_transient['default_end_date']
+        );
+    }
+
+    protected static function get_default_report_date() {
+        $date = new DateTime();
+        $date->modify( '-30 days' );
+        $default_start_date         = $date->format( 'Y-m-d' );
+        $default_compare_start_date = $date->modify( '-31 days' )->format( 'Y-m-d' );
+
+        $now                      = new DateTime();
+        $default_end_date         = $now->format( 'Y-m-d' );
+        $default_compare_end_date = $now->modify( '-31 days' )->format( 'Y-m-d' );
+
+        $default_date_range = [
+            'default_start_date'         => $default_start_date,
+            'default_end_date'           => $default_end_date,
+            'default_compare_start_date' => $default_compare_start_date,
+            'default_compare_end_date'   => $default_compare_end_date,
+        ];
+
+        return $default_date_range;
+    }
 
     protected static function get_orders_to_statistic( $start_date, $end_date ) {
         $args = [
@@ -28,7 +113,7 @@ class ReportsHelper {
         return wc_get_orders( $args );
     }
 
-    public static function statistic_data( $start_date, $end_date, $compare_start_date, $compare_end_date ) {
+    protected static function statistic_data( $start_date, $end_date, $compare_start_date, $compare_end_date ) {
         $revenue            = 0;
         $top_wholesaler     = [];
         $top_product        = [];
@@ -108,7 +193,7 @@ class ReportsHelper {
     }
 
     protected static function statistic_wholesaler( array $top_wholesaler ) {
-        $roles = get_option( 'yay_wholesale_roles', [] );
+        $roles = get_option( 'yay_wholesale_b2b_roles', [] );
 
         if ( empty( $roles ) ) {
             return [];

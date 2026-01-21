@@ -1,10 +1,10 @@
 <?php
 
-namespace Yay_Wholesale\Helpers;
+namespace Yay_Wholesale_B2B\Helpers;
 
-use Yay_Wholesale\Engine\Frontend\Pricing;
-use Yay_Wholesale\Helpers\RolesHelper;
-use Yay_Wholesale\Helpers\SettingsHelper;
+use Yay_Wholesale_B2B\Engine\Frontend\Pricing;
+use Yay_Wholesale_B2B\Helpers\RolesHelper;
+use Yay_Wholesale_B2B\Helpers\SettingsHelper;
 
 /**
  * Common Helper
@@ -21,7 +21,7 @@ class PricingHelper {
         $role = RolesHelper::is_wholesale_user();
 
         if ( ! $role && $allow_default && ! empty( SettingsHelper::get_settings()['general']['default_role'] ) ) {
-            $roles = get_option( 'yay_wholesale_roles', [] );
+            $roles = get_option( 'yay_wholesale_b2b_roles', [] );
             $role  = RolesHelper::get_role_by_slug( $roles, SettingsHelper::get_settings()['general']['default_role'] );
             if ( ! $role || empty( $role['status'] ) ) {
                 return null;
@@ -97,9 +97,10 @@ class PricingHelper {
      * @param float       $price The price.
      * @param array       $role The wholesale role.
      * @param \WC_Product $product The product object.
+     * @param float       $extra The extra price in order.
      * @return float The discounted price.
      */
-    public static function calc_discounted_price( $price, array $role, \WC_Product $product ) {
+    public static function calc_discounted_price( $price, array $role, \WC_Product $product, $extra = 0 ) {
         $discount = isset( $role['discount'] ) ? ( (float) $role['discount'] / 100 ) : 0;
         if ( $discount <= 0 ) {
             return $price;
@@ -107,11 +108,10 @@ class PricingHelper {
 
         $apply_to_sale = $role['applyToSalePrice'] ?? false;
         $regular       = (float) $product->get_regular_price( 'edit' );
-        $sale          = (float) $product->get_sale_price( 'edit' );
-
-        $base = ( $apply_to_sale && $sale > 0 ) ? $sale : $regular;
-        $new  = max( 0, $base * ( 1 - $discount ) );
-        $new  = apply_filters( 'ywhs_price_handle_processed', $new );
+        $sale          = (float) $product->get_price( 'edit' );
+        $base          = ( $apply_to_sale && $sale < $regular ) ? $sale : $regular;
+        $new           = max( 0, ( $base + $extra ) * ( 1 - $discount ) );
+        $new           = apply_filters( 'ywhs_price_handle_processed', $new );
 
         return wc_format_decimal( $new, wc_get_price_decimals() );
     }
@@ -127,7 +127,7 @@ class PricingHelper {
 
         // Calculate the subtotal (in this action, subtotal is not calculated)
         foreach ( $cart as $cart_item ) {
-            $product   = wc_get_product( $cart_item['product_id'] );
+            $product   = $cart_item['data'];
             $price     = apply_filters( 'ywhs_price_handle_processed', $product->get_price( 'edit' ) );
             $subtotal += $price * $cart_item['quantity'];
         }
@@ -167,18 +167,14 @@ class PricingHelper {
      * @param array     $wholesale_role the wholesale role.
      * @param bool      $is_discounted the discounted flag.
      */
-    public static function handle_order( $order, $wholesale_role, $is_discounted, $is_checkout_from_block = true ) {
+    public static function handle_order( $order, $wholesale_role, $is_discounted ) {
         if ( $is_discounted ) {
             $order->update_meta_data( '_ywhs_wholesale_role', $wholesale_role['name'] );
 
             // Send email when new wholesale order has just been placed
             $email_trigger = (int) $order->get_meta( '_ywhs_wholesale_email_trigger' );
 
-            if ( ! $is_checkout_from_block ) {
-                ++$email_trigger;
-            }
-            // This hook runs twice, check the trigger <= 2
-            if ( ( ! isset( $email_trigger ) || $email_trigger <= 2 ) ) {
+            if ( ( ! isset( $email_trigger ) || $email_trigger < 1 ) ) {
                 do_action( 'ywhs_new_wholesale_order_placed', $order->get_id(), $order );
                 $order->update_meta_data( '_ywhs_wholesale_email_trigger', ++$email_trigger );
             }
@@ -186,19 +182,31 @@ class PricingHelper {
             $order->delete_meta_data( '_ywhs_wholesale_role' );
         }
 
-        $default_range_transient = get_transient( ReportsHelper::REPORT_DATE_RANGE_TRANSIENT );
-        if ( false !== $default_range_transient ) {
-            $transient_key = ReportsHelper::REPORT_TRANSIENT
-                            . '_'
-                            . $default_range_transient['default_compare_start_date']
-                            . '_'
-                            . $default_range_transient['default_compare_end_date']
-                            . '_'
-                            . $default_range_transient['default_start_date']
-                            . '_'
-                            . $default_range_transient['default_end_date'];
+        ReportsHelper::delete_ywhs_report_transient();
 
-            delete_transient( $transient_key );
-        }
+        if ( ! is_admin() ) {
+            $extra_price_map = [];
+            foreach ( $order->get_items() as $item ) {
+                if ( ! $item instanceof \WC_Order_Item_Product ) {
+                    continue;
+                }
+
+                $quantity = $item->get_quantity();
+                $product  = $item->get_product();
+
+                // Calculate the Extra price of current order items that is added or substracted
+                // Unit Price * quantity = subtotal
+                $unit_price    = $item->get_subtotal() / $quantity;
+                $initial_price = $unit_price;
+                if ( $is_discounted ) {
+                    // (initial price) * (1 - discount) = Unit Price
+                    $initial_price = $unit_price / ( 1 - ( $wholesale_role['discount'] / 100 ) );
+                }
+                $initial_price                      = round( $initial_price, wc_get_price_decimals() );
+                $extra_price_map[ $item->get_id() ] = $initial_price - $product->get_price( 'edit' );
+            }//end foreach
+
+            $order->update_meta_data( '_ywhs_extra_price_map', $extra_price_map );
+        }//end if
     }
 }

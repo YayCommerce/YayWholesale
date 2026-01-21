@@ -11,18 +11,18 @@
  * Text Domain:       yay-wholesale-b2b
  * Domain Path:       /languages
  * Requires at least: 3.0
- * Requires PHP: 5.4
+ * Requires PHP: 7.0
  * WC requires at least: 3.0.0
  * WC tested up to: 10.2.2
  *
  * @package yaycommerce/yay-wholesale
  */
 
-namespace Yay_Wholesale;
+namespace Yay_Wholesale_B2B;
 
 defined( 'ABSPATH' ) || exit;
 
-if ( function_exists( 'Yay_Wholesale\\plugin_init' ) ) {
+if ( function_exists( 'Yay_Wholesale_B2B\\plugin_init' ) ) {
     require_once plugin_dir_path( __FILE__ ) . 'includes/Fallback.php';
     add_action(
         'admin_init',
@@ -33,27 +33,27 @@ if ( function_exists( 'Yay_Wholesale\\plugin_init' ) ) {
 }
 
 
-if ( ! defined( 'YAY_WHOLESALE_FILE' ) ) {
-    define( 'YAY_WHOLESALE_FILE', __FILE__ );
+if ( ! defined( 'YAY_WHOLESALE_B2B_FILE' ) ) {
+    define( 'YAY_WHOLESALE_B2B_FILE', __FILE__ );
 }
 
-// if ( ! defined( 'YAY_WHOLESALE_VERSION' ) ) {
-    define( 'YAY_WHOLESALE_VERSION', '1.0.0' );
-// }
-
-if ( ! defined( 'YAY_WHOLESALE_PLUGIN_URL' ) ) {
-    define( 'YAY_WHOLESALE_PLUGIN_URL', plugin_dir_url( YAY_WHOLESALE_FILE ) );
+if ( ! defined( 'YAY_WHOLESALE_B2B_VERSION' ) ) {
+    define( 'YAY_WHOLESALE_B2B_VERSION', '1.0.0' );
 }
 
-if ( ! defined( 'YAY_WHOLESALE_PLUGIN_DIR' ) ) {
-    define( 'YAY_WHOLESALE_PLUGIN_DIR', plugin_dir_path( YAY_WHOLESALE_FILE ) );
+if ( ! defined( 'YAY_WHOLESALE_B2B_PLUGIN_URL' ) ) {
+    define( 'YAY_WHOLESALE_B2B_PLUGIN_URL', plugin_dir_url( YAY_WHOLESALE_B2B_FILE ) );
 }
 
-if ( ! defined( 'YAY_WHOLESALE_BASE_NAME' ) ) {
-    define( 'YAY_WHOLESALE_BASE_NAME', plugin_basename( YAY_WHOLESALE_FILE ) );
+if ( ! defined( 'YAY_WHOLESALE_B2B_PLUGIN_DIR' ) ) {
+    define( 'YAY_WHOLESALE_B2B_PLUGIN_DIR', plugin_dir_path( YAY_WHOLESALE_B2B_FILE ) );
 }
 
-define( 'YAY_WHOLESALE_IS_DEVELOPMENT', true );
+if ( ! defined( 'YAY_WHOLESALE_B2B_BASE_NAME' ) ) {
+    define( 'YAY_WHOLESALE_B2B_BASE_NAME', plugin_basename( YAY_WHOLESALE_B2B_FILE ) );
+}
+
+define( 'YAY_WHOLESALE_B2B_IS_DEVELOPMENT', true );
 
 spl_autoload_register(
     function ( $class ) {
@@ -83,16 +83,16 @@ spl_autoload_register(
 );
 
 
-if ( ! function_exists( 'Yay_Wholesale\\plugin_init' ) ) {
+if ( ! function_exists( 'Yay_Wholesale_B2B\\plugin_init' ) ) {
     function plugin_init() {
 
-        \Yay_Wholesale\YayCommerceMenu\RegisterMenu::get_instance();
+        \Yay_Wholesale_B2B\YayCommerceMenu\RegisterMenu::get_instance();
         if ( ! function_exists( 'WC' ) ) {
-            add_action( 'admin_notices', [ \Yay_Wholesale\Engine\ActDeact::class, 'install_yaywholesale_admin_notice' ] );
+            add_action( 'admin_notices', [ \Yay_Wholesale_B2B\Engine\ActDeact::class, 'install_yaywholesale_admin_notice' ] );
             return;
         }
 
-        add_action( 'before_woocommerce_init', [ \Yay_Wholesale\Engine\ActDeact::class, 'before_woocommerce_init' ] );
+        add_action( 'before_woocommerce_init', [ \Yay_Wholesale_B2B\Engine\ActDeact::class, 'before_woocommerce_init' ] );
 
         Initialize::get_instance();
         I18n::load_plugin_textdomain();
@@ -100,8 +100,8 @@ if ( ! function_exists( 'Yay_Wholesale\\plugin_init' ) ) {
 }
 
 if ( ! wp_installing() ) {
-    add_action( 'plugins_loaded', 'Yay_Wholesale\\plugin_init' );
+    add_action( 'plugins_loaded', 'Yay_Wholesale_B2B\\plugin_init' );
 }
 
-register_activation_hook( YAY_WHOLESALE_FILE, [ \Yay_Wholesale\Engine\ActDeact::class, 'activate' ] );
-register_deactivation_hook( YAY_WHOLESALE_FILE, [ \Yay_Wholesale\Engine\ActDeact::class, 'deactivate' ] );
+register_activation_hook( YAY_WHOLESALE_B2B_FILE, [ \Yay_Wholesale_B2B\Engine\ActDeact::class, 'activate' ] );
+register_deactivation_hook( YAY_WHOLESALE_B2B_FILE, [ \Yay_Wholesale_B2B\Engine\ActDeact::class, 'deactivate' ] );

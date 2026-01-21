@@ -1,9 +1,9 @@
 <?php
-namespace Yay_Wholesale\Engine\Frontend;
+namespace Yay_Wholesale_B2B\Engine\Frontend;
 
-use Yay_Wholesale\Utils\SingletonTrait;
-use Yay_Wholesale\Helpers\RolesHelper;
-use Yay_Wholesale\Helpers\SettingsHelper;
+use Yay_Wholesale_B2B\Utils\SingletonTrait;
+use Yay_Wholesale_B2B\Helpers\RolesHelper;
+use Yay_Wholesale_B2B\Helpers\SettingsHelper;
 defined( 'ABSPATH' ) || exit;
 /**
  * Coupon Engine
@@ -13,7 +13,7 @@ class Coupon {
 
     protected function __construct() {
         // Enable/disable Coupon
-        add_filter( 'woocommerce_coupons_enabled', [ $this, 'coupons_enabled' ], PHP_INT_MAX, 1 );
+        add_filter( 'woocommerce_coupons_enabled', [ $this, 'ywhs_coupons_enabled' ], PHP_INT_MAX, 1 );
     }
 
     /**
@@ -22,7 +22,7 @@ class Coupon {
      * @param bool $enabled Whether the coupon is enabled.
      * @return bool Whether the coupon is enabled.
      */
-    public function coupons_enabled( $enabled ) {
+    public function ywhs_coupons_enabled( $enabled ) {
         // bail if already disabled or guest
         if ( ! $enabled || ! is_user_logged_in() ) {
             return $enabled;

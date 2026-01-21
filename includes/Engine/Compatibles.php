@@ -1,12 +1,14 @@
 <?php
-namespace Yay_Wholesale\Engine;
+namespace Yay_Wholesale_B2B\Engine;
 
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-use Yay_Wholesale\Engine\Compatibles\YayCurrency;
-use Yay_Wholesale\Utils\SingletonTrait;
+use Yay_Wholesale_B2B\Engine\Compatibles\YayCurrency;
+use Yay_Wholesale_B2B\Engine\Compatibles\YayExtra;
+use Yay_Wholesale_B2B\Engine\Compatibles\YayMail;
+use Yay_Wholesale_B2B\Utils\SingletonTrait;
 
 /**
  * Compatibles
@@ -16,6 +18,8 @@ class Compatibles {
 
     protected function __construct() {
         YayCurrency::get_instance();
+        YayExtra::get_instance();
+        YayMail::get_instance();
     }
 
     public function remove_price_related_hooks() {

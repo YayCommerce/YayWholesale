@@ -1,11 +1,11 @@
 <?php
-namespace Yay_Wholesale\Controllers;
+namespace Yay_Wholesale_B2B\Controllers;
 
-use Yay_Wholesale\Utils\SingletonTrait;
+use Yay_Wholesale_B2B\Utils\SingletonTrait;
 use WP_REST_Request;
 use WP_REST_Response;
-use Yay_Wholesale\Helpers\RolesHelper;
-use Yay_Wholesale\Helpers\WholeSalersHelper;
+use Yay_Wholesale_B2B\Helpers\RolesHelper;
+use Yay_Wholesale_B2B\Helpers\WholeSalersHelper;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -115,7 +115,7 @@ class WholeSalersController extends BaseRestController {
 
         $response = WholeSalersHelper::get_wholesalers_list( $search, $page, $per_page, $role );
 
-        return $this->success( $response, __( 'Whole salers list fetched successfully', 'yay-wholesale-b2b' ) );
+        return $this->success( $response, __( 'Wholesalers list fetched successfully', 'yay-wholesale-b2b' ) );
     }
 
     /**

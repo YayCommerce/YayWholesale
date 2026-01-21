@@ -1,7 +1,7 @@
 <?php
-namespace Yay_Wholesale\Engine\Admin\Emails;
+namespace Yay_Wholesale_B2B\Engine\Admin\Emails;
 
-use Yay_Wholesale\Utils\SingletonTrait;
+use Yay_Wholesale_B2B\Utils\SingletonTrait;
 
 defined( 'ABSPATH' ) || exit;
 /**
@@ -12,19 +12,19 @@ class Emails {
 
     protected function __construct() {
         // Register email classes
-        add_filter( 'woocommerce_email_classes', [ $this, 'yay_wholesale_register_email_classes' ] );
-        add_filter( 'woocommerce_email_actions', [ $this, 'yay_wholesale_register_email_actions' ] );
+        add_filter( 'woocommerce_email_classes', [ $this, 'ywhs_register_email_classes' ] );
+        add_filter( 'woocommerce_email_actions', [ $this, 'ywhs_register_email_actions' ] );
 
         // Preview emails
         add_filter( 'woocommerce_email_preview_placeholders', [ $this, 'email_preview_placeholders' ], 10, 3 );
     }
 
-    public function yay_wholesale_register_email_classes( $email_classes ) {
-        $email_classes['Yay_Wholesale_New_Order_Placed']              = new NewOrderPlaced();
-        $email_classes['Yay_Wholesale_New_Account_Registered']        = new NewAccountRegistered();
-        $email_classes['Yay_Wholesale_Account_Registration_Approved'] = new AccountRegistrationApproved();
-        $email_classes['Yay_Wholesale_Account_Registration_Rejected'] = new AccountRegistrationRejected();
-        $email_classes['Yay_Wholesale_Account_Registration_Pending']  = new AccountRegistrationPending();
+    public function ywhs_register_email_classes( $email_classes ) {
+        $email_classes['Yay_Wholesale_B2B_New_Order_Placed']              = new NewOrderPlaced();
+        $email_classes['Yay_Wholesale_B2B_New_Account_Registered']        = new NewAccountRegistered();
+        $email_classes['Yay_Wholesale_B2B_Account_Registration_Approved'] = new AccountRegistrationApproved();
+        $email_classes['Yay_Wholesale_B2B_Account_Registration_Rejected'] = new AccountRegistrationRejected();
+        $email_classes['Yay_Wholesale_B2B_Account_Registration_Pending']  = new AccountRegistrationPending();
 
         return $email_classes;
     }
@@ -41,7 +41,7 @@ class Emails {
      * @param array $actions
      * @return array $new_actions
      */
-    public function yay_wholesale_register_email_actions( $actions ) {
+    public function ywhs_register_email_actions( $actions ) {
         $new_actions = array_merge(
             $actions,
             [

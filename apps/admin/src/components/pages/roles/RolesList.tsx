@@ -147,11 +147,11 @@ export default function RolesList() {
           )}
           <Button
             variant="primary-outline"
-            className="hover:bg-primary hover:text-primary-foreground gap-2 rounded-sm px-4 text-sm font-medium shadow-xs"
+            className="hover:bg-primary hover:text-primary-foreground gap-0.25 rounded-sm px-4 text-sm font-medium shadow-xs"
             onClick={() => navigate('/roles/new')}
           >
             <Plus className="h-4 w-4" />
-            {__('Add New Role', 'yay-wholesale-b2b')}
+            <span className="px-0.75">{__('Add New Role', 'yay-wholesale-b2b')}</span>
           </Button>
         </div>
       </div>
@@ -173,7 +173,7 @@ export default function RolesList() {
         <Table className="min-w-full">
           <TableHeader className="text-foreground bg-muted-400 h-[46px]">
             {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id} className="border-border border-b">
+              <TableRow key={headerGroup.id} className="border-divider border-b">
                 {headerGroup.headers.map((header) => (
                   <TableHead
                     key={header.id}
@@ -206,7 +206,7 @@ export default function RolesList() {
               </TableRow>
             ) : table.getRowModel().rows.length > 0 ? (
               table.getRowModel().rows.map((row) => (
-                <TableRow key={row.id} className="group not-last:border-border not-last:border-b">
+                <TableRow key={row.id} className="group not-last:border-divider not-last:border-b">
                   {row.getVisibleCells().map((cell) => (
                     <TableCell
                       key={cell.id}
@@ -310,7 +310,7 @@ export default function RolesList() {
                   </div>
                 </PopoverContent>
               </Popover>
-              <span className="border-border h-5 w-px border-r border-solid" aria-hidden />
+              <span className="border-divider h-5 w-px border-r border-solid" aria-hidden />
               <AlertDialog open={openBulkDeleteDialog} onOpenChange={setOpenDeleteDialog}>
                 <WholeSaleToolTip
                   trigger={

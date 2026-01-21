@@ -1,7 +1,7 @@
 <?php
-namespace Yay_Wholesale\Controllers;
+namespace Yay_Wholesale_B2B\Controllers;
 
-use Yay_Wholesale\Utils\SingletonTrait;
+use Yay_Wholesale_B2B\Utils\SingletonTrait;
 use WP_REST_Request;
 use WP_REST_Response;
 
@@ -77,7 +77,7 @@ class SettingsRestController extends BaseRestController {
             return $this->error( __( 'Invalid settings data', 'yay-wholesale-b2b' ) );
         }
 
-        update_option( 'yay_wholesale_settings', $params );
+        update_option( 'yay_wholesale_b2b_settings', $params );
 
         return $this->success( [], __( 'Settings saved!', 'yay-wholesale-b2b' ) );
     }
@@ -88,7 +88,7 @@ class SettingsRestController extends BaseRestController {
      * @return WP_REST_Response The response object.
      */
     public function mark_reviewed(): WP_REST_Response {
-        update_option( 'yay_wholesale_reviewed', true );
+        update_option( 'yay_wholesale_b2b_reviewed', true );
         return $this->success();
     }
 

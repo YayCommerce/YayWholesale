@@ -1,7 +1,7 @@
 <?php
-namespace Yay_Wholesale\Engine\Admin\Emails;
+namespace Yay_Wholesale_B2B\Engine\Admin\Emails;
 
-use Yay_Wholesale\Helpers\RequestsHelper;
+use Yay_Wholesale_B2B\Helpers\RequestsHelper;
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
@@ -30,7 +30,7 @@ class AccountRegistrationApproved extends WholesaleEmailBase {
      */
     public function __construct() {
 
-        $this->id             = 'yay_wholesale_account_registration_approved';
+        $this->id             = 'ywhs_account_registration_approved';
         $this->customer_email = true;
         $this->title          = __( 'Wholesale account is approved', 'yay-wholesale-b2b' );
         $this->email_group    = 'wholesale_account';

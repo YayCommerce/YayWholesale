@@ -4,35 +4,9 @@ import { useSelect } from "@wordpress/data";
 
 const { ExperimentalOrderMeta } = window.wc.blocksCheckout;
 
-const parseWPCurrency = (price) => {
-    if (typeof price === 'string') {
-      price = parseFloat(price);
-    }
-  
-    const { symbol, position, thousand_sep, decimal_sep, num_decimals } =
-      window.ywhsRequirement.currency_data;
-  
-    const formattedPrice = price
-      .toFixed(num_decimals)
-      .replace(/\B(?=(\d{3})+(?!\d))/g, thousand_sep)
-      .replace(/(\d+)\.(\d{2})$/, `$1${decimal_sep}$2`);
-  
-    switch (position) {
-      case 'left':
-        return `${symbol}${formattedPrice}`;
-      case 'right':
-        return `${formattedPrice}${symbol}`;
-      case 'left_space':
-        return `${symbol} ${formattedPrice}`;
-      case 'right_space':
-        return `${formattedPrice} ${symbol}`;
-    }
-  }
-
 const Render = () => {
     const {
         wholesale,
-        minAmountPrice,
         priceMap
     } = window.ywhsRequirement;
 
@@ -51,9 +25,8 @@ const Render = () => {
     const {notice, progress, actualSubtotal, actualCount, isDiscounted } = useMemo(() => {
         let actualCount = cart.itemsCount;
         let actualSubtotal = 0;
-        
         cart.items.forEach(item => {
-            actualSubtotal += item.quantity * priceMap[item.id];
+            actualSubtotal += item.quantity * priceMap[item.key];
         });
 
         let isDiscounted = actualCount >= wholesale.minOrderQuantity && actualSubtotal >= wholesale.minOrderAmount;

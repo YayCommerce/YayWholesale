@@ -1,39 +1,40 @@
 :root {
-  --background: #ffffff; /* #FFFFFF */
+  --background: #ffffff;
   --foreground-400: #333333;
-  --foreground: #171719; /* #171719 neutral-900 */
+  --foreground: #171719;
 
-  --primary: #2271b1; /* #2271B1 */
-  --primary-foreground: #ffffff; /* #FFFFFF */
-  --primary-accent: #135e96; /* #135E96 */
+  --primary: #2271b1;
+  --primary-foreground: #ffffff;
+  --primary-accent: #135e96;
 
-  --success: #279727; /* #279727 */
-  --success-foreground: #ffffff; /* #FFFFFF */
-  --success-accent: #1f751f; /* #1F751F */
+  --success: #279727;
+  --success-foreground: #ffffff;
+  --success-accent: #1f751f;
 
-  --destructive: #d50719; /* #D50719 */
-  --destructive-foreground: #ffffff; /* #FFFFFF */
-  --destructive-accent: #be0010; /* #BE0010 */
+  --destructive: #d50719;
+  --destructive-foreground: #ffffff;
+  --destructive-accent: #be0010;
 
-  --warning: #f9bd09; /* #F9BD09 */
-  --warning-foreground: #111517; /* #111517 */
-  --warning-accent: #f4a20a; /* #f4a20a */
+  --warning: #f9bd09;
+  --warning-foreground: #111517;
+  --warning-accent: #f4a20a;
 
   --muted-400: #fafafa;
-  --muted: #f4f4f5; /* #f4f4f5 neutral-100 */
-  --muted-foreground: #737373; /* #737373 neutral-500 */
-  --accent: #f5f5f5; /* #f5f5f5 neutral-100 */
-  --accent-foreground: #171717; /* #171717 neutral-900 */
-  --border: #f4f4f5; /* #f4f4f5 neutral-200 */
-  --input: #e4e4e7; /* #e4e4e7 neutral-200 */
-  --input-accent: #d4d4d4; /* #d4d4d4 neutral-300 */
-  --ring: #2271b1; /* #2271B1 */
-  --ring-accent: #135e96; /* #135E96 */
+  --muted: #f4f4f5;
+  --muted-foreground: #737373;
+  --accent: #f5f5f5;
+  --accent-foreground: #171717;
+  --border: #e4e4e7;
+  --divider: #f4f4f5;
+  --input: #e4e4e7;
+  --input-accent: #d4d4d4;
+  --ring: #2271b1;
+  --ring-accent: #135e96;
 
-  --card: #ffffff; /* #FFFFFF */
-  --card-foreground: #171717; /* #171717 neutral-900 */
-  --popover: #ffffff; /* #FFFFFF */
-  --popover-foreground: #171717; /* #171717 neutral-900 */
+  --card: #ffffff;
+  --card-foreground: #171717;
+  --popover: #ffffff;
+  --popover-foreground: #171717;
 
   --radius: 0.625rem;
   --default-transition-duration: 0.3s;
@@ -72,6 +73,7 @@
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
   --color-border: var(--border);
+  --color-divider: var(--divider);
   --color-input: var(--input);
   --color-input-accent: var(--input-accent);
   --color-ring: var(--ring);

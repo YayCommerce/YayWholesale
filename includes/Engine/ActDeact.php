@@ -1,7 +1,7 @@
 <?php
-namespace Yay_Wholesale\Engine;
+namespace Yay_Wholesale_B2B\Engine;
 
-use Yay_Wholesale\Helpers\SettingsHelper;
+use Yay_Wholesale_B2B\Helpers\SettingsHelper;
 
 /**
  * Activate and deactive method of the plugin and relates.
@@ -16,7 +16,7 @@ class ActDeact {
 
     public static function before_woocommerce_init() {
         if ( class_exists( \Automattic\WooCommerce\Utilities\FeaturesUtil::class ) ) {
-            \Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility( 'custom_order_tables', YAY_WHOLESALE_FILE, true );
+            \Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility( 'custom_order_tables', YAY_WHOLESALE_B2B_FILE, true );
         }
     }
 
@@ -28,7 +28,7 @@ class ActDeact {
 
         $setting = SettingsHelper::get_settings();
         if ( empty( $setting['general']['default_role'] ) ) {
-            $role_slugs = array_column( get_option( 'yay_wholesale_roles', [] ), 'slug' );
+            $role_slugs = array_column( get_option( 'yay_wholesale_b2b_roles', [] ), 'slug' );
             if ( count( $role_slugs ) > 0 ) {
                 $setting['general']['default_role'] = $role_slugs[0];
             } else {
@@ -48,10 +48,10 @@ class ActDeact {
 
                 add_role( $default_slug, $default_role_name, [ 'read' => true ] );
 
-                update_option( 'yay_wholesale_roles', [ $default_role ] );
+                update_option( 'yay_wholesale_b2b_roles', [ $default_role ] );
                 $setting['general']['default_role'] = $default_slug;
             }//end if
-            update_option( 'yay_wholesale_settings', $setting );
+            update_option( 'yay_wholesale_b2b_settings', $setting );
         }//end if
     }
 

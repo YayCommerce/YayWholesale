@@ -1,7 +1,7 @@
 <?php
-namespace Yay_Wholesale\Engine;
+namespace Yay_Wholesale_B2B\Engine;
 
-use Yay_Wholesale\Utils\SingletonTrait;
+use Yay_Wholesale_B2B\Utils\SingletonTrait;
 
 
 defined( 'ABSPATH' ) || exit;

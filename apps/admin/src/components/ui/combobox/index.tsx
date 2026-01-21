@@ -58,7 +58,7 @@ function Combobox({ values, selectedValues, onChange }: ComboboxProps) {
                 }}
               >
                 <div
-                  className="border-input data-[selected=true]:border-primary data-[selected=true]:bg-primary data-[selected=true]:text-primary-foreground pointer-events-none size-4 shrink-0 rounded-[4px] border transition-all select-none *:[svg]:opacity-0 data-[selected=true]:*:[svg]:opacity-100"
+                  className="border-border data-[selected=true]:border-primary data-[selected=true]:bg-primary data-[selected=true]:text-primary-foreground pointer-events-none size-4 shrink-0 rounded-[4px] border transition-all select-none *:[svg]:opacity-0 data-[selected=true]:*:[svg]:opacity-100"
                   data-selected={selectedValues.length === values.length}
                 >
                   <CheckIcon className="size-3.5 text-current" />
@@ -77,7 +77,7 @@ function Combobox({ values, selectedValues, onChange }: ComboboxProps) {
                   }}
                 >
                   <div
-                    className="border-input data-[selected=true]:border-primary data-[selected=true]:bg-primary data-[selected=true]:text-primary-foreground pointer-events-none size-4 shrink-0 rounded-[4px] border transition-all select-none *:[svg]:opacity-0 data-[selected=true]:*:[svg]:opacity-100"
+                    className="border-border data-[selected=true]:border-primary data-[selected=true]:bg-primary data-[selected=true]:text-primary-foreground pointer-events-none size-4 shrink-0 rounded-[4px] border transition-all select-none *:[svg]:opacity-0 data-[selected=true]:*:[svg]:opacity-100"
                     data-selected={selectedValues.some((f) => f.value === value.value)}
                   >
                     <CheckIcon className="size-3.5 text-current" />

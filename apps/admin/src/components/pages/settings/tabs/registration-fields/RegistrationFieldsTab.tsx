@@ -64,10 +64,10 @@ export default function RegistrationFieldsTab() {
         <Button
           variant="primary-outline"
           onClick={addNewField}
-          className="rounded-1.5 hover:bg-primary hover:text-primary-foreground gap-2 p-3 text-sm font-medium shadow-xs"
+          className="rounded-1.5 hover:bg-primary hover:text-primary-foreground gap-0.25 p-3 text-sm font-medium shadow-xs"
         >
           <Plus className="h-4 w-4" />
-          {__('Add New Field', 'yay-wholesale-b2b')}
+          <span className="px-0.75">{__('Add New Field', 'yay-wholesale-b2b')}</span>
         </Button>
       </div>
       <Card className="m-0 rounded-md p-0 shadow-none">
