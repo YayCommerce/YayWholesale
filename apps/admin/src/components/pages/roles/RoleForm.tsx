@@ -229,13 +229,14 @@ export default function RoleForm() {
                     <FormItem className="w-full gap-2.5">
                       <Label className="text-foreground-400 text-xs font-medium">
                         {__('Min Order Quantity', 'yay-wholesale-b2b')}
-                        <Badge variant="warning" className="text-white">
+                        {/* <Badge variant="warning" className="text-white">
                           {__('Pro', 'yay-wholesale-b2b')}
-                        </Badge>
+                        </Badge> */}
                       </Label>
                       <FormControl>
                         <Input
-                          value={__('Upgrade to PRO to unlock this feature.', 'yay-wholesale-b2b')}
+                          // value={__('Upgrade to PRO to unlock this feature.', 'yay-wholesale-b2b')}
+                          value={0}
                           min={0}
                           disabled
                           className="h-9 w-full"

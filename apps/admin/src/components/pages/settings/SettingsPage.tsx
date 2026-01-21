@@ -41,6 +41,8 @@ export default function SettingsPage() {
   const saveMutation = useSaveSettingsMutation();
 
   async function onSubmit(data: SettingsFormData) {
+    if (saveMutation.isPending) return;
+
     await saveMutation.mutateAsync(data);
     window.yayWholesale.settings = data;
     form.reset(data);
@@ -108,16 +110,15 @@ export default function SettingsPage() {
         <UnsavedChangeDialog
           open={showDialog}
           onDiscard={confirmLeave}
-          onSave={async () => {
-            await form.handleSubmit(onSubmit)();
-            confirmLeave();
+          onSave={() => {
+            cancelLeave();
+            form.handleSubmit(onSubmit)();
           }}
           onOpenChange={(open) => {
             if (!open) {
               cancelLeave();
             }
           }}
-          disabledSave={saveMutation.isPending}
         />
       </form>
     </FormProvider>

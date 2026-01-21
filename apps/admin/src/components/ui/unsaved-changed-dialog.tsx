@@ -3,13 +3,10 @@ import { __ } from '@wordpress/i18n';
 import { Button } from './button';
 import {
   Dialog,
-  DialogClose,
-  DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogOverlay,
-  DialogPortal,
+  DialogPortalContent,
   DialogTitle,
 } from './dialog';
 
@@ -17,8 +14,6 @@ interface UnsavedChangeDialogProps {
   open: boolean;
   onDiscard: () => void;
   onSave: () => void;
-  disabledCancel?: boolean;
-  disabledSave?: boolean;
   onOpenChange: (open: boolean) => void;
   children?: React.ReactNode;
 }
@@ -27,37 +22,31 @@ export function UnsavedChangeDialog({
   open,
   onDiscard,
   onSave,
-  disabledCancel = false,
-  disabledSave = false,
   onOpenChange,
   children = (
     <DialogDescription>
-      {__('You have unsaved changes. Do you want to save them before leaving?', 'bookster')}
+      {__(
+        'You have unsaved changes. Do you want to save them before leaving?',
+        'yay-wholesale-b2b',
+      )}
     </DialogDescription>
   ),
 }: UnsavedChangeDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogPortal>
-        <DialogClose>
-          <DialogOverlay />
-        </DialogClose>
-        <DialogContent className="bw:max-w-md">
-          <DialogHeader className="bw:border-b-0">
-            <DialogTitle>{__('Unsaved Changes', 'bookster')}</DialogTitle>
-            {children}
-          </DialogHeader>
+      <DialogPortalContent className="bw:max-w-md">
+        <DialogHeader className="bw:border-b-0">
+          <DialogTitle>{__('Unsaved Changes', 'yay-wholesale-b2b')}</DialogTitle>
+          {children}
+        </DialogHeader>
 
-          <DialogFooter>
-            <Button variant="ghost" onClick={onDiscard} disabled={disabledCancel}>
-              {__('Discard Changes', 'bookster')}
-            </Button>
-            <Button onClick={onSave} disabled={disabledSave}>
-              {__('Save Changes', 'bookster')}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </DialogPortal>
+        <DialogFooter>
+          <Button variant="ghost" onClick={onDiscard}>
+            {__('Discard Changes', 'yay-wholesale-b2b')}
+          </Button>
+          <Button onClick={onSave}>{__('Save Changes', 'yay-wholesale-b2b')}</Button>
+        </DialogFooter>
+      </DialogPortalContent>
     </Dialog>
   );
 }
