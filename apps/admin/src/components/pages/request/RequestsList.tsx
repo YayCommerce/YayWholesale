@@ -3,7 +3,7 @@ import { CaretUpDownIcon } from '@phosphor-icons/react';
 import { flexRender, getCoreRowModel, PaginationState, useReactTable } from '@tanstack/react-table';
 import { Spinner } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
-import { ChevronLeft, ChevronRight, Search } from 'lucide-react';
+import { Search } from 'lucide-react';
 
 import {
   useBulkDeleteRequestMutation,
@@ -14,28 +14,27 @@ import {
 import { useActiveRolesQuery } from '@/lib/queries/roles';
 import { RequestFormValues } from '@/lib/schema/requests';
 import { cn } from '@/lib/utils';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
 import { Badge } from '@/components/ui/badge';
 import {
+  BulkActionBox,
   BulkActionButton,
   BulkActionMenu,
   BulkActionMenuContent,
   BulkMenuButtonAndTrigger,
 } from '@/components/ui/bulk-actions';
-import BulkActionBox from '@/components/ui/bulk-actions-box';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import {
+  Dialog,
+  DialogClose,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogPortalContent,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group';
-import { InputNumberInput, InputNumberRoot } from '@/components/ui/input-number';
+import { Pagination } from '@/components/ui/pagination';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import {
   Select,
@@ -140,8 +139,13 @@ export default function RequestsList() {
     table.resetRowSelection();
   };
 
+  const onFilterChanged = (value: string) => {
+    setStatusFilter(value);
+    setPagination({ ...pagination, pageIndex: 0 });
+  };
+
   return (
-    <Card className="gap-4 rounded-lg p-6 shadow-sm">
+    <Card className="gap-4 shadow-sm">
       {/* Header */}
       <div className="flex flex-nowrap items-center justify-between gap-3">
         <div className="flex items-center gap-2">
@@ -168,7 +172,7 @@ export default function RequestsList() {
           )}
         </div>
         <div className="flex flex-col items-end gap-4 md:flex-row">
-          <Select value={statusFilter} onValueChange={setStatusFilter}>
+          <Select value={statusFilter} onValueChange={(value) => onFilterChanged(value)}>
             <SelectTrigger className="w-40">
               <SelectValue />
             </SelectTrigger>
@@ -215,7 +219,7 @@ export default function RequestsList() {
           </div>
         )}
         <Table className="min-w-full">
-          <TableHeader className="text-foreground bg-muted-400 h-[46px]">
+          <TableHeader className="text-foreground">
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id} className="border-divider border-b">
                 {headerGroup.headers.map((header) => (
@@ -296,7 +300,7 @@ export default function RequestsList() {
                 <PopoverTrigger asChild>
                   <Button
                     variant="ghost"
-                    className="hover:text-primary hover:bg-primary/6 group bold flex cursor-pointer items-center gap-1.5 px-2.5"
+                    className="hover:text-primary hover:bg-primary/6 group flex gap-1.5 px-2.5"
                   >
                     <span className="text-sm font-normal">{__('Status', 'yay-wholesale-b2b')}</span>
                     <span className="group-hover:text-primary text-icon flex items-center">
@@ -332,7 +336,7 @@ export default function RequestsList() {
                 </PopoverContent>
               </Popover>
               <Separator orientation="vertical" className="h-5!" />
-              <AlertDialog open={openBulkDeleteDialog} onOpenChange={setOpenDeleteDialog}>
+              <Dialog open={openBulkDeleteDialog} onOpenChange={setOpenDeleteDialog}>
                 <WholeSaleToolTip
                   trigger={
                     <Button
@@ -346,88 +350,45 @@ export default function RequestsList() {
                   }
                   content={<span>{__('Delete', 'yay-wholesale-b2b')}</span>}
                 />
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>
+                <DialogPortalContent className="bw:max-w-md">
+                  <DialogHeader className="bw:border-b-0">
+                    <DialogTitle>
                       {sprintf(
                         __(`Are you sure you want to delete %d requests ?`, 'yay-wholesale-b2b'),
                         selectedCount,
                       )}
-                    </AlertDialogTitle>
-                    <AlertDialogDescription>
+                    </DialogTitle>
+                    <DialogDescription>
                       {__(
-                        'This action cannot be undone. This will permanently delete these request and remove data from servers',
+                        'This action cannot be undone. This will permanently delete these requests and remove data from servers',
                         'yay-wholesale-b2b',
                       )}
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel>{__('Cancel', 'yay-wholesale-b2b')}</AlertDialogCancel>
-                    <AlertDialogAction
-                      className="bg-destructive text-destructive-foreground hover:bg-destructive/80"
-                      onClick={() => handleBulkDelete()}
-                    >
+                    </DialogDescription>
+                  </DialogHeader>
+                  <DialogFooter>
+                    <DialogClose asChild>
+                      <Button variant="outline">{__('Cancel', 'yay-wholesale-b2b')}</Button>
+                    </DialogClose>
+                    <Button variant="destructive" onClick={() => handleBulkDelete()}>
                       {__('Continue', 'yay-wholesale-b2b')}
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
+                    </Button>
+                  </DialogFooter>
+                </DialogPortalContent>
+              </Dialog>
             </BulkActionBox>
           )}
 
           {table.getPageCount() > 1 && (
-            <div className="flex items-center gap-4">
-              <span className="text-foreground-400 text-sm font-normal">
-                {sprintf(
-                  __('Page %d of %d', 'yay-wholesale-b2b'),
-                  table.getState().pagination.pageIndex + 1,
-                  table.getPageCount(),
-                )}
-              </span>
-
-              <div className="flex items-center gap-1">
-                <Button
-                  variant="outline"
-                  size="icon"
-                  className="h-9 w-9 rounded-sm"
-                  onClick={() => table.previousPage()}
-                  disabled={!table.getCanPreviousPage()}
-                >
-                  <ChevronLeft className="h-4 w-4" />
-                </Button>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  className="h-9 w-9 rounded-sm"
-                  onClick={() => table.nextPage()}
-                  disabled={!table.getCanNextPage()}
-                >
-                  <ChevronRight className="h-4 w-4" />
-                </Button>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <span className="text-foreground-400 text-sm font-normal">
-                  {__('Go to', 'yay-wholesale-b2b')}
-                </span>
-                <InputNumberRoot
-                  min={1}
-                  max={table.getPageCount()}
-                  value={table.getState().pagination.pageIndex + 1}
-                  onValueChange={(value) => {
-                    if (isFetchingRequests) return;
-                    const page = value ? Number(value) - 1 : 0;
-                    if (page >= 0 && page < table.getPageCount()) {
-                      table.setPageIndex(page);
-                    }
-                  }}
-                  className="text-foreground-400 h-9 w-15 rounded-sm text-sm font-normal focus-visible:ring-0"
-                  disabled={isFetchingRequests || table.getPageCount() <= 1}
-                >
-                  <InputNumberInput className="disabled:bg-muted-400 w-full shadow-xs disabled:text-black" />
-                </InputNumberRoot>
-              </div>
-            </div>
+            <Pagination
+              pageIndex={table.getState().pagination.pageIndex}
+              pageCount={table.getPageCount()}
+              onPreviousPage={() => table.previousPage()}
+              onNextPage={() => table.nextPage()}
+              onPageChange={(page) => table.setPageIndex(page)}
+              canPreviousPage={table.getCanPreviousPage()}
+              canNextPage={table.getCanNextPage()}
+              className="sm:ms-auto"
+            />
           )}
         </div>
       )}

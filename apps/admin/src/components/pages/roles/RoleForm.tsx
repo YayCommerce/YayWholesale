@@ -1,20 +1,25 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { X } from 'lucide-react';
-import { FormProvider, useForm } from 'react-hook-form';
+import { Controller, FormProvider, useForm } from 'react-hook-form';
 import { useMatch, useNavigate, useParams } from 'react-router-dom';
 import { useUpdateEffect } from 'react-use';
 
 import { useAddRoleMutation, useRoleQuery, useUpdateRoleMutation } from '@/lib/queries/roles';
 import { createRoleSchema, RoleFormValues, roleSchema } from '@/lib/schema/roles';
-import { cn, isPro } from '@/lib/utils';
+import { isPro } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Field, FieldContent, FieldError, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
-import { InputNumberCarets, InputNumberInput, InputNumberRoot } from '@/components/ui/input-number';
 import { Label } from '@/components/ui/label';
+import {
+  NumberInput,
+  NumberInputChevrons,
+  NumberInputInput,
+  NumberInputRoot,
+  NumberInputUnit,
+} from '@/components/ui/number-input';
 import {
   Sheet,
   SheetClose,
@@ -30,9 +35,9 @@ import { Textarea } from '@/components/ui/textarea';
 export const DEFAULT_ROLE = {
   name: '',
   description: '',
-  discount: undefined,
-  minOrderQuantity: isPro ? undefined : 0,
-  minOrderAmount: undefined,
+  discount: 0,
+  minOrderQuantity: 0,
+  minOrderAmount: 0,
   applyToSalePrice: false,
   status: true,
 };
@@ -117,182 +122,229 @@ export default function RoleForm() {
                     )}
                   </SheetDescription>
                 </div>
-                <SheetClose asChild>
-                  <button className="hover:text-muted-foreground mt-1 text-[#67708066]">
-                    <X className="h-5 w-5" />
-                  </button>
-                </SheetClose>
               </div>
             </SheetHeader>
 
             <div className="grid gap-5 overflow-auto p-5">
-              <FormField
+              <Controller
                 control={form.control}
-                name={`name`}
+                name="name"
                 render={({ field: { ref, ...field }, fieldState: { error, invalid } }) => (
-                  <FormItem className="w-full gap-2.5">
-                    <FormLabel className="text-foreground-400 text-xs font-medium">
+                  <Field className="w-full gap-2.5">
+                    <FieldLabel className="text-foreground-400 text-xs font-medium">
                       {__('Role Name', 'yay-wholesale-b2b')}
-                    </FormLabel>
-                    <FormControl>
+                    </FieldLabel>
+                    <FieldContent>
                       <Input
                         {...field}
                         value={field.value ?? ''}
                         placeholder={__('Enter a wholesale role name', 'yay-wholesale-b2b')}
-                        className="h-9 rounded-md focus-visible:ring-0"
+                        className="h-9 rounded-md"
                         aria-invalid={invalid}
                       />
-                    </FormControl>
-                    {error && <FormMessage />}
-                  </FormItem>
+                    </FieldContent>
+                    {error && (
+                      <FieldError
+                        errors={[
+                          {
+                            message: error.message,
+                          },
+                        ]}
+                      />
+                    )}
+                  </Field>
                 )}
               />
 
-              <FormField
+              <Controller
                 control={form.control}
                 name={`description`}
                 render={({ field: { ref, ...field }, fieldState: { error, invalid } }) => (
-                  <FormItem className="w-full gap-2.5">
-                    <FormLabel className="text-foreground-400 text-xs font-medium">
+                  <Field className="w-full gap-2.5">
+                    <FieldLabel className="text-foreground-400 text-xs font-medium">
                       {__('Role description', 'yay-wholesale-b2b')}
-                    </FormLabel>
-                    <FormControl>
+                    </FieldLabel>
+                    <FieldContent>
                       <Textarea
                         {...field}
                         placeholder={__('This is role description', 'yay-wholesale-b2b')}
                         className="h-24 rounded-md"
                         aria-invalid={invalid}
                       />
-                    </FormControl>
-                    {error && <FormMessage>{error.message}</FormMessage>}
-                  </FormItem>
+                    </FieldContent>
+                    {error && (
+                      <FieldError
+                        errors={[
+                          {
+                            message: error.message,
+                          },
+                        ]}
+                      />
+                    )}
+                  </Field>
                 )}
               />
 
-              <FormField
+              <Controller
                 control={form.control}
                 name={`discount`}
                 render={({ field: { ref, ...field }, fieldState: { error, invalid } }) => (
-                  <FormItem className="w-full gap-2.5">
-                    <FormLabel className="text-foreground-400 text-xs font-medium">
+                  <Field className="w-full gap-2.5">
+                    <FieldLabel className="text-foreground-400 text-xs font-medium">
                       {__('Discount', 'yay-wholesale-b2b')}
-                    </FormLabel>
-                    <FormControl>
-                      <InputNumberRoot
+                    </FieldLabel>
+                    <FieldContent>
+                      <NumberInput
                         value={field.value}
                         onValueChange={(value) => field.onChange(value)}
                         min={0}
                         max={100}
-                      >
-                        <InputNumberInput
-                          placeholder={__('Enter a percentage discount', 'yay-wholesale-b2b')}
-                          className="h-9 w-full"
-                          aria-invalid={invalid}
-                        />
-                        <InputNumberCarets />
-                      </InputNumberRoot>
-                    </FormControl>
-                    {error && <FormMessage />}
-                  </FormItem>
+                        step={1}
+                        placeholder={__('Enter a percentage discount', 'yay-wholesale-b2b')}
+                        decimalSeparator={window.yayWholesale.currency_data.decimal_sep ?? '.'}
+                        decimalScale={2}
+                        className="h-9 w-full"
+                        aria-invalid={invalid}
+                        suffix="%"
+                      />
+                    </FieldContent>
+                    {error && (
+                      <FieldError
+                        errors={[
+                          {
+                            message: error.message,
+                          },
+                        ]}
+                      />
+                    )}
+                  </Field>
                 )}
               />
 
-              <FormField
+              <Controller
                 control={form.control}
                 name={`minOrderQuantity`}
                 render={({ field: { ref, ...field }, fieldState: { error, invalid } }) =>
                   isPro ? (
-                    <FormItem className="w-full gap-2.5">
-                      <FormLabel className="text-foreground-400 text-xs font-medium">
+                    <Field className="w-full gap-2.5">
+                      <FieldLabel className="text-foreground-400 text-xs font-medium">
                         {__('Min Order Quantity', 'yay-wholesale-b2b')}
-                      </FormLabel>
-                      <FormControl>
-                        <InputNumberRoot
+                      </FieldLabel>
+                      <FieldContent>
+                        <NumberInput
                           value={field.value}
                           onValueChange={(value) => field.onChange(value)}
                           min={0}
-                        >
-                          <InputNumberInput
-                            placeholder={__(
-                              'e.g. 10 (min number of items required per order)',
-                              'yay-wholesale-b2b',
-                            )}
-                            className="h-9 w-full"
-                            aria-invalid={invalid}
-                          />
-                          <InputNumberCarets />
-                        </InputNumberRoot>
-                      </FormControl>
-                      {error && <FormMessage />}
-                    </FormItem>
-                  ) : (
-                    <FormItem className="w-full gap-2.5">
-                      <Label className="text-foreground-400 text-xs font-medium">
-                        {__('Min Order Quantity', 'yay-wholesale-b2b')}
-                        {/* <Badge variant="warning" className="text-white">
-                          {__('Pro', 'yay-wholesale-b2b')}
-                        </Badge> */}
-                      </Label>
-                      <FormControl>
-                        <Input
-                          // value={__('Upgrade to PRO to unlock this feature.', 'yay-wholesale-b2b')}
-                          value={0}
-                          min={0}
-                          disabled
-                          className="h-9 w-full"
-                        />
-                      </FormControl>
-                    </FormItem>
-                  )
-                }
-              />
-
-              <FormField
-                control={form.control}
-                name={`minOrderAmount`}
-                render={({ field: { ref, ...field }, fieldState: { error, invalid } }) => (
-                  <FormItem className="w-full gap-2.5">
-                    <FormLabel className="text-foreground-400 text-xs font-medium">
-                      {__('Min Order Amount', 'yay-wholesale-b2b')}
-                    </FormLabel>
-                    <FormControl>
-                      <InputNumberRoot
-                        value={field.value}
-                        onValueChange={(value) => field.onChange(value)}
-                        min={0}
-                        decimalScale={window.yayWholesale.currency_data.num_decimals ?? 2}
-                      >
-                        <InputNumberInput
+                          step={1}
                           placeholder={__(
-                            'e.g. 200.00 (min total value required per order)',
+                            'e.g. 10 (min number of items required per order)',
                             'yay-wholesale-b2b',
                           )}
                           className="h-9 w-full"
                           aria-invalid={invalid}
                         />
-                        <InputNumberCarets />
-                      </InputNumberRoot>
-                    </FormControl>
-                    {error && <FormMessage>{error.message}</FormMessage>}
-                  </FormItem>
+                      </FieldContent>
+                      {error && (
+                        <FieldError
+                          errors={[
+                            {
+                              message: error.message,
+                            },
+                          ]}
+                        />
+                      )}
+                    </Field>
+                  ) : (
+                    <Field className="w-full gap-2.5">
+                      <Label className="text-foreground-400 text-xs font-medium">
+                        {__('Min Order Quantity', 'yay-wholesale-b2b')}
+                        <Badge variant="warning" className="text-white">
+                          {__('Pro', 'yay-wholesale-b2b')}
+                        </Badge>
+                      </Label>
+                      <FieldContent>
+                        <Input
+                          value={__('Upgrade to PRO to unlock this feature.', 'yay-wholesale-b2b')}
+                          // value={0}
+                          min={0}
+                          disabled
+                          className="h-9 w-full"
+                        />
+                      </FieldContent>
+                    </Field>
+                  )
+                }
+              />
+
+              <Controller
+                control={form.control}
+                name={`minOrderAmount`}
+                render={({ field: { ref, ...field }, fieldState: { error, invalid } }) => (
+                  <Field className="w-full gap-2.5">
+                    <FieldLabel className="text-foreground-400 text-xs font-medium">
+                      {__('Min Order Amount', 'yay-wholesale-b2b')}
+                    </FieldLabel>
+                    <FieldContent>
+                      <NumberInputRoot
+                        value={field.value}
+                        onValueChange={(value) => field.onChange(value)}
+                        min={0}
+                        fixedDecimalScale={true}
+                        decimalScale={window.yayWholesale.currency_data.num_decimals ?? 2}
+                        decimalSeparator={window.yayWholesale.currency_data.decimal_sep ?? '.'}
+                        thousandSeparator={window.yayWholesale.currency_data.thousand_sep ?? ','}
+                        step={1}
+                        className="h-9 w-full"
+                      >
+                        <NumberInputInput
+                          placeholder={__(
+                            'e.g. 200.00 (min total value required per order)',
+                            'yay-wholesale-b2b',
+                          )}
+                          aria-invalid={invalid}
+                        />
+                        <div className="absolute inset-y-0 end-0 flex">
+                          <NumberInputChevrons hasUnit />
+                          <NumberInputUnit unit={window.yayWholesale.currency_data.symbol ?? '$'} />
+                        </div>
+                      </NumberInputRoot>
+                    </FieldContent>
+                    {error && (
+                      <FieldError
+                        errors={[
+                          {
+                            message: error.message,
+                          },
+                        ]}
+                      />
+                    )}
+                  </Field>
                 )}
               />
 
-              <FormField
+              <Controller
                 control={form.control}
                 name={`applyToSalePrice`}
                 render={({ field: { ref, ...field }, fieldState: { error } }) => (
-                  <FormItem className="w-full gap-2.5">
-                    <FormControl>
+                  <Field className="w-full gap-2.5">
+                    <FieldContent>
                       <div className="border-border flex items-center justify-between rounded-md border p-3">
                         <span className="text-foreground-400 text-sm font-medium">
                           {__('Apply wholesale discounts to sale prices', 'yay-wholesale-b2b')}
                         </span>
-                        <Switch size="md" checked={field.value} onCheckedChange={field.onChange} />
+                        <Switch checked={field.value} onCheckedChange={field.onChange} />
                       </div>
-                    </FormControl>
-                    {error && <FormMessage>{error.message}</FormMessage>}
-                  </FormItem>
+                    </FieldContent>
+                    {error && (
+                      <FieldError
+                        errors={[
+                          {
+                            message: error.message,
+                          },
+                        ]}
+                      />
+                    )}
+                  </Field>
                 )}
               />
             </div>
@@ -300,17 +352,15 @@ export default function RoleForm() {
             <SheetFooter className="p-0">
               <div className="border-divider flex justify-end gap-4 border-t bg-white p-5">
                 <SheetClose asChild>
-                  <Button
-                    variant="outline"
-                    className="border-border text-foreground-400 hover:bg-muted border bg-white px-4.5"
-                  >
+                  <Button variant="outline" className="text-foreground-400 px-4.5">
                     {__('Cancel', 'yay-wholesale-b2b')}
                   </Button>
                 </SheetClose>
                 <Button
                   type="submit"
                   form="role-form"
-                  className="bg-primary hover:bg-primary-accent text-primary-foreground px-5 font-medium"
+                  variant="primary"
+                  className="px-5"
                   disabled={isAddingRolePending || isUpdatingRolePending}
                 >
                   {isAddingRole

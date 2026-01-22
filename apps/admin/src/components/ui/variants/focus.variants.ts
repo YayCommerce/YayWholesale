@@ -1,9 +1,15 @@
-import { cva } from 'class-variance-authority';
+import { cva, VariantProps } from 'class-variance-authority';
 
 export const focusVariants = cva(
-  'focus-visible:ring-offset-2 focus-visible:ring-[1.5px] aria-invalid:ring-destructive aria-invalid:border-destructive',
+  'aria-invalid:ring-destructive aria-invalid:border-destructive has-[[data-slot][aria-invalid=true]]:ring-destructive has-[[data-slot][aria-invalid=true]]:border-destructive',
   {
     variants: {
+      offset: {
+        default:
+          'focus-visible:ring-offset-2 ring-offset-background focus-visible:ring-[1.5px] has-[[data-slot=input-group-control]:focus-visible]:ring-offset-2 has-[[data-slot=input-group-control]:focus-visible]:ring-[1.5px]',
+        /* Shadcn variants: override ring-offset */
+        none: 'focus-visible:ring-offset-0 ring-offset-background focus-visible:ring-[3px]',
+      },
       variant: {
         primary: '',
         destructive: 'ring-destructive hover:ring-destructive-accent',
@@ -13,7 +19,10 @@ export const focusVariants = cva(
       },
     },
     defaultVariants: {
+      offset: 'default',
       variant: 'primary',
     },
   },
 );
+
+export type FocusVariantProps = VariantProps<typeof focusVariants>;

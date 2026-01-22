@@ -20,7 +20,6 @@ const buttonGroupVariants = cva(
     },
   },
 );
-
 function ButtonGroup({
   className,
   orientation,
@@ -36,7 +35,6 @@ function ButtonGroup({
     />
   );
 }
-
 function ButtonGroupText({
   className,
   asChild = false,
@@ -45,7 +43,6 @@ function ButtonGroupText({
   asChild?: boolean;
 }) {
   const Comp = asChild ? Slot : 'div';
-
   return (
     <Comp
       className={cn(
@@ -56,7 +53,6 @@ function ButtonGroupText({
     />
   );
 }
-
 function ButtonGroupSeparator({
   className,
   orientation = 'vertical',
@@ -67,12 +63,11 @@ function ButtonGroupSeparator({
       data-slot="button-group-separator"
       orientation={orientation}
       className={cn(
-        'bg-input relative !m-0 self-stretch data-[orientation=vertical]:h-auto',
+        'bg-input relative m-0! self-stretch data-[orientation=vertical]:h-auto',
         className,
       )}
       {...props}
     />
   );
 }
-
 export { ButtonGroup, ButtonGroupSeparator, ButtonGroupText, buttonGroupVariants };

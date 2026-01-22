@@ -110,7 +110,7 @@ export function ColorPicker({
           variant="outline"
           disabled={disabled}
           className={cn(
-            'h-8.5 w-[110px] cursor-pointer justify-start rounded-sm p-1 hover:bg-[#F9F9F9]',
+            'h-8.5 w-[110px] justify-start rounded-sm p-1 hover:bg-[#F9F9F9]',
             className,
           )}
         >
@@ -162,12 +162,7 @@ export function ColorPicker({
                 {copied ? <CheckIcon size={24} /> : <CopySimpleIcon size={24} />}
               </WPButton>
             </div>
-            <Button
-              className="w-fit cursor-pointer"
-              variant="outline"
-              type="button"
-              onClick={handleClear}
-            >
+            <Button className="w-fit" variant="outline" type="button" onClick={handleClear}>
               {__('Reset', 'yay-wholesale-b2b')}
             </Button>
           </div>

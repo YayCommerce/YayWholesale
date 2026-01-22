@@ -1,4 +1,3 @@
-import { useMemo } from 'react';
 import { Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { Crown } from 'lucide-react';
@@ -22,8 +21,8 @@ export default function TopWholesaleCustomers(props: {
   const { data: reportData, isFetching, isLoading } = props.reportQuery;
 
   return (
-    <Card className="mt-0 flex h-full flex-col rounded-lg py-0 shadow-none">
-      <CardContent className="flex min-h-0 flex-1 flex-col gap-5 p-5">
+    <Card className="mt-0 flex h-full flex-col rounded-lg shadow-none">
+      <CardContent className="flex min-h-0 flex-1 flex-col gap-5">
         {/* Header */}
         <div className="flex items-center justify-between">
           <h3 className="text-foreground text-[16px] font-semibold">

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { __ } from '@wordpress/i18n';
 import { useForm } from 'react-hook-form';
@@ -93,7 +93,7 @@ export default function SettingsPage() {
 
             {/* Right Content Area - Tab Contents */}
             <div className="flex-1">
-              <Card className="rounded-lg p-6 shadow-none">
+              <Card>
                 <CardContent className="w-full overflow-x-visible px-0">
                   {/* Other Tab Contents */}
                   {tabs.map((tab) => (

@@ -50,7 +50,7 @@ const DashboardDatePicker: FC<DashboardDatePickerProps> = ({ dateRange, setDateR
         <PopoverTrigger asChild>
           <Button
             variant="outline"
-            className="text-foreground flex h-9 min-w-67.5 items-center justify-between rounded-md border bg-white px-1.5! pl-2! text-[14px] font-medium shadow-xs not-last:ms-2 not-last:me-2"
+            className="text-foreground flex h-9 min-w-67.5 justify-between bg-white px-1.5! pl-2! shadow-xs not-last:ms-2 not-last:me-2"
           >
             <div className="mr-4 flex items-center gap-2">
               <CalendarIcon />

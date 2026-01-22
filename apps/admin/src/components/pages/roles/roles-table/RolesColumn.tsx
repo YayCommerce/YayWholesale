@@ -8,18 +8,17 @@ import { useNavigate } from 'react-router-dom';
 import { useDeleteRoleMutation, useUpdateRoleStatusMutation } from '@/lib/queries/roles';
 import { RolesListValues } from '@/lib/schema/roles';
 import { cn } from '@/lib/utils';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
+import {
+  Dialog,
+  DialogClose,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogPortalContent,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { WholeSaleToolTip } from '@/components/custom/WholeSaleToolTip';
 import DeleteIcon from '@/components/icons/DeleteIcon';
@@ -196,7 +195,7 @@ export const RolesColumn: ColumnDef<RolesListValues & { count: number }>[] = [
       const queryClient = useQueryClient();
 
       return (
-        <AlertDialog open={openDialog} onOpenChange={setOpenDialog}>
+        <Dialog open={openDialog} onOpenChange={setOpenDialog}>
           <div className="flex w-10 items-center justify-end gap-2">
             <div className="peer flex justify-end gap-1.5 opacity-0 group-hover:opacity-100 has-data-[state='delayed-open']:opacity-100 has-data-[state='instant-open']:opacity-100">
               <WholeSaleToolTip
@@ -259,29 +258,28 @@ export const RolesColumn: ColumnDef<RolesListValues & { count: number }>[] = [
               <Ellipsis className="h-4 w-4" />
             </Button>
           </div>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>
+          <DialogPortalContent className="bw:max-w-md">
+            <DialogHeader className="bw:border-b-0">
+              <DialogTitle>
                 {__('Are you sure you want to delete this role?', 'yay-wholesale-b2b')}
-              </AlertDialogTitle>
-              <AlertDialogDescription>
+              </DialogTitle>
+              <DialogDescription>
                 {__(
                   'This action cannot be undone. This will permanently delete this request and remove data from servers',
                   'yay-wholesale-b2b',
                 )}
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel>{__('Cancel', 'yay-wholesale-b2b')}</AlertDialogCancel>
-              <AlertDialogAction
-                className="bg-destructive text-destructive-foreground hover:bg-destructive/80"
-                onClick={() => deleteRoleById()}
-              >
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter>
+              <DialogClose asChild>
+                <Button variant="outline">{__('Cancel', 'yay-wholesale-b2b')}</Button>
+              </DialogClose>
+              <Button variant="destructive" onClick={() => deleteRoleById()}>
                 {__('Continue', 'yay-wholesale-b2b')}
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
+              </Button>
+            </DialogFooter>
+          </DialogPortalContent>
+        </Dialog>
       );
     },
     size: 60,
