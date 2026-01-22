@@ -1,7 +1,7 @@
 {
   "editor.formatOnSave": true,
   "editor.defaultFormatter": "esbenp.prettier-vscode",
-  "phpSniffer.executablesFolder": "C:/Users/Admin/AppData/Roaming/Composer/vendor/bin",
+  "phpSniffer.executablesFolder": "tools/vendor/squizlabs/php_codesniffer/bin",
   "[php]": {
     "editor.defaultFormatter": "wongjn.php-sniffer"
   },
@@ -76,29 +76,6 @@
     "Zend OPcache",
     "zip",
     "zlib",
-    "wordpress",
-    "woocommerce"
-  ],
-
-  // Include WooCommerce source code for better IntelliSense
-  "intelephense.environment.includePaths": [
-    "F:/LT/php/wordpress/wp-content/plugins/woocommerce"
-  ],
-
-  // Optional: Index your theme and mu-plugins
-  "intelephense.environment.includePaths": [
-    "F:/LT/php/wordpress/wp-content/themes",
-    "F:/LT/php/wordpress/wp-content/mu-plugins",
-    "F:/LT/php/wordpress/wp-content/plugins/woocommerce"
-  ],
-
-  "javascript.suggest.autoImports": true,
-  "typescript.suggest.autoImports": true,
-  "editor.quickSuggestions": {
-      "other": true,
-      "comments": false,
-      "strings": true
-  },
-  "editor.suggest.snippetsPreventQuickSuggestions": false
-
+    "wordpress"
+  ]
 }
