@@ -12,7 +12,7 @@ function Checkbox({ className, ...props }: React.ComponentProps<typeof CheckboxP
       data-slot="checkbox"
       className={cn(
         focusVariants(),
-        'peer border-border dark:bg-input/30 hover:border-ring focus-visible:hover:border-ring-accent focus-visible:border-ring disabled:border-border size-4.5 shrink-0 rounded-[4px] border shadow-xs transition-all outline-none disabled:cursor-not-allowed disabled:bg-[#f2f5f9]',
+        'peer border-input dark:bg-input/30 hover:border-ring focus-visible:hover:border-ring-accent focus-visible:border-ring disabled:border-input disabled:bg-accent size-4.5 shrink-0 rounded-[4px] border shadow-xs transition-all outline-none disabled:cursor-not-allowed',
         'data-[state=checked]:bg-primary data-[state=checked]:hover:border-primary-accent data-[state=checked]:hover:bg-primary-accent dark:data-[state=checked]:bg-primary data-[state=checked]:border-primary data-[state=checked]:text-primary-foreground data-[state=checked]:disabled:opacity-60',
         className,
       )}
@@ -22,7 +22,7 @@ function Checkbox({ className, ...props }: React.ComponentProps<typeof CheckboxP
         data-slot="checkbox-indicator"
         className="flex items-center justify-center text-current transition-none"
       >
-        <CheckIcon className="size-3.5" />
+        <CheckIcon className="size-3.5" weight="bold" />
       </CheckboxPrimitive.Indicator>
     </CheckboxPrimitive.Root>
   );

@@ -28,7 +28,7 @@ export default function DashboardSummary(props: {
           <Button
             variant="outline"
             size="sm"
-            className="text-foreground h-8 w-fit text-sm font-medium"
+            className="text-foreground h-9 w-fit leading-0"
             onClick={() => navigate('/wholesalers-list')}
           >
             {__('View all wholesalers', 'yay-wholesale-b2b')}
@@ -45,7 +45,7 @@ export default function DashboardSummary(props: {
         desc: 'Total Orders',
         button: () => (
           <a href={window.yayWholesale.order_urls.list} target="_blank" rel="noopener noreferrer">
-            <Button variant="outline" size="sm" className="text-foreground h-8 text-sm font-medium">
+            <Button variant="outline" size="sm" className="text-foreground h-9 leading-0">
               {__('View all orders', 'yay-wholesale-b2b')}
             </Button>
           </a>
@@ -60,7 +60,7 @@ export default function DashboardSummary(props: {
         desc: 'Total Revenue',
         button: () => (
           <a href={window.yayWholesale.order_urls.list} target="_blank" rel="noopener noreferrer">
-            <Button variant="outline" size="sm" className="text-foreground h-8 text-sm font-medium">
+            <Button variant="outline" size="sm" className="text-foreground h-9 leading-0">
               {__('View all revenue', 'yay-wholesale-b2b')}
             </Button>
           </a>
@@ -78,8 +78,8 @@ export default function DashboardSummary(props: {
       className={cn('grid gap-6 md:grid-cols-3', isFetching && !isLoading && 'relative opacity-50')}
     >
       {cards.map((c, i) => (
-        <Card key={i} className="mt-0 rounded-lg py-0 shadow-none">
-          <CardContent className="flex flex-col gap-4 p-6">
+        <Card key={i} className="mt-0 rounded-lg shadow-none">
+          <CardContent className="flex flex-col gap-4">
             <div className="flex items-center justify-between">
               <h3 className="text-foreground text-base font-medium">{c.title}</h3>
               <Badge

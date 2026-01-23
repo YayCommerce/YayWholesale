@@ -1,0 +1,86 @@
+import { cva, VariantProps } from 'class-variance-authority';
+
+export const inputVariants = cva('border-input', {
+  variants: {
+    variant: {
+      // input: 'focus-visible:border-foreground hover:border-foreground',
+      // picker: 'focus-visible:border-ring focus-visible:hover:border-ring-accent',
+      input:
+        'focus-visible:ring-ring hover:border-ring focus-visible:border-ring has-[[data-slot=input-group-control]:focus-visible]:ring-ring has-[[data-slot=input-group-control]:focus-visible]:border-ring',
+      picker:
+        'shadow-xs hover:bg-accent hover:border-ring focus-visible:ring-ring focus-visible:border-ring',
+
+      /* Shadcn variants: override ring-offset */
+      'input-shadcn':
+        'focus-visible:ring-offset-0 focus-visible:ring-[3px] transition-colors transition-shadow hover:border-ring-shadcn focus-visible:border-ring-shadcn focus-visible:ring-ring-shadcn/50',
+      'picker-shadcn':
+        'focus-visible:ring-offset-0 focus-visible:ring-[3px] transition-colors transition-shadow hover:bg-accent hover:border-ring-shadcn focus-visible:border-ring-shadcn focus-visible:ring-ring-shadcn/50',
+
+      'input-black':
+        'focus-visible:ring-ring-black hover:border-ring-black focus-visible:border-ring-black',
+      'picker-black':
+        'hover:bg-accent focus-visible:ring-ring-black hover:border-ring-black focus-visible:border-ring-black',
+    },
+  },
+  defaultVariants: {
+    variant: 'input',
+  },
+});
+
+export type InputVariantProps = VariantProps<typeof inputVariants>;
+
+export const inputGroupVariants = cva(
+  [
+    'group/input-group border border-input dark:bg-input/30 shadow-xs relative flex w-full items-center outline-none transition-all duration-300 min-w-0 has-[>textarea]:h-auto data-[disabled=true]:opacity-70 data-[disabled=true]:pointer-events-none data-[disabled=true]:cursor-not-allowed',
+
+    'has-[>[data-align=inline-start]]:[&>input]:pl-2 has-[>[data-align=inline-end]]:[&>input]:pr-2',
+  ],
+  {
+    variants: {
+      size: {
+        small: 'h-7 rounded-sm',
+        medium: 'h-8 rounded-sm',
+        large: 'h-9 rounded-sm',
+      },
+    },
+    defaultVariants: {
+      size: 'large',
+    },
+  },
+);
+
+export type InputGroupVariantProps = VariantProps<typeof inputGroupVariants>;
+
+export const inputGroupAddonVariants = cva(
+  "text-muted-foreground flex h-auto cursor-text items-center justify-center gap-2 py-1.5 text-sm font-medium select-none [&>svg:not([class*='size-'])]:size-4 [&>kbd]:rounded-[calc(var(--radius)-5px)]",
+  {
+    variants: {
+      align: {
+        'inline-start': 'order-first pl-3 has-[>button]:-ml-2 has-[>kbd]:ml-[-0.35rem]',
+        'inline-end': 'order-last pr-3 has-[>button]:mr-[-0.45rem] has-[>kbd]:mr-[-0.35rem]',
+        'block-start':
+          'order-first w-full justify-start px-3 pt-3 [.border-b]:pb-3 group-has-[>input]/input-group:pt-2.5',
+        'block-end':
+          'order-last w-full justify-start px-3 pb-3 [.border-t]:pt-3 group-has-[>input]/input-group:pb-2.5',
+      },
+    },
+    defaultVariants: {
+      align: 'inline-start',
+    },
+  },
+);
+
+export const inputGroupButtonVariants = cva('text-sm shadow-none flex gap-2 items-center', {
+  variants: {
+    size: {
+      medium:
+        "h-6 gap-1 px-2 rounded-[calc(var(--radius-md)-4px)] [&>svg:not([class*='size-'])]:size-3.5 has-[>svg]:px-2",
+      large: 'h-7 px-2.5 gap-1.5 rounded-[calc(var(--radius-md)-4px)] has-[>svg]:px-2.5',
+      'icon-md': 'size-6 rounded-[calc(var(--radius-md)-4px)] p-0 has-[>svg]:p-0',
+      'icon-lg': 'size-7 rounded-[calc(var(--radius-md)-4px)] p-0 has-[>svg]:p-0',
+    },
+  },
+  defaultVariants: {
+    size: 'large',
+  },
+});

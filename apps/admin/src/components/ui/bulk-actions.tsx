@@ -1,11 +1,43 @@
 import { createContext, Dispatch, FC, SetStateAction, useContext, useState } from 'react';
-import { ChevronRight } from 'lucide-react';
+import { ChevronRight, XIcon } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
 
 import { Button } from './button';
-import { ButtonGroup } from './button-group';
 import { Popover, PopoverContent, PopoverTrigger } from './popover';
+
+type BulkActionBoxProps = {
+  selected: number;
+  onClose: () => void;
+  children?: React.ReactNode;
+  className?: string;
+};
+
+const BulkActionBox = ({ selected, onClose, children, className }: BulkActionBoxProps) => {
+  return (
+    <>
+      <div
+        className={cn(
+          'border-input items-center gap-2 rounded-md border px-1.5 py-1 shadow-sm',
+          selected > 1 ? 'flex' : 'hidden',
+          className,
+        )}
+      >
+        <Button
+          variant="ghost"
+          size="icon"
+          className="hover:text-foreground text-muted-foreground h-6 w-6 shrink-0 hover:bg-transparent"
+          onClick={() => {
+            onClose();
+          }}
+        >
+          <XIcon className="size-4" />
+        </Button>
+        {children}
+      </div>
+    </>
+  );
+};
 
 type BulkActionMenuContextType = {
   setOpen: Dispatch<SetStateAction<boolean>>;
@@ -13,7 +45,7 @@ type BulkActionMenuContextType = {
 
 const BulkActionMenuContext = createContext<BulkActionMenuContextType | null>(null);
 
-export const BulkActionMenu = ({ children }: { children: React.ReactNode }) => {
+const BulkActionMenu = ({ children }: { children: React.ReactNode }) => {
   const [open, setOpen] = useState(false);
 
   return (
@@ -32,7 +64,7 @@ interface BulkActionButtonProps {
   onClick?: () => void;
 }
 
-export const BulkActionButton: FC<BulkActionButtonProps> = ({
+const BulkActionButton: FC<BulkActionButtonProps> = ({
   children,
   className,
   disabled,
@@ -59,7 +91,7 @@ export const BulkActionButton: FC<BulkActionButtonProps> = ({
   );
 };
 
-export const BulkMenuButtonAndTrigger: FC<BulkActionButtonProps> = ({
+const BulkMenuButtonAndTrigger: FC<BulkActionButtonProps> = ({
   children,
   className,
   disabled,
@@ -94,9 +126,7 @@ export const BulkMenuButtonAndTrigger: FC<BulkActionButtonProps> = ({
   );
 };
 
-export const BulkActionMenuContent = ({ children }: { children: React.ReactNode }) => {
-  const context = useContext(BulkActionMenuContext);
-
+const BulkActionMenuContent = ({ children }: { children: React.ReactNode }) => {
   return (
     <PopoverContent
       side="right"
@@ -107,4 +137,12 @@ export const BulkActionMenuContent = ({ children }: { children: React.ReactNode 
       {children}
     </PopoverContent>
   );
+};
+
+export {
+  BulkActionBox,
+  BulkActionButton,
+  BulkActionMenu,
+  BulkActionMenuContent,
+  BulkMenuButtonAndTrigger,
 };

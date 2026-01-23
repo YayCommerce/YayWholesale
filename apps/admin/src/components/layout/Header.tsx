@@ -41,7 +41,7 @@ const NAV_ITEMS = [
               <div>
                 <Badge
                   variant="destructive"
-                  className={cn('h-5 min-w-5 rounded-full px-1 tabular-nums', props.classname)}
+                  className={cn('h-5 min-w-5 px-1 tabular-nums', props.classname)}
                 >
                   {data.count}
                 </Badge>
@@ -94,7 +94,7 @@ export default function Header() {
   const handleNavClick = useCallback((to: string) => navigate(to), [navigate]);
 
   const baseItemClass =
-    'flex cursor-pointer flex-row items-center gap-1.5 sm:flex-col sm:pt-1.5 md:flex-col md:pt-1.5 lg:flex-row';
+    'flex cursor-pointer flex-row items-center gap-0 sm:gap-1.5 sm:flex-col sm:pt-1.5 md:flex-col md:pt-1.5 lg:flex-row px-1 ';
   const activeItemClass =
     'text-primary border-primary hover:text-primary-accent hover:border-primary-accent focus-visible:text-primary-accent focus-visible:border-primary-accent';
 
@@ -142,12 +142,7 @@ export default function Header() {
 
       {/* Save button (Settings only) */}
       {isSettingRoute && (
-        <Button
-          type="submit"
-          form="settings-form"
-          disabled={isSavingSettings}
-          className="relative cursor-pointer"
-        >
+        <Button type="submit" form="settings-form" disabled={isSavingSettings} className="relative">
           <span className={isSavingSettings ? 'opacity-0' : 'opacity-100'}>
             {__('Save Changes', 'yay-wholesale-b2b')}
           </span>

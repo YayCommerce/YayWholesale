@@ -15,7 +15,7 @@ import {
 export default function EmailsTab() {
   const [loadingId, setLoadingId] = useState<string | null>(null);
   const { data: emails } = useWholesaleEmailsQuery();
-  const { mutate } = useUpdateEmailStatusMutation();
+  const { mutate, isPending } = useUpdateEmailStatusMutation();
 
   return (
     <div className="overflow-x-auto rounded-lg border bg-white shadow-xs">
@@ -36,8 +36,8 @@ export default function EmailsTab() {
               <TableCell className="px-4">
                 <Switch
                   disabled={loadingId === email.id}
-                  size="md"
                   checked={email.status}
+                  loading={isPending && loadingId === email.id}
                   onCheckedChange={(checked) => {
                     setLoadingId(email.id);
                     mutate(

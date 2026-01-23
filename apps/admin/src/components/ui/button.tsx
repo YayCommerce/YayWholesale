@@ -3,23 +3,27 @@ import { Slot } from '@radix-ui/react-slot';
 import { cva, type VariantProps } from 'class-variance-authority';
 
 import { cn } from '@/lib/utils';
-
-import { focusVariants } from './variants/focus.variants';
+import { focusVariants } from '@/components/ui/variants/focus.variants';
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium cursor-pointer transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none",
   {
     variants: {
       variant: {
+        muted: 'border bg-muted text-muted-foreground-400',
         outline:
-          'border bg-background shadow-xs hover:bg-accent hover:text-accent-foreground dark:bg-input/30 dark:border-border dark:hover:bg-input/50',
-        ghost: 'hover:bg-[#F2F5F9] text-foreground bg-transparent focus-visible:text-primary',
+          'border bg-background shadow-xs hover:bg-accent hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50',
+        ghost: 'hover:bg-accent text-foreground bg-transparent focus-visible:text-primary',
         link: 'text-foreground hover:text-primary underline-offset-4 hover:underline',
+        secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/80',
 
-        primary: 'bg-primary text-primary-foreground shadow-xs hover:bg-primary-accent',
+        primary:
+          'bg-primary text-primary-foreground shadow-xs hover:bg-primary-accent border border-transparent',
         'primary-soft': 'bg-primary/6 text-primary hover:text-primary-accent',
         'primary-outline':
           'border border-primary text-primary hover:border-primary-accent hover:text-primary-accent',
+        'primary-outline-fill':
+          'border border-primary text-primary hover:bg-primary hover:text-primary-foreground hover:border-transparent',
 
         destructive:
           'bg-destructive text-destructive-foreground shadow-xs hover:bg-destructive-accent',
@@ -42,6 +46,8 @@ const buttonVariants = cva(
         sm: 'h-8 rounded-md gap-1.5 px-3 has-[>svg]:px-2.5',
         lg: 'h-10 rounded-md px-6 has-[>svg]:px-4',
         icon: 'size-9',
+        'icon-sm': 'size-8',
+        'icon-lg': 'size-10',
       },
     },
     defaultVariants: {

@@ -1,9 +1,8 @@
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { Spinner } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
-import { Ellipsis, X } from 'lucide-react';
+import { Ellipsis } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useUpdateEffect } from 'react-use';
 
 import { useRequestQuery, useUpdateRequestStatusMutation } from '@/lib/queries/requests';
 import { useActiveRolesQuery } from '@/lib/queries/roles';
@@ -15,13 +14,13 @@ import {
   DropdownMenuContent,
   DropdownMenuGroup,
   DropdownMenuItem,
+  DropdownMenuPortal,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
   Sheet,
-  SheetClose,
   SheetContent,
   SheetDescription,
   SheetFooter,
@@ -150,11 +149,6 @@ export default function RequestsForm() {
                 )}
               </SheetDescription>
             </div>
-            <SheetClose asChild>
-              <button className="hover:text-muted-foreground mt-1 text-[#67708066]">
-                <X className="h-5 w-5" />
-              </button>
-            </SheetClose>
           </div>
         </SheetHeader>
         <div className="flex cursor-default flex-col gap-5 overflow-auto p-5">
@@ -272,18 +266,20 @@ export default function RequestsForm() {
                       <Ellipsis />
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="[--radius:1rem]">
-                    <DropdownMenuGroup>
-                      {rolesData?.map((role) => {
-                        return (
-                          <DropdownMenuItem onClick={() => onApproveWithRole(role.id)}>
-                            <RequestsStatusIcon status="approved" />{' '}
-                            {sprintf(__('Approve to %s', 'yay-wholesale-b2b'), role.name)}
-                          </DropdownMenuItem>
-                        );
-                      })}
-                    </DropdownMenuGroup>
-                  </DropdownMenuContent>
+                  <DropdownMenuPortal>
+                    <DropdownMenuContent align="end" className="z-100000 [--radius:1rem]">
+                      <DropdownMenuGroup>
+                        {rolesData?.map((role) => {
+                          return (
+                            <DropdownMenuItem onClick={() => onApproveWithRole(role.id)}>
+                              <RequestsStatusIcon status="approved" />{' '}
+                              {sprintf(__('Approve to %s', 'yay-wholesale-b2b'), role.name)}
+                            </DropdownMenuItem>
+                          );
+                        })}
+                      </DropdownMenuGroup>
+                    </DropdownMenuContent>
+                  </DropdownMenuPortal>
                 </DropdownMenu>
               </ButtonGroup>
             </div>

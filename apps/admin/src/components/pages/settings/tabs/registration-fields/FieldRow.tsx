@@ -3,7 +3,7 @@ import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { __ } from '@wordpress/i18n';
 import { CirclePlus, Eye, EyeOff, GripVertical, Info } from 'lucide-react';
-import { useFormContext } from 'react-hook-form';
+import { Controller, useFormContext } from 'react-hook-form';
 
 import { SettingsFormData } from '@/lib/schema/settings';
 import { cn } from '@/lib/utils';
@@ -16,7 +16,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { FormControl, FormField, FormItem, FormLabel } from '@/components/ui/form';
+import { Field, FieldContent, FieldError, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
@@ -78,17 +78,12 @@ export function FieldRow({
                 type="button"
                 variant="ghost"
                 size="icon"
-                className="hover:text-foreground text-muted-foreground h-[36px] w-[18px] cursor-grab hover:bg-transparent active:cursor-grabbing"
+                className="hover:text-foreground text-muted-foreground h-9 w-9 hover:bg-transparent"
               >
                 <EyeOff className="h-5 w-5 cursor-default" />
               </Button>
             }
-            content={
-              <div className="flex items-center gap-2">
-                <Info className="mt-6/7 h-3.5 w-3.5" />
-                {__('Field is hidden', 'yay-wholesale-b2b')}
-              </div>
-            }
+            content={<span>{__('Field is hidden', 'yay-wholesale-b2b')}</span>}
           />
         ) : (
           <Button
@@ -107,47 +102,53 @@ export function FieldRow({
       <div className="flex flex-1 flex-wrap gap-4">
         {/* Label */}
         <div className="min-w-[160px] flex-1">
-          <FormField
+          <Controller
             control={control}
             name={`registration_fields.fields.${index}.label`}
             render={({ field, fieldState }) => (
-              <FormItem className="flex w-full flex-col gap-2.5">
-                <FormLabel className="text-foreground-400 text-xs font-medium">
+              <Field className="flex w-full flex-col gap-2.5">
+                <FieldLabel className="text-foreground-400 text-xs font-medium">
                   {__('Label', 'yay-wholesale-b2b')}
                   {isRequired && <div className="text-destructive">*</div>}
-                </FormLabel>
-                <FormControl>
+                </FieldLabel>
+                <FieldContent>
                   <Input
                     {...field}
                     placeholder="Enter field label"
-                    defaultValue={field.value}
+                    value={field.value}
                     onChange={field.onChange}
                     aria-invalid={fieldState.invalid}
                     className="h-9 w-full"
                     disabled={isHidden}
                   />
-                </FormControl>
-                {fieldState.invalid && (
-                  <div className="text-destructive text-[12px]">{fieldState.error?.message}</div>
+                </FieldContent>
+                {fieldState.error && (
+                  <FieldError
+                    errors={[
+                      {
+                        message: fieldState.error.message,
+                      },
+                    ]}
+                  />
                 )}
-              </FormItem>
+              </Field>
             )}
           />
         </div>
 
         {/* Type */}
         <div className="min-w-[160px] flex-1">
-          <FormField
+          <Controller
             control={control}
             name={`registration_fields.fields.${index}.type`}
             render={({ field }) => (
-              <FormItem className="flex w-full flex-col gap-2.5">
-                <FormLabel className="text-foreground-400 text-xs font-medium">
+              <Field className="flex w-full flex-col gap-2.5">
+                <FieldLabel className="text-foreground-400 text-xs font-medium">
                   {__('Type', 'yay-wholesale-b2b')}
-                </FormLabel>
-                <FormControl>
+                </FieldLabel>
+                <FieldContent>
                   <Select
-                    defaultValue={field.value}
+                    value={field.value}
                     onValueChange={field.onChange}
                     disabled={isDefault || isHidden}
                   >
@@ -164,47 +165,47 @@ export function FieldRow({
                       <SelectItem value="select">Select</SelectItem>
                     </SelectContent>
                   </Select>
-                </FormControl>
-              </FormItem>
+                </FieldContent>
+              </Field>
             )}
           />
         </div>
 
         {/* Placeholder */}
         <div className="min-w-[160px] flex-1">
-          <FormField
+          <Controller
             control={control}
             name={`registration_fields.fields.${index}.placeholder`}
             render={({ field }) => (
-              <FormItem className="flex w-full flex-col gap-2.5">
-                <FormLabel className="text-foreground-400 text-xs font-medium">
+              <Field className="flex w-full flex-col gap-2.5">
+                <FieldLabel className="text-foreground-400 text-xs font-medium">
                   {__('Placeholder', 'yay-wholesale-b2b')}
-                </FormLabel>
-                <FormControl>
+                </FieldLabel>
+                <FieldContent>
                   <Input
                     placeholder="Enter placeholder"
-                    defaultValue={field.value}
+                    value={field.value}
                     onChange={field.onChange}
                     className="bg-background h-9 w-full"
                     disabled={isHidden}
                   />
-                </FormControl>
-              </FormItem>
+                </FieldContent>
+              </Field>
             )}
           />
         </div>
 
         {/* Column Width */}
         <div className="min-w-[160px] flex-1">
-          <FormField
+          <Controller
             control={control}
             name={`registration_fields.fields.${index}.columnWidth`}
             render={({ field }) => (
-              <FormItem className="flex w-full flex-col gap-2.5">
-                <FormLabel className="text-foreground-400 text-xs font-medium">
+              <Field className="flex w-full flex-col gap-2.5">
+                <FieldLabel className="text-foreground-400 text-xs font-medium">
                   {__('Column Width', 'yay-wholesale-b2b')}
-                </FormLabel>
-                <FormControl>
+                </FieldLabel>
+                <FieldContent>
                   <ToggleGroup
                     className="border-border flex h-9 w-full gap-0.75 rounded-[8px] border bg-white p-[3px]"
                     type="single"
@@ -221,8 +222,8 @@ export function FieldRow({
                       100%
                     </ToggleGroupItem>
                   </ToggleGroup>
-                </FormControl>
-              </FormItem>
+                </FieldContent>
+              </Field>
             )}
           />
         </div>
@@ -232,13 +233,13 @@ export function FieldRow({
       <div className="flex shrink-0 items-center justify-center">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" disabled={isDefault} className="hover:bg-muted">
+            <Button variant="ghost" size="icon" disabled={isDefault}>
               <EllipsisIcon />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent className="w-48 p-1" align="end">
             <DropdownMenuGroup>
-              <FormField
+              <Controller
                 control={control}
                 name={`registration_fields.fields.${index}.isRequired`}
                 render={({ field }) => (
@@ -260,7 +261,7 @@ export function FieldRow({
                 <CirclePlus className="translate-y-0.5" />
                 {__('Add new field', 'yay-wholesale-b2b')}
               </DropdownMenuItem>
-              <FormField
+              <Controller
                 control={control}
                 name={`registration_fields.fields.${index}.isHidden`}
                 render={({ field }) => (

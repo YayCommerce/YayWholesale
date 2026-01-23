@@ -5,15 +5,18 @@ import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '@/lib/utils';
 
 const badgeVariants = cva(
-  'inline-flex items-center justify-center rounded-full border h-5 px-2 py-0.5 text-xs font-medium w-fit whitespace-nowrap shrink-0 [&>svg]:size-3 gap-1 [&>svg]:pointer-events-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive transition-[color,box-shadow] overflow-hidden',
+  'inline-flex items-center justify-center rounded-full border h-5 px-2 text-xs font-medium w-fit whitespace-nowrap shrink-0 [&>svg]:size-3 gap-1 [&>svg]:pointer-events-none aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive  overflow-hidden transition-[color,background-color,box-shadow]',
   {
     variants: {
       variant: {
         outline:
-          'bg-background hover:bg-accent hover:text-accent-foreground dark:bg-input/30 dark:border-border dark:hover:bg-input/50',
-        ghost: 'hover:bg-[#F2F5F9] text-foreground bg-transparent focus-visible:text-primary',
-        link: 'text-foreground hover:text-primary underline-offset-4 hover:underline',
-        muted: 'bg-muted text-muted-foreground hover:bg-muted-accent',
+          'bg-background [a&]:hover:bg-accent [a&]:hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50',
+        ghost:
+          'hover:bg-accent text-foreground bg-transparent focus-visible:text-primary border-transparent',
+        link: 'text-foreground [a&]:hover:text-primary underline-offset-4 hover:underline border-transparent',
+        muted: 'bg-muted text-muted-foreground',
+        secondary:
+          'border-transparent bg-secondary text-secondary-foreground [a&]:hover:bg-secondary/90',
 
         primary: 'border-transparent bg-primary text-primary-foreground hover:bg-primary-accent',
         'primary-soft': 'border-transparent bg-primary/6 text-primary hover:text-primary-accent',

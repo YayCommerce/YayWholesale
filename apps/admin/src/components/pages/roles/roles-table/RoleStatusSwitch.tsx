@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 import { useUpdateRoleStatusMutation } from '@/lib/queries/roles';
 import { Switch } from '@/components/ui/switch';
@@ -15,9 +15,9 @@ export default function RoleStatusSwitch({
   const { mutate: updateStatus, isPending } = useUpdateRoleStatusMutation(id);
   const [checked, setChecked] = useState(status);
 
-  useEffect(() => {
-    setChecked(status);
-  }, [status]);
+  // useEffect(() => {
+  //   setChecked(status);
+  // }, [status]);
 
   const onToggle = (value: boolean) => {
     setChecked(value);
@@ -26,7 +26,7 @@ export default function RoleStatusSwitch({
 
   return (
     <Switch
-      size="md"
+      loading={isPending}
       checked={checked}
       onCheckedChange={onToggle}
       disabled={isPending || isDefault}

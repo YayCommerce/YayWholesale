@@ -7,16 +7,15 @@ const Toaster = ({ ...props }: ToasterProps) => {
       theme="system"
       className="toaster group"
       toastOptions={{
-        className: 'max-w-fit',
-        style: {
-          padding: '10px',
-        },
+        className: 'p-2.5! justify-center',
       }}
       style={
         {
+          '--width': 'max-content',
           '--normal-bg': 'var(--popover)',
           '--normal-text': 'var(--popover-foreground)',
           '--normal-border': 'var(--border)',
+          '--border-radius': 'var(--radius-md)',
         } as React.CSSProperties
       }
       {...props}

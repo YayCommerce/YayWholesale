@@ -1,16 +1,9 @@
 import { __ } from '@wordpress/i18n';
-import { useFormContext } from 'react-hook-form';
+import { Controller, useFormContext } from 'react-hook-form';
 
 import { SettingsFormData } from '@/lib/schema/settings';
-import { FormControl, FormField, FormItem, FormLabel } from '@/components/ui/form';
+import { Field, FieldContent, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 
@@ -20,7 +13,7 @@ export default function RegistrationTab() {
   return (
     <div className="flex flex-col gap-6">
       {/* Moderate new registrations */}
-      <FormField
+      <Controller
         control={control}
         name={`registration.moderate`}
         render={({ field }) => (
@@ -36,7 +29,7 @@ export default function RegistrationTab() {
                 )}
               </p>
             </div>
-            <Switch size="md" checked={field.value} onCheckedChange={field.onChange} />
+            <Switch checked={field.value} onCheckedChange={field.onChange} />
           </div>
         )}
       />
@@ -44,15 +37,15 @@ export default function RegistrationTab() {
       {/* Two column layout */}
       {/* <div className="grid grid-cols-2 gap-6">
         // Wholesale registration page 
-        <FormField
+        <Controller
           control={control}
           name={`registration.wholesale_registration_page`}
           render={({ field }) => (
-            <FormItem className="w-full flex flex-col gap-2.5">
-              <FormLabel className="text-foreground-400 text-xs font-medium">
+            <Field className="w-full flex flex-col gap-2.5">
+              <FieldLabel className="text-foreground-400 text-xs font-medium">
                 {__('Wholesale registration page', 'yay-wholesale-b2b')}
-              </FormLabel>
-              <FormControl>
+              </FieldLabel>
+              <FieldContent>
                 <Select defaultValue={field.value} onValueChange={field.onChange}>
                   <SelectTrigger className="w-full font-normal focus-visible:border-none focus-visible:ring-0 focus-visible:ring-offset-0">
                     <SelectValue placeholder={__('Select a option', 'yay-wholesale-b2b')} />
@@ -64,23 +57,23 @@ export default function RegistrationTab() {
                     <SelectItem value="b2b-registration">{__('B2B Registration', 'yay-wholesale-b2b')}</SelectItem>
                   </SelectContent>
                 </Select>
-              </FormControl>
-            </FormItem>
+              </FieldContent>
+            </Field>
           )}
         />
       </div> */}
 
       {/* Successful registration message */}
       <div className="flex flex-col gap-5">
-        <FormField
+        <Controller
           control={control}
           name={`registration.successful_registration_message`}
           render={({ field }) => (
-            <FormItem className="flex w-full flex-col gap-2.5">
-              <FormLabel className="text-foreground-400 text-xs font-medium">
+            <Field className="flex w-full flex-col gap-2.5">
+              <FieldLabel className="text-foreground-400 text-xs font-medium">
                 {__('Successful registration message', 'yay-wholesale-b2b')}
-              </FormLabel>
-              <FormControl>
+              </FieldLabel>
+              <FieldContent>
                 <Textarea
                   id="successful-registration-message"
                   rows={4}
@@ -92,21 +85,21 @@ export default function RegistrationTab() {
                   )}
                   className="min-h-25 w-full resize-none font-normal"
                 />
-              </FormControl>
-            </FormItem>
+              </FieldContent>
+            </Field>
           )}
         />
 
         {/* Submit button label */}
-        <FormField
+        <Controller
           control={control}
           name={`registration.submit_button_label`}
           render={({ field }) => (
-            <FormItem className="flex w-62.5 flex-col gap-2.5">
-              <FormLabel className="text-foreground-400 text-xs font-medium">
+            <Field className="flex w-62.5 flex-col gap-2.5">
+              <FieldLabel className="text-foreground-400 text-xs font-medium">
                 {__('Submit button label', 'yay-wholesale-b2b')}
-              </FormLabel>
-              <FormControl>
+              </FieldLabel>
+              <FieldContent>
                 <Input
                   id="submit-label"
                   defaultValue={field.value}
@@ -114,8 +107,8 @@ export default function RegistrationTab() {
                   className="h-9 w-full font-normal"
                   onChange={field.onChange}
                 />
-              </FormControl>
-            </FormItem>
+              </FieldContent>
+            </Field>
           )}
         />
       </div>

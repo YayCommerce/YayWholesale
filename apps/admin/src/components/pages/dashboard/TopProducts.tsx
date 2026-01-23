@@ -22,8 +22,8 @@ export default function TopProducts(props: { reportQuery: ReturnType<typeof useR
   const { data: reportData, isFetching, isLoading } = props.reportQuery;
 
   return (
-    <Card className="mt-0 flex h-full flex-col rounded-lg py-0 shadow-none">
-      <CardContent className="flex min-h-0 flex-1 flex-col gap-5 p-5">
+    <Card className="mt-0 flex h-full flex-col rounded-lg shadow-none">
+      <CardContent className="flex min-h-0 flex-1 flex-col gap-5">
         {/* Header */}
         <div className="flex items-center justify-between">
           <h3 className="text-foreground text-[16px] font-semibold">

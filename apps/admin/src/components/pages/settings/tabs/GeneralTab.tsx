@@ -1,10 +1,10 @@
-import { useEffect, useMemo } from 'react';
+import { useMemo } from 'react';
 import { __ } from '@wordpress/i18n';
-import { useFormContext } from 'react-hook-form';
+import { Controller, useFormContext } from 'react-hook-form';
 
 import { useActiveRolesQuery, useRolesQuery } from '@/lib/queries/roles';
 import { SettingsFormData } from '@/lib/schema/settings';
-import { FormControl, FormField, FormItem, FormLabel } from '@/components/ui/form';
+import { Field, FieldContent, FieldLabel } from '@/components/ui/field';
 import {
   Select,
   SelectContent,
@@ -33,15 +33,15 @@ export default function GeneralTab() {
   return (
     <div className="flex flex-col gap-4">
       {/* Default role for new user */}
-      <FormField
+      <Controller
         control={control}
         name={`general.default_role`}
         render={({ field }) => (
-          <FormItem className="flex w-full flex-col gap-2.5">
-            <FormLabel className="text-xs font-medium">
+          <Field className="flex w-full flex-col gap-2.5">
+            <FieldLabel className="text-xs font-medium">
               {__('Default role for new user', 'yay-wholesale-b2b')}
-            </FormLabel>
-            <FormControl>
+            </FieldLabel>
+            <FieldContent>
               <Select value={field.value ? field.value : ''} onValueChange={field.onChange}>
                 <SelectTrigger className="min-w-40 text-sm font-normal">
                   <SelectValue placeholder={__('Select a role', 'yay-wholesale-b2b')} />
@@ -54,12 +54,12 @@ export default function GeneralTab() {
                   ))}
                 </SelectContent>
               </Select>
-            </FormControl>
-          </FormItem>
+            </FieldContent>
+          </Field>
         )}
       />
 
-      <FormField
+      <Controller
         control={control}
         name={`general.show_wholesale_price`}
         render={({ field }) => (
@@ -73,7 +73,6 @@ export default function GeneralTab() {
               </p>
             </div>
             <Switch
-              size="md"
               id="show-wholesale-price"
               checked={field.value}
               onCheckedChange={(checked) => field.onChange(checked)}
@@ -82,7 +81,7 @@ export default function GeneralTab() {
         )}
       />
 
-      <FormField
+      <Controller
         control={control}
         name={`general.disable_coupon`}
         render={({ field }) => (
@@ -95,14 +94,14 @@ export default function GeneralTab() {
                 {__('Hide coupon field for wholesale users.', 'yay-wholesale-b2b')}
               </p>
             </div>
-            <Switch size="md" checked={field.value} onCheckedChange={field.onChange} />
+            <Switch checked={field.value} onCheckedChange={field.onChange} />
           </div>
         )}
       />
 
       {/* Disable tax */}
 
-      <FormField
+      <Controller
         control={control}
         name={`general.disable_tax`}
         render={({ field }) => (
@@ -115,7 +114,7 @@ export default function GeneralTab() {
                 {__("Don't charge tax for wholesale users.", 'yay-wholesale-b2b')}
               </p>
             </div>
-            <Switch size="md" checked={field.value} onCheckedChange={field.onChange} />
+            <Switch checked={field.value} onCheckedChange={field.onChange} />
           </div>
         )}
       />

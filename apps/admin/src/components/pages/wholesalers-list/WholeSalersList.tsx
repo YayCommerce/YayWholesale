@@ -3,7 +3,7 @@ import { CaretUpDownIcon } from '@phosphor-icons/react';
 import { flexRender, getCoreRowModel, PaginationState, useReactTable } from '@tanstack/react-table';
 import { Spinner } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
-import { ChevronLeft, ChevronRight, Plus, Search } from 'lucide-react';
+import { Plus, Search } from 'lucide-react';
 
 import { useActiveRolesQuery } from '@/lib/queries/roles';
 import {
@@ -13,13 +13,17 @@ import {
 } from '@/lib/queries/wholesalers';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
-import { BulkActionButton } from '@/components/ui/bulk-actions';
-import BulkActionBox from '@/components/ui/bulk-actions-box';
+import { BulkActionBox } from '@/components/ui/bulk-actions';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group';
-import { InputNumberInput, InputNumberRoot } from '@/components/ui/input-number';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Pagination } from '@/components/ui/pagination';
 import {
   Select,
   SelectContent,
@@ -106,8 +110,13 @@ export default function WholeSalersList() {
   const { mutate: bulkUpdateWholesalersRole, isPending: isBulkUpdateWholesalersPending } =
     useBulkUpdateWholesalersRoleMutation(selectedRowsIds);
 
+  const onFilterChanged = (value: string) => {
+    setRoleFilter(value);
+    setPagination({ ...pagination, pageIndex: 0 });
+  };
+
   return (
-    <Card className="gap-4 rounded-lg p-6 shadow-sm">
+    <Card className="gap-4 shadow-sm">
       {/* Header */}
       <div className="flex flex-nowrap items-center justify-between gap-3">
         <div className="flex items-center gap-2">
@@ -146,7 +155,7 @@ export default function WholeSalersList() {
               </InputGroupAddon>
             </InputGroup>
           )}
-          <Select value={roleFilter} onValueChange={setRoleFilter}>
+          <Select value={roleFilter} onValueChange={(value) => onFilterChanged(value)}>
             <SelectTrigger className="w-45.5">
               <SelectValue />
             </SelectTrigger>
@@ -167,7 +176,7 @@ export default function WholeSalersList() {
           <a href={window.yayWholesale.user_urls.add_new} target="_blank" rel="noopener noreferrer">
             <Button
               variant="primary-outline"
-              className="hover:bg-primary hover:text-primary-foreground gap-0.25 rounded-sm px-4 text-sm font-medium shadow-xs"
+              className="hover:bg-primary hover:text-primary-foreground gap-0.25 rounded-sm px-4 shadow-xs"
             >
               <Plus className="h-4 w-4" />
               <span className="px-0.75 text-[12px] text-nowrap sm:text-[14px]">
@@ -192,7 +201,7 @@ export default function WholeSalersList() {
           </div>
         )}
         <Table className="min-w-full">
-          <TableHeader className="text-foreground bg-muted-400 h-[46px]">
+          <TableHeader className="text-foreground">
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id} className="border-divider border-b">
                 {headerGroup.headers.map((header) => (
@@ -273,11 +282,11 @@ export default function WholeSalersList() {
                 {sprintf(__('%d selected', 'yay-wholesale-b2b'), selectedCount)}
               </span>
               <Separator orientation="vertical" className="ml-2 h-5!" />
-              <Popover>
-                <PopoverTrigger asChild>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
                   <Button
                     variant="ghost"
-                    className="hover:text-primary hover:bg-primary/6 group bold flex cursor-pointer items-center gap-1.5 px-2.5"
+                    className="hover:text-primary hover:bg-primary/6 group flex gap-1.5 px-2.5"
                   >
                     <span className="text-sm font-normal">
                       {__('Wholesaler Role', 'yay-wholesale-b2b')}
@@ -286,85 +295,45 @@ export default function WholeSalersList() {
                       <CaretUpDownIcon size={12} weight="bold" />
                     </span>
                   </Button>
-                </PopoverTrigger>
+                </DropdownMenuTrigger>
 
-                <PopoverContent align="start" sideOffset={9} className="w-fit min-w-[20px] p-1">
-                  <div className="flex flex-col">
-                    {activeRoles?.map((role) => (
-                      <BulkActionButton
-                        onClick={() =>
-                          bulkUpdateWholesalersRole(
-                            { roleSlug: role.slug },
-                            {
-                              onSuccess: () => {
-                                table.resetRowSelection();
-                              },
+                <DropdownMenuContent
+                  align="start"
+                  sideOffset={9}
+                  className="w-fit min-w-[20px] p-1"
+                >
+                  {activeRoles?.map((role) => (
+                    <DropdownMenuItem
+                      onClick={() =>
+                        bulkUpdateWholesalersRole(
+                          { roleSlug: role.slug },
+                          {
+                            onSuccess: () => {
+                              table.resetRowSelection();
                             },
-                          )
-                        }
-                      >
-                        <RolesIcon role={role?.slug} className="mt-0.5 min-h-4 min-w-4" />{' '}
-                        {role.name}
-                      </BulkActionButton>
-                    ))}
-                  </div>
-                </PopoverContent>
-              </Popover>
+                          },
+                        )
+                      }
+                    >
+                      <RolesIcon role={role?.slug} className="mt-0.5 min-h-4 min-w-4" /> {role.name}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
             </BulkActionBox>
           )}
 
           {table.getPageCount() > 1 && (
-            <div className="flex items-center gap-4">
-              <span className="text-foreground-400 text-sm font-normal">
-                {sprintf(
-                  __('Page %d of %d', 'yay-wholesale-b2b'),
-                  table.getState().pagination.pageIndex + 1,
-                  table.getPageCount(),
-                )}
-              </span>
-
-              <div className="flex items-center gap-1">
-                <Button
-                  variant="outline"
-                  size="icon"
-                  className="h-9 w-9 rounded-sm"
-                  onClick={() => table.previousPage()}
-                  disabled={!table.getCanPreviousPage()}
-                >
-                  <ChevronLeft className="h-4 w-4" />
-                </Button>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  className="h-9 w-9 rounded-sm"
-                  onClick={() => table.nextPage()}
-                  disabled={!table.getCanNextPage()}
-                >
-                  <ChevronRight className="h-4 w-4" />
-                </Button>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <span className="text-foreground-400 text-sm font-normal">
-                  {__('Go to', 'yay-wholesale-b2b')}
-                </span>
-                <InputNumberRoot
-                  min={1}
-                  max={table.getPageCount()}
-                  value={table.getState().pagination.pageIndex + 1}
-                  onValueChange={(value) => {
-                    const page = value ? Number(value) - 1 : 0;
-                    if (page >= 0 && page < table.getPageCount()) {
-                      table.setPageIndex(page);
-                    }
-                  }}
-                  className="text-foreground-400 h-9 w-15 rounded-sm text-sm font-normal focus-visible:ring-0"
-                  disabled={isFetchingWholesalers || table.getPageCount() <= 1}
-                >
-                  <InputNumberInput className="disabled:bg-muted-400 w-full shadow-xs disabled:text-black" />
-                </InputNumberRoot>
-              </div>
-            </div>
+            <Pagination
+              pageIndex={table.getState().pagination.pageIndex}
+              pageCount={table.getPageCount()}
+              onPreviousPage={() => table.previousPage()}
+              onNextPage={() => table.nextPage()}
+              onPageChange={(page) => table.setPageIndex(page)}
+              canPreviousPage={table.getCanPreviousPage()}
+              canNextPage={table.getCanNextPage()}
+              className="sm:ms-auto"
+            />
           )}
         </div>
       )}

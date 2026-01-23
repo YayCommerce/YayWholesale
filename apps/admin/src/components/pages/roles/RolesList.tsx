@@ -10,7 +10,7 @@ import {
 } from '@tanstack/react-table';
 import { Spinner } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
-import { ChevronLeft, ChevronRight, Plus, Search, XIcon } from 'lucide-react';
+import { Plus, Search } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 import {
@@ -19,25 +19,27 @@ import {
   useRolesQuery,
 } from '@/lib/queries/roles';
 import { cn } from '@/lib/utils';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
 import { Badge } from '@/components/ui/badge';
-import { BulkActionButton } from '@/components/ui/bulk-actions';
-import BulkActionBox from '@/components/ui/bulk-actions-box';
+import { BulkActionBox } from '@/components/ui/bulk-actions';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
+import {
+  Dialog,
+  DialogClose,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogPortalContent,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group';
-import { InputNumberInput, InputNumberRoot } from '@/components/ui/input-number';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Pagination } from '@/components/ui/pagination';
 import { Separator } from '@/components/ui/separator';
 import {
   Table,
@@ -106,7 +108,7 @@ export default function RolesList() {
   };
 
   return (
-    <Card className="gap-4 rounded-lg p-6 shadow-sm">
+    <Card className="gap-4 shadow-sm">
       {/* Header */}
       <div className="flex flex-nowrap items-center justify-between gap-3">
         <div className="flex items-center gap-2">
@@ -147,7 +149,7 @@ export default function RolesList() {
           )}
           <Button
             variant="primary-outline"
-            className="hover:bg-primary hover:text-primary-foreground gap-0.25 rounded-sm px-4 text-sm font-medium shadow-xs"
+            className="hover:bg-primary hover:text-primary-foreground gap-0.25 rounded-sm px-4 leading-0 shadow-xs"
             onClick={() => navigate('/roles/new')}
           >
             <Plus className="h-4 w-4" />
@@ -171,7 +173,7 @@ export default function RolesList() {
         )}
 
         <Table className="min-w-full">
-          <TableHeader className="text-foreground bg-muted-400 h-[46px]">
+          <TableHeader className="text-foreground">
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id} className="border-divider border-b">
                 {headerGroup.headers.map((header) => (
@@ -262,56 +264,58 @@ export default function RolesList() {
                 {sprintf(__('%d selected', 'yay-wholesale-b2b'), selectedCount)}
               </span>
               <Separator orientation="vertical" className="ml-2 h-5!" />
-              <Popover>
-                <PopoverTrigger asChild>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
                   <Button
                     variant="ghost"
-                    className="hover:text-primary hover:bg-primary/6 group bold flex cursor-pointer items-center gap-1.5 px-2.5"
+                    className="hover:text-primary hover:bg-primary/6 group flex gap-1.5 px-2.5"
                   >
                     <span className="text-sm font-normal">{__('Status', 'yay-wholesale-b2b')}</span>
                     <span className="group-hover:text-primary text-icon flex items-center">
                       <CaretUpDownIcon size={12} weight="bold" />
                     </span>
                   </Button>
-                </PopoverTrigger>
-                <PopoverContent align="start" sideOffset={9} className="w-fit min-w-[20px] p-1">
-                  <div className="flex flex-col">
-                    <BulkActionButton
-                      className="w-30"
-                      onClick={() =>
-                        bulkUpdateRoleStatus(
-                          { ids: selectedRowsIds, status: true },
-                          {
-                            onSuccess: () => {
-                              clearSelection();
-                            },
+                </DropdownMenuTrigger>
+                <DropdownMenuContent
+                  align="start"
+                  sideOffset={9}
+                  className="w-fit min-w-[20px] p-1"
+                >
+                  <DropdownMenuItem
+                    className="w-30"
+                    onClick={() =>
+                      bulkUpdateRoleStatus(
+                        { ids: selectedRowsIds, status: true },
+                        {
+                          onSuccess: () => {
+                            clearSelection();
                           },
-                        )
-                      }
-                    >
-                      {__('Active', 'yay-wholesale-b2b')}
-                    </BulkActionButton>
+                        },
+                      )
+                    }
+                  >
+                    {__('Active', 'yay-wholesale-b2b')}
+                  </DropdownMenuItem>
 
-                    <BulkActionButton
-                      className="w-30"
-                      onClick={() =>
-                        bulkUpdateRoleStatus(
-                          { ids: selectedRowsIds, status: false },
-                          {
-                            onSuccess: () => {
-                              clearSelection();
-                            },
+                  <DropdownMenuItem
+                    className="w-30"
+                    onClick={() =>
+                      bulkUpdateRoleStatus(
+                        { ids: selectedRowsIds, status: false },
+                        {
+                          onSuccess: () => {
+                            clearSelection();
                           },
-                        )
-                      }
-                    >
-                      {__('Inactive', 'yay-wholesale-b2b')}
-                    </BulkActionButton>
-                  </div>
-                </PopoverContent>
-              </Popover>
+                        },
+                      )
+                    }
+                  >
+                    {__('Inactive', 'yay-wholesale-b2b')}
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
               <span className="border-divider h-5 w-px border-r border-solid" aria-hidden />
-              <AlertDialog open={openBulkDeleteDialog} onOpenChange={setOpenDeleteDialog}>
+              <Dialog open={openBulkDeleteDialog} onOpenChange={setOpenDeleteDialog}>
                 <WholeSaleToolTip
                   trigger={
                     <Button
@@ -326,88 +330,46 @@ export default function RolesList() {
                   }
                   content={<span>{__('Delete', 'yay-wholesale-b2b')}</span>}
                 />
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>
+                <DialogPortalContent className="bw:max-w-md">
+                  <DialogHeader className="bw:border-b-0">
+                    <DialogTitle>
                       {sprintf(
                         __(`Are you sure you want to delete %d roles ?`, 'yay-wholesale-b2b'),
                         selectedCount,
                       )}
-                    </AlertDialogTitle>
-                    <AlertDialogDescription>
+                    </DialogTitle>
+                    <DialogDescription>
                       {__(
                         'This action cannot be undone. This will permanently delete these request and remove data from servers',
                         'yay-wholesale-b2b',
                       )}
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel>{__('Cancel', 'yay-wholesale-b2b')}</AlertDialogCancel>
-                    <AlertDialogAction
-                      className="bg-destructive text-destructive-foreground hover:bg-destructive/80"
-                      onClick={() => handleBulkDelete()}
-                    >
+                    </DialogDescription>
+                  </DialogHeader>
+                  <DialogFooter>
+                    <DialogClose asChild>
+                      <Button variant="outline">{__('Cancel', 'yay-wholesale-b2b')}</Button>
+                    </DialogClose>
+                    <Button variant="destructive" onClick={() => handleBulkDelete()}>
                       {__('Continue', 'yay-wholesale-b2b')}
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
+                    </Button>
+                  </DialogFooter>
+                </DialogPortalContent>
+              </Dialog>
             </BulkActionBox>
           )}
 
           {/* Right side - Pagination controls */}
           {table.getPageCount() > 1 && (
-            <div className="flex items-center gap-4">
-              <span className="text-foreground-400 text-sm font-normal">
-                {sprintf(
-                  __('Page %d of %d', 'yay-wholesale-b2b'),
-                  table.getState().pagination.pageIndex + 1,
-                  table.getPageCount(),
-                )}
-              </span>
-
-              <div className="flex items-center gap-1">
-                <Button
-                  variant="outline"
-                  size="icon"
-                  className="h-9 w-9 rounded-sm"
-                  onClick={() => table.previousPage()}
-                  disabled={!table.getCanPreviousPage()}
-                >
-                  <ChevronLeft className="h-4 w-4" />
-                </Button>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  className="h-9 w-9 rounded-sm"
-                  onClick={() => table.nextPage()}
-                  disabled={!table.getCanNextPage()}
-                >
-                  <ChevronRight className="h-4 w-4" />
-                </Button>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <span className="text-foreground-400 text-sm font-normal">
-                  {__('Go to', 'yay-wholesale-b2b')}
-                </span>
-                <InputNumberRoot
-                  min={1}
-                  max={table.getPageCount()}
-                  value={table.getState().pagination.pageIndex + 1}
-                  onValueChange={(value) => {
-                    const page = value ? Number(value) - 1 : 0;
-                    if (page >= 0 && page < table.getPageCount()) {
-                      table.setPageIndex(page);
-                    }
-                  }}
-                  className="text-foreground-400 h-9 w-15 rounded-sm text-sm font-normal focus-visible:ring-0"
-                  disabled={isFetchingRoles || table.getPageCount() <= 1}
-                >
-                  <InputNumberInput className="disabled:bg-muted-400 w-full shadow-xs disabled:text-black" />
-                </InputNumberRoot>
-              </div>
-            </div>
+            <Pagination
+              pageIndex={table.getState().pagination.pageIndex}
+              pageCount={table.getPageCount()}
+              onPreviousPage={() => table.previousPage()}
+              onNextPage={() => table.nextPage()}
+              onPageChange={(page) => table.setPageIndex(page)}
+              canPreviousPage={table.getCanPreviousPage()}
+              canNextPage={table.getCanNextPage()}
+              className="sm:ms-auto"
+            />
           )}
         </div>
       )}

@@ -1,9 +1,8 @@
 import { __ } from '@wordpress/i18n';
-import { useFormContext } from 'react-hook-form';
+import { Controller, useFormContext } from 'react-hook-form';
 
 import { SettingsFormData } from '@/lib/schema/settings';
-import { ColorPicker } from '@/components/ui/color-picker';
-import { FormControl, FormField, FormItem, FormLabel } from '@/components/ui/form';
+import { Field, FieldContent, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import {
   Select,
@@ -12,6 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { ColorPicker } from '@/components/ui/wp-color-picker';
 
 export default function DisplayTab() {
   const { control, watch } = useFormContext<SettingsFormData>();
@@ -20,15 +20,15 @@ export default function DisplayTab() {
       {/* Two column layout */}
       <div className="grid grid-cols-2 gap-6">
         {/* Wholesale registration page */}
-        <FormField
+        <Controller
           control={control}
           name={`display.price_format`}
           render={({ field }) => (
-            <FormItem className="flex w-full flex-col gap-2.5">
-              <FormLabel className="text-foreground-400 text-xs font-medium">
+            <Field className="flex w-full flex-col gap-2.5">
+              <FieldLabel className="text-foreground-400 text-xs font-medium">
                 {__('Display price format', 'yay-wholesale-b2b')}
-              </FormLabel>
-              <FormControl>
+              </FieldLabel>
+              <FieldContent>
                 <Select defaultValue={field.value} onValueChange={field.onChange}>
                   <SelectTrigger id="display-price-format" className="w-full font-normal">
                     <SelectValue placeholder={__('Select a option', 'yay-wholesale-b2b')} />
@@ -45,22 +45,22 @@ export default function DisplayTab() {
                     </SelectItem>
                   </SelectContent>
                 </Select>
-              </FormControl>
-            </FormItem>
+              </FieldContent>
+            </Field>
           )}
         />
 
         {/* Submit button label */}
 
-        <FormField
+        <Controller
           control={control}
           name={`display.wholesale_price_label`}
           render={({ field }) => (
-            <FormItem className="flex w-full flex-col gap-2.5">
-              <FormLabel className="text-foreground-400 text-xs font-medium">
+            <Field className="flex w-full flex-col gap-2.5">
+              <FieldLabel className="text-foreground-400 text-xs font-medium">
                 {__('Wholesale price label', 'yay-wholesale-b2b')}
-              </FormLabel>
-              <FormControl>
+              </FieldLabel>
+              <FieldContent>
                 <Input
                   id="wholesale-price-label"
                   defaultValue={field.value}
@@ -68,30 +68,30 @@ export default function DisplayTab() {
                   placeholder={__('Wholesale price', 'yay-wholesale-b2b')}
                   className="w-full font-normal"
                 />
-              </FormControl>
-            </FormItem>
+              </FieldContent>
+            </Field>
           )}
         />
       </div>
 
       {/* Successful registration message */}
 
-      <FormField
+      <Controller
         control={control}
         name={`display.wholesale_price_color`}
         render={({ field }) => (
-          <FormItem className="flex w-full flex-col gap-2.5">
-            <FormLabel className="text-foreground-400 text-xs font-medium">
+          <Field className="flex w-full flex-col gap-2.5">
+            <FieldLabel className="text-foreground-400 text-xs font-medium">
               {__('Wholesale price color', 'yay-wholesale-b2b')}
-            </FormLabel>
-            <FormControl>
+            </FieldLabel>
+            <FieldContent>
               <ColorPicker
                 value={field.value}
                 defaultColor={field.value}
                 onChangeColor={(color: string) => field.onChange(color)}
               />
-            </FormControl>
-          </FormItem>
+            </FieldContent>
+          </Field>
         )}
       />
     </div>
