@@ -25,7 +25,23 @@ class WholeSalersController extends BaseRestController {
      * @return bool|WP_Error True if the user has the necessary permissions, otherwise a WP_Error object.
      */
     public function wholesalers_permission_callback() {
-        if ( ! current_user_can( 'manage_options' ) || ! current_user_can( 'manage_woocommerce' ) ) {
+        if ( ! current_user_can( 'edit_posts' ) || ! current_user_can( 'manage_woocommerce' ) ) {
+            return new \WP_Error( 'rest_forbidden', esc_html__( 'Forbidden.', 'yay-wholesale-b2b' ), [ 'status' => 401 ] );
+        }
+
+        return true;
+    }
+
+    /**
+     * Check if the user has the necessary permissions to access the whole salers list endpoints.
+     *
+     * @return bool|WP_Error True if the user has the necessary permissions, otherwise a WP_Error object.
+     */
+    public function wholesalers_users_permission_callback() {
+        if ( ! current_user_can( 'edit_posts' ) ||
+            ! current_user_can( 'promote_users' ) ||
+            ! current_user_can( 'manage_woocommerce' ) ) {
+
             return new \WP_Error( 'rest_forbidden', esc_html__( 'Forbidden.', 'yay-wholesale-b2b' ), [ 'status' => 401 ] );
         }
 
@@ -56,7 +72,7 @@ class WholeSalersController extends BaseRestController {
             [
                 'methods'             => 'PUT',
                 'callback'            => [ $this, 'update_wholesaler_role' ],
-                'permission_callback' => [ $this,'wholesalers_permission_callback' ],
+                'permission_callback' => [ $this,'wholesalers_users_permission_callback' ],
             ]
         );
 
@@ -67,7 +83,7 @@ class WholeSalersController extends BaseRestController {
                 [
                     'methods'             => 'PUT',
                     'callback'            => [ $this, 'bulk_update_wholesaler_role' ],
-                    'permission_callback' => [ $this,'wholesalers_permission_callback' ],
+                    'permission_callback' => [ $this,'wholesalers_users_permission_callback' ],
                 ],
             ]
         );

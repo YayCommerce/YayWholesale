@@ -29,7 +29,7 @@ class RolesRestController extends BaseRestController {
                 [
                     'methods'             => 'GET',
                     'callback'            => [ $this, 'get_roles' ],
-                    'permission_callback' => [ $this, 'roles_permission_callback' ],
+                    'permission_callback' => [ $this, 'roles_get_permission_callback' ],
                 ],
                 [
                     'methods'             => 'POST',
@@ -69,7 +69,7 @@ class RolesRestController extends BaseRestController {
                 [
                     'methods'             => 'GET',
                     'callback'            => [ $this, 'get_role' ],
-                    'permission_callback' => [ $this, 'roles_permission_callback' ],
+                    'permission_callback' => [ $this, 'roles_get_permission_callback' ],
                 ],
                 [
                     'methods'             => 'PUT',
@@ -92,6 +92,14 @@ class RolesRestController extends BaseRestController {
      */
     public function roles_permission_callback() {
         if ( ! current_user_can( 'manage_options' ) || ! current_user_can( 'manage_woocommerce' ) ) {
+            return new \WP_Error( 'rest_forbidden', esc_html__( 'Forbidden.', 'yay-wholesale-b2b' ), [ 'status' => 401 ] );
+        }
+
+        return true;
+    }
+
+    public function roles_get_permission_callback() {
+        if ( ! current_user_can( 'edit_posts' ) || ! current_user_can( 'manage_woocommerce' ) ) {
             return new \WP_Error( 'rest_forbidden', esc_html__( 'Forbidden.', 'yay-wholesale-b2b' ), [ 'status' => 401 ] );
         }
 

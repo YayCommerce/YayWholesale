@@ -12,16 +12,20 @@ export default function RoleStatusSwitch({
   status: boolean;
   isDefault: boolean;
 }) {
-  const { mutate: updateStatus, isPending } = useUpdateRoleStatusMutation(id);
+  const { mutateAsync: updateStatus, isPending } = useUpdateRoleStatusMutation(id);
   const [checked, setChecked] = useState(status);
 
   // useEffect(() => {
   //   setChecked(status);
   // }, [status]);
 
-  const onToggle = (value: boolean) => {
+  const onToggle = async (value: boolean) => {
     setChecked(value);
-    updateStatus(value);
+    try {
+      await updateStatus(value);
+    } catch (error) {
+      setChecked(!value);
+    }
   };
 
   return (

@@ -71,6 +71,20 @@ class RequestForm {
             $last_name_autofill  = $user->last_name;
             $email_autofill      = $user->user_email;
         }
+
+        if ( empty( $_COOKIE['yaywholesaleb2b_cid'] ) ) {
+            $cid = wp_generate_uuid4();
+
+            setcookie(
+                'yaywholesaleb2b_cid',
+                $cid,
+                time() + MONTH_IN_SECONDS,
+                COOKIEPATH,
+                COOKIE_DOMAIN,
+                is_ssl(),
+                true
+            );
+        }
         ob_start();
         ?>
         <div>

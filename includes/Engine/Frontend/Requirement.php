@@ -226,9 +226,9 @@ class Requirement {
      */
     public function ywhs_get_original_price_in_cart() {
         $raw  = file_get_contents( 'php://input' );
-        $data = json_decode( $raw, true );
+        $data = json_decode( wp_unslash( $raw ), true );
 
-        if ( ! wp_verify_nonce( $data['nonce'], 'get_original_price_in_cart' ) ) {
+        if ( ! isset( $data['nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $data['nonce'] ) ), 'get_original_price_in_cart' ) ) {
             wp_send_json_error( 'Invalid nonce' );
         }
 
