@@ -9,12 +9,12 @@ use WP_User;
  * Settings Helper Class
  */
 class RequestsHelper {
-    public const REQUEST_POST_TYPE         = 'yay-whs-request';
-    public const REQUEST_META_DATA         = 'yay-whs-request-data';
-    public const REQUEST_META_DISPLAY_NAME = 'yay-whs-request-display-name';
-    public const REQUEST_META_EMAIL        = 'yay-whs-request-email';
-    public const REQUEST_META_STATUS       = 'yay-whs-request-status';
-    public const REQUEST_META_MESSAGE      = 'yay-whs-request-message';
+    public const REQUEST_POST_TYPE         = 'yaywholesaleb2b-request';
+    public const REQUEST_META_DATA         = 'yaywholesaleb2b-request-data';
+    public const REQUEST_META_DISPLAY_NAME = 'yaywholesaleb2b-request-display-name';
+    public const REQUEST_META_EMAIL        = 'yaywholesaleb2b-request-email';
+    public const REQUEST_META_STATUS       = 'yaywholesaleb2b-request-status';
+    public const REQUEST_META_MESSAGE      = 'yaywholesaleb2b-request-message';
     public const REJECTED                  = 'rejected';
     public const PENDING                   = 'pending';
     public const APPROVED                  = 'approved';
