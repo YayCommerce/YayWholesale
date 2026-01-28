@@ -1,5 +1,5 @@
 <?php
-namespace Yay_Wholesale_B2B\Helpers;
+namespace YayWholesaleB2B\Helpers;
 
 use Exception;
 use WP_Query;

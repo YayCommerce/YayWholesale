@@ -1,5 +1,5 @@
 <?php
-namespace Yay_Wholesale_B2B\Controllers;
+namespace YayWholesaleB2B\Controllers;
 
 use WP_REST_Request;
 use WP_REST_Response;

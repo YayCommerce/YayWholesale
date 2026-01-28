@@ -1,6 +1,6 @@
 <?php
 
-use Yay_Wholesale_B2B\Engine\Compatibles\YayMail\AccountRegistrationRejected;
+use YayWholesaleB2B\Engine\Compatibles\YayMail\AccountRegistrationRejected;
 
 defined( 'ABSPATH' ) || exit;
 

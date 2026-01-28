@@ -1,14 +1,14 @@
 <?php
-namespace Yay_Wholesale_B2B\Engine;
+namespace YayWholesaleB2B\Engine;
 
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-use Yay_Wholesale_B2B\Engine\Compatibles\YayCurrency;
-use Yay_Wholesale_B2B\Engine\Compatibles\YayExtra;
-use Yay_Wholesale_B2B\Engine\Compatibles\YayMail;
-use Yay_Wholesale_B2B\Utils\SingletonTrait;
+use YayWholesaleB2B\Engine\Compatibles\YayCurrency;
+use YayWholesaleB2B\Engine\Compatibles\YayExtra;
+use YayWholesaleB2B\Engine\Compatibles\YayMail;
+use YayWholesaleB2B\Utils\SingletonTrait;
 
 /**
  * Compatibles

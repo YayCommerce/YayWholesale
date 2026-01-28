@@ -111,7 +111,7 @@ export const RolesColumn: ColumnDef<RolesListValues & { count: number }>[] = [
           onClick={() => {
             if (count > 0) {
               window.open(
-                window.yayWholesale.user_urls.list + '?role=' + column.row.original.slug,
+                window.yayWholesaleB2BAdmin.user_urls.list + '?role=' + column.row.original.slug,
                 '_blank',
               );
             }
@@ -274,7 +274,13 @@ export const RolesColumn: ColumnDef<RolesListValues & { count: number }>[] = [
               <DialogClose asChild>
                 <Button variant="outline">{__('Cancel', 'yay-wholesale-b2b')}</Button>
               </DialogClose>
-              <Button variant="destructive" onClick={() => deleteRoleById()}>
+              <Button
+                variant="destructive"
+                onClick={() => {
+                  deleteRoleById();
+                  setOpenDialog(false);
+                }}
+              >
                 {__('Continue', 'yay-wholesale-b2b')}
               </Button>
             </DialogFooter>

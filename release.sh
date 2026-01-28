@@ -120,7 +120,7 @@ fi
 #
 # 7) Remove development-only code
 #
-sed -i "/'YAY_WHOLESALE_B2B_IS_DEVELOPMENT', true/d" "$DEST_PATH/yay-wholesale-b2b.php"
+sed -i "/'YAYWHOLESALEB2B_IS_DEVELOPMENT', true/d" "$DEST_PATH/yay-wholesale-b2b.php"
 rm -rf "$DEST_PATH/includes/Engine/Register/RegisterDev.php"
 
 #

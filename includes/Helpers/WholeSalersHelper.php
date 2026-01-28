@@ -1,5 +1,5 @@
 <?php
-namespace Yay_Wholesale_B2B\Helpers;
+namespace YayWholesaleB2B\Helpers;
 
 /**
  * WholeSalers Helper Class
@@ -16,7 +16,7 @@ class WholeSalersHelper {
      * @return array The list of wholesalers.
      */
     public static function get_wholesalers_list( string $search = '', int $page = 1, int $per_page = 10, string $role = '' ): array {
-        $roles = get_option( 'yay_wholesale_b2b_roles', [] );
+        $roles = get_option( 'yaywholesaleb2b_roles', [] );
 
         if ( empty( $roles ) ) {
             return [
@@ -136,7 +136,7 @@ class WholeSalersHelper {
             return reset( $user_roles );
         }
 
-        $roles_option    = get_option( 'yay_wholesale_b2b_roles', [] );
+        $roles_option    = get_option( 'yaywholesaleb2b_roles', [] );
         $wholesale_slugs = array_filter( array_map( fn( $r ) => $r['slug'] ?? null, $roles_option ) );
         $matched         = array_values( array_intersect( $user_roles, $wholesale_slugs ) );
         return reset( $matched ) ?? '';
@@ -178,7 +178,7 @@ class WholeSalersHelper {
      * @return int count of the pending requests.
      */
     public static function count_total_wholesalers() {
-        $roles = get_option( 'yay_wholesale_b2b_roles', [] );
+        $roles = get_option( 'yaywholesaleb2b_roles', [] );
 
         if ( empty( $roles ) ) {
             return 0;

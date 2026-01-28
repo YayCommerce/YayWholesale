@@ -1,10 +1,10 @@
 <?php
-namespace Yay_Wholesale_B2B\Engine\Frontend;
+namespace YayWholesaleB2B\Engine\Frontend;
 
-use Yay_Wholesale_B2B\Utils\SingletonTrait;
-use Yay_Wholesale_B2B\Helpers\RolesHelper;
-use Yay_Wholesale_B2B\Helpers\SettingsHelper;
-use Yay_Wholesale_B2B\Helpers\PricingHelper;
+use YayWholesaleB2B\Utils\SingletonTrait;
+use YayWholesaleB2B\Helpers\RolesHelper;
+use YayWholesaleB2B\Helpers\SettingsHelper;
+use YayWholesaleB2B\Helpers\PricingHelper;
 
 defined( 'ABSPATH' ) || exit;
 

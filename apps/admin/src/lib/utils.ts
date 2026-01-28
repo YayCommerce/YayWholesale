@@ -11,5 +11,5 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export const getSettings = (): SettingsFormData => {
-  return window.yayWholesale.settings;
+  return window.yayWholesaleB2BAdmin.settings;
 };

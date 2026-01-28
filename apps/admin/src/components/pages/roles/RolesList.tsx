@@ -105,6 +105,7 @@ export default function RolesList() {
         clearSelection();
       },
     });
+    setOpenDeleteDialog(false);
   };
 
   return (

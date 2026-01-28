@@ -1,8 +1,8 @@
 <?php
-namespace Yay_Wholesale_B2B\Engine\Register;
+namespace YayWholesaleB2B\Engine\Register;
 
-use Yay_Wholesale_B2B\Utils\SingletonTrait;
-use Yay_Wholesale_B2B\Engine\Register\ScriptName;
+use YayWholesaleB2B\Utils\SingletonTrait;
+use YayWholesaleB2B\Engine\Register\ScriptName;
 
 /**
  * Register in Development Mode
@@ -32,6 +32,6 @@ class RegisterDev {
         $deps = [ 'react', 'react-dom', 'wp-hooks', 'wp-i18n' ];
 
         wp_register_script( ScriptName::PAGE_SETTINGS, 'http://localhost:3000/main.tsx', $deps, null, true );
-        wp_set_script_translations( ScriptName::PAGE_SETTINGS, 'yay-wholesale-b2b', YAY_WHOLESALE_B2B_PLUGIN_DIR . 'languages' );
+        wp_set_script_translations( ScriptName::PAGE_SETTINGS, 'yay-wholesale-b2b', YAYWHOLESALEB2B_PLUGIN_DIR . 'languages' );
     }
 }

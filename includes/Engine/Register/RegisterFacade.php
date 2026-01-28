@@ -1,12 +1,12 @@
 <?php
-namespace Yay_Wholesale_B2B\Engine\Register;
+namespace YayWholesaleB2B\Engine\Register;
 
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-use Yay_Wholesale_B2B\Utils\SingletonTrait;
-use Yay_Wholesale_B2B\Engine\Register\ScriptName;
+use YayWholesaleB2B\Utils\SingletonTrait;
+use YayWholesaleB2B\Engine\Register\ScriptName;
 
 /**
  * Register Facade.
@@ -22,11 +22,11 @@ class RegisterFacade {
         add_action( 'init', [ $this, 'register_all_assets' ] );
         add_filter( 'pre_load_script_translations', [ $this, 'use_mo_file_for_script_translations' ], 10, 4 );
 
-        $is_prod = ! defined( 'YAY_WHOLESALE_B2B_IS_DEVELOPMENT' ) || YAY_WHOLESALE_B2B_IS_DEVELOPMENT !== true;
-        if ( $is_prod && class_exists( '\Yay_Wholesale_B2B\Engine\Register\RegisterProd' ) ) {
-            \Yay_Wholesale_B2B\Engine\Register\RegisterProd::get_instance();
-        } elseif ( ! $is_prod && class_exists( '\Yay_Wholesale_B2B\Engine\Register\RegisterDev' ) ) {
-            \Yay_Wholesale_B2B\Engine\Register\RegisterDev::get_instance();
+        $is_prod = ! defined( 'YAYWHOLESALEB2B_IS_DEVELOPMENT' ) || YAYWHOLESALEB2B_IS_DEVELOPMENT !== true;
+        if ( $is_prod && class_exists( '\YayWholesaleB2B\Engine\Register\RegisterProd' ) ) {
+            \YayWholesaleB2B\Engine\Register\RegisterProd::get_instance();
+        } elseif ( ! $is_prod && class_exists( '\YayWholesaleB2B\Engine\Register\RegisterDev' ) ) {
+            \YayWholesaleB2B\Engine\Register\RegisterDev::get_instance();
         }
     }
 
@@ -44,12 +44,12 @@ class RegisterFacade {
     public function register_all_assets() {
         wp_register_style(
             ScriptName::STYLE_SETTINGS,
-            YAY_WHOLESALE_B2B_PLUGIN_URL . 'assets/dist/admin/style.css',
+            YAYWHOLESALEB2B_PLUGIN_URL . 'assets/dist/admin/style.css',
             [
                 'woocommerce_admin_styles',
                 'wp-components',
             ],
-            YAY_WHOLESALE_B2B_VERSION
+            YAYWHOLESALEB2B_VERSION
         );
     }
 

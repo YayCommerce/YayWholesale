@@ -2,7 +2,7 @@
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 3,
 	"name": "yay-wholesale/request-registration-form-block",
-	"version": "0.1.0",
+	"version": "0.1.1",
 	"title": "Request Registration Form",
 	"category": "widgets",
 	"icon": "format-aside",

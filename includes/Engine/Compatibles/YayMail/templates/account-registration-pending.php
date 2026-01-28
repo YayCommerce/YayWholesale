@@ -1,6 +1,6 @@
 <?php
 
-use Yay_Wholesale_B2B\Engine\Compatibles\YayMail\AccountRegistrationPending;
+use YayWholesaleB2B\Engine\Compatibles\YayMail\AccountRegistrationPending;
 
 defined( 'ABSPATH' ) || exit;
 

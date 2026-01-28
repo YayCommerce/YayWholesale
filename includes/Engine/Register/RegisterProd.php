@@ -1,12 +1,12 @@
 <?php
-namespace Yay_Wholesale_B2B\Engine\Register;
+namespace YayWholesaleB2B\Engine\Register;
 
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-use Yay_Wholesale_B2B\Utils\SingletonTrait;
-use Yay_Wholesale_B2B\Engine\Register\ScriptName;
+use YayWholesaleB2B\Utils\SingletonTrait;
+use YayWholesaleB2B\Engine\Register\ScriptName;
 
 /** Register in Production Mode */
 class RegisterProd {
@@ -19,7 +19,7 @@ class RegisterProd {
 
     public function register_all_scripts() {
         $deps = [ 'react', 'react-dom', 'wp-hooks', 'wp-i18n' ];
-        wp_register_script( ScriptName::PAGE_SETTINGS, YAY_WHOLESALE_B2B_PLUGIN_URL . 'assets/dist/admin/js/main.js', $deps, YAY_WHOLESALE_B2B_VERSION, true );
-        wp_set_script_translations( ScriptName::PAGE_SETTINGS, 'yay-wholesale-b2b', YAY_WHOLESALE_B2B_PLUGIN_DIR . 'languages' );
+        wp_register_script( ScriptName::PAGE_SETTINGS, YAYWHOLESALEB2B_PLUGIN_URL . 'assets/dist/admin/js/main.js', $deps, YAYWHOLESALEB2B_VERSION, true );
+        wp_set_script_translations( ScriptName::PAGE_SETTINGS, 'yay-wholesale-b2b', YAYWHOLESALEB2B_PLUGIN_DIR . 'languages' );
     }
 }

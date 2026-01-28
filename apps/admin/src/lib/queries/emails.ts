@@ -8,8 +8,8 @@ import { updateEmailStatus } from '../api/emails.api';
 export function useWholesaleEmailsQuery() {
   return useQuery({
     queryKey: ['wholesale_emails'],
-    queryFn: async () => window.yayWholesale.wholesale_emails,
-    initialData: window.yayWholesale.wholesale_emails,
+    queryFn: async () => window.yayWholesaleB2BAdmin.wholesale_emails,
+    initialData: window.yayWholesaleB2BAdmin.wholesale_emails,
   });
 }
 

@@ -1,14 +1,14 @@
 <?php
-namespace Yay_Wholesale_B2B\Engine\Admin;
+namespace YayWholesaleB2B\Engine\Admin;
 
 use WC_Data_Store;
 use WC_Tax;
-use Yay_Wholesale_B2B\Engine\Compatibles;
-use Yay_Wholesale_B2B\Engine\Frontend\Tax;
-use Yay_Wholesale_B2B\Helpers\RolesHelper;
-use Yay_Wholesale_B2B\Helpers\SettingsHelper;
-use Yay_Wholesale_B2B\Helpers\PricingHelper;
-use Yay_Wholesale_B2B\Utils\SingletonTrait;
+use YayWholesaleB2B\Engine\Compatibles;
+use YayWholesaleB2B\Engine\Frontend\Tax;
+use YayWholesaleB2B\Helpers\RolesHelper;
+use YayWholesaleB2B\Helpers\SettingsHelper;
+use YayWholesaleB2B\Helpers\PricingHelper;
+use YayWholesaleB2B\Utils\SingletonTrait;
 
 defined( 'ABSPATH' ) || exit;
 

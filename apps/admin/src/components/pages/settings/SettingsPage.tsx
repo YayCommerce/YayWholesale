@@ -44,7 +44,7 @@ export default function SettingsPage() {
     if (saveMutation.isPending) return;
 
     await saveMutation.mutateAsync(data);
-    window.yayWholesale.settings = data;
+    window.yayWholesaleB2BAdmin.settings = data;
     form.reset(data);
   }
 

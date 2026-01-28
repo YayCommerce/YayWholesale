@@ -1,11 +1,11 @@
 <?php
-namespace Yay_Wholesale_B2B\Controllers;
+namespace YayWholesaleB2B\Controllers;
 
 use DateTime;
-use Yay_Wholesale_B2B\Utils\SingletonTrait;
+use YayWholesaleB2B\Utils\SingletonTrait;
 use WP_REST_Request;
 use WP_REST_Response;
-use Yay_Wholesale_B2B\Helpers\ReportsHelper;
+use YayWholesaleB2B\Helpers\ReportsHelper;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -39,7 +39,7 @@ class ReportsRestController extends BaseRestController {
      * @return bool|WP_Error True if the user has the necessary permissions, otherwise a WP_Error object.
      */
     public function reports_permission_callback() {
-        if ( ! current_user_can( 'manage_options' ) || ! current_user_can( 'manage_woocommerce' ) ) {
+        if ( ! current_user_can( 'edit_posts' ) || ! current_user_can( 'manage_woocommerce' ) ) {
             return new \WP_Error( 'rest_forbidden', esc_html__( 'Forbidden.', 'yay-wholesale-b2b' ), [ 'status' => 401 ] );
         }
 

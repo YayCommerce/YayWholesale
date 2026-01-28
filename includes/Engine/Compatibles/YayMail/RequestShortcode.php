@@ -1,7 +1,7 @@
 <?php
-namespace Yay_Wholesale_B2B\Engine\Compatibles\YayMail;
+namespace YayWholesaleB2B\Engine\Compatibles\YayMail;
 
-use Yay_Wholesale_B2B\Utils\SingletonTrait;
+use YayWholesaleB2B\Utils\SingletonTrait;
 
 defined( 'ABSPATH' ) || exit;
 

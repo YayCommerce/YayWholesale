@@ -136,6 +136,7 @@ export default function RequestsList() {
 
   const handleBulkDelete = async () => {
     await useBulkDeleteMutation.mutateAsync();
+    setOpenDeleteDialog(false);
     table.resetRowSelection();
   };
 

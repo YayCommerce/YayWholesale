@@ -1,8 +1,8 @@
 <?php
-namespace Yay_Wholesale_B2B\Engine\Admin\Emails;
+namespace YayWholesaleB2B\Engine\Admin\Emails;
 
 use Automattic\WooCommerce\Utilities\FeaturesUtil;
-use Yay_Wholesale_B2B\Helpers\RequestsHelper;
+use YayWholesaleB2B\Helpers\RequestsHelper;
 
 if ( ! defined( 'ABSPATH' ) ) {
     exit;

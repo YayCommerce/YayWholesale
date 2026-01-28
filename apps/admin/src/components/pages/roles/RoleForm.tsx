@@ -201,7 +201,9 @@ export default function RoleForm() {
                         max={100}
                         step={1}
                         placeholder={__('Enter a percentage discount', 'yay-wholesale-b2b')}
-                        decimalSeparator={window.yayWholesale.currency_data.decimal_sep ?? '.'}
+                        decimalSeparator={
+                          window.yayWholesaleB2BAdmin.currency_data.decimal_sep ?? '.'
+                        }
                         decimalScale={2}
                         className="h-9 w-full"
                         aria-invalid={invalid}
@@ -290,9 +292,13 @@ export default function RoleForm() {
                         onValueChange={(value) => field.onChange(value)}
                         min={0}
                         fixedDecimalScale={true}
-                        decimalScale={window.yayWholesale.currency_data.num_decimals ?? 2}
-                        decimalSeparator={window.yayWholesale.currency_data.decimal_sep ?? '.'}
-                        thousandSeparator={window.yayWholesale.currency_data.thousand_sep ?? ','}
+                        decimalScale={window.yayWholesaleB2BAdmin.currency_data.num_decimals ?? 2}
+                        decimalSeparator={
+                          window.yayWholesaleB2BAdmin.currency_data.decimal_sep ?? '.'
+                        }
+                        thousandSeparator={
+                          window.yayWholesaleB2BAdmin.currency_data.thousand_sep ?? ','
+                        }
                         step={1}
                         className="h-9 w-full"
                       >
@@ -305,7 +311,9 @@ export default function RoleForm() {
                         />
                         <div className="absolute inset-y-0 end-0 flex">
                           <NumberInputChevrons hasUnit />
-                          <NumberInputUnit unit={window.yayWholesale.currency_data.symbol ?? '$'} />
+                          <NumberInputUnit
+                            unit={window.yayWholesaleB2BAdmin.currency_data.symbol ?? '$'}
+                          />
                         </div>
                       </NumberInputRoot>
                     </FieldContent>

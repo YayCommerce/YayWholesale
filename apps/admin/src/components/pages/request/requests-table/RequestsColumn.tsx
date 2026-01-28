@@ -190,7 +190,13 @@ export const RequestsColumn: ColumnDef<RequestFormValues>[] = [
               <DialogClose asChild>
                 <Button variant="outline">{__('Cancel', 'yay-wholesale-b2b')}</Button>
               </DialogClose>
-              <Button variant="destructive" onClick={() => deleteRequest()}>
+              <Button
+                variant="destructive"
+                onClick={() => {
+                  deleteRequest();
+                  setOpenDialog(false);
+                }}
+              >
                 {__('Continue', 'yay-wholesale-b2b')}
               </Button>
             </DialogFooter>

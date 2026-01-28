@@ -1,12 +1,12 @@
 <?php
-namespace Yay_Wholesale_B2B\Controllers;
+namespace YayWholesaleB2B\Controllers;
 
-use Yay_Wholesale_B2B\Utils\SingletonTrait;
-use Yay_Wholesale_B2B\Helpers\RolesHelper;
+use YayWholesaleB2B\Utils\SingletonTrait;
+use YayWholesaleB2B\Helpers\RolesHelper;
 use WP_REST_Request;
 use WP_REST_Response;
 use WP_User_Query;
-use Yay_Wholesale_B2B\Helpers\SettingsHelper;
+use YayWholesaleB2B\Helpers\SettingsHelper;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -113,7 +113,7 @@ class RolesRestController extends BaseRestController {
      * @return WP_REST_Response The response object.
      */
     public function get_roles( WP_REST_Request $request ): WP_REST_Response {
-        $roles    = get_option( 'yay_wholesale_b2b_roles', [] );
+        $roles    = get_option( 'yaywholesaleb2b_roles', [] );
         $settings = SettingsHelper::get_settings();
 
         $active_filter = $request->get_param( 'active' );
@@ -161,7 +161,7 @@ class RolesRestController extends BaseRestController {
      */
     public function get_role( WP_REST_Request $request ): WP_REST_Response {
         $id    = (int) $request->get_param( 'roleId' );
-        $roles = get_option( 'yay_wholesale_b2b_roles', [] );
+        $roles = get_option( 'yaywholesaleb2b_roles', [] );
 
         $role = array_values( array_filter( $roles, fn( $r ) => (int) ( $r['id'] ?? 0 ) === $id ) )[0] ?? null;
 
@@ -186,7 +186,7 @@ class RolesRestController extends BaseRestController {
             return $this->error( __( 'Missing role name', 'yay-wholesale-b2b' ) );
         }
 
-        $roles = get_option( 'yay_wholesale_b2b_roles', [] );
+        $roles = get_option( 'yaywholesaleb2b_roles', [] );
         $slug  = RolesHelper::generate_unique_role_slug( $role_name, $roles );
 
         if ( ! get_role( $slug ) ) {
@@ -202,7 +202,7 @@ class RolesRestController extends BaseRestController {
         );
 
         $roles[] = $new_role;
-        update_option( 'yay_wholesale_b2b_roles', $roles );
+        update_option( 'yaywholesaleb2b_roles', $roles );
 
         return $this->success( $new_role, __( 'Role created successfully', 'yay-wholesale-b2b' ) );
     }
@@ -217,14 +217,14 @@ class RolesRestController extends BaseRestController {
         $params  = $this->get_json_params( $request );
         $role_id = (int) $request->get_param( 'roleId' );
 
-        $roles = get_option( 'yay_wholesale_b2b_roles', [] );
+        $roles = get_option( 'yaywholesaleb2b_roles', [] );
         foreach ( $roles as &$role ) {
             if ( (int) ( $role['id'] ?? 0 ) === $role_id ) {
                 $role = array_merge( $role, $params );
                 break;
             }
         }
-        update_option( 'yay_wholesale_b2b_roles', $roles );
+        update_option( 'yaywholesaleb2b_roles', $roles );
 
         return $this->success( $params, __( 'Role updated successfully', 'yay-wholesale-b2b' ) );
     }
@@ -237,7 +237,7 @@ class RolesRestController extends BaseRestController {
      */
     public function delete_role( WP_REST_Request $request ): WP_REST_Response {
         $role_id = (int) $request->get_param( 'roleId' );
-        $roles   = get_option( 'yay_wholesale_b2b_roles', [] );
+        $roles   = get_option( 'yaywholesaleb2b_roles', [] );
 
         $roles = array_filter(
             $roles,
@@ -250,7 +250,7 @@ class RolesRestController extends BaseRestController {
             }
         );
 
-        update_option( 'yay_wholesale_b2b_roles', array_values( $roles ) );
+        update_option( 'yaywholesaleb2b_roles', array_values( $roles ) );
 
         return $this->success( $roles, __( 'Role deleted successfully', 'yay-wholesale-b2b' ) );
     }
@@ -263,7 +263,7 @@ class RolesRestController extends BaseRestController {
      */
     public function delete_roles_bulk( WP_REST_Request $request ): WP_REST_Response {
         $ids   = array_map( 'intval', (array) $request->get_param( 'ids' ) );
-        $roles = get_option( 'yay_wholesale_b2b_roles', [] );
+        $roles = get_option( 'yaywholesaleb2b_roles', [] );
 
         $roles = array_filter(
             $roles,
@@ -276,7 +276,7 @@ class RolesRestController extends BaseRestController {
             }
         );
 
-        update_option( 'yay_wholesale_b2b_roles', array_values( $roles ) );
+        update_option( 'yaywholesaleb2b_roles', array_values( $roles ) );
 
         return $this->success( $roles, __( 'Roles deleted successfully', 'yay-wholesale-b2b' ) );
     }
@@ -296,14 +296,14 @@ class RolesRestController extends BaseRestController {
             return $this->error( __( 'Invalid parameters', 'yay-wholesale-b2b' ) );
         }
 
-        $roles = get_option( 'yay_wholesale_b2b_roles', [] );
+        $roles = get_option( 'yaywholesaleb2b_roles', [] );
         foreach ( $roles as &$role ) {
             if ( in_array( (int) $role['id'], $ids, true ) ) {
                 $role['status'] = $status;
             }
         }
 
-        update_option( 'yay_wholesale_b2b_roles', $roles );
+        update_option( 'yaywholesaleb2b_roles', $roles );
         return $this->success( $roles, __( 'Statuses updated successfully', 'yay-wholesale-b2b' ) );
     }
 }

@@ -5,7 +5,7 @@
  * @package YayWholesale
  */
 
-namespace Yay_Wholesale_B2B\YayCommerceMenu;
+namespace YayWholesaleB2B\YayCommerceMenu;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -47,15 +47,15 @@ class RegisterMenu {
      * Constructor
      */
     public function __construct() {
-        if ( ! defined( 'YAY_WHOLESALE_B2B_MENU_ORDER' ) ) {
-            define( 'YAY_WHOLESALE_B2B_MENU_ORDER', 2 );
+        if ( ! defined( 'YAYWHOLESALEB2B_MENU_ORDER' ) ) {
+            define( 'YAYWHOLESALEB2B_MENU_ORDER', 2 );
         }
-        if ( ! defined( 'YAY_WHOLESALE_B2B_MENU_PRIORITY' ) ) {
-            define( 'YAY_WHOLESALE_B2B_MENU_PRIORITY', 90 );
+        if ( ! defined( 'YAYWHOLESALEB2B_MENU_PRIORITY' ) ) {
+            define( 'YAYWHOLESALEB2B_MENU_PRIORITY', 90 );
         }
         add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_yaycommerce_menu_scripts' ] );
         add_action( 'admin_menu', [ $this, 'settings_menu' ] );
-        add_action( 'admin_menu', [ $this, 'add_placeholder_menu' ], YAY_WHOLESALE_B2B_MENU_PRIORITY + 1 );
+        add_action( 'admin_menu', [ $this, 'add_placeholder_menu' ], YAYWHOLESALEB2B_MENU_PRIORITY + 1 );
     }
 
     /**

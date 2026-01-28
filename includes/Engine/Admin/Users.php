@@ -1,7 +1,7 @@
 <?php
-namespace Yay_Wholesale_B2B\Engine\Admin;
+namespace YayWholesaleB2B\Engine\Admin;
 
-use Yay_Wholesale_B2B\Utils\SingletonTrait;
+use YayWholesaleB2B\Utils\SingletonTrait;
 
 defined( 'ABSPATH' ) || exit;
 /**
@@ -33,7 +33,7 @@ class Users {
             return $roles;
         }
 
-        $wholesale_roles = get_option( 'yay_wholesale_b2b_roles', [] );
+        $wholesale_roles = get_option( 'yaywholesaleb2b_roles', [] );
         $wholesale_roles = array_column( $wholesale_roles, 'slug' );
 
         // Filter $roles keeping only keys also present in $wholesale_roles

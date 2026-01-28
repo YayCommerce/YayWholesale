@@ -1,10 +1,10 @@
 <?php
-namespace Yay_Wholesale_B2B\Engine\Frontend;
+namespace YayWholesaleB2B\Engine\Frontend;
 
 use WC_Tax;
-use Yay_Wholesale_B2B\Utils\SingletonTrait;
-use Yay_Wholesale_B2B\Helpers\RolesHelper;
-use Yay_Wholesale_B2B\Helpers\PricingHelper;
+use YayWholesaleB2B\Utils\SingletonTrait;
+use YayWholesaleB2B\Helpers\RolesHelper;
+use YayWholesaleB2B\Helpers\PricingHelper;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -167,12 +167,12 @@ class Requirement {
             ( function_exists( 'is_cart' ) && is_cart() ) ) {
             $wholesale = RolesHelper::is_wholesale_user();
             $slug      = 'ywhs_wholesale_requirement';
-            $asset     = include YAY_WHOLESALE_B2B_PLUGIN_DIR . 'assets/dist/blocks/requirement-slot-fill/index.asset.php';
+            $asset     = include YAYWHOLESALEB2B_PLUGIN_DIR . 'assets/dist/blocks/requirement-slot-fill/index.asset.php';
             wp_enqueue_script(
                 $slug,
-                YAY_WHOLESALE_B2B_PLUGIN_URL . 'assets/dist/blocks/requirement-slot-fill/index.js',
+                YAYWHOLESALEB2B_PLUGIN_URL . 'assets/dist/blocks/requirement-slot-fill/index.js',
                 $asset['dependencies'],
-                YAY_WHOLESALE_B2B_VERSION,
+                YAYWHOLESALEB2B_VERSION,
                 true
             );
 
@@ -198,7 +198,7 @@ class Requirement {
      * Register new block type of Wholesale Requirement
      */
     public function create_ywhs_requirement_block_init() {
-        $block_json_path = YAY_WHOLESALE_B2B_PLUGIN_DIR . 'assets/dist/blocks/requirement-block/block.json';
+        $block_json_path = YAYWHOLESALEB2B_PLUGIN_DIR . 'assets/dist/blocks/requirement-block/block.json';
 
         if ( ! file_exists( $block_json_path ) ) {
             return;

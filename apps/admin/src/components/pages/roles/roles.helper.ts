@@ -1,5 +1,5 @@
 export function formatWooPrice(value: number): string {
-  const { currency_data } = window.yayWholesale;
+  const { currency_data } = window.yayWholesaleB2BAdmin;
   const { symbol, position, thousand_sep, decimal_sep, num_decimals } = currency_data;
 
   const [intPart, decPart] = value.toFixed(num_decimals).split('.');

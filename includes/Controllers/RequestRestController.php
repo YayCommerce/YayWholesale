@@ -1,13 +1,13 @@
 <?php
-namespace Yay_Wholesale_B2B\Controllers;
+namespace YayWholesaleB2B\Controllers;
 
 use Exception;
 use WP_Error;
-use Yay_Wholesale_B2B\Utils\SingletonTrait;
+use YayWholesaleB2B\Utils\SingletonTrait;
 use WP_REST_Request;
 use WP_REST_Response;
-use Yay_Wholesale_B2B\Helpers\RequestsHelper;
-use Yay_Wholesale_B2B\Helpers\SettingsHelper;
+use YayWholesaleB2B\Helpers\RequestsHelper;
+use YayWholesaleB2B\Helpers\SettingsHelper;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -50,7 +50,7 @@ class RequestRestController extends BaseRestController {
 
         $cookie_id  = sanitize_text_field( wp_unslash( $_COOKIE['yaywholesaleb2b_cid'] ) );
         $count      = (int) get_transient( "yaywholesaleb2b_client_$cookie_id" ) + 1;
-        $limit_rate = 3;
+        $limit_rate = 5;
         if ( $count > $limit_rate ) {
             return new WP_Error( 'rest_forbidden', esc_html__( 'You reached the limit requests you can send. Please try again in few minutes.', 'yay-wholesale-b2b' ), [ 'status' => 401 ] );
         }
@@ -81,14 +81,21 @@ class RequestRestController extends BaseRestController {
             '/requests',
             [
                 [
-                    'methods'             => 'POST',
-                    'callback'            => [ $this, 'register_request' ],
-                    'permission_callback' => [ $this, 'request_public_permission_callback' ],
-                ],
-                [
                     'methods'             => 'GET',
                     'callback'            => [ $this, 'get_request_list' ],
                     'permission_callback' => [ $this,'request_permission_callback' ],
+                ],
+            ]
+        );
+
+        register_rest_route(
+            $this->namespace,
+            '/register-request',
+            [
+                [
+                    'methods'             => 'POST',
+                    'callback'            => [ $this, 'register_request' ],
+                    'permission_callback' => [ $this, 'request_public_permission_callback' ],
                 ],
             ]
         );
@@ -223,7 +230,7 @@ class RequestRestController extends BaseRestController {
         if ( isset( $_COOKIE['yaywholesaleb2b_cid'] ) && ! empty( $_COOKIE['yaywholesaleb2b_cid'] ) ) {
             $cookie_id = sanitize_text_field( wp_unslash( $_COOKIE['yaywholesaleb2b_cid'] ) );
             $count     = (int) get_transient( "yaywholesaleb2b_client_$cookie_id" ) + 1;
-            set_transient( "yaywholesaleb2b_client_$cookie_id", $count, 15 * 60 );
+            set_transient( "yaywholesaleb2b_client_$cookie_id", $count, 15 * MINUTE_IN_SECONDS );
         }
 
         $params       = $this->get_form_data( $request );
@@ -237,7 +244,7 @@ class RequestRestController extends BaseRestController {
 
         $settings = SettingsHelper::get_settings();
         if ( ! $settings['registration']['moderate'] ) {
-            $roles        = get_option( 'yay_wholesale_b2b_roles', [] );
+            $roles        = get_option( 'yaywholesaleb2b_roles', [] );
             $active_roles = array_values( array_filter( $roles, fn( $r ) => $r['status'] ) );
             $role_slug    = $settings['general']['default_role'];
             $role         = array_values( array_filter( $active_roles, fn( $r ) => $r['slug'] === $role_slug ) )[0] ?? null;
@@ -362,7 +369,7 @@ class RequestRestController extends BaseRestController {
         $json_data = $this->get_json_params( $request );
 
         $role_slug    = '';
-        $roles        = get_option( 'yay_wholesale_b2b_roles', [] );
+        $roles        = get_option( 'yaywholesaleb2b_roles', [] );
         $active_roles = array_values( array_filter( $roles, fn( $r ) => $r['status'] ) );
 
         if ( ! array_key_exists( 'role_id', $json_data ) || $json_data['role_id'] < 0 ) {
@@ -438,7 +445,7 @@ class RequestRestController extends BaseRestController {
         $failed_totally   = 0;
 
         $role_slug    = '';
-        $roles        = get_option( 'yay_wholesale_b2b_roles', [] );
+        $roles        = get_option( 'yaywholesaleb2b_roles', [] );
         $active_roles = array_values( array_filter( $roles, fn( $r ) => $r['status'] ) );
 
         if ( ! isset( $role_id ) || $role_id < 0 ) {

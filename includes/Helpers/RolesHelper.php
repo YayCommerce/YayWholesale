@@ -1,5 +1,5 @@
 <?php
-namespace Yay_Wholesale_B2B\Helpers;
+namespace YayWholesaleB2B\Helpers;
 
 /**
  * Roles Helper Class
@@ -17,7 +17,7 @@ class RolesHelper {
             return null;
         }
 
-        $roles          = get_option( 'yay_wholesale_b2b_roles', [] );
+        $roles          = get_option( 'yaywholesaleb2b_roles', [] );
         $user           = $user_id > 0 ? get_user_by( 'ID', $user_id ) : wp_get_current_user();
         $user_role_slug = self::get_user_wholesale_role( $user, $roles );
         if ( ! $user_role_slug ) {
@@ -87,7 +87,7 @@ class RolesHelper {
      * @return string|null The wholesale role slug or null if not found.
      */
     public static function get_user_wholesale_role( \WP_User $user, array $roles ): ?string {
-        $meta_slug = get_user_meta( $user->ID, '_yay_wholesale_b2b_role', true );
+        $meta_slug = get_user_meta( $user->ID, '_yaywholesaleb2b_role', true );
         if ( $meta_slug ) {
             return sanitize_title( $meta_slug );
         }
@@ -110,7 +110,7 @@ class RolesHelper {
      * @return void
      */
     public static function remove_ywhs_role_from_user( \WP_User $user ): void {
-        $role_slugs = array_column( get_option( 'yay_wholesale_b2b_roles', [] ), 'slug' );
+        $role_slugs = array_column( get_option( 'yaywholesaleb2b_roles', [] ), 'slug' );
 
         foreach ( $role_slugs as $ywhs_role ) {
             if ( in_array( $ywhs_role, $user->roles, true ) ) {
