@@ -4,6 +4,7 @@ import { __ } from '@wordpress/i18n';
 import { showToast } from '@/components/custom/showToast';
 
 import { updateEmailStatus } from '../api/emails.api';
+import { handleErrorMessage } from '../utils';
 
 export function useWholesaleEmailsQuery() {
   return useQuery({
@@ -40,7 +41,7 @@ export function useUpdateEmailStatusMutation() {
       if (context?.previousData) {
         queryClient.setQueryData(['wholesale_emails'], context.previousData);
       }
-      showToast.error(err.message);
+      handleErrorMessage(err);
     },
 
     onSuccess: () => {

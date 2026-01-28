@@ -8,6 +8,7 @@ import {
   getTotalCountWholesalers,
   updateWholesalerRole,
 } from '../api/wholesalers';
+import { handleErrorMessage } from '../utils';
 
 export function useWholesalersQuery(
   search: string,
@@ -38,9 +39,7 @@ export function useUpdateWholesalersRoleMutation(userId: number) {
         queryClient.invalidateQueries({ queryKey: ['wholesalers'] });
       }
     },
-    onError: (error: Error) => {
-      showToast.error(error.message);
-    },
+    onError: handleErrorMessage,
   });
 }
 
@@ -55,9 +54,7 @@ export function useBulkUpdateWholesalersRoleMutation(userIds: number[]) {
         queryClient.invalidateQueries({ queryKey: ['wholesalers'] });
       }
     },
-    onError: (error: Error) => {
-      showToast.error(error.message);
-    },
+    onError: handleErrorMessage,
   });
 }
 

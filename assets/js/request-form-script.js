@@ -13,7 +13,7 @@ jQuery(document).ready(() => {
         jQuery("#ywhs_request_form button[type='submit']").attr("disabled", "disabled");
 
         jQuery.ajax({
-            url: `${yayWholesaleB2B.rest_url}${yayWholesaleB2B.rest_base}/register-request`, 
+            url: `${yayWholesaleB2B.rest_url}${yayWholesaleB2B.rest_base}/requests`, 
             type: 'POST',
             beforeSend: function(xhr) {
                 if (!yayWholesaleB2B || !yayWholesaleB2B.rest_nonce)

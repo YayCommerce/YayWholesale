@@ -27,23 +27,10 @@ class ReportsRestController extends BaseRestController {
                 [
                     'methods'             => 'GET',
                     'callback'            => [ $this, 'statistic_wholesalers' ],
-                    'permission_callback' => [ $this, 'reports_permission_callback' ],
+                    'permission_callback' => [ $this, 'can_manage_report' ],
                 ],
             ]
         );
-    }
-
-    /**
-     * Check if the user has the necessary permissions to access the settings endpoints.
-     *
-     * @return bool|WP_Error True if the user has the necessary permissions, otherwise a WP_Error object.
-     */
-    public function reports_permission_callback() {
-        if ( ! current_user_can( 'edit_posts' ) || ! current_user_can( 'manage_woocommerce' ) ) {
-            return new \WP_Error( 'rest_forbidden', esc_html__( 'Forbidden.', 'yay-wholesale-b2b' ), [ 'status' => 401 ] );
-        }
-
-        return true;
     }
 
     /**
@@ -66,5 +53,18 @@ class ReportsRestController extends BaseRestController {
         );
 
         return $this->success( $ywhs_statistic, __( 'Reports generated!', 'yay-wholesale-b2b' ) );
+    }
+
+    /**
+     * Check if the user has the necessary permissions to access the reports endpoints.
+     *
+     * @return bool|WP_Error True if the user has the necessary permissions, otherwise a WP_Error object.
+     */
+    public function can_manage_report() {
+        if ( ! current_user_can( 'edit_posts' ) || ! current_user_can( 'manage_woocommerce' ) ) {
+            return new \WP_Error( 'rest_forbidden', esc_html__( 'Forbidden.', 'yay-wholesale-b2b' ), [ 'status' => 401 ] );
+        }
+
+        return true;
     }
 }

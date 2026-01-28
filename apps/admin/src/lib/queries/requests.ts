@@ -14,6 +14,7 @@ import {
   updateRequestStatusById,
 } from '../api/requests.api';
 import { RequestFormValues } from '../schema/requests';
+import { handleErrorMessage } from '../utils';
 
 export function useRequestsQuery(
   keyword: string,
@@ -57,9 +58,7 @@ export function useUpdateRequestMutation(requestId: number) {
       queryClient.invalidateQueries({ queryKey: ['requests'] });
       queryClient.invalidateQueries({ queryKey: ['roles'] });
     },
-    onError: (error: Error) => {
-      showToast.error(error.message);
-    },
+    onError: handleErrorMessage,
   });
 }
 
@@ -74,9 +73,7 @@ export function useDeleteRequestMutation(requestId: number) {
       queryClient.invalidateQueries({ queryKey: ['requests'] });
       queryClient.invalidateQueries({ queryKey: ['roles'] });
     },
-    onError: (error: Error) => {
-      showToast.error(error.message);
-    },
+    onError: handleErrorMessage,
   });
 }
 
@@ -93,9 +90,7 @@ export function useUpdateRequestStatusMutation(requestId: number) {
       queryClient.invalidateQueries({ queryKey: ['roles'] });
       queryClient.invalidateQueries({ queryKey: ['wholesalers'] });
     },
-    onError: (error: Error) => {
-      showToast.error(error.message);
-    },
+    onError: handleErrorMessage,
   });
 }
 
@@ -111,9 +106,7 @@ export function useBulkUpdateRequestStatusMutation(ids: number[]) {
       queryClient.invalidateQueries({ queryKey: ['roles'] });
       queryClient.invalidateQueries({ queryKey: ['wholesalers'] });
     },
-    onError: (error: Error) => {
-      showToast.error(error.message);
-    },
+    onError: handleErrorMessage,
   });
 }
 
@@ -127,9 +120,7 @@ export function useBulkDeleteRequestMutation(ids: number[]) {
       queryClient.invalidateQueries({ queryKey: ['requests'] });
       queryClient.invalidateQueries({ queryKey: ['roles'] });
     },
-    onError: (error: Error) => {
-      showToast.error(error.message);
-    },
+    onError: handleErrorMessage,
   });
 }
 

@@ -20,35 +20,6 @@ class WholeSalersController extends BaseRestController {
     }
 
     /**
-     * Check if the user has the necessary permissions to access the whole salers list endpoints.
-     *
-     * @return bool|WP_Error True if the user has the necessary permissions, otherwise a WP_Error object.
-     */
-    public function wholesalers_permission_callback() {
-        if ( ! current_user_can( 'edit_posts' ) || ! current_user_can( 'manage_woocommerce' ) ) {
-            return new \WP_Error( 'rest_forbidden', esc_html__( 'Forbidden.', 'yay-wholesale-b2b' ), [ 'status' => 401 ] );
-        }
-
-        return true;
-    }
-
-    /**
-     * Check if the user has the necessary permissions to access the whole salers list endpoints.
-     *
-     * @return bool|WP_Error True if the user has the necessary permissions, otherwise a WP_Error object.
-     */
-    public function wholesalers_users_permission_callback() {
-        if ( ! current_user_can( 'edit_posts' ) ||
-            ! current_user_can( 'promote_users' ) ||
-            ! current_user_can( 'manage_woocommerce' ) ) {
-
-            return new \WP_Error( 'rest_forbidden', esc_html__( 'Forbidden.', 'yay-wholesale-b2b' ), [ 'status' => 401 ] );
-        }
-
-        return true;
-    }
-
-    /**
      * Initialize the hooks.
      *
      * @return void
@@ -62,7 +33,7 @@ class WholeSalersController extends BaseRestController {
                 [
                     'methods'             => 'GET',
                     'callback'            => [ $this, 'get_wholesalers' ],
-                    'permission_callback' => [ $this,'wholesalers_permission_callback' ],
+                    'permission_callback' => [ $this,'can_manage_wholesalers' ],
                 ],
             ]
         );
@@ -72,7 +43,7 @@ class WholeSalersController extends BaseRestController {
             [
                 'methods'             => 'PUT',
                 'callback'            => [ $this, 'update_wholesaler_role' ],
-                'permission_callback' => [ $this,'wholesalers_users_permission_callback' ],
+                'permission_callback' => [ $this,'can_manage_wholesalers_and_roles' ],
             ]
         );
 
@@ -83,7 +54,7 @@ class WholeSalersController extends BaseRestController {
                 [
                     'methods'             => 'PUT',
                     'callback'            => [ $this, 'bulk_update_wholesaler_role' ],
-                    'permission_callback' => [ $this,'wholesalers_users_permission_callback' ],
+                    'permission_callback' => [ $this,'can_manage_wholesalers_and_roles' ],
                 ],
             ]
         );
@@ -95,7 +66,7 @@ class WholeSalersController extends BaseRestController {
                 [
                     'methods'             => 'GET',
                     'callback'            => [ $this, 'get_total_count' ],
-                    'permission_callback' => [ $this,'wholesalers_permission_callback' ],
+                    'permission_callback' => [ $this,'can_manage_wholesalers' ],
                 ],
             ]
         );
@@ -150,7 +121,7 @@ class WholeSalersController extends BaseRestController {
 
         $user = get_user_by( 'ID', $user_id );
         if ( ! $user ) {
-            return $this->error( __( 'User not exists', 'yay-wholesale-b2b' ) );
+            return $this->error( __( 'User not exists', 'yay-wholesale-b2b' ), 404 );
         }
 
         RolesHelper::remove_ywhs_role_from_user( $user );
@@ -204,5 +175,34 @@ class WholeSalersController extends BaseRestController {
         $count = WholeSalersHelper::count_total_wholesalers();
 
         return $this->success( [ 'count' => $count ], __( 'Total of Wholesaler is successfully counted', 'yay-wholesale-b2b' ) );
+    }
+
+        /**
+         * Check if the user has the necessary permissions to access the whole salers list endpoints.
+         *
+         * @return bool|WP_Error True if the user has the necessary permissions, otherwise a WP_Error object.
+         */
+    public function can_manage_wholesalers() {
+        if ( ! current_user_can( 'edit_posts' ) || ! current_user_can( 'manage_woocommerce' ) ) {
+            return new \WP_Error( 'rest_forbidden', esc_html__( 'Forbidden.', 'yay-wholesale-b2b' ), [ 'status' => 401 ] );
+        }
+
+        return true;
+    }
+
+    /**
+     * Check if the user has the necessary permissions to access the whole salers list endpoints.
+     *
+     * @return bool|WP_Error True if the user has the necessary permissions, otherwise a WP_Error object.
+     */
+    public function can_manage_wholesalers_and_roles() {
+        if ( ! ( current_user_can( 'edit_posts' ) &&
+            current_user_can( 'promote_users' ) &&
+            current_user_can( 'manage_woocommerce' ) ) ) {
+
+            return new \WP_Error( 'rest_forbidden', esc_html__( 'Forbidden.', 'yay-wholesale-b2b' ), [ 'status' => 401 ] );
+        }
+
+        return true;
     }
 }

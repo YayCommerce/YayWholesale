@@ -20,7 +20,7 @@ class AccountRegistrationRejected extends WholesaleEmailBase {
      */
     public function __construct() {
 
-        $this->id             = 'ywhs_account_registration_rejected';
+        $this->id             = 'yaywholesaleb2b_account_registration_rejected';
         $this->customer_email = true;
         $this->title          = __( 'Wholesale account is rejected', 'yay-wholesale-b2b' );
         $this->email_group    = 'wholesale_account';

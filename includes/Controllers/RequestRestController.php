@@ -21,60 +21,6 @@ class RequestRestController extends BaseRestController {
         $this->init_hooks();
     }
 
-    /**
-     * Check if the user has the necessary permissions to access the requests endpoints.
-     *
-     * @return bool|WP_Error True if the user has the necessary permissions, otherwise a WP_Error object.
-     */
-    public function request_permission_callback() {
-        if ( ! current_user_can( 'edit_posts' ) || ! current_user_can( 'manage_woocommerce' ) ) {
-            return new WP_Error( 'rest_forbidden', esc_html__( 'Forbidden.', 'yay-wholesale-b2b' ), [ 'status' => 401 ] );
-        }
-
-        return true;
-    }
-
-    public function request_public_permission_callback( WP_REST_Request $request ) {
-        if ( is_user_logged_in() ) {
-            $params = $this->get_form_data( $request );
-            global $current_user;
-
-            if ( $params['email_address'] !== $current_user->user_email ) {
-                return new WP_Error( 'rest_forbidden', esc_html__( 'Forbidden.', 'yay-wholesale-b2b' ), [ 'status' => 401 ] );
-            }
-        }
-
-        if ( ! isset( $_COOKIE['yaywholesaleb2b_cid'] ) || empty( $_COOKIE['yaywholesaleb2b_cid'] ) ) {
-            return new WP_Error( 'rest_forbidden', esc_html__( 'Cookie Error.', 'yay-wholesale-b2b' ), [ 'status' => 401 ] );
-        }
-
-        $cookie_id  = sanitize_text_field( wp_unslash( $_COOKIE['yaywholesaleb2b_cid'] ) );
-        $count      = (int) get_transient( "yaywholesaleb2b_client_$cookie_id" ) + 1;
-        $limit_rate = 5;
-        if ( $count > $limit_rate ) {
-            return new WP_Error( 'rest_forbidden', esc_html__( 'You reached the limit requests you can send. Please try again in few minutes.', 'yay-wholesale-b2b' ), [ 'status' => 401 ] );
-        }
-
-        return true;
-    }
-
-    /**
-     * Check if the user has the necessary permissions to access the requests endpoints.
-     *
-     * @return bool|WP_Error True if the user has the necessary permissions, otherwise a WP_Error object.
-     */
-    public function request_users_permission_callback() {
-        if ( ! current_user_can( 'edit_posts' ) ||
-            ! current_user_can( 'create_users' ) ||
-            ! current_user_can( 'promote_users' ) ||
-            ! current_user_can( 'manage_woocommerce' ) ) {
-
-            return new WP_Error( 'rest_forbidden', esc_html__( 'Forbidden.', 'yay-wholesale-b2b' ), [ 'status' => 401 ] );
-        }
-
-        return true;
-    }
-
     protected function init_hooks(): void {
         register_rest_route(
             $this->namespace,
@@ -83,19 +29,12 @@ class RequestRestController extends BaseRestController {
                 [
                     'methods'             => 'GET',
                     'callback'            => [ $this, 'get_request_list' ],
-                    'permission_callback' => [ $this,'request_permission_callback' ],
+                    'permission_callback' => [ $this,'can_manage_request' ],
                 ],
-            ]
-        );
-
-        register_rest_route(
-            $this->namespace,
-            '/register-request',
-            [
                 [
                     'methods'             => 'POST',
                     'callback'            => [ $this, 'register_request' ],
-                    'permission_callback' => [ $this, 'request_public_permission_callback' ],
+                    'permission_callback' => [ $this, 'can_submit_request' ],
                 ],
             ]
         );
@@ -107,17 +46,17 @@ class RequestRestController extends BaseRestController {
                 [
                     'methods'             => 'GET',
                     'callback'            => [ $this, 'get_request_by_id' ],
-                    'permission_callback' => [ $this,'request_permission_callback' ],
+                    'permission_callback' => [ $this,'can_manage_request' ],
                 ],
                 [
                     'methods'             => 'PUT',
                     'callback'            => [ $this, 'update_request_by_id' ],
-                    'permission_callback' => [ $this,'request_permission_callback' ],
+                    'permission_callback' => [ $this,'can_manage_request' ],
                 ],
                 [
                     'methods'             => 'DELETE',
                     'callback'            => [ $this, 'delete_request_by_id' ],
-                    'permission_callback' => [ $this,'request_permission_callback' ],
+                    'permission_callback' => [ $this,'can_manage_request' ],
                 ],
             ]
         );
@@ -129,7 +68,7 @@ class RequestRestController extends BaseRestController {
                 [
                     'methods'             => 'PUT',
                     'callback'            => [ $this, 'approve_request_status_by_id' ],
-                    'permission_callback' => [ $this,'request_users_permission_callback' ],
+                    'permission_callback' => [ $this,'can_manage_request_and_user_role' ],
                 ],
             ]
         );
@@ -141,7 +80,7 @@ class RequestRestController extends BaseRestController {
                 [
                     'methods'             => 'PUT',
                     'callback'            => [ $this, 'reject_request_status_by_id' ],
-                    'permission_callback' => [ $this,'request_permission_callback' ],
+                    'permission_callback' => [ $this,'can_manage_request' ],
                 ],
             ]
         );
@@ -153,7 +92,7 @@ class RequestRestController extends BaseRestController {
                 [
                     'methods'             => 'PUT',
                     'callback'            => [ $this, 'bulk_approve_request_status' ],
-                    'permission_callback' => [ $this,'request_users_permission_callback' ],
+                    'permission_callback' => [ $this,'can_manage_request_and_user_role' ],
                 ],
             ]
         );
@@ -165,7 +104,7 @@ class RequestRestController extends BaseRestController {
                 [
                     'methods'             => 'PUT',
                     'callback'            => [ $this, 'bulk_reject_request_status' ],
-                    'permission_callback' => [ $this,'request_permission_callback' ],
+                    'permission_callback' => [ $this,'can_manage_request' ],
                 ],
             ]
         );
@@ -177,7 +116,7 @@ class RequestRestController extends BaseRestController {
                 [
                     'methods'             => 'PUT',
                     'callback'            => [ $this, 'bulk_update_request_status' ],
-                    'permission_callback' => [ $this,'request_permission_callback' ],
+                    'permission_callback' => [ $this,'can_manage_request' ],
                 ],
             ]
         );
@@ -189,7 +128,7 @@ class RequestRestController extends BaseRestController {
                 [
                     'methods'             => 'DELETE',
                     'callback'            => [ $this, 'bulk_delete_request' ],
-                    'permission_callback' => [ $this,'request_permission_callback' ],
+                    'permission_callback' => [ $this,'can_manage_request' ],
                 ],
             ]
         );
@@ -201,7 +140,7 @@ class RequestRestController extends BaseRestController {
                 [
                     'methods'             => 'GET',
                     'callback'            => [ $this, 'get_pending_count' ],
-                    'permission_callback' => [ $this,'request_permission_callback' ],
+                    'permission_callback' => [ $this,'can_manage_request' ],
                 ],
             ]
         );
@@ -213,7 +152,7 @@ class RequestRestController extends BaseRestController {
                 [
                     'methods'             => 'GET',
                     'callback'            => [ $this, 'get_total_count' ],
-                    'permission_callback' => [ $this,'request_permission_callback' ],
+                    'permission_callback' => [ $this,'can_manage_request' ],
                 ],
             ]
         );
@@ -250,7 +189,7 @@ class RequestRestController extends BaseRestController {
             $role         = array_values( array_filter( $active_roles, fn( $r ) => $r['slug'] === $role_slug ) )[0] ?? null;
             if ( ! isset( $role ) ) {
                 do_action( 'ywhs_account_registration_pending', $wholesale_id );
-                return $this->error( __( 'The default role is inactive, your request is changed to pending', 'yay-wholesale-b2b' ), 400 );
+                return $this->error( __( 'The default role is inactive, your request is changed to pending', 'yay-wholesale-b2b' ) );
             }
 
             $result = RequestsHelper::add_role_to_ywhs_request_author( $wholesale_id, $role_slug );
@@ -258,7 +197,7 @@ class RequestRestController extends BaseRestController {
             if ( $result ) {
                 if ( ! RequestsHelper::update_whs_request( $wholesale_id, [ 'status' => RequestsHelper::APPROVED ] ) ) {
                     do_action( 'ywhs_account_registration_pending', $wholesale_id );
-                    return $this->error( __( 'Role has been applied, but your request is still pending', 'yay-wholesale-b2b' ), 400 );
+                    return $this->error( __( 'Role has been applied, but your request is still pending', 'yay-wholesale-b2b' ) );
                 }
 
                 // Trigger the email when a new wholesale account is approved.
@@ -319,7 +258,7 @@ class RequestRestController extends BaseRestController {
         $request = RequestsHelper::get_request_by_id( $id );
 
         if ( empty( $request ) ) {
-            return $this->error( __( 'Request not found', 'yay-wholesale-b2b' ) );
+            return $this->error( __( 'Request not found', 'yay-wholesale-b2b' ), 404 );
         }
 
         return $this->success( $request );
@@ -417,8 +356,6 @@ class RequestRestController extends BaseRestController {
         $id        = (int) $request->get_param( 'request_id' );
         $json_data = $this->get_json_params( $request );
 
-        RequestsHelper::remove_role_from_ywhs_request_author( $id );
-
         if ( ! RequestsHelper::update_whs_request( $id, [ 'status' => RequestsHelper::REJECTED ] ) ) {
             return $this->error( __( 'Role has been removed from the request author, but cannot change the status', 'yay-wholesale-b2b' ) );
         }
@@ -505,30 +442,22 @@ class RequestRestController extends BaseRestController {
      * @return WP_REST_Response The response object.
      */
     public function bulk_reject_request_status( WP_REST_Request $request ): WP_REST_Response {
-        $params           = $this->get_json_params( $request );
-        $ids              = $params['ids'] ?? [];
-        $status           = RequestsHelper::REJECTED;
-        $updated          = 0;
-        $failed_partially = 0;
-        $failed_totally   = 0;
+        $params         = $this->get_json_params( $request );
+        $ids            = $params['ids'] ?? [];
+        $status         = RequestsHelper::REJECTED;
+        $updated        = 0;
+        $failed_totally = 0;
 
         foreach ( $ids as $id ) {
-            try {
-                RequestsHelper::remove_role_from_ywhs_request_author( $id );
-            } catch ( Exception $e ) {
-                ++$failed_totally;
-                continue;
-            }
-
             if ( ! RequestsHelper::update_whs_request( $id, [ 'status' => $status ] ) ) {
-                ++$failed_partially;
+                ++$failed_totally;
             } else {
                 ++$updated;
                 do_action( 'ywhs_account_registration_rejected', $id );
             }
         }
 
-        if ( count( $ids ) === $failed_partially || count( $ids ) === $failed_totally ) {
+        if ( count( $ids ) === $failed_totally ) {
             return $this->error( __( 'Can not update these requests', 'yay-wholesale-b2b' ) );
         }
 
@@ -536,9 +465,9 @@ class RequestRestController extends BaseRestController {
             return $this->success( [], __( 'Requests status have been updated successfully', 'yay-wholesale-b2b' ) );
         }
 
-        // Translators: 1: number of requests successfully updated; 2: number of requests that have add/remove role; 3: number of requests that failed.
-        $message = __( '%1$d request(s) updated, %2$d request(s) changed role but failed updated status, %3$d request(s) failed', 'yay-wholesale-b2b' );
-        $message = sprintf( $message, $updated, $failed_partially, $failed_totally );
+        // Translators: 1: number of requests successfully updated; 2: number of requests that have failed.
+        $message = __( '%1$d request(s) updated, %2$d request(s) failed', 'yay-wholesale-b2b' );
+        $message = sprintf( $message, $updated, $failed_totally );
 
         return $this->success( [], $message );
     }
@@ -601,5 +530,80 @@ class RequestRestController extends BaseRestController {
         $count = RequestsHelper::count_total_requests();
 
         return $this->success( [ 'count' => $count ], __( 'Requests are successfully counted', 'yay-wholesale-b2b' ) );
+    }
+
+    /**
+     * Check if the user reached the limit rate of sudmiting requests.
+     *
+     * @return bool.
+     */
+    private function check_submit_request_limit_rate() {
+        if ( ! isset( $_COOKIE['yaywholesaleb2b_cid'] ) || empty( $_COOKIE['yaywholesaleb2b_cid'] ) ) {
+            return false;
+        }
+        $cookie_id  = sanitize_text_field( wp_unslash( $_COOKIE['yaywholesaleb2b_cid'] ) );
+        $count      = (int) get_transient( "yaywholesaleb2b_client_$cookie_id" ) + 1;
+        $limit_rate = 5;
+
+        return $count <= $limit_rate;
+    }
+
+    /**
+     * Check if the user has the necessary permissions to access the requests endpoints (actions: get, search, delete).
+     *
+     * @return bool|WP_Error True if the user has the necessary permissions, otherwise a WP_Error object.
+     */
+    public function can_manage_request() {
+        if ( ! current_user_can( 'edit_posts' ) || ! current_user_can( 'manage_woocommerce' ) ) {
+            return new WP_Error( 'rest_forbidden', esc_html__( 'Forbidden.', 'yay-wholesale-b2b' ), [ 'status' => 401 ] );
+        }
+
+        return true;
+    }
+
+    /**
+     * Check if the user has the necessary permissions to access the requests endpoints (actions: update status, bulk update).
+     *
+     * @return bool|WP_Error True if the user has the necessary permissions, otherwise a WP_Error object.
+     */
+    public function can_manage_request_and_user_role() {
+        if ( ! ( current_user_can( 'edit_posts' ) &&
+            current_user_can( 'create_users' ) &&
+            current_user_can( 'promote_users' ) &&
+            current_user_can( 'manage_woocommerce' ) ) ) {
+
+            return new WP_Error( 'rest_forbidden', esc_html__( 'Forbidden.', 'yay-wholesale-b2b' ), [ 'status' => 401 ] );
+        }
+
+        return true;
+    }
+
+    /**
+     * Check if the user can submit a wholesale request
+     *
+     * @param \WP_REST_Request $request the request receivced.
+     * @return bool|WP_Error True if the user has the necessary permissions, otherwise a WP_Error object.
+     */
+    public function can_submit_request( WP_REST_Request $request ) {
+        if ( is_user_logged_in() ) {
+            $params = $this->get_form_data( $request );
+            global $current_user;
+
+            if ( in_array( 'email_address', $params, true ) ) {
+                if ( $params['email_address'] !== $current_user->user_email ) {
+                    return new WP_Error( 'rest_forbidden', esc_html__( 'Forbidden.', 'yay-wholesale-b2b' ), [ 'status' => 401 ] );
+                }
+            }
+        }
+
+        if ( ! isset( $_COOKIE['yaywholesaleb2b_cid'] ) || empty( $_COOKIE['yaywholesaleb2b_cid'] ) ) {
+            return new WP_Error( 'rest_forbidden', esc_html__( 'Cookie Error.', 'yay-wholesale-b2b' ), [ 'status' => 401 ] );
+        }
+
+        if ( ! $this->check_submit_request_limit_rate() ) {
+            return new WP_Error( 'rest_forbidden', esc_html__( 'You reached the limit requests you can send. Please try again in few minutes.', 'yay-wholesale-b2b' ), [ 'status' => 401 ] );
+        }
+
+        return true;
     }
 }

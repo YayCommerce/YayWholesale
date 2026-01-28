@@ -29,12 +29,12 @@ class RolesRestController extends BaseRestController {
                 [
                     'methods'             => 'GET',
                     'callback'            => [ $this, 'get_roles' ],
-                    'permission_callback' => [ $this, 'roles_get_permission_callback' ],
+                    'permission_callback' => [ $this, 'can_get_roles' ],
                 ],
                 [
                     'methods'             => 'POST',
                     'callback'            => [ $this, 'create_role' ],
-                    'permission_callback' => [ $this, 'roles_permission_callback' ],
+                    'permission_callback' => [ $this, 'can_manage_roles' ],
                 ],
             ]
         );
@@ -46,7 +46,7 @@ class RolesRestController extends BaseRestController {
             [
                 'methods'             => 'DELETE',
                 'callback'            => [ $this, 'delete_roles_bulk' ],
-                'permission_callback' => [ $this, 'roles_permission_callback' ],
+                'permission_callback' => [ $this, 'can_manage_roles' ],
             ]
         );
 
@@ -57,7 +57,7 @@ class RolesRestController extends BaseRestController {
             [
                 'methods'             => 'PUT',
                 'callback'            => [ $this, 'bulk_update_role_status' ],
-                'permission_callback' => [ $this, 'roles_permission_callback' ],
+                'permission_callback' => [ $this, 'can_manage_roles' ],
             ]
         );
 
@@ -69,41 +69,20 @@ class RolesRestController extends BaseRestController {
                 [
                     'methods'             => 'GET',
                     'callback'            => [ $this, 'get_role' ],
-                    'permission_callback' => [ $this, 'roles_get_permission_callback' ],
+                    'permission_callback' => [ $this, 'can_get_roles' ],
                 ],
                 [
                     'methods'             => 'PUT',
                     'callback'            => [ $this, 'update_role' ],
-                    'permission_callback' => [ $this, 'roles_permission_callback' ],
+                    'permission_callback' => [ $this, 'can_manage_roles' ],
                 ],
                 [
                     'methods'             => 'DELETE',
                     'callback'            => [ $this, 'delete_role' ],
-                    'permission_callback' => [ $this, 'roles_permission_callback' ],
+                    'permission_callback' => [ $this, 'can_manage_roles' ],
                 ],
             ]
         );
-    }
-
-    /**
-     * Check if the user has the necessary permissions to access the roles endpoints.
-     *
-     * @return bool|WP_Error True if the user has the necessary permissions, otherwise a WP_Error object.
-     */
-    public function roles_permission_callback() {
-        if ( ! current_user_can( 'manage_options' ) || ! current_user_can( 'manage_woocommerce' ) ) {
-            return new \WP_Error( 'rest_forbidden', esc_html__( 'Forbidden.', 'yay-wholesale-b2b' ), [ 'status' => 401 ] );
-        }
-
-        return true;
-    }
-
-    public function roles_get_permission_callback() {
-        if ( ! current_user_can( 'edit_posts' ) || ! current_user_can( 'manage_woocommerce' ) ) {
-            return new \WP_Error( 'rest_forbidden', esc_html__( 'Forbidden.', 'yay-wholesale-b2b' ), [ 'status' => 401 ] );
-        }
-
-        return true;
     }
 
     /**
@@ -166,7 +145,7 @@ class RolesRestController extends BaseRestController {
         $role = array_values( array_filter( $roles, fn( $r ) => (int) ( $r['id'] ?? 0 ) === $id ) )[0] ?? null;
 
         if ( ! $role ) {
-            return $this->error( __( 'Role not found', 'yay-wholesale-b2b' ) );
+            return $this->error( __( 'Role not found', 'yay-wholesale-b2b' ), 404 );
         }
 
         return $this->success( $role );
@@ -305,5 +284,31 @@ class RolesRestController extends BaseRestController {
 
         update_option( 'yaywholesaleb2b_roles', $roles );
         return $this->success( $roles, __( 'Statuses updated successfully', 'yay-wholesale-b2b' ) );
+    }
+
+    /**
+     * Check if the user has the necessary permissions to access the roles endpoints (action: get, search).
+     *
+     * @return bool|WP_Error True if the user has the necessary permissions, otherwise a WP_Error object.
+     */
+    public function can_manage_roles() {
+        if ( ! current_user_can( 'manage_options' ) || ! current_user_can( 'manage_woocommerce' ) ) {
+            return new \WP_Error( 'rest_forbidden', esc_html__( 'Forbidden.', 'yay-wholesale-b2b' ), [ 'status' => 401 ] );
+        }
+
+        return true;
+    }
+
+    /**
+     * Check if the user has the necessary permissions to access the roles endpoints (actions: get, search).
+     *
+     * @return bool|WP_Error True if the user has the necessary permissions, otherwise a WP_Error object.
+     */
+    public function can_get_roles() {
+        if ( ! current_user_can( 'edit_posts' ) || ! current_user_can( 'manage_woocommerce' ) ) {
+            return new \WP_Error( 'rest_forbidden', esc_html__( 'Forbidden.', 'yay-wholesale-b2b' ), [ 'status' => 401 ] );
+        }
+
+        return true;
     }
 }

@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 class NewOrderPlaced extends WholesaleEmailBase {
 
     public function __construct() {
-        $this->id             = 'ywhs_new_order_placed';
+        $this->id             = 'yaywholesaleb2b_new_order_placed';
         $this->customer_email = false;
         $this->email_group    = 'wholesale_order';
         $this->title          = __( 'New wholesale order is placed', 'yay-wholesale-b2b' );

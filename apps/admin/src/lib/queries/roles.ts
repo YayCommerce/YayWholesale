@@ -16,6 +16,7 @@ import {
 import { showToast } from '@/components/custom/showToast';
 
 import { RoleFormValues } from '../schema/roles';
+import { handleErrorMessage } from '../utils';
 
 const QUERY_KEY = ['roles'];
 
@@ -69,9 +70,7 @@ export function useAddRoleMutation() {
       queryClient.invalidateQueries({ queryKey: QUERY_KEY });
       navigate('/roles');
     },
-    onError: (error: Error) => {
-      showToast.error(error.message);
-    },
+    onError: handleErrorMessage,
   });
 }
 
@@ -87,9 +86,7 @@ export function useUpdateRoleMutation(roleId: number) {
       queryClient.invalidateQueries({ queryKey: QUERY_KEY });
       navigate('/roles');
     },
-    onError: (error: Error) => {
-      showToast.error(error.message);
-    },
+    onError: handleErrorMessage,
   });
 }
 
@@ -102,9 +99,7 @@ export function useDeleteRoleMutation(roleId: number) {
       showToast.success(response.message);
       queryClient.invalidateQueries({ queryKey: QUERY_KEY });
     },
-    onError: (error: Error) => {
-      showToast.error(error.message);
-    },
+    onError: handleErrorMessage,
   });
 }
 
@@ -119,9 +114,7 @@ export function useDeleteManyRolesMutation() {
         queryClient.invalidateQueries({ queryKey: QUERY_KEY });
       }
     },
-    onError: (error: Error) => {
-      showToast.error(error.message);
-    },
+    onError: handleErrorMessage,
   });
 }
 
@@ -136,9 +129,7 @@ export function useUpdateRoleStatusMutation(roleId: number) {
       queryClient.invalidateQueries({ queryKey: QUERY_KEY });
       navigate('/roles');
     },
-    onError: (error: Error) => {
-      showToast.error(error.message);
-    },
+    onError: handleErrorMessage,
   });
 }
 
@@ -153,8 +144,6 @@ export function useBulkUpdateRoleStatusMutation() {
         queryClient.invalidateQueries({ queryKey: QUERY_KEY });
       }
     },
-    onError: (error: Error) => {
-      showToast.error(error.message);
-    },
+    onError: handleErrorMessage,
   });
 }

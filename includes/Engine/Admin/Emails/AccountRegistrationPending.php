@@ -19,7 +19,7 @@ class AccountRegistrationPending extends WholesaleEmailBase {
      */
     public function __construct() {
 
-        $this->id             = 'ywhs_account_registration_pending';
+        $this->id             = 'yaywholesaleb2b_account_registration_pending';
         $this->customer_email = true;
         $this->title          = __( 'Wholesale account is pending', 'yay-wholesale-b2b' );
         $this->email_group    = 'wholesale_account';

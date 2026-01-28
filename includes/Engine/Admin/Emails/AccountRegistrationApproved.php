@@ -30,7 +30,7 @@ class AccountRegistrationApproved extends WholesaleEmailBase {
      */
     public function __construct() {
 
-        $this->id             = 'ywhs_account_registration_approved';
+        $this->id             = 'yaywholesaleb2b_account_registration_approved';
         $this->customer_email = true;
         $this->title          = __( 'Wholesale account is approved', 'yay-wholesale-b2b' );
         $this->email_group    = 'wholesale_account';

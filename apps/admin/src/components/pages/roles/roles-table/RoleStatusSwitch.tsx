@@ -20,6 +20,7 @@ export default function RoleStatusSwitch({
   // }, [status]);
 
   const onToggle = async (value: boolean) => {
+    if (isPending) return;
     setChecked(value);
     try {
       await updateStatus(value);
@@ -29,11 +30,6 @@ export default function RoleStatusSwitch({
   };
 
   return (
-    <Switch
-      loading={isPending}
-      checked={checked}
-      onCheckedChange={onToggle}
-      disabled={isPending || isDefault}
-    />
+    <Switch loading={isPending} checked={checked} onCheckedChange={onToggle} disabled={isDefault} />
   );
 }
