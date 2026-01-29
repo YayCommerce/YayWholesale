@@ -48,14 +48,18 @@ class NewAccountRegistered extends \YayMail\Abstracts\BaseEmail {
 
     public function get_default_elements() {
         $email_title = $this->title;
-        // translators: customer name.
+        // translators: admin name.
         $email_hi     = sprintf( esc_html__( 'Hi %s,', 'yay-wholesale-b2b' ), '[yaymail_wholesale_admin_name]' );
         $email_text   = __( 'This is to inform you that a new wholesale account registration has just been submitted on the website.', 'yay-wholesale-b2b' );
         $email_text_1 = __( 'The customer has successfully completed the wholesale registration form, and their information is now pending review and approval.', 'yay-wholesale-b2b' );
         $email_text_2 = __( 'Registration details:', 'yay-wholesale-b2b' );
+        // translators: customer name.
         $email_text_3 = sprintf( esc_html__( 'Customer name: %s', 'yay-wholesale-b2b' ), '[yaymail_wholesale_request_author_name]' );
+        // translators: customer email.
         $email_text_4 = sprintf( esc_html__( 'Email Address: %s', 'yay-wholesale-b2b' ), '[yaymail_wholesale_request_author_email]' );
+        // translators: customer request registration time.
         $email_text_5 = sprintf( esc_html__( 'Registration time: %s', 'yay-wholesale-b2b' ), '[yaymail_wholesale_request_create_time]' );
+        // translators: admin url.
         $email_text_6 = sprintf( __( 'Please log in to the <a href="%s">admin</a> to review the submitted information and take the necessary action (approve or reject the wholesale request).', 'yay-wholesale-b2b' ), '[yaymail_wholesale_request_admin_url]' );
         $email_end    = __( 'Thank you for your attention and timely support.', 'yay-wholesale-b2b' );
 

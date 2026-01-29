@@ -3,7 +3,7 @@ Contributors: YayCommerce
 Tags: wholesale, b2b, wholesale pricing, discount rules, sale
 Requires at least: 3.0
 Tested up to: 6.9
-Stable tag: 1.0.0
+Stable tag: 1.0.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -42,6 +42,9 @@ Ready to run retail and wholesale from one WooCommerce store, with pricing that 
 - **Progress Tracking**: Show customers their progress toward wholesale pricing
 - **Conditional Display**: Appears in mini-cart, cart, and checkout
 - **Block Integration**: Add requirement widgets to any page
+
+All source code, including unminified JS/CSS, is publicly available here:
+[https://github.com/YayCommerce/YayWholesale](https://github.com/YayCommerce/YayWholesale)
 
 ## Installation
 
@@ -108,5 +111,10 @@ For documentation, support, and updates, visit our website or [contact YayCommer
 
 ## Changelog
 
-### Version 1.0.0
+= Jan 29, 2026 - Version 1.0.2 =
+- Update permission callback for API
+- Implement submission rate limit for wholesale submit form
+- Refactor plugin prefix
+
+= Jan 12, 2026 - Version 1.0.0 =
 - Initial release

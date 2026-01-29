@@ -20,11 +20,11 @@ if ( $ywhs_is_autofill ) {
 }
 
 if ( empty( $_COOKIE['yaywholesaleb2b_cid'] ) ) {
-	$cid = wp_generate_uuid4();
+	$ywhs_cid = wp_generate_uuid4();
 
 	setcookie(
 		'yaywholesaleb2b_cid',
-		$cid,
+		$ywhs_cid,
 		time() + MONTH_IN_SECONDS,
 		COOKIEPATH,
 		COOKIE_DOMAIN,
