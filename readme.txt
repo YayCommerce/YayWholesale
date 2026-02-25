@@ -3,7 +3,7 @@ Contributors: YayCommerce
 Tags: wholesale, b2b, wholesale pricing, discount rules, sale
 Requires at least: 3.0
 Tested up to: 6.9
-Stable tag: 1.0.2
+Stable tag: 1.0.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -110,6 +110,9 @@ You can enable/disable coupon functionality for wholesale orders in Settings > G
 For documentation, support, and updates, visit our website or [contact YayCommerce support team](http://yaycommerce.com/support/).
 
 ## Changelog
+
+= Feb 25, 2026 - Version 1.0.3 =
+- Implement YayUIKits to Admin UI
 
 = Jan 29, 2026 - Version 1.0.2 =
 - Update permission callback for API

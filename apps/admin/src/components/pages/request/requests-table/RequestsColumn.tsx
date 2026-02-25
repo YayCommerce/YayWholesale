@@ -57,35 +57,23 @@ export const RequestsColumn: ColumnDef<RequestFormValues>[] = [
   {
     id: 'select',
     header: ({ table }) => (
-      <Label
-        htmlFor="select-all"
-        className="flex h-full w-full cursor-pointer items-center justify-center px-4"
-      >
-        <Checkbox
-          id="select-all"
-          className="size-4 bg-white"
-          checked={table.getIsAllPageRowsSelected()}
-          onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-          aria-label="Select all"
-        />
-      </Label>
+      <Checkbox
+        id="select-all"
+        checked={table.getIsAllPageRowsSelected()}
+        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+        aria-label="Select all"
+      />
     ),
     cell: ({ row }) => {
       const id = `select-${row.original.id}`;
 
       return (
-        <Label
-          htmlFor={id}
-          className="flex h-full w-full cursor-pointer items-center justify-center px-4"
-        >
-          <Checkbox
-            id={id}
-            className="pointer-events-none size-4 bg-white"
-            checked={row.getIsSelected()}
-            onCheckedChange={(value) => row.toggleSelected(!!value)}
-            aria-label="Select row"
-          />
-        </Label>
+        <Checkbox
+          id={id}
+          checked={row.getIsSelected()}
+          onCheckedChange={(value) => row.toggleSelected(!!value)}
+          aria-label="Select row"
+        />
       );
     },
     meta: { align: 'center', isCheckbox: true },
