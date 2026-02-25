@@ -28,7 +28,7 @@ class WholeSalersHelper {
         }
 
         $wholesale_slugs = array_filter(
-            array_map( fn( $r ) => $r['slug'] ?? null, $roles )
+            array_map( fn( $r ) => $r['status'] ? $r['slug'] : null, $roles )
         );
 
         if ( ! empty( $role ) && 'all' !== $role ) {
@@ -185,7 +185,7 @@ class WholeSalersHelper {
         }
 
         $wholesale_slugs = array_filter(
-            array_map( fn( $r ) => $r['slug'] ?? null, $roles )
+            array_map( fn( $r ) => $r['status'] ? $r['slug'] : null, $roles )
         );
 
         if ( ! empty( $role ) && 'all' !== $role ) {

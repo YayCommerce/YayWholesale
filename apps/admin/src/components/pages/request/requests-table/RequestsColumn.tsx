@@ -13,10 +13,10 @@ import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import {
   Dialog,
+  DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogPortalContent,
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
@@ -174,7 +174,7 @@ export const RequestsColumn: ColumnDef<RequestFormValues>[] = [
               <Ellipsis className="h-4 w-4" />
             </Button>
           </div>
-          <DialogPortalContent className="bw:max-w-md">
+          <DialogContent className="bw:max-w-md">
             <DialogHeader className="bw:border-b-0">
               <DialogTitle>
                 {__('Are you sure you want to delete this request?', 'yay-wholesale-b2b')}
@@ -200,7 +200,7 @@ export const RequestsColumn: ColumnDef<RequestFormValues>[] = [
                 {__('Continue', 'yay-wholesale-b2b')}
               </Button>
             </DialogFooter>
-          </DialogPortalContent>
+          </DialogContent>
         </Dialog>
       );
     },

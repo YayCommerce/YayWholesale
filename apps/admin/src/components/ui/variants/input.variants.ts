@@ -3,23 +3,15 @@ import { cva, VariantProps } from 'class-variance-authority';
 export const inputVariants = cva('border-input', {
   variants: {
     variant: {
-      // input: 'focus-visible:border-foreground hover:border-foreground',
-      // picker: 'focus-visible:border-ring focus-visible:hover:border-ring-accent',
       input:
-        'focus-visible:ring-ring hover:border-ring focus-visible:border-ring has-[[data-slot=input-group-control]:focus-visible]:ring-ring has-[[data-slot=input-group-control]:focus-visible]:border-ring',
-      picker:
-        'shadow-xs hover:bg-accent hover:border-ring focus-visible:ring-ring focus-visible:border-ring',
+        'hover:border-muted-foreground focus-visible:ring-ring has-[[data-slot=input-group-control]:focus-visible]:ring-ring',
+      picker: 'cursor-pointer shadow-xs hover:bg-muted-400 focus-visible:ring-ring',
 
       /* Shadcn variants: override ring-offset */
       'input-shadcn':
         'focus-visible:ring-offset-0 focus-visible:ring-[3px] transition-colors transition-shadow hover:border-ring-shadcn focus-visible:border-ring-shadcn focus-visible:ring-ring-shadcn/50',
       'picker-shadcn':
         'focus-visible:ring-offset-0 focus-visible:ring-[3px] transition-colors transition-shadow hover:bg-accent hover:border-ring-shadcn focus-visible:border-ring-shadcn focus-visible:ring-ring-shadcn/50',
-
-      'input-black':
-        'focus-visible:ring-ring-black hover:border-ring-black focus-visible:border-ring-black',
-      'picker-black':
-        'hover:bg-accent focus-visible:ring-ring-black hover:border-ring-black focus-visible:border-ring-black',
     },
   },
   defaultVariants: {
@@ -31,20 +23,19 @@ export type InputVariantProps = VariantProps<typeof inputVariants>;
 
 export const inputGroupVariants = cva(
   [
-    'group/input-group border border-input dark:bg-input/30 shadow-xs relative flex w-full items-center outline-none transition-all duration-300 min-w-0 has-[>textarea]:h-auto data-[disabled=true]:opacity-70 data-[disabled=true]:pointer-events-none data-[disabled=true]:cursor-not-allowed',
-
+    'group/input-group border border-input dark:bg-input/30 shadow-xs relative flex w-full items-center outline-none transition-default duration-300 min-w-0 has-[>textarea]:h-auto data-[disabled=true]:opacity-70 data-[disabled=true]:pointer-events-none data-[disabled=true]:cursor-not-allowed has-[>[data-align=block-end]]:h-auto has-[>[data-align=block-end]]:flex-col has-[>[data-align=block-start]]:h-auto has-[>[data-align=block-start]]:flex-col',
     'has-[>[data-align=inline-start]]:[&>input]:pl-2 has-[>[data-align=inline-end]]:[&>input]:pr-2',
   ],
   {
     variants: {
       size: {
-        small: 'h-7 rounded-sm',
-        medium: 'h-8 rounded-sm',
-        large: 'h-9 rounded-sm',
+        small: 'h-8 rounded-sm',
+        medium: 'h-9 rounded-md',
+        large: 'h-10 rounded-lg',
       },
     },
     defaultVariants: {
-      size: 'large',
+      size: 'medium',
     },
   },
 );

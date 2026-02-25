@@ -2,8 +2,8 @@
 
 import * as React from 'react';
 import { forwardRef } from 'react';
-import { XIcon } from '@phosphor-icons/react';
 import * as SheetPrimitive from '@radix-ui/react-dialog';
+import { XIcon } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
 
@@ -24,13 +24,12 @@ function SheetCloseIcon({
     <SheetPrimitive.Close
       data-slot="sheet-close"
       className={cn(
-        'ring-offset-background focus:ring-ring data-[state=open]:bg-secondary text-muted-foreground-400 hover:text-muted-foreground absolute top-4 right-4 rounded-xs font-normal transition-opacity hover:opacity-100 focus:ring-2 focus:ring-offset-2 focus:outline-hidden disabled:pointer-events-none',
-        'mt-1 text-[#67708066]',
+        'text-muted-foreground hover:text-foreground absolute top-4 right-4 cursor-pointer transition-colors focus:outline-hidden disabled:pointer-events-none',
         className,
       )}
       {...props}
     >
-      <XIcon weight="bold" className="size-5 cursor-pointer" />
+      <XIcon className="size-5" />
     </SheetPrimitive.Close>
   );
 }
@@ -57,8 +56,6 @@ const SheetOverlay = forwardRef<
     {...props}
   />
 ));
-
-SheetOverlay.displayName = 'SheetOverlay';
 
 function SheetContent({
   className,

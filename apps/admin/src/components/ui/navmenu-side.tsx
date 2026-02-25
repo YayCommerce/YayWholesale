@@ -63,7 +63,7 @@ const SideNavMenuItem = React.forwardRef<HTMLLIElement, SideNavMenuItemProps>(
       <Comp
         data-slot="side-navigation-menu-item"
         className={cn(
-          'hover:text-primary text-foreground transition-background flex h-10 w-full cursor-default items-center gap-1.5 rounded-md pl-3 text-sm shadow-none transition-colors outline-none focus-visible:ring-[1.5px]',
+          'hover:text-primary text-foreground transition-background flex h-10 w-full cursor-default items-center gap-2 rounded-md pl-3 text-sm shadow-none transition-colors outline-none focus-visible:ring-[1.5px]',
           'data-[state=active]:text-primary data-[state=active]:hover:text-primary-accent data-[state=active]:bg-background data-[state=active]:focus-visible:text-primary-accent',
           'data-[active=true]:text-primary data-[active=true]:hover:text-primary-accent data-[active=true]:bg-background data-[active=true]:focus-visible:text-primary-accent',
           className,

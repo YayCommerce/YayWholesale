@@ -1,6 +1,8 @@
 <?php
 namespace YayWholesaleB2B\Helpers;
 
+use WP_User_Query;
+
 /**
  * Roles Helper Class
  */
@@ -12,7 +14,7 @@ class RolesHelper {
      * @param int $user_id The user ID.
      * @return array|null The user role or null if not found.
      */
-    public static function is_wholesale_user( int $user_id = 0 ): array|null {
+    public static function is_wholesale_user( int $user_id = 0 ) {
         if ( ! is_user_logged_in() ) {
             return null;
         }
@@ -117,5 +119,44 @@ class RolesHelper {
                 $user->remove_role( $ywhs_role );
             }
         }
+    }
+
+    /**
+     * Handle the data of roles list option with setting
+     *
+     * @param array $roles The roles option.
+     * @param array $settings The settings.
+     * @return array
+     */
+    public static function handle_roles_data( array $roles, array $settings ) {
+        foreach ( $roles as $key => &$role ) {
+            $slug          = $role['slug'] ?? sanitize_title( $role['name'] );
+            $user_query    = new WP_User_Query(
+                [
+                    'role'   => $slug,
+                    'fields' => 'ID',
+                    'number' => -1,
+                ]
+            );
+            $count         = $user_query->get_total();
+            $role['count'] = $count;
+            if ( $count > 0 ) {
+                $role['role_url'] = admin_url( 'users.php?role=' . rawurlencode( $slug ) );
+            }
+            $role['isDefault'] = $slug === $settings['general']['default_role'];
+
+            if ( $role['isDefault'] ) {
+                $default_index = $key;
+            }
+        }
+
+        if ( isset( $default_index ) && $default_index < count( $roles ) - 1 ) {
+            $default_role = $roles[ $default_index ];
+            unset( $roles[ $default_index ] );
+            $roles   = array_values( $roles );
+            $roles[] = $default_role;
+        }
+
+        return $roles;
     }
 }

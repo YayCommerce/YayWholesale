@@ -63,7 +63,7 @@ function Calendar({
           defaultClassNames.dropdowns,
         ),
         dropdown_root: cn(
-          'relative border border-input rounded-md bg-transparent transition-all outline-none',
+          'relative border border-input rounded-md bg-transparent transition-default outline-none',
           focusVariants(),
           inputVariants({ variant: 'picker' }),
           defaultClassNames.dropdown_root,

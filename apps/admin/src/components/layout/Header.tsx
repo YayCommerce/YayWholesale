@@ -41,7 +41,7 @@ const NAV_ITEMS = [
               <div>
                 <Badge
                   variant="destructive"
-                  className={cn('h-5 min-w-5 px-1 tabular-nums', props.classname)}
+                  className={cn('h-5 min-w-5 px-1 leading-0 tabular-nums', props.classname)}
                 >
                   {data.count}
                 </Badge>

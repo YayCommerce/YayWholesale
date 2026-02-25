@@ -1,9 +1,10 @@
 'use client';
 
-import * as React from 'react';
+import { useCallback, useEffect, useState, type MouseEvent } from 'react';
 import { type VariantProps } from 'class-variance-authority';
 import { CheckIcon, CopyIcon } from 'lucide-react';
-import { AnimatePresence, HTMLMotionProps, motion } from 'motion/react';
+import { AnimatePresence, HTMLMotionProps } from 'motion/react';
+import * as m from 'motion/react-m';
 
 import { cn } from '@/lib/utils';
 
@@ -29,20 +30,23 @@ function CopyButton({
   onCopyChange,
   ...props
 }: CopyButtonProps) {
-  const [localIsCopied, setLocalIsCopied] = React.useState(isCopied ?? false);
-  const Icon = localIsCopied ? CheckIcon : CopyIcon;
-  React.useEffect(() => {
+  const [localIsCopied, setLocalIsCopied] = useState(isCopied ?? false);
+  const [isDirty, setIsDirty] = useState(false);
+
+  useEffect(() => {
     setLocalIsCopied(isCopied ?? false);
+    setIsDirty(true);
   }, [isCopied]);
-  const handleIsCopied = React.useCallback(
+  const handleIsCopied = useCallback(
     (isCopied: boolean) => {
       setLocalIsCopied(isCopied);
+      setIsDirty(true);
       onCopyChange?.(isCopied);
     },
     [onCopyChange],
   );
-  const handleCopy = React.useCallback(
-    (e: React.MouseEvent<HTMLButtonElement>) => {
+  const handleCopy = useCallback(
+    (e: MouseEvent<HTMLButtonElement>) => {
       e.preventDefault();
       if (isCopied) return;
       if (content) {
@@ -61,8 +65,9 @@ function CopyButton({
     },
     [isCopied, content, delay, onClick, onCopy, handleIsCopied],
   );
+
   return (
-    <motion.button
+    <m.button
       data-slot="copy-button"
       whileHover={{ scale: 1.05 }}
       whileTap={{ scale: 0.95 }}
@@ -71,18 +76,19 @@ function CopyButton({
       {...props}
     >
       <AnimatePresence mode="wait">
-        <motion.span
+        <m.span
           key={localIsCopied ? 'check' : 'copy'}
           data-slot="copy-button-icon"
-          initial={{ scale: 0 }}
+          initial={{ scale: isDirty ? 0 : 1 }} // prevent animation on first render
           animate={{ scale: 1 }}
           exit={{ scale: 0 }}
           transition={{ duration: 0.15 }}
         >
-          <Icon />
-        </motion.span>
+          {localIsCopied ? <CheckIcon /> : <CopyIcon />}
+        </m.span>
       </AnimatePresence>
-    </motion.button>
+    </m.button>
   );
 }
+
 export { CopyButton, buttonVariants, type CopyButtonProps };

@@ -5,6 +5,7 @@ use YayWholesaleB2B\Utils\SingletonTrait;
 use YayWholesaleB2B\Helpers\SettingsHelper;
 use YayWholesaleB2B\Engine\Register\ScriptName;
 use YayWholesaleB2B\Helpers\RequestsHelper;
+use YayWholesaleB2B\Helpers\RolesHelper;
 
 defined( 'ABSPATH' ) || exit;
 /**
@@ -112,6 +113,9 @@ class Settings {
             return;
         }
 
+        $settings = SettingsHelper::get_settings();
+        $roles    = get_option( 'yaywholesaleb2b_roles', [] );
+
         wp_localize_script(
             ScriptName::PAGE_SETTINGS,
             'yayWholesaleB2BAdmin',
@@ -151,9 +155,9 @@ class Settings {
                     'decimal_sep'  => get_option( 'woocommerce_price_decimal_sep' ),
                     'num_decimals' => intval( get_option( 'woocommerce_price_num_decimals' ) ),
                 ],
-                'settings'         => SettingsHelper::get_settings(),
+                'settings'         => $settings,
                 'wholesale_emails' => SettingsHelper::get_email_templates(),
-                'roles'            => get_option( 'yaywholesaleb2b_roles', [] ),
+                'roles'            => RolesHelper::handle_roles_data( $roles, $settings ),
                 'reviewed'         => get_option( 'yaywholesaleb2b_reviewed', false ),
                 'day_format'       => get_option( 'date_format' ),
                 'time_format'      => get_option( 'time_format' ),

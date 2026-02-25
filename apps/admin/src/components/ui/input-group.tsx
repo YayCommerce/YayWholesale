@@ -19,7 +19,7 @@ import {
 
 function InputGroup({
   className,
-  size = 'large',
+  size = 'medium',
   ...props
 }: React.ComponentProps<'div'> & InputGroupVariantProps) {
   return (
@@ -90,31 +90,37 @@ function InputGroupText({ className, ...props }: React.ComponentProps<'span'>) {
   );
 }
 
-function InputGroupInput({ className, ...props }: React.ComponentProps<'input'>) {
-  return (
-    <Input
-      data-slot="input-group-control"
-      className={cn(
-        'flex-1 rounded-none border-0 bg-transparent shadow-none focus:outline-none focus-visible:ring-0 focus-visible:ring-offset-0 disabled:opacity-100 dark:bg-transparent',
-        className,
-      )}
-      {...props}
-    />
-  );
-}
+const InputGroupInput = React.forwardRef<HTMLInputElement, React.ComponentProps<'input'>>(
+  ({ className, ...props }, ref) => {
+    return (
+      <Input
+        ref={ref}
+        data-slot="input-group-control"
+        className={cn(
+          'flex-1 rounded-none border-0 bg-transparent shadow-none focus:outline-none focus-visible:ring-0 focus-visible:ring-offset-0 disabled:opacity-100 dark:bg-transparent',
+          className,
+        )}
+        {...props}
+      />
+    );
+  },
+);
 
-function InputGroupTextarea({ className, ...props }: React.ComponentProps<'textarea'>) {
-  return (
-    <Textarea
-      data-slot="input-group-control"
-      className={cn(
-        'flex-1 resize-none rounded-none border-0 bg-transparent py-3 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 dark:bg-transparent',
-        className,
-      )}
-      {...props}
-    />
-  );
-}
+const InputGroupTextarea = React.forwardRef<HTMLTextAreaElement, React.ComponentProps<'textarea'>>(
+  ({ className, ...props }, ref) => {
+    return (
+      <Textarea
+        ref={ref}
+        data-slot="input-group-control"
+        className={cn(
+          'flex-1 resize-none rounded-none border-0 bg-transparent py-3 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 dark:bg-transparent',
+          className,
+        )}
+        {...props}
+      />
+    );
+  },
+);
 
 export {
   InputGroup,

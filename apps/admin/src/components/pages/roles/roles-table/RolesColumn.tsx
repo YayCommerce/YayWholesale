@@ -13,10 +13,10 @@ import { Checkbox } from '@/components/ui/checkbox';
 import {
   Dialog,
   DialogClose,
+  DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogPortalContent,
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
@@ -81,7 +81,7 @@ export const RolesColumn: ColumnDef<RolesListValues & { count: number }>[] = [
             trigger={
               <div className="inline-block">
                 {row.original.name}
-                <div className="text-foreground/45 h-0.25 -translate-y-0.5 bg-[radial-gradient(circle,currentColor_0.5px,transparent_0.8px)] bg-size-[2.25px_2px] bg-repeat-x"></div>
+                <div className="text-foreground/45 h-0.5 -translate-y-0.5 bg-[radial-gradient(circle,currentColor_0.5px,transparent_0.8px)] bg-size-[2.25px_1.75px] bg-repeat-x"></div>
               </div>
             }
             content={<span>{__('Default role', 'yay-wholesale-b2b')}</span>}
@@ -138,7 +138,7 @@ export const RolesColumn: ColumnDef<RolesListValues & { count: number }>[] = [
         trigger={
           <span className="inline-block p-0">
             {__('MOQ', 'yay-wholesale-b2b')}
-            <div className="text-foreground/45 h-0.25 -translate-y-0.5 bg-[radial-gradient(circle,currentColor_0.5px,transparent_0.8px)] bg-size-[2.25px_2px] bg-repeat-x"></div>
+            <div className="text-foreground/45 h-0.5 -translate-y-0.5 bg-[radial-gradient(circle,currentColor_0.5px,transparent_0.8px)] bg-size-[2.25px_1.75px] bg-repeat-x"></div>
           </span>
         }
         content={<span>{__('Minimum order quantity', 'yay-wholesale-b2b')}</span>}
@@ -155,7 +155,7 @@ export const RolesColumn: ColumnDef<RolesListValues & { count: number }>[] = [
         trigger={
           <span className="inline-block p-0">
             {__('MOA', 'yay-wholesale-b2b')}
-            <div className="text-foreground/45 h-0.25 -translate-y-0.5 bg-[radial-gradient(circle,currentColor_0.5px,transparent_0.8px)] bg-size-[2.25px_2px] bg-repeat-x"></div>
+            <div className="text-foreground/45 h-0.5 -translate-y-0.5 bg-[radial-gradient(circle,currentColor_0.5px,transparent_0.8px)] bg-size-[2.25px_1.75px] bg-repeat-x"></div>
           </span>
         }
         content={<span>{__('Minimum order amount', 'yay-wholesale-b2b')}</span>}
@@ -258,7 +258,7 @@ export const RolesColumn: ColumnDef<RolesListValues & { count: number }>[] = [
               <Ellipsis className="h-4 w-4" />
             </Button>
           </div>
-          <DialogPortalContent className="bw:max-w-md">
+          <DialogContent className="bw:max-w-md">
             <DialogHeader className="bw:border-b-0">
               <DialogTitle>
                 {__('Are you sure you want to delete this role?', 'yay-wholesale-b2b')}
@@ -284,7 +284,7 @@ export const RolesColumn: ColumnDef<RolesListValues & { count: number }>[] = [
                 {__('Continue', 'yay-wholesale-b2b')}
               </Button>
             </DialogFooter>
-          </DialogPortalContent>
+          </DialogContent>
         </Dialog>
       );
     },

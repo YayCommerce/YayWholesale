@@ -50,7 +50,7 @@ export default function TopWholesaleCustomers(props: {
                 </TableHead>
                 <TableHead className="text-foreground text-[14px]">
                   <span className="flex items-center justify-center font-medium">
-                    {__('Orders', 'yay-wholesale-b2b')}
+                    {__('Order number', 'yay-wholesale-b2b')}
                   </span>
                 </TableHead>
                 <TableHead className="text-foreground text-[14px]">
@@ -106,8 +106,8 @@ export default function TopWholesaleCustomers(props: {
                     <TableCell className="text-foreground py-3 text-[14px]">
                       <div className="flex justify-center">
                         <Badge
-                          variant="muted"
-                          className="text-foreground bg-muted-400 cursor-default rounded-md text-xs font-semibold shadow-xs"
+                          variant="dimmed-outline"
+                          className="cursor-default leading-0 font-semibold shadow-xs"
                         >
                           {data.role}
                         </Badge>

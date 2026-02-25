@@ -4,6 +4,7 @@ import { twMerge } from 'tailwind-merge';
 
 import { showToast } from '@/components/custom/showToast';
 
+import { RolesListValues } from './schema/roles';
 import { SettingsFormData } from './schema/settings';
 
 export const isPro = import.meta.env.VITE_IS_PRO === 'true';
@@ -15,6 +16,10 @@ export function cn(...inputs: ClassValue[]) {
 
 export const getSettings = (): SettingsFormData => {
   return window.yayWholesaleB2BAdmin.settings;
+};
+
+export const getRoles = (): RolesListValues[] => {
+  return window.yayWholesaleB2BAdmin.roles;
 };
 
 export const handleErrorMessage = async (error: Error) => {

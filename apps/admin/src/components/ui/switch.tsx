@@ -20,20 +20,19 @@ const switchVariants = cva('', {
   },
 });
 
-function Switch({
-  className,
-  loading = false,
-  size,
-  ...props
-}: React.ComponentProps<typeof SwitchPrimitive.Root> &
-  VariantProps<typeof switchVariants> & { loading?: boolean }) {
+const Switch = React.forwardRef<
+  React.ElementRef<typeof SwitchPrimitive.Root>,
+  React.ComponentPropsWithoutRef<typeof SwitchPrimitive.Root> &
+    VariantProps<typeof switchVariants> & { loading?: boolean }
+>(({ className, loading = false, size, ...props }, ref) => {
   return (
     <SwitchPrimitive.Root
+      ref={ref}
       data-slot="switch"
       className={cn(
         focusVariants(),
         switchVariants({ size }),
-        'peer dark:data-[state=unchecked]:bg-input/80 inline-flex shrink-0 items-center rounded-full border-2 border-transparent shadow-xs transition-all outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50',
+        'peer dark:data-[state=unchecked]:bg-input/80 transition-default inline-flex shrink-0 items-center rounded-full border-2 border-transparent shadow-xs outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50',
         'data-[state=unchecked]:bg-input data-[state=unchecked]:hover:bg-input-accent',
         'data-[state=checked]:bg-primary data-[state=checked]:hover:bg-primary-accent',
         className,
@@ -58,6 +57,6 @@ function Switch({
       </SwitchPrimitive.Thumb>
     </SwitchPrimitive.Root>
   );
-}
+});
 
 export { Switch };

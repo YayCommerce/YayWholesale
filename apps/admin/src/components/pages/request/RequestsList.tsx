@@ -1,9 +1,8 @@
 import { useCallback, useMemo, useRef, useState } from 'react';
-import { CaretUpDownIcon } from '@phosphor-icons/react';
 import { flexRender, getCoreRowModel, PaginationState, useReactTable } from '@tanstack/react-table';
 import { Spinner } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
-import { Search } from 'lucide-react';
+import { ChevronsUpDown, Search } from 'lucide-react';
 
 import {
   useBulkDeleteRequestMutation,
@@ -15,27 +14,30 @@ import { useActiveRolesQuery } from '@/lib/queries/roles';
 import { RequestFormValues } from '@/lib/schema/requests';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
-import {
-  BulkActionBox,
-  BulkActionButton,
-  BulkActionMenu,
-  BulkActionMenuContent,
-  BulkMenuButtonAndTrigger,
-} from '@/components/ui/bulk-actions';
+import { BulkActionBox, BulkActionCloseButton } from '@/components/ui/bulk-actions';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import {
   Dialog,
   DialogClose,
+  DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogPortalContent,
   DialogTitle,
 } from '@/components/ui/dialog';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group';
 import { Pagination } from '@/components/ui/pagination';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import {
   Select,
   SelectContent,
@@ -83,7 +85,7 @@ export default function RequestsList() {
   }, []);
 
   const {
-    data,
+    data: requests,
     isLoading: isLoadingRequests,
     isFetching: isFetchingRequests,
   } = useRequestsQuery(keyword, pagination, statusFilter);
@@ -95,7 +97,7 @@ export default function RequestsList() {
   const defaultData = useMemo(() => [], []);
 
   const table = useReactTable({
-    data: data?.data ?? defaultData,
+    data: requests?.data ?? defaultData,
     columns,
     state: {
       pagination,
@@ -103,8 +105,8 @@ export default function RequestsList() {
     getCoreRowModel: getCoreRowModel(),
     onPaginationChange: setPagination,
     manualPagination: true,
-    pageCount: data?.totalPage ?? 0,
-    rowCount: data?.data.length ?? 0,
+    pageCount: requests?.totalPage ?? 0,
+    rowCount: requests?.data.length ?? 0,
   });
 
   const selectedCount = table.getFilteredSelectedRowModel().rows.length;
@@ -112,8 +114,8 @@ export default function RequestsList() {
     () => Array.from(table.getSelectedRowModel().rows, (row) => row.original.id),
     [selectedCount],
   );
-  const useBulkUpdateMutation = useBulkUpdateRequestStatusMutation(selectedRowsIds);
-  const useBulkDeleteMutation = useBulkDeleteRequestMutation(selectedRowsIds);
+  const bulkUpdateMutation = useBulkUpdateRequestStatusMutation(selectedRowsIds);
+  const bulkDeleteMutation = useBulkDeleteRequestMutation(selectedRowsIds);
 
   const handleChangeSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearch(e.target.value);
@@ -127,15 +129,21 @@ export default function RequestsList() {
   };
 
   const handleBulkStatusChange = async (status: RequestFormValues['status'], roleId?: number) => {
+    if (bulkUpdateMutation.isPending || bulkDeleteMutation.isPending || isFetchingRequests) {
+      return;
+    }
     if (!roleId) {
       roleId = -1;
     }
-    await useBulkUpdateMutation.mutateAsync({ status, roleId });
+    await bulkUpdateMutation.mutateAsync({ status, roleId });
     table.resetRowSelection();
   };
 
   const handleBulkDelete = async () => {
-    await useBulkDeleteMutation.mutateAsync();
+    if (bulkUpdateMutation.isPending || bulkDeleteMutation.isPending || isFetchingRequests) {
+      return;
+    }
+    await bulkDeleteMutation.mutateAsync();
     setOpenDeleteDialog(false);
     table.resetRowSelection();
   };
@@ -144,6 +152,8 @@ export default function RequestsList() {
     setStatusFilter(value);
     setPagination({ ...pagination, pageIndex: 0 });
   };
+
+  console.log(selectedCount);
 
   return (
     <Card className="gap-4 shadow-sm">
@@ -155,10 +165,7 @@ export default function RequestsList() {
             <WholeSaleToolTip
               trigger={
                 <div>
-                  <Badge
-                    variant="muted"
-                    className="text-foreground h-5 min-w-5 rounded-full border-none px-1 tabular-nums"
-                  >
+                  <Badge variant="secondary" className="h-5 min-w-5 px-1 tabular-nums">
                     {totalCount.count}
                   </Badge>
                 </div>
@@ -209,12 +216,11 @@ export default function RequestsList() {
       <div
         className={cn(
           'relative overflow-x-auto rounded-lg border',
-          (useBulkUpdateMutation.isPending || useBulkDeleteMutation.isPending) &&
-            'relative opacity-50',
+          (bulkUpdateMutation.isPending || bulkDeleteMutation.isPending) && 'relative opacity-50',
         )}
       >
         {/* Overlay Spinner */}
-        {(useBulkUpdateMutation.isPending || useBulkDeleteMutation.isPending) && (
+        {(bulkUpdateMutation.isPending || bulkDeleteMutation.isPending) && (
           <div className="absolute inset-0 z-50 flex items-center justify-center">
             <Spinner className="text-muted-foreground size-6 animate-spin" />
           </div>
@@ -231,7 +237,7 @@ export default function RequestsList() {
                       header.column.columnDef.meta?.align === 'center'
                         ? 'text-center'
                         : 'text-left',
-                      header.column.columnDef.meta?.isCheckbox ? 'w-[36px] p-0' : 'px-3',
+                      header.column.columnDef.meta?.isCheckbox ? 'w-[36px] p-0!' : 'px-3',
                     )}
                   >
                     {flexRender(header.column.columnDef.header, header.getContext())}
@@ -261,7 +267,7 @@ export default function RequestsList() {
                       key={cell.id}
                       className={cn(
                         'h-14',
-                        cell.column.id === 'select' ? 'p-0' : '',
+                        cell.column.id === 'select' ? 'p-0!' : '',
                         cell.column.id === 'actions' ? 'flex w-25 justify-end lg:w-full' : '',
                       )}
                     >
@@ -285,99 +291,103 @@ export default function RequestsList() {
         <div
           className={cn(
             'relative flex flex-col items-center gap-3 sm:flex-row',
-            selectedCount > 1 &&
-              !(useBulkUpdateMutation.isPending || useBulkDeleteMutation.isPending)
-              ? 'justify-between'
-              : 'justify-end',
+            selectedCount > 1 ? 'justify-between' : 'justify-end',
           )}
         >
-          {!(useBulkUpdateMutation.isPending || useBulkDeleteMutation.isPending) && (
-            <BulkActionBox selected={selectedCount} onClose={() => table.resetRowSelection()}>
-              <span className="text-foreground text-sm font-normal">
-                {sprintf(__('%d selected', 'yay-wholesale-b2b'), selectedCount)}
-              </span>
-              <Separator orientation="vertical" className="ml-2 h-5!" />
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    className="hover:text-primary hover:bg-primary/6 group flex gap-1.5 px-2.5"
+          <BulkActionBox visible={selectedCount > 1}>
+            <BulkActionCloseButton onClick={() => table.resetRowSelection()} />
+            <span className="text-foreground text-sm font-normal">
+              {sprintf(__('%d selected', 'yay-wholesale-b2b'), selectedCount)}
+            </span>
+            <Separator orientation="vertical" className="ml-2 h-5!" />
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  className="hover:text-primary hover:bg-primary/6 group flex gap-1.5 px-2.5"
+                >
+                  <span className="text-sm font-normal">{__('Status', 'yay-wholesale-b2b')}</span>
+                  <span className="group-hover:text-primary text-muted-foreground flex items-center">
+                    <ChevronsUpDown className="size-3.5 stroke-[2.5px]" />
+                  </span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" sideOffset={9} className="w-fit min-w-[20px] p-1">
+                <DropdownMenuSub>
+                  <DropdownMenuSubTrigger
+                    className="w-35"
+                    onClick={() => {
+                      handleBulkStatusChange('approved');
+                    }}
                   >
-                    <span className="text-sm font-normal">{__('Status', 'yay-wholesale-b2b')}</span>
-                    <span className="group-hover:text-primary text-icon flex items-center">
-                      <CaretUpDownIcon size={12} weight="bold" />
-                    </span>
-                  </Button>
-                </PopoverTrigger>
-
-                <PopoverContent align="start" sideOffset={9} className="w-fit min-w-[20px] p-1">
-                  <div className="flex flex-col">
-                    <BulkActionMenu>
-                      <BulkMenuButtonAndTrigger onClick={() => handleBulkStatusChange('approved')}>
+                    <RequestsStatusIcon status="approved" className="mt-0.5" />
+                    {__('Approve', 'yay-wholesale-b2b')}
+                  </DropdownMenuSubTrigger>
+                  <DropdownMenuSubContent>
+                    {activeRoles?.map((role) => (
+                      <DropdownMenuItem
+                        onClick={() => {
+                          handleBulkStatusChange('approved', role.id);
+                        }}
+                        className="hover:bg-muted flex w-full cursor-pointer items-center justify-start gap-2 rounded-sm px-2.5 py-2 text-sm"
+                      >
                         <RequestsStatusIcon status="approved" className="mt-0.5" />
-                        {__('Approve', 'yay-wholesale-b2b')}
-                      </BulkMenuButtonAndTrigger>
-                      <BulkActionMenuContent>
-                        {activeRoles?.map((role) => (
-                          <BulkActionButton
-                            onClick={() => handleBulkStatusChange('approved', role.id)}
-                          >
-                            <RequestsStatusIcon status="approved" />
-                            {sprintf(__('Approve to %s', 'yay-wholesale-b2b'), role.name)}
-                          </BulkActionButton>
-                        ))}
-                      </BulkActionMenuContent>
-                    </BulkActionMenu>
+                        {sprintf(__('Approve to %s', 'yay-wholesale-b2b'), role.name)}
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuSubContent>
+                </DropdownMenuSub>
 
-                    <BulkActionButton onClick={() => handleBulkStatusChange('rejected')}>
-                      <RequestsStatusIcon status="rejected" />
-                      {__('Reject', 'yay-wholesale-b2b')}
-                    </BulkActionButton>
-                  </div>
-                </PopoverContent>
-              </Popover>
-              <Separator orientation="vertical" className="h-5!" />
-              <Dialog open={openBulkDeleteDialog} onOpenChange={setOpenDeleteDialog}>
-                <WholeSaleToolTip
-                  trigger={
-                    <Button
-                      size="icon"
-                      variant="ghost"
-                      className="hover:text-destructive text-muted-foreground h-8 w-8 hover:bg-transparent hover:shadow-sm"
-                      onClick={() => setOpenDeleteDialog(true)}
-                    >
-                      <DeleteIcon className="size-4" />
-                    </Button>
-                  }
-                  content={<span>{__('Delete', 'yay-wholesale-b2b')}</span>}
-                />
-                <DialogPortalContent className="bw:max-w-md">
-                  <DialogHeader className="bw:border-b-0">
-                    <DialogTitle>
-                      {sprintf(
-                        __(`Are you sure you want to delete %d requests ?`, 'yay-wholesale-b2b'),
-                        selectedCount,
-                      )}
-                    </DialogTitle>
-                    <DialogDescription>
-                      {__(
-                        'This action cannot be undone. This will permanently delete these requests and remove data from servers',
-                        'yay-wholesale-b2b',
-                      )}
-                    </DialogDescription>
-                  </DialogHeader>
-                  <DialogFooter>
-                    <DialogClose asChild>
-                      <Button variant="outline">{__('Cancel', 'yay-wholesale-b2b')}</Button>
-                    </DialogClose>
-                    <Button variant="destructive" onClick={() => handleBulkDelete()}>
-                      {__('Continue', 'yay-wholesale-b2b')}
-                    </Button>
-                  </DialogFooter>
-                </DialogPortalContent>
-              </Dialog>
-            </BulkActionBox>
-          )}
+                <DropdownMenuItem
+                  className="w-35"
+                  onClick={() => handleBulkStatusChange('rejected')}
+                >
+                  <RequestsStatusIcon status="rejected" />
+                  {__('Reject', 'yay-wholesale-b2b')}
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+            <Separator orientation="vertical" className="h-5!" />
+            <Dialog open={openBulkDeleteDialog} onOpenChange={setOpenDeleteDialog}>
+              <WholeSaleToolTip
+                trigger={
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    className="hover:text-destructive text-muted-foreground h-8 w-8 hover:bg-transparent hover:shadow-sm"
+                    onClick={() => setOpenDeleteDialog(true)}
+                  >
+                    <DeleteIcon className="size-4" />
+                  </Button>
+                }
+                content={<span>{__('Delete', 'yay-wholesale-b2b')}</span>}
+              />
+              <DialogContent className="bw:max-w-md">
+                <DialogHeader className="bw:border-b-0">
+                  <DialogTitle>
+                    {sprintf(
+                      __(`Are you sure you want to delete %d requests ?`, 'yay-wholesale-b2b'),
+                      selectedCount,
+                    )}
+                  </DialogTitle>
+                  <DialogDescription>
+                    {__(
+                      'This action cannot be undone. This will permanently delete these requests and remove data from servers',
+                      'yay-wholesale-b2b',
+                    )}
+                  </DialogDescription>
+                </DialogHeader>
+                <DialogFooter>
+                  <DialogClose asChild>
+                    <Button variant="outline">{__('Cancel', 'yay-wholesale-b2b')}</Button>
+                  </DialogClose>
+                  <Button variant="destructive" onClick={() => handleBulkDelete()}>
+                    {__('Continue', 'yay-wholesale-b2b')}
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+          </BulkActionBox>
 
           {table.getPageCount() > 1 && (
             <Pagination

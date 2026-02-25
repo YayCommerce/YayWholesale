@@ -37,7 +37,7 @@ function Segmented({ className, size, shape, children, ...props }: SegmentedProp
       type="single"
       className={cn(
         segmentedVariants({ size, shape }),
-        'bg-muted text-muted-foreground-600 inline-flex w-fit items-center justify-center gap-2.5 p-1',
+        'bg-muted text-muted-foreground-600 inline-flex w-fit items-center justify-center gap-1 p-1',
         className,
       )}
       {...props}
@@ -47,23 +47,21 @@ function Segmented({ className, size, shape, children, ...props }: SegmentedProp
   );
 }
 
-function SegmentedItem({
-  className,
-  children,
-  size,
-  shape,
-  ...props
-}: React.ComponentProps<typeof ToggleGroupPrimitive.Item> &
-  VariantProps<typeof segmentedVariants>) {
+const SegmentedItem = React.forwardRef<
+  React.ElementRef<typeof ToggleGroupPrimitive.Item>,
+  React.ComponentPropsWithoutRef<typeof ToggleGroupPrimitive.Item> &
+    VariantProps<typeof segmentedVariants>
+>(({ className, children, size, shape, ...props }, ref) => {
   const context = React.useContext(SegmentedContext);
 
   return (
     <ToggleGroupPrimitive.Item
+      ref={ref}
       data-slot="toggle-group-item"
       data-size={context.size || size}
       data-shape={shape ?? context.shape ?? 'default'}
       className={cn(
-        "data-[state=on]:bg-background data-[state=on]:text-foreground hover:bg-muted dark:data-[state=on]:text-foreground focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:outline-ring dark:data-[state=on]:border-input dark:data-[state=on]:bg-input/30 dark:text-muted-foreground inline-flex h-full cursor-pointer items-center justify-center gap-1.5 border border-transparent px-3 py-[9px] text-sm font-medium whitespace-nowrap transition-colors focus-visible:ring-[3px] focus-visible:outline-1 disabled:pointer-events-none disabled:opacity-50 data-[shape=default]:rounded-full data-[shape=square]:rounded-sm data-[state=on]:shadow-sm [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+        "data-[state=on]:bg-background data-[state=on]:text-foreground hover:bg-muted dark:data-[state=on]:text-foreground focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:outline-ring dark:data-[state=on]:border-input dark:data-[state=on]:bg-input/30 dark:text-muted-foreground inline-flex h-full cursor-pointer items-center justify-center gap-1.5 border border-transparent px-3 text-sm font-medium whitespace-nowrap transition focus-visible:ring-[3px] focus-visible:outline-1 disabled:pointer-events-none disabled:opacity-50 data-[shape=default]:rounded-full data-[shape=square]:rounded-sm data-[state=on]:shadow-sm [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
         className,
       )}
       {...props}
@@ -71,6 +69,6 @@ function SegmentedItem({
       {children}
     </ToggleGroupPrimitive.Item>
   );
-}
+});
 
 export { Segmented, SegmentedItem };

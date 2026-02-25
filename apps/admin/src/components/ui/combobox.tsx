@@ -1,6 +1,5 @@
 import * as React from 'react';
-import { CheckIcon, XIcon } from '@phosphor-icons/react';
-import { ChevronDown } from 'lucide-react';
+import { CheckIcon, ChevronDown, XIcon } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -23,7 +22,7 @@ function ComboboxTrigger({
         variant="outline"
         role="combobox"
         className={cn(
-          '[&_svg:not([class*="text-"])]:text-muted-foreground h-auto min-h-9 w-fit min-w-[300px] justify-between px-2 py-1 font-normal [&_svg:not([class*="text-"])]:transition-colors',
+          '[&_svg:not([class*="text-"])]:text-muted-foreground h-auto min-h-9 w-fit min-w-75 justify-between rounded-md px-2 py-1 font-normal [&_svg:not([class*="text-"])]:transition-colors',
           inputVariants({ variant: 'picker' }),
           className,
         )}
@@ -35,33 +34,43 @@ function ComboboxTrigger({
   );
 }
 
-function ComboboxBadge({
-  label,
+function ComboboxBadge({ className, children }: { className?: string; children: React.ReactNode }) {
+  return (
+    <Badge
+      variant="dimmed-outline"
+      className={cn(
+        'h-6.5 gap-0.5 rounded-sm has-[svg]:pe-1 [&>svg]:pointer-events-auto',
+        className,
+      )}
+    >
+      {children}
+    </Badge>
+  );
+}
+
+function ComboboxRemove({
+  className,
   onRemove,
 }: {
-  label: string;
+  className?: string;
   onRemove: (e: React.MouseEvent) => void;
 }) {
   return (
-    <Badge
-      variant="muted"
-      className="text-foreground bg-muted-400 h-6.5 rounded-sm [&>svg]:pointer-events-auto"
-    >
-      {label}
-      <XIcon
-        onMouseDown={(e) => {
-          e.stopPropagation();
-          e.preventDefault();
-        }}
-        onClick={(e) => {
-          e.stopPropagation();
-          e.preventDefault();
-          onRemove(e);
-        }}
-        className="text-muted-foreground hover:text-destructive size-3.5"
-        weight="bold"
-      />
-    </Badge>
+    <XIcon
+      onMouseDown={(e) => {
+        e.stopPropagation();
+        e.preventDefault();
+      }}
+      onClick={(e) => {
+        e.stopPropagation();
+        e.preventDefault();
+        onRemove(e);
+      }}
+      className={cn(
+        'text-muted-foreground hover:text-destructive mx-0.5 size-3.5 stroke-[2.5px] transition-colors',
+        className,
+      )}
+    />
   );
 }
 
@@ -72,7 +81,7 @@ function ComboboxIcon({ className }: { className?: string }) {
 function ComboboxCheckbox({ selected }: { selected: boolean }) {
   return (
     <div
-      className="border-input data-[selected=true]:border-primary data-[selected=true]:bg-primary data-[selected=true]:text-primary-foreground pointer-events-none size-4 shrink-0 rounded-[4px] border transition-all select-none *:[svg]:opacity-0 data-[selected=true]:*:[svg]:opacity-100"
+      className="border-input data-[selected=true]:border-primary data-[selected=true]:bg-primary data-[selected=true]:text-primary-foreground transition-default pointer-events-none size-4 shrink-0 rounded-xs border select-none *:[svg]:opacity-0 data-[selected=true]:*:[svg]:opacity-100"
       data-selected={selected}
     >
       <CheckIcon className="size-3.5 text-current" />
@@ -80,4 +89,4 @@ function ComboboxCheckbox({ selected }: { selected: boolean }) {
   );
 }
 
-export { ComboboxTrigger, ComboboxBadge, ComboboxIcon, ComboboxCheckbox };
+export { ComboboxTrigger, ComboboxBadge, ComboboxRemove, ComboboxIcon, ComboboxCheckbox };

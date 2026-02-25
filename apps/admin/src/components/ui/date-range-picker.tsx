@@ -1,15 +1,14 @@
-import * as React from 'react';
 import { ComponentProps, ElementRef, forwardRef, useState } from 'react';
 import { format } from 'date-fns';
 import { ArrowRight, Calendar as CalendarIcon } from 'lucide-react';
 import { type DateRange } from 'react-day-picker';
 
 import { useUncontrolled } from '@/lib/hooks/useUncontrolled';
+import { cn } from '@/lib/utils';
 import { Calendar } from '@/components/ui/calendar';
+import { ComboboxIcon, ComboboxTrigger } from '@/components/ui/combobox';
 import { Popover, PopoverContent } from '@/components/ui/popover';
 
-import { ComboboxIcon, ComboboxTrigger } from '@/components/ui/combobox';
-import { cn } from '@/lib/utils';
 import { Button } from './button';
 
 export type DateRangePickerProps = Omit<
@@ -48,25 +47,20 @@ export const DateRangePicker = forwardRef<ElementRef<typeof Button>, DateRangePi
 
     return (
       <Popover open={open} onOpenChange={setOpen}>
-        <ComboboxTrigger ref={ref} className={cn('px-3 gap-2', className)} {...props}>
+        <ComboboxTrigger ref={ref} className={cn('gap-2 px-3', className)} {...props}>
           <div className="flex items-center gap-2">
             <CalendarIcon />
-            <span className="overflow-hidden flex-auto text-start">
+            <span className="flex-auto overflow-hidden text-start">
               {dateRange?.from ? format(dateRange.from, dateFormat) : placeholder}
             </span>
             {dateRange?.from && dateRange?.to && <ArrowRight />}
-            <span className="overflow-hidden flex-auto text-start">
+            <span className="flex-auto overflow-hidden text-start">
               {dateRange?.to ? format(dateRange.to, dateFormat) : ''}
             </span>
           </div>
           <ComboboxIcon />
         </ComboboxTrigger>
-        <PopoverContent
-          className="w-auto p-0 flex"
-          side="bottom"
-          align="start"
-          sideOffset={5}
-        >
+        <PopoverContent className="flex w-auto p-0" side="bottom" align="start" sideOffset={5}>
           <Calendar
             mode="range"
             defaultMonth={dateRange?.from}

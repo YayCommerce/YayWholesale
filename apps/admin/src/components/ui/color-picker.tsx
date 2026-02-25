@@ -1,3 +1,5 @@
+import './color-picker.css';
+
 import {
   ComponentProps,
   createContext,
@@ -77,7 +79,7 @@ export const ColorPickerTrigger = forwardRef<
   return (
     <ComboboxTrigger
       ref={ref}
-      className={cn('min-h-0 min-w-0 justify-start gap-2 rounded-sm py-1 pr-2.5 pl-1', className)}
+      className={cn('min-h-0 min-w-0 justify-start gap-2 py-1 pr-4 pl-1', className)}
       {...props}
     >
       {children ? (
@@ -85,7 +87,7 @@ export const ColorPickerTrigger = forwardRef<
       ) : (
         <>
           <span
-            className="border-accent size-6.5 rounded-[3px] border-[1.5px]"
+            className="border-accent size-6.5 rounded-xs border"
             style={{ backgroundColor: value }}
           />
           <span className="overflow-hidden">{value}</span>
@@ -139,7 +141,7 @@ export function ColorPickerInput({
   const { value, debouncedSetValue } = useColorPicker();
 
   return (
-    <InputGroup size="large">
+    <InputGroup size="medium">
       <HexColorInput
         color={value}
         onChange={debouncedSetValue}
