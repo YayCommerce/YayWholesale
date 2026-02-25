@@ -1,6 +1,6 @@
 <?php
 /**
- * Plugin Name:       Yay Wholesale B2B for WooCommerce
+ * Plugin Name:       Yay Wholesale B2B for WooCommerce (PRO)
  * Plugin URI:        https://yaycommerce.com/
  * Description:       WooCommerce wholesale plugin for serving wholesale & B2B customers.
  * Version:           1.0.2
@@ -87,11 +87,16 @@ if ( ! function_exists( 'YayWholesaleB2B\\plugin_init' ) ) {
     function plugin_init() {
 
         \YayWholesaleB2B\YayCommerceMenu\RegisterMenu::get_instance();
+        \YayWholesaleB2B\License\LicenseHandler::get_instance();
         if ( ! function_exists( 'WC' ) ) {
             add_action( 'admin_notices', [ \YayWholesaleB2B\Engine\ActDeact::class, 'install_yaywholesaleb2b_admin_notice' ] );
             return;
         }
 
+        $license = new \YayWholesaleB2B\License\License( 'yaywholesaleb2b' );
+        if ( ! $license->is_active() ) {
+            return;
+        }
         add_action( 'before_woocommerce_init', [ \YayWholesaleB2B\Engine\ActDeact::class, 'before_woocommerce_init' ] );
 
         Initialize::get_instance();

@@ -1,6 +1,6 @@
 PLUGIN_SLUG="yay-wholesale-b2b"
 PROJECT_PATH=$(pwd)
-IS_PRO="false"
+IS_PRO="true"
 BUILD_PATH="${PROJECT_PATH}/build"
 # Detect OS
 os=$(uname -s)
@@ -8,9 +8,9 @@ os=$(uname -s)
 for param in "$@"
 do
     case $param in
-        IS_PRO=*)
-            IS_PRO="${param#*=}"
-            ;;
+    #     IS_PRO=*)
+    #         IS_PRO="${param#*=}"
+    #         ;;
         OUTPUT_PATH=*)
             BUILD_PATH="${param#*=}"
 
