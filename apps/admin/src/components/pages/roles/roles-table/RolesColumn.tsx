@@ -31,39 +31,24 @@ export const RolesColumn: ColumnDef<RolesListValues & { count: number }>[] = [
   {
     id: 'select',
     header: ({ table }) => (
-      <Label
-        htmlFor="select-all"
-        className="flex h-full w-full cursor-pointer items-center justify-center px-4"
-      >
-        <Checkbox
-          id="select-all"
-          className="size-4 bg-white"
-          checked={table.getIsAllRowsSelected()}
-          onCheckedChange={(v) => table.toggleAllRowsSelected(!!v)}
-          aria-label="Select all"
-        />
-      </Label>
+      <Checkbox
+        id="select-all"
+        checked={table.getIsAllRowsSelected()}
+        onCheckedChange={(v) => table.toggleAllRowsSelected(!!v)}
+        aria-label="Select all"
+      />
     ),
     cell: ({ row }) => {
       const id = `select-${row.id}`;
 
       return (
-        <Label
-          htmlFor={id}
-          className={cn(
-            'flex h-full w-full items-center justify-center px-4',
-            row.original.isDefault ? 'cursor-no-drop' : 'cursor-pointer',
-          )}
-        >
-          <Checkbox
-            id={id}
-            className="pointer-events-none size-4 bg-white"
-            checked={row.getIsSelected()}
-            onCheckedChange={(v) => row.toggleSelected(!!v)}
-            aria-label="Select row"
-            disabled={row.original.isDefault}
-          />
-        </Label>
+        <Checkbox
+          id={id}
+          checked={row.getIsSelected()}
+          onCheckedChange={(v) => row.toggleSelected(!!v)}
+          aria-label="Select row"
+          disabled={row.original.isDefault}
+        />
       );
     },
     meta: { align: 'center', isCheckbox: true },

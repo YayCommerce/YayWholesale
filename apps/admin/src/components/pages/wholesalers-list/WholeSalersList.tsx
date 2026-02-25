@@ -212,7 +212,7 @@ export default function WholeSalersList() {
                       header.column.columnDef.meta?.align === 'center'
                         ? 'text-center'
                         : 'text-left',
-                      header.column.columnDef.meta?.isCheckbox ? 'w-[36px] p-0!' : 'px-3',
+                      header.column.columnDef.meta?.isCheckbox ? 'w-9' : 'px-3',
                     )}
                   >
                     {flexRender(header.column.columnDef.header, header.getContext())}
@@ -248,7 +248,7 @@ export default function WholeSalersList() {
                         cell.column.columnDef.meta?.align === 'center'
                           ? 'text-center'
                           : 'text-left',
-                        cell.column.columnDef.meta?.isCheckbox ? 'w-[36px] p-0!' : 'px-3',
+                        cell.column.columnDef.meta?.isCheckbox ? 'w-9' : 'px-3',
                       )}
                     >
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}
@@ -268,17 +268,10 @@ export default function WholeSalersList() {
       </div>
       {/* Footer */}
       {(table.getPageCount() > 1 || selectedCount > 1) && (
-        <div
-          className={cn(
-            'relative flex flex-col items-center gap-3 sm:flex-row',
-            selectedCount > 1 ? 'justify-between' : 'justify-end',
-          )}
-        >
+        <div className="relative flex flex-col items-center gap-3 sm:flex-row">
           <BulkActionBox visible={selectedCount > 1}>
             <BulkActionCloseButton onClick={() => table.resetRowSelection()} />
-            <span className="text-foreground text-sm font-normal">
-              {sprintf(__('%d selected', 'yay-wholesale-b2b'), selectedCount)}
-            </span>
+            <span>{sprintf(__('%d selected', 'yay-wholesale-b2b'), selectedCount)}</span>
             <Separator orientation="vertical" className="ml-2 h-5!" />
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
