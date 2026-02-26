@@ -71,24 +71,13 @@ foreach ( (array) $recommended_plugins as $recommended_plugin ) {
             case 'install':
                 if ( $install_status['url'] ) {
                     if ( $compatible_php && $compatible_wp ) {
-                        if ( 'yaypricing' === $recommended_plugin['slug'] ) {
-                            $action_links[] = sprintf(
-                                '<a href="%s" target="_bank"><button class="button button-primary" data-install-url="%s" aria-label="%s">%s</button></a>',
-                                esc_attr( $download_link ),
-                                esc_attr( $download_link ),
-                                /* translators: %s: Plugin name and version. */
-                                esc_attr( sprintf( _x( 'Install %s now', 'plugin', 'yay-wholesale-b2b' ), $name ) ),
-                                __( 'Install Now', 'yay-wholesale-b2b' )
-                            );
-                        } else {
-                            $action_links[] = sprintf(
-                                '<button class="install-now button button-primary" data-install-url="%s" aria-label="%s">%s</button>',
-                                esc_attr( $download_link ),
-                                /* translators: %s: Plugin name and version. */
-                                esc_attr( sprintf( _x( 'Install %s now', 'plugin', 'yay-wholesale-b2b' ), $name ) ),
-                                __( 'Install Now', 'yay-wholesale-b2b' )
-                            );
-                        }
+                        $action_links[] = sprintf(
+                            '<button class="install-now button button-primary" data-install-url="%s" aria-label="%s">%s</button>',
+                            esc_attr( $download_link ),
+                            /* translators: %s: Plugin name and version. */
+                            esc_attr( sprintf( _x( 'Install %s now', 'plugin', 'yay-wholesale-b2b' ), $name ) ),
+                            __( 'Install Now', 'yay-wholesale-b2b' )
+                        );
                     } else {
                         $action_links[] = sprintf(
                             '<button type="button" class="button button-disabled" disabled="disabled">%s</button>',
@@ -102,29 +91,16 @@ foreach ( (array) $recommended_plugins as $recommended_plugin ) {
             case 'update_available':
                 if ( $install_status['url'] ) {
                     if ( $compatible_php && $compatible_wp ) {
-                        if ( 'yaypricing' === $recommended_plugin['slug'] ) {
-                            $action_links[] = sprintf(
-                                '<button class="button aria-button-if-js" data-plugin="%s" data-slug="%s" data-update-url="%s" aria-label="%s" data-name="%s">%s</button>',
-                                esc_attr( $install_status['file'] ),
-                                esc_attr( $recommended_plugin['slug'] ),
-                                esc_url( $install_status['url'] ),
-                                /* translators: %s: Plugin name and version. */
-                                esc_attr( sprintf( _x( 'Update %s now', 'plugin', 'yay-wholesale-b2b' ), $name ) ),
-                                esc_attr( $name ),
-                                __( 'Update Now', 'yay-wholesale-b2b' )
-                            );
-                        } else {
-                            $action_links[] = sprintf(
-                                '<button class="update-now button aria-button-if-js" data-plugin="%s" data-slug="%s" data-update-url="%s" aria-label="%s" data-name="%s">%s</button>',
-                                esc_attr( $install_status['file'] ),
-                                esc_attr( $recommended_plugin['slug'] ),
-                                esc_url( $install_status['url'] ),
-                                /* translators: %s: Plugin name and version. */
-                                esc_attr( sprintf( _x( 'Update %s now', 'plugin', 'yay-wholesale-b2b' ), $name ) ),
-                                esc_attr( $name ),
-                                __( 'Update Now', 'yay-wholesale-b2b' )
-                            );
-                        }//end if
+                        $action_links[] = sprintf(
+                            '<button class="update-now button aria-button-if-js" data-plugin="%s" data-slug="%s" data-update-url="%s" aria-label="%s" data-name="%s">%s</button>',
+                            esc_attr( $install_status['file'] ),
+                            esc_attr( $recommended_plugin['slug'] ),
+                            esc_url( $install_status['url'] ),
+                            /* translators: %s: Plugin name and version. */
+                            esc_attr( sprintf( _x( 'Update %s now', 'plugin', 'yay-wholesale-b2b' ), $name ) ),
+                            esc_attr( $name ),
+                            __( 'Update Now', 'yay-wholesale-b2b' )
+                        );
                     } else {
                         $action_links[] = sprintf(
                             '<button type="button" class="button button-disabled" disabled="disabled">%s</button>',
