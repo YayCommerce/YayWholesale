@@ -1,4 +1,9 @@
 <?php
+
+if ( ! defined( 'ABSPATH' ) ) {
+    exit;
+}
+
 $plugin_slug = $_plugin['slug'];
 $plugin_name = $_plugin['name'];
 $is_addon    = false !== strpos( $plugin_slug, 'addon' );

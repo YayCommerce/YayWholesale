@@ -1,3 +1,8 @@
+<?php
+if ( ! defined( 'ABSPATH' ) ) {
+    exit;
+}
+?>
 <div class="update-message notice inline notice-warning notice-alt">
     <p class="license_expired_text">
         <span><?php echo esc_html( 'Your license has expired, please ' ); ?></span>

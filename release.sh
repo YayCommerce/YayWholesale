@@ -1,4 +1,4 @@
-PLUGIN_SLUG="yay-wholesale-b2b"
+PLUGIN_SLUG="yay-wholesale-b2b-pro"
 PROJECT_PATH=$(pwd)
 IS_PRO="true"
 BUILD_PATH="${PROJECT_PATH}/build"

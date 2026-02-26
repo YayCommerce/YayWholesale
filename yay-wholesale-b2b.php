@@ -93,7 +93,7 @@ if ( ! function_exists( 'YayWholesaleB2B\\plugin_init' ) ) {
             return;
         }
 
-        $license = new \YayWholesaleB2B\License\License( 'yaywholesaleb2b' );
+        $license = new \YayWholesaleB2B\License\License( 'yay_wholesale_b2b_pro' );
         if ( ! $license->is_active() ) {
             return;
         }

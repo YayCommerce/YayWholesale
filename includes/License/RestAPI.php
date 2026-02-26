@@ -2,6 +2,10 @@
 
 namespace YayWholesaleB2B\License;
 
+if ( ! defined( 'ABSPATH' ) ) {
+    exit;
+}
+
 /**
  * REST API Controller for License
  */

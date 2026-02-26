@@ -1,5 +1,5 @@
 jQuery(document).ready(function () {
-  const slug = "yayextra";
+  const slug = "yay_wholesale_b2b_pro";
   const REST_URL =
     window[`${slug}LicenseData`].apiSettings.restUrl;
   const REST_NONCE = window[`${slug}LicenseData`].apiSettings.restNonce;

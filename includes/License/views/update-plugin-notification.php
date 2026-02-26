@@ -1,4 +1,7 @@
 <?php
+if ( ! defined( 'ABSPATH' ) ) {
+    exit;
+}
 $changelog_link = self_admin_url( 'plugin-install.php?tab=plugin-information&plugin=' . $file . '&section=changelog&TB_iframe=true&width=600&height=800' );
 ?>
 <div class="update-message notice inline notice-warning notice-alt">

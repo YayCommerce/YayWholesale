@@ -1,10 +1,15 @@
 <?php
-    $plugin_slug  = $_plugin['slug'];
-    $plugin_name  = $_plugin['name'];
-    $license_info = $license->get_license_info();
-    $expires      = $license_info['expires'];
-    $is_expired   = $license->is_expired();
-    $is_addon     = false !== strpos( $plugin_slug, 'addon' );
+
+if ( ! defined( 'ABSPATH' ) ) {
+    exit;
+}
+
+$plugin_slug  = $_plugin['slug'];
+$plugin_name  = $_plugin['name'];
+$license_info = $license->get_license_info();
+$expires      = $license_info['expires'];
+$is_expired   = $license->is_expired();
+$is_addon     = false !== strpos( $plugin_slug, 'addon' );
 ?>
 <div class="yaycommerce-license-card" id="<?php echo esc_attr( "{$plugin_slug}_license_card" ); ?>" style="<?php echo esc_attr( $is_addon ? 'order: 999;' : 'order: ' . YAYWHOLESALEB2B_MENU_ORDER . ';' ); ?>">
     <div class="yaycommerce-license-card-header">
