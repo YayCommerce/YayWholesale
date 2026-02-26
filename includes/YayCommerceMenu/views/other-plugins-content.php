@@ -48,16 +48,7 @@ foreach ( (array) $recommended_plugins as $recommended_plugin ) {
     if ( current_user_can( 'install_plugins' ) || current_user_can( 'update_plugins' ) ) {
         $plugin_pro_ver = $this->check_pro_version_exists( $recommended_plugin );
         if ( false === $plugin_pro_ver ) {
-            if ( 'yaypricing' === $recommended_plugin['slug'] ) {
-                $install_status = [
-                    'status'  => 'install',
-                    'url'     => $recommended_plugin['download_link'],
-                    'version' => '',
-                    'file'    => $plugin_pro_ver,
-                ];
-            } else {
-                $install_status = \install_plugin_install_status( $recommended_plugin );
-            }
+            $install_status = \install_plugin_install_status( $recommended_plugin );
         } else {
             $install_status = [
                 'status'  => 'latest_installed',
