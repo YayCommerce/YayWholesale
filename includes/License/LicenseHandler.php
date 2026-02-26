@@ -117,7 +117,7 @@ class LicenseHandler {
         wp_enqueue_script( CorePlugin::get( 'slug' ) . '-license-script', plugin_dir_url( __FILE__ ) . 'assets/js/license.js', [], CorePlugin::get( 'version' ), true );
         wp_localize_script(
             CorePlugin::get( 'slug' ) . '-license-script',
-            CorePlugin::get( 'slug' ) . 'LicenseData',
+            'yayWholesaleB2BLicenseData',
             [
                 'apiSettings' => [
                     'restNonce' => wp_create_nonce( 'wp_rest' ),

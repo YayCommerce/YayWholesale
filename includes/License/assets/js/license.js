@@ -1,8 +1,9 @@
 jQuery(document).ready(function () {
-  const slug = "yay_wholesale_b2b_pro";
+  const localizedSlug = "yayWholesaleB2B";
+  const slug = "yay-wholesale-b2b-pro";
   const REST_URL =
-    window[`${slug}LicenseData`].apiSettings.restUrl;
-  const REST_NONCE = window[`${slug}LicenseData`].apiSettings.restNonce;
+    window[`${localizedSlug}LicenseData`].apiSettings.restUrl;
+  const REST_NONCE = window[`${localizedSlug}LicenseData`].apiSettings.restNonce;
   const POST_OPTIONS = {
     method: "POST",
     headers: {
