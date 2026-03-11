@@ -35,11 +35,10 @@ jQuery(document).ready(() => {
     "yaye_total_price_hook",
     "ywhs",
     function (html, quantityProduct, totalPriceOriginalData) {
-      console.log(totalPriceOriginalData);
         let optionExtra = parseFloat(totalPriceOriginalData.total_options_original) * currencyRate;
         let linkedProductExtra = parseFloat(totalPriceOriginalData.total_linked_product_original) * currencyRate;
         
-        let base = (wholesaleRole['applyToSalePrice'] && salePrice < regularPrice) ? parseFloat(salePrice) : parseFloat(regularPrice);
+        let base = (wholesaleRole && wholesaleRole['applyToSalePrice'] && salePrice < regularPrice) ? parseFloat(salePrice) : parseFloat(regularPrice);
         let totalUnit = base + optionExtra + linkedProductExtra;
         let total;
         if (isDiscounted === "1" && wholesaleRole) {

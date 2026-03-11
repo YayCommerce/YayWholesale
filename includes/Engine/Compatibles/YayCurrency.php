@@ -25,7 +25,7 @@ class YayCurrency {
     }
 
     /* Convert the final price with YayCurrency */
-    public function convert_currency_price( float $price ) {
+    public function convert_currency_price( $price ) {
         if ( is_checkout() || self::is_checkout_blocks() ) {
             return $price;
         }

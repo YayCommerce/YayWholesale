@@ -61,16 +61,16 @@ const nonce = config?.nonce ?? "";
 
 const { state, callbacks } = store('ywhs_wholesale_requirement', {
     state: {
-        wholesaleName: wholesaleRole.name,
+        wholesaleName: wholesaleRole?.name ?? "",
         progressStyle: "width: 0",
         qtyMet: false,
-        minQty: wholesaleRole.minOrderQuantity,
+        minQty: wholesaleRole?.minOrderQuantity ?? 0,
         count: 0,
         amountMet: false,
         subtotal: parseWPCurrency(0),
-        minAmount: parseWPCurrency(wholesaleRole.minOrderAmount),
+        minAmount: parseWPCurrency(wholesaleRole?.minOrderAmount ?? 0),
         isDiscounted: false,
-        discountText: sprintf(__('%d%% Off', 'yay-wholesale-b2b'), wholesaleRole.discount)
+        discountText: sprintf(__('%d%% Off', 'yay-wholesale-b2b'), wholesaleRole?.discount ?? 0)
     },
     callbacks: {
         async getPriceMap() {
