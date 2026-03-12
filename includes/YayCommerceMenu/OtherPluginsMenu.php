@@ -164,7 +164,7 @@ class OtherPluginsMenu {
 
     public static function get_other_plugins() {
         return [
-            'filebird'          => [
+            'filebird'                               => [
                 'slug'              => 'filebird',
                 'name'              => 'FileBird - WordPress Media Library Folders & File Manager',
                 'short_description' => 'Organize thousands of WordPress media files in folders / categories at ease.',
@@ -173,7 +173,7 @@ class OtherPluginsMenu {
                 'type'              => [ 'featured' ],
                 'version'           => 0,
             ],
-            'yaymail'           => [
+            'yaymail'                                => [
                 'slug'              => 'yaymail',
                 'name'              => 'YayMail - WooCommerce Email Customizer',
                 'short_description' => 'Customize WooCommerce email templates with live preview & drag and drop email builder.',
@@ -182,7 +182,7 @@ class OtherPluginsMenu {
                 'type'              => [ 'featured', 'woocommerce' ],
                 'version'           => 0,
             ],
-            'yaycurrency'       => [
+            'yaycurrency'                            => [
                 'slug'              => 'yaycurrency',
                 'name'              => 'YayCurrency - WooCommerce Multi-Currency Switcher',
                 'short_description' => 'WooCommerce Multi-Currency made easy, powerful, and flexible.',
@@ -191,7 +191,7 @@ class OtherPluginsMenu {
                 'type'              => [ 'featured', 'woocommerce' ],
                 'version'           => 0,
             ],
-            'yayswatches'       => [
+            'yayswatches'                            => [
                 'slug'              => 'yayswatches',
                 'name'              => 'YaySwatches - Variation Swatches for WooCommerce',
                 'short_description' => 'Optimize your variable product showcase with color swatches, image swatches, custom images, buttons, and more!',
@@ -200,7 +200,7 @@ class OtherPluginsMenu {
                 'type'              => [ 'woocommerce' ],
                 'version'           => 0,
             ],
-            'yayextra'          => [
+            'yayextra'                               => [
                 'slug'              => 'yayextra',
                 'name'              => 'YayExtra - WooCommerce Extra Product Options',
                 'short_description' => 'Add WooCommerce product options like personal engraving, print-on-demand items, gifts, custom canvas prints, and personalized products.',
@@ -209,7 +209,7 @@ class OtherPluginsMenu {
                 'type'              => [ 'woocommerce' ],
                 'version'           => 0,
             ],
-            'yaypricing'        => [
+            'yaypricing'                             => [
                 'slug'              => 'yaypricing',
                 'name'              => 'YayPricing - WooCommerce Dynamic Pricing & Discounts',
                 'short_description' => 'Offer automatic pricing and discounts to design a powerful marketing strategy for your WooCommerce store.',
@@ -218,7 +218,7 @@ class OtherPluginsMenu {
                 'type'              => [ 'woocommerce' ],
                 'version'           => 0,
             ],
-            'yaysmtp'           => [
+            'yaysmtp'                                => [
                 'slug'              => 'yaysmtp',
                 'name'              => 'YaySMTP - Simple WP SMTP Mail',
                 'short_description' => 'Send WordPress emails successfully with WP Mail SMTP via your favorite Mailer.',
@@ -227,7 +227,7 @@ class OtherPluginsMenu {
                 'type'              => [ 'featured', 'marketing' ],
                 'version'           => 0,
             ],
-            'wp-whatsapp'       => [
+            'wp-whatsapp'                            => [
                 'slug'              => 'wp-whatsapp',
                 'name'              => 'WP Chat App',
                 'short_description' => 'Integrate WhatsApp experience directly into your WordPress website.',
@@ -236,7 +236,7 @@ class OtherPluginsMenu {
                 'type'              => [ 'featured' ],
                 'version'           => 0,
             ],
-            'filester'          => [
+            'filester'                               => [
                 'slug'              => 'filester',
                 'name'              => 'Filester - File Manager Pro',
                 'short_description' => 'Best WordPress file manager without FTP access. Clean design. No need to upgrade because this…',
@@ -245,7 +245,7 @@ class OtherPluginsMenu {
                 'type'              => [ 'management' ],
                 'version'           => 0,
             ],
-            'cf7-multi-step'    => [
+            'cf7-multi-step'                         => [
                 'slug'              => 'cf7-multi-step',
                 'name'              => 'Multi Step for Contact Form 7',
                 'short_description' => 'Break your looooooong form into user-friendly steps.',
@@ -254,7 +254,7 @@ class OtherPluginsMenu {
                 'type'              => [ 'management' ],
                 'version'           => 0,
             ],
-            'cf7-database'      => [
+            'cf7-database'                           => [
                 'slug'              => 'cf7-database',
                 'name'              => 'Database for Contact Form 7',
                 'short_description' => 'Automatically save all data submitted via Contact Form 7 to your database.',
@@ -263,7 +263,7 @@ class OtherPluginsMenu {
                 'type'              => [ 'management' ],
                 'version'           => 0,
             ],
-            'wp-duplicate-page' => [
+            'wp-duplicate-page'                      => [
                 'slug'              => 'wp-duplicate-page',
                 'name'              => 'WP Duplicate Page',
                 'short_description' => 'Clone WordPress page, post, custom post types.',
@@ -272,7 +272,7 @@ class OtherPluginsMenu {
                 'type'              => [ 'management' ],
                 'version'           => 0,
             ],
-            'notibar'           => [
+            'notibar'                                => [
                 'slug'              => 'notibar',
                 'name'              => 'Notibar - Notification Bar for WordPress',
                 'short_description' => 'Customizer for sticky header, notification bar, alert, promo code, marketing campaign, top banner.',
@@ -281,7 +281,7 @@ class OtherPluginsMenu {
                 'type'              => [ 'marketing' ],
                 'version'           => 0,
             ],
-            'yayreviews'        => [
+            'yayreviews'                             => [
                 'slug'              => 'yay-customer-reviews-woocommerce',
                 'name'              => 'YayReviews – Advanced Customer Reviews for WooCommerce',
                 'short_description' => 'YayReviews helps online stores collect, manage, and display authentic customer feedback.',
@@ -290,12 +290,21 @@ class OtherPluginsMenu {
                 'type'              => [ 'featured', 'woocommerce' ],
                 'version'           => 0,
             ],
-            'yay-wholesale-b2b' => [
+            'yay-wholesale-b2b'                      => [
                 'slug'              => 'yay-wholesale-b2b',
                 'name'              => 'Yay Wholesale B2B for WooCommerce',
                 'short_description' => 'Yay Wholesale & B2B for WooCommerce is a powerful plugin that allows you to sell your products to wholesale customers and businesses.',
                 'icon'              => 'https://ps.w.org/yay-wholesale-b2b/assets/icon-256x256.png',
                 'download_link'     => 'https://downloads.wordpress.org/plugin/yay-wholesale-b2b.zip',
+                'type'              => [ 'featured', 'woocommerce' ],
+                'version'           => 0,
+            ],
+            'yayboost-sales-booster-for-woocommerce' => [
+                'slug'              => 'yayboost-sales-booster-for-woocommerce',
+                'name'              => 'YayBoost – Sales Booster for WooCommerce',
+                'short_description' => 'Boost conversions with smart sales triggers',
+                'icon'              => 'https://ps.w.org/yayboost-sales-booster-for-woocommerce/assets/icon-256x256.png',
+                'download_link'     => 'https://downloads.wordpress.org/plugin/yayboost-sales-booster-for-woocommerce.zip',
                 'type'              => [ 'featured', 'woocommerce' ],
                 'version'           => 0,
             ],
@@ -553,6 +562,9 @@ class OtherPluginsMenu {
             } elseif ( array_key_exists( 'yayreviews/yay-customer-reviews-woocommerce.php', $all_plugin ) ) {
                 $exist_pro_ver = 'yayreviews/yay-customer-reviews-woocommerce.php';
             }
+        }
+        if ( 'yayboost-sales-booster-for-woocommerce' === $plugin_detail['slug'] && array_key_exists( 'yayboost-pro/yayboost-sales-booster-for-woocommerce.php', $all_plugin ) ) {
+            $exist_pro_ver = 'yayboost-pro/yayboost-sales-booster-for-woocommerce.php';
         }
         return $exist_pro_ver;
     }
