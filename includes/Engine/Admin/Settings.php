@@ -74,14 +74,14 @@ class Settings {
     }
 
     public function add_action_links( $links ) {
-        $links = array_merge(
-            [
-                '<a href="' . esc_url( admin_url( '/admin.php?page=yay_wholesale' ) ) . '">' . __( 'Settings', 'yay-wholesale-b2b' ) . '</a>',
-            ],
-            $links
-        );
+        $action_links = [
+            '<a href="' . esc_url( admin_url( '/admin.php?page=yay_wholesale' ) ) . '">' . __( 'Settings', 'yay-wholesale-b2b' ) . '</a>',
+        ];
+        if ( ! defined( 'YAYWHOLESALEB2B_IS_PRO' ) || ! YAYWHOLESALEB2B_IS_PRO ) {
+            $links[] = '<a target="_blank" href="https://yaycommerce.com/yay-wholesale-b2b-for-woocommerce/" style="color: #43B854; font-weight: bold">' . __( 'Go Pro', 'yay-wholesale-b2b' ) . '</a>';
+        }
 
-        return $links;
+        return array_merge( $action_links, $links );
     }
 
     public function add_document_support_links( $links, $file ) {

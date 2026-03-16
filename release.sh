@@ -1,4 +1,3 @@
-PLUGIN_SLUG="yay-wholesale-b2b-pro"
 PROJECT_PATH=$(pwd)
 IS_PRO="true"
 BUILD_PATH="${PROJECT_PATH}/build"
@@ -8,9 +7,9 @@ os=$(uname -s)
 for param in "$@"
 do
     case $param in
-    #     IS_PRO=*)
-    #         IS_PRO="${param#*=}"
-    #         ;;
+        IS_PRO=*)
+            IS_PRO="${param#*=}"
+            ;;
         OUTPUT_PATH=*)
             BUILD_PATH="${param#*=}"
 
@@ -42,8 +41,10 @@ done
 
 if [ "$IS_PRO" = "true" ]; then
     BUILD_PATH="${BUILD_PATH}/pro"
+    PLUGIN_SLUG="yay-wholesale-b2b-pro"
 else
     BUILD_PATH="${BUILD_PATH}/lite"
+    PLUGIN_SLUG="yay-wholesale-b2b"
 fi
 
 DEST_PATH="$BUILD_PATH/$PLUGIN_SLUG"
@@ -106,6 +107,17 @@ cd "$PROJECT_PATH"
 #
 echo "Syncing files..."
 rsync -rc --exclude-from="$PROJECT_PATH/.distignore" "$PROJECT_PATH/" "$DEST_PATH/" --delete --delete-excluded
+
+#
+# 6) Delete Pro folder if building Lite ver
+#
+if [ "$IS_PRO" = "false" ]; then
+    TARGET="$DEST_PATH/includes/Engine/ProFeatures"
+
+    if [ -d "$TARGET" ]; then
+        rm -rf "$TARGET" && echo "Removed: $TARGET (and its content)"
+    fi
+fi
 
 #
 # 6) Run code formatter if tools directory exists before running lint
