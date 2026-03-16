@@ -70,7 +70,7 @@ class LicenseHandler {
         if ( 'yaycommerce_page_yaycommerce-licenses' === $current_screen->id ) {
             return;
         }
-        $license = new License( 'yay-wholesale-b2b' );
+        $license = new License( 'yay-wholesale-b2b-pro' );
         if ( $license->is_active() ) {
             return;
         }

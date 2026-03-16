@@ -27,6 +27,5 @@ class Initialize {
         \YayWholesaleB2B\Engine\Frontend\Coupon::get_instance();
         \YayWholesaleB2B\Engine\Frontend\Tax::get_instance();
         \YayWholesaleB2B\Engine\Frontend\RequestForm::get_instance();
-        \YayWholesaleB2B\Engine\Frontend\Requirement::get_instance();
     }
 }

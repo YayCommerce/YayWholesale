@@ -1,7 +1,6 @@
 <?php
-namespace YayWholesaleB2B\Engine\Frontend;
+namespace YayWholesaleB2B\Engine\ProFeatures;
 
-use WC_Tax;
 use YayWholesaleB2B\Utils\SingletonTrait;
 use YayWholesaleB2B\Helpers\RolesHelper;
 use YayWholesaleB2B\Helpers\PricingHelper;
@@ -9,7 +8,7 @@ use YayWholesaleB2B\Helpers\PricingHelper;
 defined( 'ABSPATH' ) || exit;
 
 /**
- * Pricing Engine
+ * Pro Requirement Progress feature
  */
 class Requirement {
     use SingletonTrait;
@@ -212,6 +211,8 @@ class Requirement {
 
     /**
      * Automatically add requirement block to mini cart block of woocommerce
+     *
+     * @param string $block_content The default HTML of mini-cart block.
      */
     public function automatically_add_ywhs_to_mini_cart( $block_content ) {
         // Your custom block HTML
