@@ -32,7 +32,7 @@ class LicenseHandler {
     }
 
     public function do_hooks() {
-        // add_action( 'admin_notices', [ $this, 'not_activate_license_notice' ] );
+        add_action( 'admin_notices', [ $this, 'not_activate_license_notice' ] );
         add_filter( 'plugins_list', [ $this, 'support_auto_update' ], 100 );
 
         add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_license_scripts' ] );
