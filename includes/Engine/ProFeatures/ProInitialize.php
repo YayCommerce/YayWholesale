@@ -14,6 +14,5 @@ class ProInitialize {
     use SingletonTrait;
 
     protected function __construct() {
-        Requirement::get_instance();
     }
 }

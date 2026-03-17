@@ -1,30 +1,34 @@
 <?php
-namespace YayWholesaleB2B\Engine\ProFeatures;
+namespace YayWholesaleB2B\Engine\Frontend;
 
 use YayWholesaleB2B\Utils\SingletonTrait;
 use YayWholesaleB2B\Helpers\RolesHelper;
 use YayWholesaleB2B\Helpers\PricingHelper;
+use YayWholesaleB2B\Utils\Utils;
 
 defined( 'ABSPATH' ) || exit;
 
 /**
- * Pro Requirement Progress feature
+ * Requirement Progress feature
  */
 class Requirement {
     use SingletonTrait;
 
     protected function __construct() {
-        // --- WooCommerce hooks ---
-        add_action( 'woocommerce_widget_shopping_cart_before_buttons', [ $this, 'add_yay_wholesale_requirement' ], 999, 0 );
-        add_action( 'woocommerce_before_cart_totals', [ $this, 'add_yay_wholesale_requirement' ], 999, 0 );
-        add_action( 'woocommerce_review_order_before_payment', [ $this, 'add_yay_wholesale_requirement' ], 999, 0 );
 
-        add_action( 'wp_enqueue_scripts', [ $this, 'enqueue_yay_wholesale_requirement' ], 999 );
-        add_action( 'init', [ $this, 'create_ywhs_requirement_block_init' ], 999 );
-        add_filter( 'render_block_woocommerce/mini-cart-footer-block', [ $this, 'automatically_add_ywhs_to_mini_cart' ], 999 );
+        if ( Utils::is_pro() ) {
+            // --- WooCommerce hooks ---
+            add_action( 'woocommerce_widget_shopping_cart_before_buttons', [ $this, 'add_yay_wholesale_requirement' ], 999, 0 );
+            add_action( 'woocommerce_before_cart_totals', [ $this, 'add_yay_wholesale_requirement' ], 999, 0 );
+            add_action( 'woocommerce_review_order_before_payment', [ $this, 'add_yay_wholesale_requirement' ], 999, 0 );
 
-        add_action( 'wp_ajax_ywhs_get_original_price_in_cart', [ $this, 'ywhs_get_original_price_in_cart' ] );
-        add_action( 'wp_ajax_nopriv_ywhs_get_original_price_in_cart', [ $this, 'ywhs_get_original_price_in_cart' ] );
+            add_action( 'wp_enqueue_scripts', [ $this, 'enqueue_yay_wholesale_requirement' ], 999 );
+            add_action( 'init', [ $this, 'create_ywhs_requirement_block_init' ], 999 );
+            add_filter( 'render_block_woocommerce/mini-cart-footer-block', [ $this, 'automatically_add_ywhs_to_mini_cart' ], 999 );
+
+            add_action( 'wp_ajax_ywhs_get_original_price_in_cart', [ $this, 'ywhs_get_original_price_in_cart' ] );
+            add_action( 'wp_ajax_nopriv_ywhs_get_original_price_in_cart', [ $this, 'ywhs_get_original_price_in_cart' ] );
+        }
     }
 
     /**

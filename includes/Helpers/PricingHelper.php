@@ -5,6 +5,7 @@ namespace YayWholesaleB2B\Helpers;
 use YayWholesaleB2B\Engine\Frontend\Pricing;
 use YayWholesaleB2B\Helpers\RolesHelper;
 use YayWholesaleB2B\Helpers\SettingsHelper;
+use YayWholesaleB2B\Utils\Utils;
 
 /**
  * Common Helper
@@ -28,6 +29,10 @@ class PricingHelper {
             }
             // Handle price (Compatible to other price-related plugins)
             $role['minOrderAmount'] = apply_filters( 'ywhs_price_handle_processed', $role['minOrderAmount'] );
+
+            if ( ! Utils::is_pro() ) {
+                $role['minOrderQuantity'] = 0;
+            }
         }
         return $role;
     }

@@ -111,6 +111,15 @@ For documentation, support, and updates, visit our website or [contact YayCommer
 
 ## Changelog
 
+= Mar 17, 2026 - Version 1.0.5 =
+- Fixed: Admin notice display
+- Updated: Limit the B2B Requirements Display feature (only for Pro) 
+
+= Mar 13, 2026 – Version 1.0.4 =
+- Updated: Plugin logo in admin dashboard
+- Improved: Recommended plugins screen
+- Improved: Licenses screen (Pro version)
+
 = Feb 25, 2026 - Version 1.0.3 =
 - Implement YayUIKits to Admin UI
 

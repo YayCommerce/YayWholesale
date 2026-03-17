@@ -2,6 +2,7 @@
 namespace YayWholesaleB2B\Helpers;
 
 use WP_User_Query;
+use YayWholesaleB2B\Utils\Utils;
 
 /**
  * Roles Helper Class
@@ -148,7 +149,11 @@ class RolesHelper {
             if ( $role['isDefault'] ) {
                 $default_index = $key;
             }
-        }
+
+            if ( ! Utils::is_pro() ) {
+                $role['minOrderQuantity'] = 0;
+            }
+        }//end foreach
 
         if ( isset( $default_index ) && $default_index < count( $roles ) - 1 ) {
             $default_role = $roles[ $default_index ];

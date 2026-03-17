@@ -6,6 +6,7 @@ use YayWholesaleB2B\Helpers\SettingsHelper;
 use YayWholesaleB2B\Engine\Register\ScriptName;
 use YayWholesaleB2B\Helpers\RequestsHelper;
 use YayWholesaleB2B\Helpers\RolesHelper;
+use YayWholesaleB2B\Utils\Utils;
 
 defined( 'ABSPATH' ) || exit;
 /**
@@ -77,7 +78,7 @@ class Settings {
         $action_links = [
             '<a href="' . esc_url( admin_url( '/admin.php?page=yay_wholesale' ) ) . '">' . __( 'Settings', 'yay-wholesale-b2b' ) . '</a>',
         ];
-        if ( ! defined( 'YAYWHOLESALEB2B_IS_PRO' ) || ! YAYWHOLESALEB2B_IS_PRO ) {
+        if ( ! Utils::is_pro() ) {
             $links[] = '<a target="_blank" href="https://yaycommerce.com/yay-wholesale-b2b-for-woocommerce/" style="color: #43B854; font-weight: bold">' . __( 'Go Pro', 'yay-wholesale-b2b' ) . '</a>';
         }
 
