@@ -1,5 +1,5 @@
 <?php
-namespace Yay_Wholesale_B2B\Helpers;
+namespace YayWholesaleB2B\Helpers;
 
 use Exception;
 use WP_Query;
@@ -9,12 +9,12 @@ use WP_User;
  * Settings Helper Class
  */
 class RequestsHelper {
-    public const REQUEST_POST_TYPE         = 'yay-whs-request';
-    public const REQUEST_META_DATA         = 'yay-whs-request-data';
-    public const REQUEST_META_DISPLAY_NAME = 'yay-whs-request-display-name';
-    public const REQUEST_META_EMAIL        = 'yay-whs-request-email';
-    public const REQUEST_META_STATUS       = 'yay-whs-request-status';
-    public const REQUEST_META_MESSAGE      = 'yay-whs-request-message';
+    public const REQUEST_POST_TYPE         = 'ywhs_request';
+    public const REQUEST_META_DATA         = 'ywhs_request_data';
+    public const REQUEST_META_DISPLAY_NAME = 'ywhs_request_display_name';
+    public const REQUEST_META_EMAIL        = 'ywhs_request_email';
+    public const REQUEST_META_STATUS       = 'ywhs_request_status';
+    public const REQUEST_META_MESSAGE      = 'ywhs_request_message';
     public const REJECTED                  = 'rejected';
     public const PENDING                   = 'pending';
     public const APPROVED                  = 'approved';

@@ -1,8 +1,8 @@
 
 <?php
 
-use Yay_Wholesale_B2B\Helpers\RequestsHelper;
-use Yay_Wholesale_B2B\Helpers\SettingsHelper;
+use YayWholesaleB2B\Helpers\RequestsHelper;
+use YayWholesaleB2B\Helpers\SettingsHelper;
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 
@@ -18,6 +18,21 @@ if ( $ywhs_is_autofill ) {
 	$ywhs_last_name_autofill  = $ywhs_user->last_name;
 	$ywhs_email_autofill      = $ywhs_user->user_email;
 }
+
+if ( empty( $_COOKIE['yaywholesaleb2b_cid'] ) ) {
+	$ywhs_cid = wp_generate_uuid4();
+
+	setcookie(
+		'yaywholesaleb2b_cid',
+		$ywhs_cid,
+		time() + MONTH_IN_SECONDS,
+		COOKIEPATH,
+		COOKIE_DOMAIN,
+		is_ssl(),
+		true
+	);
+}
+
 ?>
 <div <?php echo esc_attr(get_block_wrapper_attributes()); ?>>
 	<h4 style="text-align: <?php echo esc_attr($attributes['titleAlign']); ?>;"><?php echo esc_html($attributes['formTitle']); ?></h4>

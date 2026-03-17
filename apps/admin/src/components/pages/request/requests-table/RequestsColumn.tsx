@@ -13,10 +13,10 @@ import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import {
   Dialog,
+  DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogPortalContent,
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
@@ -57,35 +57,23 @@ export const RequestsColumn: ColumnDef<RequestFormValues>[] = [
   {
     id: 'select',
     header: ({ table }) => (
-      <Label
-        htmlFor="select-all"
-        className="flex h-full w-full cursor-pointer items-center justify-center px-4"
-      >
-        <Checkbox
-          id="select-all"
-          className="size-4 bg-white"
-          checked={table.getIsAllPageRowsSelected()}
-          onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-          aria-label="Select all"
-        />
-      </Label>
+      <Checkbox
+        id="select-all"
+        checked={table.getIsAllPageRowsSelected()}
+        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+        aria-label="Select all"
+      />
     ),
     cell: ({ row }) => {
       const id = `select-${row.original.id}`;
 
       return (
-        <Label
-          htmlFor={id}
-          className="flex h-full w-full cursor-pointer items-center justify-center px-4"
-        >
-          <Checkbox
-            id={id}
-            className="pointer-events-none size-4 bg-white"
-            checked={row.getIsSelected()}
-            onCheckedChange={(value) => row.toggleSelected(!!value)}
-            aria-label="Select row"
-          />
-        </Label>
+        <Checkbox
+          id={id}
+          checked={row.getIsSelected()}
+          onCheckedChange={(value) => row.toggleSelected(!!value)}
+          aria-label="Select row"
+        />
       );
     },
     meta: { align: 'center', isCheckbox: true },
@@ -174,7 +162,7 @@ export const RequestsColumn: ColumnDef<RequestFormValues>[] = [
               <Ellipsis className="h-4 w-4" />
             </Button>
           </div>
-          <DialogPortalContent className="bw:max-w-md">
+          <DialogContent className="bw:max-w-md">
             <DialogHeader className="bw:border-b-0">
               <DialogTitle>
                 {__('Are you sure you want to delete this request?', 'yay-wholesale-b2b')}
@@ -190,11 +178,17 @@ export const RequestsColumn: ColumnDef<RequestFormValues>[] = [
               <DialogClose asChild>
                 <Button variant="outline">{__('Cancel', 'yay-wholesale-b2b')}</Button>
               </DialogClose>
-              <Button variant="destructive" onClick={() => deleteRequest()}>
+              <Button
+                variant="destructive"
+                onClick={() => {
+                  deleteRequest();
+                  setOpenDialog(false);
+                }}
+              >
                 {__('Continue', 'yay-wholesale-b2b')}
               </Button>
             </DialogFooter>
-          </DialogPortalContent>
+          </DialogContent>
         </Dialog>
       );
     },

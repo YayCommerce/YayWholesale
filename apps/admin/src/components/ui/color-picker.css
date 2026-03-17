@@ -1,3 +1,5 @@
+@reference '@/main.css';
+
 .yayui-color-picker {
   .react-colorful {
     @apply w-auto;

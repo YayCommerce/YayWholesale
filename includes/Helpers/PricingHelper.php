@@ -1,10 +1,11 @@
 <?php
 
-namespace Yay_Wholesale_B2B\Helpers;
+namespace YayWholesaleB2B\Helpers;
 
-use Yay_Wholesale_B2B\Engine\Frontend\Pricing;
-use Yay_Wholesale_B2B\Helpers\RolesHelper;
-use Yay_Wholesale_B2B\Helpers\SettingsHelper;
+use YayWholesaleB2B\Engine\Frontend\Pricing;
+use YayWholesaleB2B\Helpers\RolesHelper;
+use YayWholesaleB2B\Helpers\SettingsHelper;
+use YayWholesaleB2B\Utils\Utils;
 
 /**
  * Common Helper
@@ -21,13 +22,17 @@ class PricingHelper {
         $role = RolesHelper::is_wholesale_user();
 
         if ( ! $role && $allow_default && ! empty( SettingsHelper::get_settings()['general']['default_role'] ) ) {
-            $roles = get_option( 'yay_wholesale_b2b_roles', [] );
+            $roles = get_option( 'yaywholesaleb2b_roles', [] );
             $role  = RolesHelper::get_role_by_slug( $roles, SettingsHelper::get_settings()['general']['default_role'] );
             if ( ! $role || empty( $role['status'] ) ) {
                 return null;
             }
             // Handle price (Compatible to other price-related plugins)
             $role['minOrderAmount'] = apply_filters( 'ywhs_price_handle_processed', $role['minOrderAmount'] );
+
+            if ( ! Utils::is_pro() ) {
+                $role['minOrderQuantity'] = 0;
+            }
         }
         return $role;
     }

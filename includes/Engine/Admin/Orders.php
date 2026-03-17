@@ -1,14 +1,14 @@
 <?php
-namespace Yay_Wholesale_B2B\Engine\Admin;
+namespace YayWholesaleB2B\Engine\Admin;
 
 use WC_Data_Store;
 use WC_Tax;
-use Yay_Wholesale_B2B\Engine\Compatibles;
-use Yay_Wholesale_B2B\Engine\Frontend\Tax;
-use Yay_Wholesale_B2B\Helpers\RolesHelper;
-use Yay_Wholesale_B2B\Helpers\SettingsHelper;
-use Yay_Wholesale_B2B\Helpers\PricingHelper;
-use Yay_Wholesale_B2B\Utils\SingletonTrait;
+use YayWholesaleB2B\Engine\Compatibles;
+use YayWholesaleB2B\Engine\Frontend\Tax;
+use YayWholesaleB2B\Helpers\RolesHelper;
+use YayWholesaleB2B\Helpers\SettingsHelper;
+use YayWholesaleB2B\Helpers\PricingHelper;
+use YayWholesaleB2B\Utils\SingletonTrait;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -291,7 +291,7 @@ class Orders {
             return;
         }
 
-        $filter = filter_input( INPUT_GET, '_ywhs_order_type' );
+        $filter = filter_input( INPUT_GET, '_ywhs_order_type', FILTER_SANITIZE_SPECIAL_CHARS );
         $value  = isset( $filter ) ? $filter : 'all';
         ?>
         <select name="_ywhs_order_type">
@@ -309,7 +309,7 @@ class Orders {
      * @param array $args The arguments.
      */
     public function ywhs_admin_wc_orders_wholesale_filtered( $result, $args ) {
-        $order_type = filter_input( INPUT_GET, '_ywhs_order_type' );
+        $order_type = filter_input( INPUT_GET, '_ywhs_order_type', FILTER_SANITIZE_SPECIAL_CHARS );
 
         if ( ! isset( $order_type ) || 'all' === $order_type ) {
             return $result;

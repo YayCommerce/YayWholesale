@@ -1,6 +1,6 @@
 import * as React from 'react';
-import { QuestionIcon } from '@phosphor-icons/react';
 import * as TooltipPrimitive from '@radix-ui/react-tooltip';
+import { HelpCircleIcon } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
 
@@ -25,9 +25,12 @@ function Tooltip({ ...props }: React.ComponentProps<typeof TooltipPrimitive.Root
   );
 }
 
-function TooltipTrigger({ ...props }: React.ComponentProps<typeof TooltipPrimitive.Trigger>) {
-  return <TooltipPrimitive.Trigger data-slot="tooltip-trigger" {...props} />;
-}
+const TooltipTrigger = React.forwardRef<
+  React.ElementRef<typeof TooltipPrimitive.Trigger>,
+  React.ComponentPropsWithoutRef<typeof TooltipPrimitive.Trigger>
+>(({ ...props }, ref) => {
+  return <TooltipPrimitive.Trigger ref={ref} data-slot="tooltip-trigger" {...props} />;
+});
 
 function TooltipContent({
   className,
@@ -61,7 +64,7 @@ interface HelpTipProps {
 }
 
 function HelpTip({
-  trigger = <QuestionIcon className="text-background fill-muted-foreground size-4" />,
+  trigger = <HelpCircleIcon className="text-muted-foreground size-4" />,
   content,
   className,
   side = 'top',

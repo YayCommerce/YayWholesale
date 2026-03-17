@@ -1,7 +1,7 @@
 <?php
-namespace Yay_Wholesale_B2B\Engine\Frontend;
+namespace YayWholesaleB2B\Engine\Frontend;
 
-use Yay_Wholesale_B2B\Utils\SingletonTrait;
+use YayWholesaleB2B\Utils\SingletonTrait;
 
 defined( 'ABSPATH' ) || exit;
 /**
@@ -18,9 +18,9 @@ class Frontend {
         $dep           = [ 'jquery', 'wp-i18n' ];
         $script_handle = 'yay-wholesale-scripts';
 
-        wp_enqueue_script( $script_handle, YAY_WHOLESALE_B2B_PLUGIN_URL . 'assets/js/request-form-script.js', $dep, YAY_WHOLESALE_B2B_VERSION, false );
-        wp_enqueue_script( 'ywhs-requirement-scripts', YAY_WHOLESALE_B2B_PLUGIN_URL . 'assets/js/wholesale-requirement-script.js', $dep, YAY_WHOLESALE_B2B_VERSION, false );
-        wp_enqueue_style( 'yay-wholesale-styles', YAY_WHOLESALE_B2B_PLUGIN_URL . 'assets/css/front_store_styles.css', [], YAY_WHOLESALE_B2B_VERSION );
+        wp_enqueue_script( $script_handle, YAYWHOLESALEB2B_PLUGIN_URL . 'assets/js/request-form-script.js', $dep, YAYWHOLESALEB2B_VERSION, false );
+        wp_enqueue_script( 'ywhs-requirement-scripts', YAYWHOLESALEB2B_PLUGIN_URL . 'assets/js/wholesale-requirement-script.js', $dep, YAYWHOLESALEB2B_VERSION, false );
+        wp_enqueue_style( 'yay-wholesale-styles', YAYWHOLESALEB2B_PLUGIN_URL . 'assets/css/front_store_styles.css', [], YAYWHOLESALEB2B_VERSION );
 
         $currency         = apply_filters( 'ywhs_get_currency_by_third_party', [] );
         $default_currency = apply_filters( 'ywhs_ajax_using_default_currency', false );
@@ -46,7 +46,7 @@ class Frontend {
 
         wp_localize_script(
             $script_handle,
-            'yayWholesale',
+            'yayWholesaleB2B',
             [
                 'rest_url'      => esc_url_raw( rest_url() ),
                 'rest_nonce'    => wp_create_nonce( 'wp_rest' ),

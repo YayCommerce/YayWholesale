@@ -3,7 +3,7 @@ import dayjs from 'dayjs';
 export function parseWPDate(date: string | undefined) {
   var format = '';
 
-  var arr = window.yayWholesale.day_format.split('');
+  var arr = window.yayWholesaleB2BAdmin.day_format.split('');
   arr.forEach((ch) => {
     switch (ch) {
       case 'd':
@@ -50,7 +50,7 @@ export function parseWPDate(date: string | undefined) {
 export function parseWPTime(date: string) {
   var format = '';
 
-  var arr = window.yayWholesale.time_format.split('');
+  var arr = window.yayWholesaleB2BAdmin.time_format.split('');
   arr.forEach((ch) => {
     switch (ch) {
       case 'g':
@@ -92,7 +92,7 @@ export function parseWPCurrency(price: string | number) {
   }
 
   const { symbol, position, thousand_sep, decimal_sep, num_decimals } =
-    window.yayWholesale.currency_data;
+    window.yayWholesaleB2BAdmin.currency_data;
 
   const formattedPrice = price
     .toFixed(num_decimals)
@@ -115,8 +115,8 @@ export function parseWPDecimal(number: number) {
   const formattedNumber = number
     .toFixed(2)
     .replace(/\.00$/, '')
-    .replace(/\B(?=(\d{3})+(?!\d))/g, window.yayWholesale.currency_data.thousand_sep)
-    .replace(/(\d+)\.(\d{2})$/, `$1${window.yayWholesale.currency_data.decimal_sep}$2`);
+    .replace(/\B(?=(\d{3})+(?!\d))/g, window.yayWholesaleB2BAdmin.currency_data.thousand_sep)
+    .replace(/(\d+)\.(\d{2})$/, `$1${window.yayWholesaleB2BAdmin.currency_data.decimal_sep}$2`);
 
   return formattedNumber;
 }

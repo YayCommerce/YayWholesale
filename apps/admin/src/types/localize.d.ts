@@ -1,6 +1,6 @@
 declare global {
   interface Window {
-    yayWholesale: {
+    yayWholesaleB2BAdmin: {
       user_urls: {
         list: string;
         add_new: string;

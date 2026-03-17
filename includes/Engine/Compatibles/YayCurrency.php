@@ -1,7 +1,7 @@
 <?php
-namespace Yay_Wholesale_B2B\Engine\Compatibles;
+namespace YayWholesaleB2B\Engine\Compatibles;
 
-use Yay_Wholesale_B2B\Utils\SingletonTrait;
+use YayWholesaleB2B\Utils\SingletonTrait;
 
 use Yay_Currency\Helpers\YayCurrencyHelper;
 
@@ -25,8 +25,7 @@ class YayCurrency {
     }
 
     /* Convert the final price with YayCurrency */
-    public function convert_currency_price( float $price ) {
-            // Admin
+    public function convert_currency_price( $price ) {
         if ( is_checkout() || self::is_checkout_blocks() ) {
             return $price;
         }
@@ -95,7 +94,7 @@ class YayCurrency {
         }
 
         if ( isset( $_SERVER['HTTP_YAYCURRENCY_WC_BLOCKS_CONTEXT'] ) ) {
-            $page_context = sanitize_text_field( $_SERVER['HTTP_YAYCURRENCY_WC_BLOCKS_CONTEXT'] );
+            $page_context = sanitize_text_field( wp_unslash( $_SERVER['HTTP_YAYCURRENCY_WC_BLOCKS_CONTEXT'] ) );
         }
 
         return $page_context;

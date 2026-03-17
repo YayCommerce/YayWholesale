@@ -13,10 +13,10 @@ import { Checkbox } from '@/components/ui/checkbox';
 import {
   Dialog,
   DialogClose,
+  DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogPortalContent,
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
@@ -31,39 +31,24 @@ export const RolesColumn: ColumnDef<RolesListValues & { count: number }>[] = [
   {
     id: 'select',
     header: ({ table }) => (
-      <Label
-        htmlFor="select-all"
-        className="flex h-full w-full cursor-pointer items-center justify-center px-4"
-      >
-        <Checkbox
-          id="select-all"
-          className="size-4 bg-white"
-          checked={table.getIsAllRowsSelected()}
-          onCheckedChange={(v) => table.toggleAllRowsSelected(!!v)}
-          aria-label="Select all"
-        />
-      </Label>
+      <Checkbox
+        id="select-all"
+        checked={table.getIsAllRowsSelected()}
+        onCheckedChange={(v) => table.toggleAllRowsSelected(!!v)}
+        aria-label="Select all"
+      />
     ),
     cell: ({ row }) => {
       const id = `select-${row.id}`;
 
       return (
-        <Label
-          htmlFor={id}
-          className={cn(
-            'flex h-full w-full items-center justify-center px-4',
-            row.original.isDefault ? 'cursor-no-drop' : 'cursor-pointer',
-          )}
-        >
-          <Checkbox
-            id={id}
-            className="pointer-events-none size-4 bg-white"
-            checked={row.getIsSelected()}
-            onCheckedChange={(v) => row.toggleSelected(!!v)}
-            aria-label="Select row"
-            disabled={row.original.isDefault}
-          />
-        </Label>
+        <Checkbox
+          id={id}
+          checked={row.getIsSelected()}
+          onCheckedChange={(v) => row.toggleSelected(!!v)}
+          aria-label="Select row"
+          disabled={row.original.isDefault}
+        />
       );
     },
     meta: { align: 'center', isCheckbox: true },
@@ -81,7 +66,7 @@ export const RolesColumn: ColumnDef<RolesListValues & { count: number }>[] = [
             trigger={
               <div className="inline-block">
                 {row.original.name}
-                <div className="text-foreground/45 h-0.25 -translate-y-0.5 bg-[radial-gradient(circle,currentColor_0.5px,transparent_0.8px)] bg-size-[2.25px_2px] bg-repeat-x"></div>
+                <div className="text-foreground/45 h-0.5 -translate-y-0.5 bg-[radial-gradient(circle,currentColor_0.5px,transparent_0.8px)] bg-size-[2.25px_1.75px] bg-repeat-x"></div>
               </div>
             }
             content={<span>{__('Default role', 'yay-wholesale-b2b')}</span>}
@@ -111,7 +96,7 @@ export const RolesColumn: ColumnDef<RolesListValues & { count: number }>[] = [
           onClick={() => {
             if (count > 0) {
               window.open(
-                window.yayWholesale.user_urls.list + '?role=' + column.row.original.slug,
+                window.yayWholesaleB2BAdmin.user_urls.list + '?role=' + column.row.original.slug,
                 '_blank',
               );
             }
@@ -138,7 +123,7 @@ export const RolesColumn: ColumnDef<RolesListValues & { count: number }>[] = [
         trigger={
           <span className="inline-block p-0">
             {__('MOQ', 'yay-wholesale-b2b')}
-            <div className="text-foreground/45 h-0.25 -translate-y-0.5 bg-[radial-gradient(circle,currentColor_0.5px,transparent_0.8px)] bg-size-[2.25px_2px] bg-repeat-x"></div>
+            <div className="text-foreground/45 h-0.5 -translate-y-0.5 bg-[radial-gradient(circle,currentColor_0.5px,transparent_0.8px)] bg-size-[2.25px_1.75px] bg-repeat-x"></div>
           </span>
         }
         content={<span>{__('Minimum order quantity', 'yay-wholesale-b2b')}</span>}
@@ -155,7 +140,7 @@ export const RolesColumn: ColumnDef<RolesListValues & { count: number }>[] = [
         trigger={
           <span className="inline-block p-0">
             {__('MOA', 'yay-wholesale-b2b')}
-            <div className="text-foreground/45 h-0.25 -translate-y-0.5 bg-[radial-gradient(circle,currentColor_0.5px,transparent_0.8px)] bg-size-[2.25px_2px] bg-repeat-x"></div>
+            <div className="text-foreground/45 h-0.5 -translate-y-0.5 bg-[radial-gradient(circle,currentColor_0.5px,transparent_0.8px)] bg-size-[2.25px_1.75px] bg-repeat-x"></div>
           </span>
         }
         content={<span>{__('Minimum order amount', 'yay-wholesale-b2b')}</span>}
@@ -258,7 +243,7 @@ export const RolesColumn: ColumnDef<RolesListValues & { count: number }>[] = [
               <Ellipsis className="h-4 w-4" />
             </Button>
           </div>
-          <DialogPortalContent className="bw:max-w-md">
+          <DialogContent className="bw:max-w-md">
             <DialogHeader className="bw:border-b-0">
               <DialogTitle>
                 {__('Are you sure you want to delete this role?', 'yay-wholesale-b2b')}
@@ -274,11 +259,17 @@ export const RolesColumn: ColumnDef<RolesListValues & { count: number }>[] = [
               <DialogClose asChild>
                 <Button variant="outline">{__('Cancel', 'yay-wholesale-b2b')}</Button>
               </DialogClose>
-              <Button variant="destructive" onClick={() => deleteRoleById()}>
+              <Button
+                variant="destructive"
+                onClick={() => {
+                  deleteRoleById();
+                  setOpenDialog(false);
+                }}
+              >
                 {__('Continue', 'yay-wholesale-b2b')}
               </Button>
             </DialogFooter>
-          </DialogPortalContent>
+          </DialogContent>
         </Dialog>
       );
     },

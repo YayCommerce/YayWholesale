@@ -1,7 +1,7 @@
 <?php
-namespace Yay_Wholesale_B2B\Engine\Compatibles\YayMail;
+namespace YayWholesaleB2B\Engine\Compatibles\YayMail;
 
-use Yay_Wholesale_B2B\Utils\SingletonTrait;
+use YayWholesaleB2B\Utils\SingletonTrait;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -15,7 +15,7 @@ class AccountRegistrationRejected extends \YayMail\Abstracts\BaseEmail {
 
     protected function __construct() {
         $emails = \WC_Emails::instance()->get_emails();
-        $email  = $emails['Yay_Wholesale_B2B_Account_Registration_Rejected'];
+        $email  = $emails['YayWholesaleB2B_Account_Registration_Rejected'];
         if ( ! $email ) {
             return;
         }

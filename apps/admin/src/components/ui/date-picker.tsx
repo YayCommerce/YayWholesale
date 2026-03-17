@@ -1,4 +1,3 @@
-import * as React from 'react';
 import { ComponentProps, useState } from 'react';
 import { format } from 'date-fns';
 import { Calendar as CalendarIcon } from 'lucide-react';
@@ -45,7 +44,8 @@ export function DatePicker({
         side="bottom"
         align="start"
         sideOffset={5}
-        className="w-auto min-w-0 overflow-hidden p-0">
+        className="w-auto min-w-0 overflow-hidden p-0"
+      >
         <Calendar
           mode="single"
           selected={date}

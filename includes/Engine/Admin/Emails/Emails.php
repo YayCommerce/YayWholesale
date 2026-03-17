@@ -1,7 +1,7 @@
 <?php
-namespace Yay_Wholesale_B2B\Engine\Admin\Emails;
+namespace YayWholesaleB2B\Engine\Admin\Emails;
 
-use Yay_Wholesale_B2B\Utils\SingletonTrait;
+use YayWholesaleB2B\Utils\SingletonTrait;
 
 defined( 'ABSPATH' ) || exit;
 /**
@@ -20,11 +20,11 @@ class Emails {
     }
 
     public function ywhs_register_email_classes( $email_classes ) {
-        $email_classes['Yay_Wholesale_B2B_New_Order_Placed']              = new NewOrderPlaced();
-        $email_classes['Yay_Wholesale_B2B_New_Account_Registered']        = new NewAccountRegistered();
-        $email_classes['Yay_Wholesale_B2B_Account_Registration_Approved'] = new AccountRegistrationApproved();
-        $email_classes['Yay_Wholesale_B2B_Account_Registration_Rejected'] = new AccountRegistrationRejected();
-        $email_classes['Yay_Wholesale_B2B_Account_Registration_Pending']  = new AccountRegistrationPending();
+        $email_classes['YayWholesaleB2B_New_Order_Placed']              = new NewOrderPlaced();
+        $email_classes['YayWholesaleB2B_New_Account_Registered']        = new NewAccountRegistered();
+        $email_classes['YayWholesaleB2B_Account_Registration_Approved'] = new AccountRegistrationApproved();
+        $email_classes['YayWholesaleB2B_Account_Registration_Rejected'] = new AccountRegistrationRejected();
+        $email_classes['YayWholesaleB2B_Account_Registration_Pending']  = new AccountRegistrationPending();
 
         return $email_classes;
     }

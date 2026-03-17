@@ -47,17 +47,16 @@ function DropdownMenuGroup({ ...props }: React.ComponentProps<typeof DropdownMen
   return <DropdownMenuPrimitive.Group data-slot="dropdown-menu-group" {...props} />;
 }
 
-function DropdownMenuItem({
-  className,
-  inset,
-  variant = 'default',
-  ...props
-}: React.ComponentProps<typeof DropdownMenuPrimitive.Item> & {
-  inset?: boolean;
-  variant?: 'default' | 'destructive';
-}) {
+const DropdownMenuItem = React.forwardRef<
+  React.ElementRef<typeof DropdownMenuPrimitive.Item>,
+  React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Item> & {
+    inset?: boolean;
+    variant?: 'default' | 'destructive';
+  }
+>(({ className, inset, variant = 'default', ...props }, ref) => {
   return (
     <DropdownMenuPrimitive.Item
+      ref={ref}
       data-slot="dropdown-menu-item"
       data-inset={inset}
       data-variant={variant}
@@ -68,19 +67,17 @@ function DropdownMenuItem({
       {...props}
     />
   );
-}
+});
 
-function DropdownMenuCheckboxItem({
-  className,
-  children,
-  checked,
-  iconPosition = 'left',
-  ...props
-}: React.ComponentProps<typeof DropdownMenuPrimitive.CheckboxItem> & {
-  iconPosition?: 'left' | 'right';
-}) {
+const DropdownMenuCheckboxItem = React.forwardRef<
+  React.ElementRef<typeof DropdownMenuPrimitive.CheckboxItem>,
+  React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.CheckboxItem> & {
+    iconPosition?: 'left' | 'right';
+  }
+>(({ className, children, checked, iconPosition = 'left', ...props }, ref) => {
   return (
     <DropdownMenuPrimitive.CheckboxItem
+      ref={ref}
       data-slot="dropdown-menu-checkbox-item"
       className={cn(
         "focus:bg-accent focus:text-accent-foreground relative flex cursor-default items-center gap-2 rounded-sm py-1.5 text-sm outline-hidden select-none data-disabled:pointer-events-none data-disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
@@ -103,7 +100,7 @@ function DropdownMenuCheckboxItem({
       {children}
     </DropdownMenuPrimitive.CheckboxItem>
   );
-}
+});
 
 function DropdownMenuRadioGroup({
   ...props
@@ -111,13 +108,13 @@ function DropdownMenuRadioGroup({
   return <DropdownMenuPrimitive.RadioGroup data-slot="dropdown-menu-radio-group" {...props} />;
 }
 
-function DropdownMenuRadioItem({
-  className,
-  children,
-  ...props
-}: React.ComponentProps<typeof DropdownMenuPrimitive.RadioItem>) {
+const DropdownMenuRadioItem = React.forwardRef<
+  React.ElementRef<typeof DropdownMenuPrimitive.RadioItem>,
+  React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.RadioItem>
+>(({ className, children, ...props }, ref) => {
   return (
     <DropdownMenuPrimitive.RadioItem
+      ref={ref}
       data-slot="dropdown-menu-radio-item"
       className={cn(
         "focus:bg-accent focus:text-accent-foreground relative flex cursor-default items-center gap-2 rounded-sm py-1.5 pr-2 pl-8 text-sm outline-hidden select-none data-disabled:pointer-events-none data-disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
@@ -133,7 +130,7 @@ function DropdownMenuRadioItem({
       {children}
     </DropdownMenuPrimitive.RadioItem>
   );
-}
+});
 
 function DropdownMenuLabel({
   className,
@@ -179,29 +176,28 @@ function DropdownMenuSub({ ...props }: React.ComponentProps<typeof DropdownMenuP
   return <DropdownMenuPrimitive.Sub data-slot="dropdown-menu-sub" {...props} />;
 }
 
-function DropdownMenuSubTrigger({
-  className,
-  inset,
-  children,
-  ...props
-}: React.ComponentProps<typeof DropdownMenuPrimitive.SubTrigger> & {
-  inset?: boolean;
-}) {
+const DropdownMenuSubTrigger = React.forwardRef<
+  React.ElementRef<typeof DropdownMenuPrimitive.SubTrigger>,
+  React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.SubTrigger> & {
+    inset?: boolean;
+  }
+>(({ className, inset, children, ...props }, ref) => {
   return (
     <DropdownMenuPrimitive.SubTrigger
+      ref={ref}
       data-slot="dropdown-menu-sub-trigger"
       data-inset={inset}
       className={cn(
-        'focus:bg-accent focus:text-accent-foreground data-[state=open]:bg-accent data-[state=open]:text-accent-foreground flex cursor-default items-center rounded-sm px-2 py-1.5 text-sm outline-hidden select-none data-inset:pl-8',
+        "focus:bg-accent focus:text-accent-foreground data-[state=open]:bg-accent data-[state=open]:text-accent-foreground [&_svg:not([class*='text-'])]:text-muted-foreground relative flex cursor-default items-center gap-2 rounded-sm py-1.5 ps-2 pe-1.5 text-sm outline-hidden select-none data-inset:pl-8 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
         className,
       )}
       {...props}
     >
       {children}
-      <ChevronRightIcon className="ml-auto size-4" />
+      <ChevronRightIcon className="ms-auto size-4" />
     </DropdownMenuPrimitive.SubTrigger>
   );
-}
+});
 
 function DropdownMenuSubContent({
   className,

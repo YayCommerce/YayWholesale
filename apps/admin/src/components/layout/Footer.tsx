@@ -14,7 +14,7 @@ export default function Footer({
   currentMenu: string[];
   onBackToDefault: () => void;
 }) {
-  const [hasReviewed, setHasReviewed] = useState(window.yayWholesale.reviewed || false);
+  const [hasReviewed, setHasReviewed] = useState(window.yayWholesaleB2BAdmin.reviewed || false);
   const [containerRect, setContainerRect] = useState({ left: 0, width: 0 });
   const containerRef = useRef<HTMLDivElement>(null);
   function formatMenuLabel(menu: string) {

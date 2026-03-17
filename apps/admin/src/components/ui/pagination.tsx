@@ -41,7 +41,6 @@ function Pagination({
           variant="outline"
           size="icon"
           onClick={onPreviousPage}
-          className="rounded-sm"
           disabled={!canPreviousPage || disabled}
         >
           <ChevronLeftIcon className="size-4" />
@@ -50,7 +49,6 @@ function Pagination({
           variant="outline"
           size="icon"
           onClick={onNextPage}
-          className="rounded-sm"
           disabled={!canNextPage || disabled}
         >
           <ChevronRightIcon className="size-4" />

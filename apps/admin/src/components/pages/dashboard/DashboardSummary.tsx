@@ -44,7 +44,11 @@ export default function DashboardSummary(props: {
         percent: reportData?.orderIncreaseRate ?? 0,
         desc: 'Total Orders',
         button: () => (
-          <a href={window.yayWholesale.order_urls.list} target="_blank" rel="noopener noreferrer">
+          <a
+            href={window.yayWholesaleB2BAdmin.order_urls.list}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             <Button variant="outline" size="sm" className="text-foreground h-9 leading-0">
               {__('View all orders', 'yay-wholesale-b2b')}
             </Button>
@@ -59,7 +63,11 @@ export default function DashboardSummary(props: {
         percent: reportData?.revenueIncreaseRate ?? 0,
         desc: 'Total Revenue',
         button: () => (
-          <a href={window.yayWholesale.order_urls.list} target="_blank" rel="noopener noreferrer">
+          <a
+            href={window.yayWholesaleB2BAdmin.order_urls.list}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             <Button variant="outline" size="sm" className="text-foreground h-9 leading-0">
               {__('View all revenue', 'yay-wholesale-b2b')}
             </Button>

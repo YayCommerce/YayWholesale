@@ -1,9 +1,8 @@
 import { useCallback, useMemo, useRef, useState } from 'react';
-import { CaretUpDownIcon } from '@phosphor-icons/react';
 import { flexRender, getCoreRowModel, PaginationState, useReactTable } from '@tanstack/react-table';
 import { Spinner } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
-import { Plus, Search } from 'lucide-react';
+import { ChevronsUpDown, Plus, Search } from 'lucide-react';
 
 import { useActiveRolesQuery } from '@/lib/queries/roles';
 import {
@@ -13,7 +12,7 @@ import {
 } from '@/lib/queries/wholesalers';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
-import { BulkActionBox } from '@/components/ui/bulk-actions';
+import { BulkActionBox, BulkActionCloseButton } from '@/components/ui/bulk-actions';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import {
@@ -125,10 +124,7 @@ export default function WholeSalersList() {
             <WholeSaleToolTip
               trigger={
                 <div>
-                  <Badge
-                    variant="muted"
-                    className="text-foreground h-5 min-w-5 rounded-full border-none px-1 tabular-nums"
-                  >
+                  <Badge variant="secondary" className="h-5 min-w-5 px-1 tabular-nums">
                     {totalCount.count}
                   </Badge>
                 </div>
@@ -173,7 +169,11 @@ export default function WholeSalersList() {
               </SelectGroup>
             </SelectContent>
           </Select>
-          <a href={window.yayWholesale.user_urls.add_new} target="_blank" rel="noopener noreferrer">
+          <a
+            href={window.yayWholesaleB2BAdmin.user_urls.add_new}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             <Button
               variant="primary-outline"
               className="hover:bg-primary hover:text-primary-foreground gap-0.25 rounded-sm px-4 shadow-xs"
@@ -212,7 +212,7 @@ export default function WholeSalersList() {
                       header.column.columnDef.meta?.align === 'center'
                         ? 'text-center'
                         : 'text-left',
-                      header.column.columnDef.meta?.isCheckbox ? 'w-[36px] p-0' : 'px-3',
+                      header.column.columnDef.meta?.isCheckbox ? 'w-9' : 'px-3',
                     )}
                   >
                     {flexRender(header.column.columnDef.header, header.getContext())}
@@ -248,7 +248,7 @@ export default function WholeSalersList() {
                         cell.column.columnDef.meta?.align === 'center'
                           ? 'text-center'
                           : 'text-left',
-                        cell.column.columnDef.meta?.isCheckbox ? 'w-[36px] p-0' : 'px-3',
+                        cell.column.columnDef.meta?.isCheckbox ? 'w-9' : 'px-3',
                       )}
                     >
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}
@@ -268,60 +268,47 @@ export default function WholeSalersList() {
       </div>
       {/* Footer */}
       {(table.getPageCount() > 1 || selectedCount > 1) && (
-        <div
-          className={cn(
-            'relative flex flex-col items-center gap-3 sm:flex-row',
-            selectedCount > 1 && !isBulkUpdateWholesalersPending
-              ? 'justify-between'
-              : 'justify-end',
-          )}
-        >
-          {!isBulkUpdateWholesalersPending && (
-            <BulkActionBox selected={selectedCount} onClose={() => table.resetRowSelection()}>
-              <span className="text-foreground text-sm font-normal">
-                {sprintf(__('%d selected', 'yay-wholesale-b2b'), selectedCount)}
-              </span>
-              <Separator orientation="vertical" className="ml-2 h-5!" />
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    className="hover:text-primary hover:bg-primary/6 group flex gap-1.5 px-2.5"
-                  >
-                    <span className="text-sm font-normal">
-                      {__('Wholesaler Role', 'yay-wholesale-b2b')}
-                    </span>
-                    <span className="group-hover:text-primary text-icon flex items-center">
-                      <CaretUpDownIcon size={12} weight="bold" />
-                    </span>
-                  </Button>
-                </DropdownMenuTrigger>
-
-                <DropdownMenuContent
-                  align="start"
-                  sideOffset={9}
-                  className="w-fit min-w-[20px] p-1"
+        <div className="relative flex flex-col items-center gap-3 sm:flex-row">
+          <BulkActionBox visible={selectedCount > 1}>
+            <BulkActionCloseButton onClick={() => table.resetRowSelection()} />
+            <span>{sprintf(__('%d selected', 'yay-wholesale-b2b'), selectedCount)}</span>
+            <Separator orientation="vertical" className="ml-2 h-5!" />
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  className="hover:text-primary hover:bg-primary/6 group flex gap-1.5 px-2.5"
                 >
-                  {activeRoles?.map((role) => (
-                    <DropdownMenuItem
-                      onClick={() =>
-                        bulkUpdateWholesalersRole(
-                          { roleSlug: role.slug },
-                          {
-                            onSuccess: () => {
-                              table.resetRowSelection();
-                            },
+                  <span className="text-sm font-normal">
+                    {__('Wholesaler Role', 'yay-wholesale-b2b')}
+                  </span>
+                  <span className="group-hover:text-primary text-muted-foreground flex items-center">
+                    <ChevronsUpDown className="size-3.5 stroke-[2.5px]" />
+                  </span>
+                </Button>
+              </DropdownMenuTrigger>
+
+              <DropdownMenuContent align="start" sideOffset={9} className="w-fit min-w-[20px] p-1">
+                {activeRoles?.map((role) => (
+                  <DropdownMenuItem
+                    onClick={() => {
+                      if (isBulkUpdateWholesalersPending || isFetchingWholesalers) return;
+                      bulkUpdateWholesalersRole(
+                        { roleSlug: role.slug },
+                        {
+                          onSuccess: () => {
+                            table.resetRowSelection();
                           },
-                        )
-                      }
-                    >
-                      <RolesIcon role={role?.slug} className="mt-0.5 min-h-4 min-w-4" /> {role.name}
-                    </DropdownMenuItem>
-                  ))}
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </BulkActionBox>
-          )}
+                        },
+                      );
+                    }}
+                  >
+                    <RolesIcon role={role?.slug} className="mt-0.5 min-h-4 min-w-4" /> {role.name}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </BulkActionBox>
 
           {table.getPageCount() > 1 && (
             <Pagination

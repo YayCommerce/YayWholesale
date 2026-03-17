@@ -63,6 +63,7 @@ export default function RequestsForm() {
 
   const {
     data,
+    error,
     isLoading: isLoadingRequest,
     isError: isErrorRequest,
   } = useRequestQuery(editRequestId);
@@ -115,14 +116,14 @@ export default function RequestsForm() {
     >
       <SheetContent
         side="right"
-        className="top-[32px] h-[calc(100%-32px)] w-full gap-0 overflow-x-auto pt-0 md:m-2.5 md:h-[calc(100%-52px)] md:min-w-[490px] md:rounded-md"
+        className="overflow-x-auto md:m-2.5 md:h-[calc(100%-52px)] md:min-w-[490px] md:rounded-md"
       >
         {(isLoadingRequest || isErrorRequest) && (
           <div className="absolute inset-0 z-50 flex items-center justify-center bg-white/70">
             <Spinner className="text-muted-foreground size-6 animate-spin" />
           </div>
         )}
-        <SheetHeader className="border-divider border-b p-5">
+        <SheetHeader>
           <div className="flex items-start justify-between gap-2.5">
             <div>
               <SheetTitle className="text-foreground flex items-center gap-2 text-[18px] font-semibold">

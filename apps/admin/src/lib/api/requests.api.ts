@@ -60,15 +60,25 @@ export async function updateRequestStatusById(
   status: RequestFormValues['status'],
   roleId: number,
 ) {
-  let data = { status, role_id: roleId };
+  let data = { role_id: roleId };
 
-  const response = await api.put(`requests/${requestId}/status`, { json: data });
-  const result = await handleResponse<RequestFormValues>(
-    response,
-    __('Failed to update request status', 'yay-wholesale-b2b'),
-  );
+  if (status === 'approved') {
+    const response = await api.put(`requests/${requestId}/approve`, { json: data });
+    const result = await handleResponse<RequestFormValues>(
+      response,
+      __('Failed to update request status', 'yay-wholesale-b2b'),
+    );
 
-  return result;
+    return result;
+  } else {
+    const response = await api.put(`requests/${requestId}/reject`, { json: data });
+    const result = await handleResponse<RequestFormValues>(
+      response,
+      __('Failed to update request status', 'yay-wholesale-b2b'),
+    );
+
+    return result;
+  }
 }
 
 export async function bulkUpdateRequestStatus(
@@ -76,15 +86,23 @@ export async function bulkUpdateRequestStatus(
   status: RequestFormValues['status'],
   roleId: number,
 ) {
-  let data = { ids: requestIds, status, role_id: roleId };
+  let data = { ids: requestIds, role_id: roleId };
 
-  const response = await api.put('requests/bulk-status', { json: data });
-  const result = await handleResponse<RequestFormValues>(
-    response,
-    __('Failed to update request status', 'yay-wholesale-b2b'),
-  );
-
-  return result;
+  if (status === 'approved') {
+    const response = await api.put('requests/bulk-approve', { json: data });
+    const result = await handleResponse<RequestFormValues>(
+      response,
+      __('Failed to update request status', 'yay-wholesale-b2b'),
+    );
+    return result;
+  } else {
+    const response = await api.put('requests/bulk-reject', { json: data });
+    const result = await handleResponse<RequestFormValues>(
+      response,
+      __('Failed to update request status', 'yay-wholesale-b2b'),
+    );
+    return result;
+  }
 }
 
 export async function bulkDeleteRequest(requestIds: number[]) {

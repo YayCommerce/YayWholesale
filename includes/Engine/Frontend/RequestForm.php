@@ -1,10 +1,10 @@
 <?php
 
-namespace Yay_Wholesale_B2B\Engine\Frontend;
+namespace YayWholesaleB2B\Engine\Frontend;
 
-use Yay_Wholesale_B2B\Helpers\RequestsHelper;
-use Yay_Wholesale_B2B\Helpers\SettingsHelper;
-use Yay_Wholesale_B2B\Utils\SingletonTrait;
+use YayWholesaleB2B\Helpers\RequestsHelper;
+use YayWholesaleB2B\Helpers\SettingsHelper;
+use YayWholesaleB2B\Utils\SingletonTrait;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -70,6 +70,20 @@ class RequestForm {
             $first_name_autofill = $user->first_name;
             $last_name_autofill  = $user->last_name;
             $email_autofill      = $user->user_email;
+        }
+
+        if ( empty( $_COOKIE['yaywholesaleb2b_cid'] ) ) {
+            $cid = wp_generate_uuid4();
+
+            setcookie(
+                'yaywholesaleb2b_cid',
+                $cid,
+                time() + MONTH_IN_SECONDS,
+                COOKIEPATH,
+                COOKIE_DOMAIN,
+                is_ssl(),
+                true
+            );
         }
         ob_start();
         ?>
@@ -157,7 +171,7 @@ class RequestForm {
     }
 
     public function create_ywhs_block_request_form_block_init() {
-        $base_dir      = YAY_WHOLESALE_B2B_PLUGIN_DIR . 'assets/dist/blocks/request-form-block/';
+        $base_dir      = YAYWHOLESALEB2B_PLUGIN_DIR . 'assets/dist/blocks/request-form-block/';
         $manifest_file = $base_dir . 'blocks-manifest.php';
 
         if ( ! file_exists( $manifest_file ) ) {

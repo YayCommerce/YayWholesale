@@ -4,12 +4,13 @@ import { __ } from '@wordpress/i18n';
 import { showToast } from '@/components/custom/showToast';
 
 import { updateEmailStatus } from '../api/emails.api';
+import { handleErrorMessage } from '../utils';
 
 export function useWholesaleEmailsQuery() {
   return useQuery({
     queryKey: ['wholesale_emails'],
-    queryFn: async () => window.yayWholesale.wholesale_emails,
-    initialData: window.yayWholesale.wholesale_emails,
+    queryFn: async () => window.yayWholesaleB2BAdmin.wholesale_emails,
+    initialData: window.yayWholesaleB2BAdmin.wholesale_emails,
   });
 }
 
@@ -40,7 +41,7 @@ export function useUpdateEmailStatusMutation() {
       if (context?.previousData) {
         queryClient.setQueryData(['wholesale_emails'], context.previousData);
       }
-      showToast.error(err.message);
+      handleErrorMessage(err);
     },
 
     onSuccess: () => {

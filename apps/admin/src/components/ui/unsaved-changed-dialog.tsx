@@ -3,10 +3,10 @@ import { __ } from '@wordpress/i18n';
 import { Button } from './button';
 import {
   Dialog,
+  DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogPortalContent,
   DialogTitle,
 } from './dialog';
 
@@ -34,7 +34,7 @@ export function UnsavedChangeDialog({
 }: UnsavedChangeDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogPortalContent className="bw:max-w-md">
+      <DialogContent className="bw:max-w-md">
         <DialogHeader className="bw:border-b-0">
           <DialogTitle>{__('Unsaved Changes', 'yay-wholesale-b2b')}</DialogTitle>
           {children}
@@ -46,7 +46,7 @@ export function UnsavedChangeDialog({
           </Button>
           <Button onClick={onSave}>{__('Save Changes', 'yay-wholesale-b2b')}</Button>
         </DialogFooter>
-      </DialogPortalContent>
+      </DialogContent>
     </Dialog>
   );
 }

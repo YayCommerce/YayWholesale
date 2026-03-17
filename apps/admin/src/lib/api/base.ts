@@ -1,7 +1,7 @@
 import { __ } from '@wordpress/i18n';
 import ky, { Options, ResponsePromise } from 'ky';
 
-const YayWholesaleConfig = window?.yayWholesale || {};
+const YayWholesaleConfig = window?.yayWholesaleB2BAdmin || {};
 
 let _ky = ky.create({
   prefixUrl: YayWholesaleConfig.rest_url,

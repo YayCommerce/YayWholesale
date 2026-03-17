@@ -41,7 +41,7 @@ const NAV_ITEMS = [
               <div>
                 <Badge
                   variant="destructive"
-                  className={cn('h-5 min-w-5 px-1 tabular-nums', props.classname)}
+                  className={cn('h-5 min-w-5 px-1 leading-0 tabular-nums', props.classname)}
                 >
                   {data.count}
                 </Badge>
@@ -111,7 +111,7 @@ export default function Header() {
       {/* Logo */}
       <div className="border-border flex h-full bg-[#FFF5DB] px-[3px] pt-[3px]">
         <img
-          src={`${window.yayWholesale.plugin_url}/assets/images/favicon.svg`}
+          src={`${window.yayWholesaleB2BAdmin.plugin_url}/assets/images/favicon.svg`}
           alt="YayWholesale"
           className="h-[50px] w-[50px]"
         />

@@ -1,5 +1,8 @@
 <?php
-namespace Yay_Wholesale_B2B\Helpers;
+namespace YayWholesaleB2B\Helpers;
+
+use WP_User_Query;
+use YayWholesaleB2B\Utils\Utils;
 
 /**
  * Roles Helper Class
@@ -12,12 +15,12 @@ class RolesHelper {
      * @param int $user_id The user ID.
      * @return array|null The user role or null if not found.
      */
-    public static function is_wholesale_user( int $user_id = 0 ): array|null {
+    public static function is_wholesale_user( int $user_id = 0 ) {
         if ( ! is_user_logged_in() ) {
             return null;
         }
 
-        $roles          = get_option( 'yay_wholesale_b2b_roles', [] );
+        $roles          = get_option( 'yaywholesaleb2b_roles', [] );
         $user           = $user_id > 0 ? get_user_by( 'ID', $user_id ) : wp_get_current_user();
         $user_role_slug = self::get_user_wholesale_role( $user, $roles );
         if ( ! $user_role_slug ) {
@@ -87,7 +90,7 @@ class RolesHelper {
      * @return string|null The wholesale role slug or null if not found.
      */
     public static function get_user_wholesale_role( \WP_User $user, array $roles ): ?string {
-        $meta_slug = get_user_meta( $user->ID, '_yay_wholesale_b2b_role', true );
+        $meta_slug = get_user_meta( $user->ID, '_yaywholesaleb2b_role', true );
         if ( $meta_slug ) {
             return sanitize_title( $meta_slug );
         }
@@ -110,12 +113,55 @@ class RolesHelper {
      * @return void
      */
     public static function remove_ywhs_role_from_user( \WP_User $user ): void {
-        $role_slugs = array_column( get_option( 'yay_wholesale_b2b_roles', [] ), 'slug' );
+        $role_slugs = array_column( get_option( 'yaywholesaleb2b_roles', [] ), 'slug' );
 
         foreach ( $role_slugs as $ywhs_role ) {
             if ( in_array( $ywhs_role, $user->roles, true ) ) {
                 $user->remove_role( $ywhs_role );
             }
         }
+    }
+
+    /**
+     * Handle the data of roles list option with setting
+     *
+     * @param array $roles The roles option.
+     * @param array $settings The settings.
+     * @return array
+     */
+    public static function handle_roles_data( array $roles, array $settings ) {
+        foreach ( $roles as $key => &$role ) {
+            $slug          = $role['slug'] ?? sanitize_title( $role['name'] );
+            $user_query    = new WP_User_Query(
+                [
+                    'role'   => $slug,
+                    'fields' => 'ID',
+                    'number' => -1,
+                ]
+            );
+            $count         = $user_query->get_total();
+            $role['count'] = $count;
+            if ( $count > 0 ) {
+                $role['role_url'] = admin_url( 'users.php?role=' . rawurlencode( $slug ) );
+            }
+            $role['isDefault'] = $slug === $settings['general']['default_role'];
+
+            if ( $role['isDefault'] ) {
+                $default_index = $key;
+            }
+
+            if ( ! Utils::is_pro() ) {
+                $role['minOrderQuantity'] = 0;
+            }
+        }//end foreach
+
+        if ( isset( $default_index ) && $default_index < count( $roles ) - 1 ) {
+            $default_role = $roles[ $default_index ];
+            unset( $roles[ $default_index ] );
+            $roles   = array_values( $roles );
+            $roles[] = $default_role;
+        }
+
+        return $roles;
     }
 }

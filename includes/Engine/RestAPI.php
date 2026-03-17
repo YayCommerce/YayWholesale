@@ -1,12 +1,12 @@
 <?php
-namespace Yay_Wholesale_B2B\Engine;
+namespace YayWholesaleB2B\Engine;
 
-use Yay_Wholesale_B2B\Controllers\ReportsRestController;
-use Yay_Wholesale_B2B\Controllers\RequestRestController;
-use Yay_Wholesale_B2B\Controllers\RolesRestController;
-use Yay_Wholesale_B2B\Controllers\SettingsRestController;
-use Yay_Wholesale_B2B\Controllers\WholeSalersController;
-use Yay_Wholesale_B2B\Utils\SingletonTrait;
+use YayWholesaleB2B\Controllers\ReportsRestController;
+use YayWholesaleB2B\Controllers\RequestRestController;
+use YayWholesaleB2B\Controllers\RolesRestController;
+use YayWholesaleB2B\Controllers\SettingsRestController;
+use YayWholesaleB2B\Controllers\WholeSalersController;
+use YayWholesaleB2B\Utils\SingletonTrait;
 
 
 defined( 'ABSPATH' ) || exit;

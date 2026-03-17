@@ -5,7 +5,7 @@
  * @package YayWholesale
  */
 
-namespace Yay_Wholesale_B2B\YayCommerceMenu;
+namespace YayWholesaleB2B\YayCommerceMenu;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -47,15 +47,16 @@ class RegisterMenu {
      * Constructor
      */
     public function __construct() {
-        if ( ! defined( 'YAY_WHOLESALE_B2B_MENU_ORDER' ) ) {
-            define( 'YAY_WHOLESALE_B2B_MENU_ORDER', 2 );
+        if ( ! defined( 'YAYWHOLESALEB2B_MENU_ORDER' ) ) {
+            define( 'YAYWHOLESALEB2B_MENU_ORDER', 2 );
         }
-        if ( ! defined( 'YAY_WHOLESALE_B2B_MENU_PRIORITY' ) ) {
-            define( 'YAY_WHOLESALE_B2B_MENU_PRIORITY', 90 );
+        if ( ! defined( 'YAYWHOLESALEB2B_MENU_PRIORITY' ) ) {
+            define( 'YAYWHOLESALEB2B_MENU_PRIORITY', 90 );
         }
         add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_yaycommerce_menu_scripts' ] );
         add_action( 'admin_menu', [ $this, 'settings_menu' ] );
-        add_action( 'admin_menu', [ $this, 'add_placeholder_menu' ], YAY_WHOLESALE_B2B_MENU_PRIORITY + 1 );
+        add_action( 'admin_menu', [ $this, 'add_placeholder_menu' ], YAYWHOLESALEB2B_MENU_PRIORITY + 1 );
+        OtherPluginsMenu::get_instance();
     }
 
     /**
@@ -78,6 +79,49 @@ class RegisterMenu {
             'capability'         => 'manage_options',
             'render_callback'    => false,
             'load_data_callback' => false,
+        ];
+
+        /**
+         * Temporarily until all Yay plugins has the same code
+         */
+        if ( function_exists( 'YAYDP\\load_plugin' ) && class_exists( '\YAYDP\License\License_Handler' ) ) {
+            $licensing_plugins_yay_pricing = \YAYDP\License\License_Handler::get_licensing_plugins();
+        }
+
+        if ( function_exists( 'YayMail\\plugin_init' ) && class_exists( '\YayMail\License\LicenseHandler' ) ) {
+            $licensing_plugins_yay_mail = \YayMail\License\LicenseHandler::get_licensing_plugins();
+        }
+
+        if ( function_exists( 'Yay_Swatches\\init' ) && class_exists( '\Yay_Swatches\License\LicenseHandler' ) ) {
+            $licensing_plugins_yay_swatches = \Yay_Swatches\License\LicenseHandler::get_licensing_plugins();
+        }
+        if ( function_exists( 'YayExtra\\plugins_loaded' ) && class_exists( '\YayExtra\License\LicenseHandler' ) ) {
+            $licensing_plugins_yay_extra = \YayExtra\License\LicenseHandler::get_licensing_plugins();
+        }
+
+        if ( function_exists( 'YaySMTP\\init' ) && class_exists( '\YaySMTP\License\LicenseHandler' ) ) {
+            $licensing_plugins_yay_smtp = \YaySMTP\License\LicenseHandler::get_licensing_plugins();
+        }
+        /** -------- */
+
+        $yay_licensing_plugins = apply_filters( 'yaycommerce_licensing_plugins', [] );
+
+        if ( ! empty( $licensing_plugins_yay_mail ) || ! empty( $licensing_plugins_yay_pricing ) || ! empty( $licensing_plugins_yay_swatches ) || ! empty( $licensing_plugins_yay_extra ) || ! empty( $licensing_plugins_yay_smtp ) || ! empty( $yay_licensing_plugins ) ) {
+            $submenus['yaycommerce-licenses'] = [
+                'parent'             => 'yaycommerce',
+                'name'               => __( 'Licenses', 'yay-wholesale-b2b' ),
+                'capability'         => 'manage_options',
+                'render_callback'    => [ '\YayWholesaleB2B\YayCommerceMenu\LicensesMenu', 'render' ],
+                'load_data_callback' => [ '\YayWholesaleB2B\YayCommerceMenu\LicensesMenu', 'load_data' ],
+            ];
+        }
+
+        $submenus['yaycommerce-other-plugins'] = [
+            'parent'             => 'yaycommerce',
+            'name'               => __( 'Other plugins', 'yay-wholesale-b2b' ),
+            'capability'         => 'manage_options',
+            'render_callback'    => [ '\YayWholesaleB2B\YayCommerceMenu\OtherPluginsMenu', 'render' ],
+            'load_data_callback' => [ '\YayWholesaleB2B\YayCommerceMenu\OtherPluginsMenu', 'load_data' ],
         ];
 
         return $submenus;

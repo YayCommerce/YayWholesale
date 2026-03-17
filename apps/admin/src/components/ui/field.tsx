@@ -53,7 +53,7 @@ function FieldGroup({ className, ...props }: React.ComponentProps<'div'>) {
   );
 }
 
-const fieldVariants = cva('group/field flex w-full gap-2 data-[invalid=true]:text-destructive', {
+const fieldVariants = cva('group/field flex w-full gap-1.5', {
   variants: {
     orientation: {
       vertical: ['flex-col [&>*]:w-auto [&>.sr-only]:w-auto', '[&>[data-slot=field-label]]:w-fit'],
@@ -105,7 +105,7 @@ function FieldLabel({ className, ...props }: React.ComponentProps<typeof Label>)
     <Label
       data-slot="field-label"
       className={cn(
-        'group/field-label peer/field-label flex w-fit gap-2 text-xs leading-snug group-data-[disabled=true]/field:opacity-50',
+        'group/field-label peer/field-label flex w-fit gap-2 text-[13px] leading-snug group-data-[disabled=true]/field:opacity-50',
         'has-[>[data-slot=field]]:w-full has-[>[data-slot=field]]:flex-col has-[>[data-slot=field]]:rounded-md has-[>[data-slot=field]]:border *:data-[slot=field]:p-4',
         'has-data-[state=checked]:bg-primary/5 has-data-[state=checked]:border-primary dark:has-data-[state=checked]:bg-primary/10',
         'text-foreground',

@@ -16,6 +16,7 @@ import {
 import { showToast } from '@/components/custom/showToast';
 
 import { RoleFormValues } from '../schema/roles';
+import { getRoles, handleErrorMessage } from '../utils';
 
 const QUERY_KEY = ['roles'];
 
@@ -24,6 +25,7 @@ function rolesOptions() {
     queryKey: ['roles'],
     queryFn: () => fetchRoles(),
     staleTime: 15 * 60 * 1000,
+    placeholderData: (previousData) => previousData ?? getRoles(),
   });
 }
 
@@ -36,6 +38,7 @@ export function useActiveRolesQuery() {
   return useQuery({
     queryKey: ['roles', { active: true }],
     queryFn: () => fetchActiveRoles(),
+    placeholderData: (previousData) => previousData ?? getRoles().filter((role) => role.status),
   });
 }
 
@@ -69,9 +72,7 @@ export function useAddRoleMutation() {
       queryClient.invalidateQueries({ queryKey: QUERY_KEY });
       navigate('/roles');
     },
-    onError: (error: Error) => {
-      showToast.error(error.message);
-    },
+    onError: handleErrorMessage,
   });
 }
 
@@ -87,9 +88,7 @@ export function useUpdateRoleMutation(roleId: number) {
       queryClient.invalidateQueries({ queryKey: QUERY_KEY });
       navigate('/roles');
     },
-    onError: (error: Error) => {
-      showToast.error(error.message);
-    },
+    onError: handleErrorMessage,
   });
 }
 
@@ -102,9 +101,7 @@ export function useDeleteRoleMutation(roleId: number) {
       showToast.success(response.message);
       queryClient.invalidateQueries({ queryKey: QUERY_KEY });
     },
-    onError: (error: Error) => {
-      showToast.error(error.message);
-    },
+    onError: handleErrorMessage,
   });
 }
 
@@ -119,9 +116,7 @@ export function useDeleteManyRolesMutation() {
         queryClient.invalidateQueries({ queryKey: QUERY_KEY });
       }
     },
-    onError: (error: Error) => {
-      showToast.error(error.message);
-    },
+    onError: handleErrorMessage,
   });
 }
 
@@ -134,11 +129,10 @@ export function useUpdateRoleStatusMutation(roleId: number) {
       showToast.success(response.message);
       queryClient.invalidateQueries({ queryKey: ['role', roleId] });
       queryClient.invalidateQueries({ queryKey: QUERY_KEY });
+      queryClient.invalidateQueries({ queryKey: ['wholesalers'] });
       navigate('/roles');
     },
-    onError: (error: Error) => {
-      showToast.error(error.message);
-    },
+    onError: handleErrorMessage,
   });
 }
 
@@ -152,9 +146,8 @@ export function useBulkUpdateRoleStatusMutation() {
       if (!queryClient.isFetching({ queryKey: QUERY_KEY })) {
         queryClient.invalidateQueries({ queryKey: QUERY_KEY });
       }
+      queryClient.invalidateQueries({ queryKey: ['wholesalers'] });
     },
-    onError: (error: Error) => {
-      showToast.error(error.message);
-    },
+    onError: handleErrorMessage,
   });
 }

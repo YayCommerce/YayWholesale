@@ -1,10 +1,12 @@
 <?php
-namespace Yay_Wholesale_B2B\Engine\Admin;
+namespace YayWholesaleB2B\Engine\Admin;
 
-use Yay_Wholesale_B2B\Utils\SingletonTrait;
-use Yay_Wholesale_B2B\Helpers\SettingsHelper;
-use Yay_Wholesale_B2B\Engine\Register\ScriptName;
-use Yay_Wholesale_B2B\Helpers\RequestsHelper;
+use YayWholesaleB2B\Utils\SingletonTrait;
+use YayWholesaleB2B\Helpers\SettingsHelper;
+use YayWholesaleB2B\Engine\Register\ScriptName;
+use YayWholesaleB2B\Helpers\RequestsHelper;
+use YayWholesaleB2B\Helpers\RolesHelper;
+use YayWholesaleB2B\Utils\Utils;
 
 defined( 'ABSPATH' ) || exit;
 /**
@@ -19,9 +21,9 @@ class Settings {
         // Register Custom Post Type
         add_action( 'init', [ $this, 'register_ywhs_request_post_type' ] );
 
-        add_action( 'admin_menu', [ $this, 'admin_menu' ], YAY_WHOLESALE_B2B_MENU_PRIORITY );
+        add_action( 'admin_menu', [ $this, 'admin_menu' ], YAYWHOLESALEB2B_MENU_PRIORITY );
 
-        add_filter( 'plugin_action_links_' . YAY_WHOLESALE_B2B_BASE_NAME, [ $this, 'add_action_links' ] );
+        add_filter( 'plugin_action_links_' . YAYWHOLESALEB2B_BASE_NAME, [ $this, 'add_action_links' ] );
 
         add_filter( 'plugin_row_meta', [ $this, 'add_document_support_links' ], 10, 2 );
 
@@ -73,18 +75,18 @@ class Settings {
     }
 
     public function add_action_links( $links ) {
-        $links = array_merge(
-            [
-                '<a href="' . esc_url( admin_url( '/admin.php?page=yay_wholesale' ) ) . '">' . __( 'Settings', 'yay-wholesale-b2b' ) . '</a>',
-            ],
-            $links
-        );
+        $action_links = [
+            '<a href="' . esc_url( admin_url( '/admin.php?page=yay_wholesale' ) ) . '">' . __( 'Settings', 'yay-wholesale-b2b' ) . '</a>',
+        ];
+        if ( ! Utils::is_pro() ) {
+            $links[] = '<a target="_blank" href="https://yaycommerce.com/yay-wholesale-b2b-for-woocommerce/" style="color: #43B854; font-weight: bold">' . __( 'Go Pro', 'yay-wholesale-b2b' ) . '</a>';
+        }
 
-        return $links;
+        return array_merge( $action_links, $links );
     }
 
     public function add_document_support_links( $links, $file ) {
-        if ( strpos( $file, YAY_WHOLESALE_B2B_BASE_NAME ) !== false ) {
+        if ( strpos( $file, YAYWHOLESALEB2B_BASE_NAME ) !== false ) {
             $new_links = [
                 'doc'     => '<a href="https://yaycommerce.com/ " target="_blank">' . __( 'Docs', 'yay-wholesale-b2b' ) . '</a>',
                 'support' => '<a href="https://yaycommerce.com/support/" target="_blank" aria-label="' . esc_attr__( 'Visit community forums', 'yay-wholesale-b2b' ) . '">' . esc_html__( 'Support', 'yay-wholesale-b2b' ) . '</a>',
@@ -112,9 +114,12 @@ class Settings {
             return;
         }
 
+        $settings = SettingsHelper::get_settings();
+        $roles    = get_option( 'yaywholesaleb2b_roles', [] );
+
         wp_localize_script(
             ScriptName::PAGE_SETTINGS,
-            'yayWholesale',
+            'yayWholesaleB2BAdmin',
             [
                 'user_urls'        => [
                     'list'    => esc_url_raw( admin_url( 'users.php' ) ),
@@ -139,7 +144,7 @@ class Settings {
                 'order_urls'       => [
                     'list' => esc_url_raw( admin_url( 'edit.php?post_type=shop_order' ) ),
                 ],
-                'plugin_url'       => YAY_WHOLESALE_B2B_PLUGIN_URL,
+                'plugin_url'       => YAYWHOLESALEB2B_PLUGIN_URL,
                 'rest_url'         => esc_url_raw( rest_url() ),
                 'rest_nonce'       => wp_create_nonce( 'wp_rest' ),
                 'rest_base'        => 'yay-wholesale/v1',
@@ -151,10 +156,10 @@ class Settings {
                     'decimal_sep'  => get_option( 'woocommerce_price_decimal_sep' ),
                     'num_decimals' => intval( get_option( 'woocommerce_price_num_decimals' ) ),
                 ],
-                'settings'         => SettingsHelper::get_settings(),
+                'settings'         => $settings,
                 'wholesale_emails' => SettingsHelper::get_email_templates(),
-                'roles'            => get_option( 'yay_wholesale_b2b_roles', [] ),
-                'reviewed'         => get_option( 'yay_wholesale_b2b_reviewed', false ),
+                'roles'            => RolesHelper::handle_roles_data( $roles, $settings ),
+                'reviewed'         => get_option( 'yaywholesaleb2b_reviewed', false ),
                 'day_format'       => get_option( 'date_format' ),
                 'time_format'      => get_option( 'time_format' ),
             ]
@@ -165,6 +170,6 @@ class Settings {
     }
 
     public function admin_enqueue_admin_styles() {
-        wp_enqueue_style( 'yay-wholesale-admin-styles', YAY_WHOLESALE_B2B_PLUGIN_URL . 'assets/css/admin_styles.css', [], YAY_WHOLESALE_B2B_VERSION );
+        wp_enqueue_style( 'yay-wholesale-admin-styles', YAYWHOLESALEB2B_PLUGIN_URL . 'assets/css/admin_styles.css', [], YAYWHOLESALEB2B_VERSION );
     }
 }

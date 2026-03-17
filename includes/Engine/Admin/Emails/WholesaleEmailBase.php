@@ -1,5 +1,5 @@
 <?php
-namespace Yay_Wholesale_B2B\Engine\Admin\Emails;
+namespace YayWholesaleB2B\Engine\Admin\Emails;
 
 use WC_Email;
 

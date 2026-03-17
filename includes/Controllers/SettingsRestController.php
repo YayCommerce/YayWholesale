@@ -1,7 +1,7 @@
 <?php
-namespace Yay_Wholesale_B2B\Controllers;
+namespace YayWholesaleB2B\Controllers;
 
-use Yay_Wholesale_B2B\Utils\SingletonTrait;
+use YayWholesaleB2B\Utils\SingletonTrait;
 use WP_REST_Request;
 use WP_REST_Response;
 
@@ -25,7 +25,7 @@ class SettingsRestController extends BaseRestController {
                 [
                     'methods'             => 'POST',
                     'callback'            => [ $this, 'manage_settings' ],
-                    'permission_callback' => [ $this, 'settings_permission_callback' ],
+                    'permission_callback' => [ $this, 'can_manage_settings' ],
                 ],
             ]
         );
@@ -36,7 +36,7 @@ class SettingsRestController extends BaseRestController {
             [
                 'methods'             => 'POST',
                 'callback'            => [ $this, 'mark_reviewed' ],
-                'permission_callback' => [ $this, 'settings_permission_callback' ],
+                'permission_callback' => [ $this, 'can_manage_settings' ],
             ]
         );
 
@@ -46,22 +46,9 @@ class SettingsRestController extends BaseRestController {
             [
                 'methods'             => 'POST',
                 'callback'            => [ $this, 'update_email_status' ],
-                'permission_callback' => [ $this, 'settings_permission_callback' ],
+                'permission_callback' => [ $this, 'can_manage_settings' ],
             ]
         );
-    }
-
-    /**
-     * Check if the user has the necessary permissions to access the settings endpoints.
-     *
-     * @return bool|WP_Error True if the user has the necessary permissions, otherwise a WP_Error object.
-     */
-    public function settings_permission_callback() {
-        if ( ! current_user_can( 'manage_options' ) || ! current_user_can( 'manage_woocommerce' ) ) {
-            return new \WP_Error( 'rest_forbidden', esc_html__( 'Forbidden.', 'yay-wholesale-b2b' ), [ 'status' => 401 ] );
-        }
-
-        return true;
     }
 
     /**
@@ -77,7 +64,7 @@ class SettingsRestController extends BaseRestController {
             return $this->error( __( 'Invalid settings data', 'yay-wholesale-b2b' ) );
         }
 
-        update_option( 'yay_wholesale_b2b_settings', $params );
+        update_option( 'yaywholesaleb2b_settings', $params );
 
         return $this->success( [], __( 'Settings saved!', 'yay-wholesale-b2b' ) );
     }
@@ -88,7 +75,7 @@ class SettingsRestController extends BaseRestController {
      * @return WP_REST_Response The response object.
      */
     public function mark_reviewed(): WP_REST_Response {
-        update_option( 'yay_wholesale_b2b_reviewed', true );
+        update_option( 'yaywholesaleb2b_reviewed', true );
         return $this->success();
     }
 
@@ -129,7 +116,7 @@ class SettingsRestController extends BaseRestController {
             $settings = $this->get_email_settings_by_id( $email_id );
 
             if ( empty( $settings ) ) {
-                return $this->error( __( 'Email settings not found for this email ID', 'yay-wholesale-b2b' ) );
+                return $this->error( __( 'Email settings not found for this email ID', 'yay-wholesale-b2b' ), 404 );
             }
         }
 
@@ -149,5 +136,18 @@ class SettingsRestController extends BaseRestController {
         update_option( $option_key, $settings, 'yes' );
 
         return $this->success( [], __( 'Email status updated!', 'yay-wholesale-b2b' ) );
+    }
+
+    /**
+     * Check if the user has the necessary permissions to access the settings endpoints.
+     *
+     * @return bool|WP_Error True if the user has the necessary permissions, otherwise a WP_Error object.
+     */
+    public function can_manage_settings() {
+        if ( ! current_user_can( 'manage_options' ) || ! current_user_can( 'manage_woocommerce' ) ) {
+            return new \WP_Error( 'rest_forbidden', esc_html__( 'Forbidden.', 'yay-wholesale-b2b' ), [ 'status' => 401 ] );
+        }
+
+        return true;
     }
 }

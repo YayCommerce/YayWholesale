@@ -1,5 +1,5 @@
 <?php
-namespace Yay_Wholesale_B2B\Controllers;
+namespace YayWholesaleB2B\Controllers;
 
 use WP_REST_Request;
 use WP_REST_Response;
@@ -34,7 +34,7 @@ abstract class BaseRestController {
      * @param int    $status The HTTP status code.
      * @return WP_REST_Response The response object.
      */
-    protected function error( string $message, int $status = 200 ): WP_REST_Response {
+    protected function error( string $message, int $status = 400 ): WP_REST_Response {
         return new WP_REST_Response(
             [
                 'success' => false,

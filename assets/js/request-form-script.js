@@ -6,20 +6,20 @@ jQuery(document).ready(() => {
         const {__} = window.wp.i18n;
 
         var formData = jQuery(this).serialize();
-        var yayWholesale = window.yayWholesale;
+        var yayWholesaleB2B = window.yayWholesaleB2B;
 
         jQuery("#ywhs_request_form button[type='submit']").css('opacity', '0.5');
 
         jQuery("#ywhs_request_form button[type='submit']").attr("disabled", "disabled");
 
         jQuery.ajax({
-            url: `${yayWholesale.rest_url}${yayWholesale.rest_base}/requests`, 
+            url: `${yayWholesaleB2B.rest_url}${yayWholesaleB2B.rest_base}/requests`, 
             type: 'POST',
             beforeSend: function(xhr) {
-                if (!yayWholesale || !yayWholesale.rest_nonce)
+                if (!yayWholesaleB2B || !yayWholesaleB2B.rest_nonce)
                     return;
 
-                xhr.setRequestHeader('X-WP-Nonce', yayWholesale.rest_nonce);
+                xhr.setRequestHeader('X-WP-Nonce', yayWholesaleB2B.rest_nonce);
               },
             data: formData,
             success: (response) => {
@@ -55,7 +55,7 @@ const parseWPCurrency = (price) => {
     }
   
     const { symbol, position, thousand_sep, decimal_sep, num_decimals } =
-      window.yayWholesale.currency_data;
+      window.yayWholesaleB2B.currency_data;
   
     const formattedPrice = price
       .toFixed(num_decimals)

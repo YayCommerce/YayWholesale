@@ -1,5 +1,4 @@
 import { useMemo, useState } from 'react';
-import { CaretUpDownIcon } from '@phosphor-icons/react';
 import { useQueryClient } from '@tanstack/react-query';
 import {
   flexRender,
@@ -10,7 +9,7 @@ import {
 } from '@tanstack/react-table';
 import { Spinner } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
-import { Plus, Search } from 'lucide-react';
+import { ChevronsUpDown, Plus, Search } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 import {
@@ -20,16 +19,16 @@ import {
 } from '@/lib/queries/roles';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
-import { BulkActionBox } from '@/components/ui/bulk-actions';
+import { BulkActionBox, BulkActionCloseButton } from '@/components/ui/bulk-actions';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import {
   Dialog,
   DialogClose,
+  DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogPortalContent,
   DialogTitle,
 } from '@/components/ui/dialog';
 import {
@@ -93,18 +92,23 @@ export default function RolesList() {
   });
 
   const selectedCount = table.getFilteredSelectedRowModel().rows.length;
-  const selectedRowsIds = table.getSelectedRowModel().rows.map((row) => row.original.id);
+  const selectedRowsIds = useMemo(
+    () => table.getSelectedRowModel().rows.map((row) => row.original.id),
+    [selectedCount],
+  );
 
   const clearSelection = () => {
     table.resetRowSelection();
   };
 
   const handleBulkDelete = () => {
+    if (isDeletingManyRolesPending || isBulkUpdatingRoleStatusPending || isFetchingRoles) return;
     deleteManyRolesByIds(selectedRowsIds, {
       onSuccess: () => {
         clearSelection();
       },
     });
+    setOpenDeleteDialog(false);
   };
 
   return (
@@ -117,10 +121,7 @@ export default function RolesList() {
             <WholeSaleToolTip
               trigger={
                 <div>
-                  <Badge
-                    variant="muted"
-                    className="text-foreground h-5 min-w-5 rounded-full border-none px-1 tabular-nums"
-                  >
+                  <Badge variant="secondary" className="h-5 min-w-5 px-1 tabular-nums">
                     {totalCount}
                   </Badge>
                 </div>
@@ -180,11 +181,10 @@ export default function RolesList() {
                   <TableHead
                     key={header.id}
                     className={cn(
-                      'text-foreground-400 py-2 text-sm font-medium',
                       header.column.columnDef.meta?.align === 'center'
                         ? 'text-center'
                         : 'text-left',
-                      header.column.columnDef.meta?.isCheckbox ? 'w-[36px] p-0' : 'px-3',
+                      header.column.columnDef.meta?.isCheckbox ? 'w-9' : 'px-3',
                     )}
                   >
                     {flexRender(header.column.columnDef.header, header.getContext())}
@@ -213,12 +213,13 @@ export default function RolesList() {
                     <TableCell
                       key={cell.id}
                       className={cn(
-                        'text-foreground h-13 cursor-pointer text-sm font-normal',
                         cell.column.columnDef.meta?.align === 'center'
                           ? 'text-center'
                           : 'text-left',
-                        cell.column.columnDef.meta?.isCheckbox ? 'w-[36px] p-0' : 'px-3',
+                        cell.column.columnDef.meta?.isCheckbox ? 'w-9' : 'px-3',
                         cell.column.id === 'actions' && 'm-0 flex w-25 justify-end lg:w-full',
+                        ['select', 'actions', 'status'].indexOf(cell.column.id) < 0 &&
+                          'cursor-pointer',
                       )}
                       onClick={() => {
                         if (['select', 'actions', 'status'].indexOf(cell.column.id) < 0) {
@@ -250,113 +251,109 @@ export default function RolesList() {
 
       {/* Pagination Footer */}
       {(table.getPageCount() > 1 || selectedCount > 1) && (
-        <div
-          className={cn(
-            'relative flex flex-col items-center gap-3 sm:flex-row',
-            selectedCount > 1 && !(isDeletingManyRolesPending || isBulkUpdatingRoleStatusPending)
-              ? 'justify-between'
-              : 'justify-end',
-          )}
-        >
-          {!(isDeletingManyRolesPending || isBulkUpdatingRoleStatusPending) && (
-            <BulkActionBox selected={selectedCount} onClose={() => table.resetRowSelection()}>
-              <span className="text-foreground text-sm font-normal">
-                {sprintf(__('%d selected', 'yay-wholesale-b2b'), selectedCount)}
-              </span>
-              <Separator orientation="vertical" className="ml-2 h-5!" />
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
+        <div className="relative flex flex-col items-center gap-3 sm:flex-row">
+          <BulkActionBox visible={selectedCount > 1}>
+            <BulkActionCloseButton onClick={() => table.resetRowSelection()} />
+            <span>{sprintf(__('%d selected', 'yay-wholesale-b2b'), selectedCount)}</span>
+            <Separator orientation="vertical" className="ml-2 h-5!" />
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  className="hover:text-primary hover:bg-primary/6 group flex gap-1.5 px-2.5"
+                >
+                  <span className="text-sm font-normal">{__('Status', 'yay-wholesale-b2b')}</span>
+                  <span className="group-hover:text-primary text-muted-foreground flex items-center">
+                    <ChevronsUpDown className="size-3.5 stroke-[2.5px]" />
+                  </span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" sideOffset={9} className="w-fit min-w-[20px] p-1">
+                <DropdownMenuItem
+                  onClick={() => {
+                    if (
+                      isDeletingManyRolesPending ||
+                      isBulkUpdatingRoleStatusPending ||
+                      isFetchingRoles
+                    )
+                      return;
+                    bulkUpdateRoleStatus(
+                      { ids: selectedRowsIds, status: true },
+                      {
+                        onSuccess: () => {
+                          clearSelection();
+                        },
+                      },
+                    );
+                  }}
+                >
+                  {__('Active', 'yay-wholesale-b2b')}
+                </DropdownMenuItem>
+
+                <DropdownMenuItem
+                  onClick={() => {
+                    if (
+                      isDeletingManyRolesPending ||
+                      isBulkUpdatingRoleStatusPending ||
+                      isFetchingRoles
+                    )
+                      return;
+                    bulkUpdateRoleStatus(
+                      { ids: selectedRowsIds, status: false },
+                      {
+                        onSuccess: () => {
+                          clearSelection();
+                        },
+                      },
+                    );
+                  }}
+                >
+                  {__('Inactive', 'yay-wholesale-b2b')}
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+            <span className="border-divider h-5 w-px border-r border-solid" aria-hidden />
+            <Dialog open={openBulkDeleteDialog} onOpenChange={setOpenDeleteDialog}>
+              <WholeSaleToolTip
+                trigger={
                   <Button
                     variant="ghost"
-                    className="hover:text-primary hover:bg-primary/6 group flex gap-1.5 px-2.5"
+                    size="icon"
+                    className="hover:text-destructive text-muted-foreground h-8 w-8 shrink-0 hover:bg-transparent hover:shadow-sm"
+                    onClick={() => setOpenDeleteDialog(true)}
+                    aria-label="Delete selected"
                   >
-                    <span className="text-sm font-normal">{__('Status', 'yay-wholesale-b2b')}</span>
-                    <span className="group-hover:text-primary text-icon flex items-center">
-                      <CaretUpDownIcon size={12} weight="bold" />
-                    </span>
+                    <DeleteIcon className="size-4" />
                   </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent
-                  align="start"
-                  sideOffset={9}
-                  className="w-fit min-w-[20px] p-1"
-                >
-                  <DropdownMenuItem
-                    className="w-30"
-                    onClick={() =>
-                      bulkUpdateRoleStatus(
-                        { ids: selectedRowsIds, status: true },
-                        {
-                          onSuccess: () => {
-                            clearSelection();
-                          },
-                        },
-                      )
-                    }
-                  >
-                    {__('Active', 'yay-wholesale-b2b')}
-                  </DropdownMenuItem>
-
-                  <DropdownMenuItem
-                    className="w-30"
-                    onClick={() =>
-                      bulkUpdateRoleStatus(
-                        { ids: selectedRowsIds, status: false },
-                        {
-                          onSuccess: () => {
-                            clearSelection();
-                          },
-                        },
-                      )
-                    }
-                  >
-                    {__('Inactive', 'yay-wholesale-b2b')}
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-              <span className="border-divider h-5 w-px border-r border-solid" aria-hidden />
-              <Dialog open={openBulkDeleteDialog} onOpenChange={setOpenDeleteDialog}>
-                <WholeSaleToolTip
-                  trigger={
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="hover:text-destructive text-muted-foreground h-8 w-8 shrink-0 hover:bg-transparent hover:shadow-sm"
-                      onClick={() => setOpenDeleteDialog(true)}
-                      aria-label="Delete selected"
-                    >
-                      <DeleteIcon className="size-4" />
-                    </Button>
-                  }
-                  content={<span>{__('Delete', 'yay-wholesale-b2b')}</span>}
-                />
-                <DialogPortalContent className="bw:max-w-md">
-                  <DialogHeader className="bw:border-b-0">
-                    <DialogTitle>
-                      {sprintf(
-                        __(`Are you sure you want to delete %d roles ?`, 'yay-wholesale-b2b'),
-                        selectedCount,
-                      )}
-                    </DialogTitle>
-                    <DialogDescription>
-                      {__(
-                        'This action cannot be undone. This will permanently delete these request and remove data from servers',
-                        'yay-wholesale-b2b',
-                      )}
-                    </DialogDescription>
-                  </DialogHeader>
-                  <DialogFooter>
-                    <DialogClose asChild>
-                      <Button variant="outline">{__('Cancel', 'yay-wholesale-b2b')}</Button>
-                    </DialogClose>
-                    <Button variant="destructive" onClick={() => handleBulkDelete()}>
-                      {__('Continue', 'yay-wholesale-b2b')}
-                    </Button>
-                  </DialogFooter>
-                </DialogPortalContent>
-              </Dialog>
-            </BulkActionBox>
-          )}
+                }
+                content={<span>{__('Delete', 'yay-wholesale-b2b')}</span>}
+              />
+              <DialogContent className="bw:max-w-md">
+                <DialogHeader className="bw:border-b-0">
+                  <DialogTitle>
+                    {sprintf(
+                      __(`Are you sure you want to delete %d roles ?`, 'yay-wholesale-b2b'),
+                      selectedCount,
+                    )}
+                  </DialogTitle>
+                  <DialogDescription>
+                    {__(
+                      'This action cannot be undone. This will permanently delete these request and remove data from servers',
+                      'yay-wholesale-b2b',
+                    )}
+                  </DialogDescription>
+                </DialogHeader>
+                <DialogFooter>
+                  <DialogClose asChild>
+                    <Button variant="outline">{__('Cancel', 'yay-wholesale-b2b')}</Button>
+                  </DialogClose>
+                  <Button variant="destructive" onClick={() => handleBulkDelete()}>
+                    {__('Continue', 'yay-wholesale-b2b')}
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+          </BulkActionBox>
 
           {/* Right side - Pagination controls */}
           {table.getPageCount() > 1 && (

@@ -12,7 +12,7 @@
 		"lint:js": "wp-scripts lint-js",
 		"packages-update": "wp-scripts packages-update",
 		"plugin-zip": "wp-scripts plugin-zip",
-		"start": "wp-scripts start --webpack-copy-php --blocks-manifest"
+		"start": "wp-scripts start --webpack-copy-php --blocks-manifest --output-path=../../../assets/dist/blocks/request-form-block"
 	},
 	"devDependencies": {
 		"@wordpress/scripts": "^31.0.0"

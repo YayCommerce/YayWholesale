@@ -1,6 +1,6 @@
 <?php
 
-namespace Yay_Wholesale_B2B\Helpers;
+namespace YayWholesaleB2B\Helpers;
 
 use DateTime;
 use WP_User_Query;
@@ -193,7 +193,7 @@ class ReportsHelper {
     }
 
     protected static function statistic_wholesaler( array $top_wholesaler ) {
-        $roles = get_option( 'yay_wholesale_b2b_roles', [] );
+        $roles = get_option( 'yaywholesaleb2b_roles', [] );
 
         if ( empty( $roles ) ) {
             return [];

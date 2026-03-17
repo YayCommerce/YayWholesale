@@ -1,31 +1,34 @@
 <?php
-namespace Yay_Wholesale_B2B\Engine\Frontend;
+namespace YayWholesaleB2B\Engine\Frontend;
 
-use WC_Tax;
-use Yay_Wholesale_B2B\Utils\SingletonTrait;
-use Yay_Wholesale_B2B\Helpers\RolesHelper;
-use Yay_Wholesale_B2B\Helpers\PricingHelper;
+use YayWholesaleB2B\Utils\SingletonTrait;
+use YayWholesaleB2B\Helpers\RolesHelper;
+use YayWholesaleB2B\Helpers\PricingHelper;
+use YayWholesaleB2B\Utils\Utils;
 
 defined( 'ABSPATH' ) || exit;
 
 /**
- * Pricing Engine
+ * Requirement Progress feature
  */
 class Requirement {
     use SingletonTrait;
 
     protected function __construct() {
-        // --- WooCommerce hooks ---
-        add_action( 'woocommerce_widget_shopping_cart_before_buttons', [ $this, 'add_yay_wholesale_requirement' ], 999, 0 );
-        add_action( 'woocommerce_before_cart_totals', [ $this, 'add_yay_wholesale_requirement' ], 999, 0 );
-        add_action( 'woocommerce_review_order_before_payment', [ $this, 'add_yay_wholesale_requirement' ], 999, 0 );
 
-        add_action( 'wp_enqueue_scripts', [ $this, 'enqueue_yay_wholesale_requirement' ], 999 );
-        add_action( 'init', [ $this, 'create_ywhs_requirement_block_init' ], 999 );
-        add_filter( 'render_block_woocommerce/mini-cart-footer-block', [ $this, 'automatically_add_ywhs_to_mini_cart' ], 999 );
+        if ( Utils::is_pro() ) {
+            // --- WooCommerce hooks ---
+            add_action( 'woocommerce_widget_shopping_cart_before_buttons', [ $this, 'add_yay_wholesale_requirement' ], 999, 0 );
+            add_action( 'woocommerce_before_cart_totals', [ $this, 'add_yay_wholesale_requirement' ], 999, 0 );
+            add_action( 'woocommerce_review_order_before_payment', [ $this, 'add_yay_wholesale_requirement' ], 999, 0 );
 
-        add_action( 'wp_ajax_ywhs_get_original_price_in_cart', [ $this, 'ywhs_get_original_price_in_cart' ] );
-        add_action( 'wp_ajax_nopriv_ywhs_get_original_price_in_cart', [ $this, 'ywhs_get_original_price_in_cart' ] );
+            add_action( 'wp_enqueue_scripts', [ $this, 'enqueue_yay_wholesale_requirement' ], 999 );
+            add_action( 'init', [ $this, 'create_ywhs_requirement_block_init' ], 999 );
+            add_filter( 'render_block_woocommerce/mini-cart-footer-block', [ $this, 'automatically_add_ywhs_to_mini_cart' ], 999 );
+
+            add_action( 'wp_ajax_ywhs_get_original_price_in_cart', [ $this, 'ywhs_get_original_price_in_cart' ] );
+            add_action( 'wp_ajax_nopriv_ywhs_get_original_price_in_cart', [ $this, 'ywhs_get_original_price_in_cart' ] );
+        }
     }
 
     /**
@@ -167,12 +170,12 @@ class Requirement {
             ( function_exists( 'is_cart' ) && is_cart() ) ) {
             $wholesale = RolesHelper::is_wholesale_user();
             $slug      = 'ywhs_wholesale_requirement';
-            $asset     = include YAY_WHOLESALE_B2B_PLUGIN_DIR . 'assets/dist/blocks/requirement-slot-fill/index.asset.php';
+            $asset     = include YAYWHOLESALEB2B_PLUGIN_DIR . 'assets/dist/blocks/requirement-slot-fill/index.asset.php';
             wp_enqueue_script(
                 $slug,
-                YAY_WHOLESALE_B2B_PLUGIN_URL . 'assets/dist/blocks/requirement-slot-fill/index.js',
+                YAYWHOLESALEB2B_PLUGIN_URL . 'assets/dist/blocks/requirement-slot-fill/index.js',
                 $asset['dependencies'],
-                YAY_WHOLESALE_B2B_VERSION,
+                YAYWHOLESALEB2B_VERSION,
                 true
             );
 
@@ -198,7 +201,7 @@ class Requirement {
      * Register new block type of Wholesale Requirement
      */
     public function create_ywhs_requirement_block_init() {
-        $block_json_path = YAY_WHOLESALE_B2B_PLUGIN_DIR . 'assets/dist/blocks/requirement-block/block.json';
+        $block_json_path = YAYWHOLESALEB2B_PLUGIN_DIR . 'assets/dist/blocks/requirement-block/block.json';
 
         if ( ! file_exists( $block_json_path ) ) {
             return;
@@ -212,6 +215,8 @@ class Requirement {
 
     /**
      * Automatically add requirement block to mini cart block of woocommerce
+     *
+     * @param string $block_content The default HTML of mini-cart block.
      */
     public function automatically_add_ywhs_to_mini_cart( $block_content ) {
         // Your custom block HTML
@@ -226,9 +231,9 @@ class Requirement {
      */
     public function ywhs_get_original_price_in_cart() {
         $raw  = file_get_contents( 'php://input' );
-        $data = json_decode( $raw, true );
+        $data = json_decode( wp_unslash( $raw ), true );
 
-        if ( ! wp_verify_nonce( $data['nonce'], 'get_original_price_in_cart' ) ) {
+        if ( ! isset( $data['nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $data['nonce'] ) ), 'get_original_price_in_cart' ) ) {
             wp_send_json_error( 'Invalid nonce' );
         }
 

@@ -1,5 +1,5 @@
 <?php
-namespace Yay_Wholesale_B2B\Engine\Register;
+namespace YayWholesaleB2B\Engine\Register;
 
 /**
  * Script Name Constants

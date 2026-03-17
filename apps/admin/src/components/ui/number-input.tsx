@@ -1,11 +1,10 @@
 import { ComponentProps, createContext, forwardRef, useContext } from 'react';
-import { CaretDownIcon, CaretUpIcon } from '@phosphor-icons/react';
+import { ChevronDownIcon, ChevronUpIcon } from 'lucide-react';
 import { NumericFormat, NumericFormatProps } from 'react-number-format';
 
 import { useUncontrolled } from '@/lib/hooks/useUncontrolled';
 import { cn } from '@/lib/utils';
 
-// import { InputProps } from '../input';
 import { InputGroup, InputGroupInput } from './input-group';
 import { InputGroupVariantProps } from './variants/input.variants';
 
@@ -212,7 +211,7 @@ function NumberInputChevronUp({ className, children, ...props }: ComponentProps<
       )}
       {...props}
     >
-      {children ?? <CaretUpIcon weight="bold" className="size-3" />}
+      {children ?? <ChevronUpIcon className="size-3" />}
     </span>
   );
 }
@@ -235,7 +234,7 @@ function NumberInputChevronDown({ className, children, ...props }: ComponentProp
       )}
       {...props}
     >
-      {children ?? <CaretDownIcon weight="bold" className="size-3" />}
+      {children ?? <ChevronDownIcon className="size-3" />}
     </span>
   );
 }
