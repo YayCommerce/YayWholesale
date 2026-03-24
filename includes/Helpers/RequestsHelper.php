@@ -32,10 +32,6 @@ class RequestsHelper {
     public static function insert_whs_request( int $user_id, array $form_data ): int {
         $name         = '';
         $display_name = '';
-        if ( array_key_exists( 'name', $form_data ) ) {
-            $name         = $form_data['name'];
-            $display_name = $form_data['name'];
-        }
 
         if ( array_key_exists( 'first_name', $form_data ) && array_key_exists( 'last_name', $form_data ) ) {
             $name         = $form_data['first_name'] . ' ' . $form_data['last_name'];
@@ -67,11 +63,11 @@ class RequestsHelper {
         $general_setting = SettingsHelper::get_settings();
 
         foreach ( $general_setting['registration_fields']['fields'] as $gsetting ) {
-            $key = self::label_to_input_name( $gsetting['label'] );
+            $key = $gsetting['inputName'];
             if ( array_key_exists( $key, $form_data ) ) {
-                if ( 'email' === $gsetting['type'] && ! $gsetting['deletable'] ) {
+                if ( 'email_address' === $key ) {
                     update_post_meta( $new_request_id, self::REQUEST_META_EMAIL, $form_data[ $key ] );
-                } elseif ( 'textarea' === $gsetting['type'] && ! $gsetting['deletable'] ) {
+                } elseif ( 'message' === $key ) {
                     update_post_meta( $new_request_id, self::REQUEST_META_MESSAGE, $form_data[ $key ] );
                 } else {
                     $data[ $gsetting['label'] ] = [

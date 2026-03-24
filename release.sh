@@ -1,5 +1,5 @@
 PROJECT_PATH=$(pwd)
-IS_PRO="true"
+IS_PRO="false"
 BUILD_PATH="${PROJECT_PATH}/build"
 # Detect OS
 os=$(uname -s)
@@ -109,7 +109,16 @@ echo "Syncing files..."
 rsync -rc --exclude-from="$PROJECT_PATH/.distignore" "$PROJECT_PATH/" "$DEST_PATH/" --delete --delete-excluded
 
 #
-# 6) Delete Pro folder if building Lite ver
+# 6) Convert if endline is CRLF -> LF
+#
+if [ "${os#CYGWIN}" != "$os" ] || [ "${os#MINGW}" != "$os" ] || [ "${os#MSYS}" != "$os" ]; then
+find "$DEST_PATH" \( -name "*.js" -o -name "*.css" -o -name "*.php" -o -name "*.json" \) -type f | while read -r file; do
+    tr -d '\r' < "$file" > "$file.tmp" && mv "$file.tmp" "$file"
+done
+fi
+
+#
+# 7) Delete Pro folder if building Lite ver
 #
 if [ "$IS_PRO" = "false" ]; then
     TARGET="$DEST_PATH/includes/Engine/ProFeatures"
@@ -120,7 +129,7 @@ if [ "$IS_PRO" = "false" ]; then
 fi
 
 #
-# 6) Run code formatter if tools directory exists before running lint
+# 8) Run code formatter if tools directory exists before running lint
 #
 if [ -d "$PROJECT_PATH/tools" ]; then
     echo "Running PHP Code Beautifier..."
@@ -130,13 +139,13 @@ if [ -d "$PROJECT_PATH/tools" ]; then
 fi
 
 #
-# 7) Remove development-only code
+# 9) Remove development-only code
 #
 sed -i "/'YAYWHOLESALEB2B_IS_DEVELOPMENT', true/d" "$DEST_PATH/yay-wholesale-b2b.php"
 rm -rf "$DEST_PATH/includes/Engine/Register/RegisterDev.php"
 
 #
-# 8) Generate ZIP
+# 10) Generate ZIP
 #
 echo "Generating zip file..."
 cd "$BUILD_PATH" || exit

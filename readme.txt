@@ -3,7 +3,7 @@ Contributors: YayCommerce
 Tags: wholesale, b2b, wholesale pricing, discount rules, sale
 Requires at least: 3.0
 Tested up to: 6.9
-Stable tag: 1.0.3
+Stable tag: 1.0.6
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -111,9 +111,13 @@ For documentation, support, and updates, visit our website or [contact YayCommer
 
 ## Changelog
 
+= Mar 24, 2026 - Version 1.0.6 =
+- Improved: Registration fields setting
+- Improved: Registration form mechanic
+
 = Mar 17, 2026 - Version 1.0.5 =
-- Fixed: Admin notice display
-- Updated: Limit the B2B Requirements Display feature (only for Pro) 
+- Fixed: Bugs from admin notice
+- Updated: Requirements progress bar (Pro version)
 
 = Mar 13, 2026 – Version 1.0.4 =
 - Updated: Plugin logo in admin dashboard

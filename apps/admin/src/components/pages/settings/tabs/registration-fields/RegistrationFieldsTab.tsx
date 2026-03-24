@@ -40,9 +40,11 @@ export default function RegistrationFieldsTab() {
   };
 
   const addNewField = () => {
+    const custom_field_index = fields.length - 3;
     append({
       id: uuidv4(),
       label: '',
+      inputName: `custom_field_${custom_field_index}`,
       type: 'text',
       placeholder: '',
       columnWidth: '50%',

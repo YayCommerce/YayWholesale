@@ -80,14 +80,14 @@ if ( empty( $_COOKIE['yaywholesaleb2b_cid'] ) ) {
 						id="<?php echo esc_html( $ywhs_field['id'] ); ?>" 
 						type="<?php echo esc_html( $ywhs_field['type'] ); ?>" 
 						placeholder="<?php echo esc_html( $ywhs_field['placeholder'] ); ?>"
-						name="<?php echo esc_html( RequestsHelper::label_to_input_name( $ywhs_field['label'] ) ); ?>" 
+						name="<?php echo esc_html( $ywhs_field['inputName'] ); ?>" 
 						<?php echo( $ywhs_field['isRequired'] ? 'required' : '' ); ?>
-						<?php echo( $ywhs_field['isDefault'] && 'email' === $ywhs_field['type'] && $ywhs_is_autofill ? 'readonly' : '' ); ?>
-						<?php if ( $ywhs_field['isDefault'] && 'email' === $ywhs_field['type'] ) : ?>
+						<?php echo( "email_address" === $ywhs_field['inputName'] && $ywhs_is_autofill ? 'readonly' : '' ); ?>
+						<?php if ("email_address" === $ywhs_field['inputName'] ) : ?>
 						value="<?php echo esc_html( trim( $ywhs_email_autofill ) ); ?>" 
-						<?php elseif ( $ywhs_field['isDefault'] && 'text' === $ywhs_field['type'] && str_contains( $ywhs_field['label'], __( 'First Name', 'yay-wholesale-b2b' ) ) ) : ?>
+						<?php elseif ( "first_name" === $ywhs_field['inputName'] ) : ?>
 							value="<?php echo esc_html( trim( $ywhs_first_name_autofill ) ); ?>" 
-						<?php elseif ( $ywhs_field['isDefault'] && 'text' === $ywhs_field['type'] && str_contains( $ywhs_field['label'], __( 'Last Name', 'yay-wholesale-b2b' ) ) ) : ?>    
+						<?php elseif ( "last_name" === $ywhs_field['inputName'] ) : ?>    
 							value="<?php echo esc_html( trim( $ywhs_last_name_autofill ) ); ?>"
 						<?php endif ?>                                
 					/>
@@ -95,7 +95,7 @@ if ( empty( $_COOKIE['yaywholesaleb2b_cid'] ) ) {
 					<textarea 
 						id="<?php echo esc_html( $ywhs_field['id'] ); ?>" 
 						placeholder="<?php echo esc_html( $ywhs_field['placeholder'] ); ?>" 
-						name="<?php echo esc_html( RequestsHelper::label_to_input_name( $ywhs_field['label'] ) ); ?>" 
+						name="<?php echo esc_html( $ywhs_field['inputName'] ); ?>" 
 						<?php echo( $ywhs_field['isRequired'] ? 'required' : '' ); ?>
 						></textarea>
 				<?php endif ?>

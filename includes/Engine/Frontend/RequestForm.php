@@ -133,14 +133,14 @@ class RequestForm {
                                 id="<?php echo esc_html( $field['id'] ); ?>" 
                                 type="<?php echo esc_html( $field['type'] ); ?>" 
                                 placeholder="<?php echo esc_html( $field['placeholder'] ); ?>"
-                                name="<?php echo esc_html( RequestsHelper::label_to_input_name( $field['label'] ) ); ?>" 
+                                name="<?php echo esc_html( $field['inputName'] ); ?>" 
                                 <?php echo( $field['isRequired'] ? 'required' : '' ); ?>
-                                <?php echo( $field['isDefault'] && 'email' === $field['type'] && $is_autofill ? 'readonly' : '' ); ?>
-                                <?php if ( $field['isDefault'] && 'email' === $field['type'] ) : ?>
+                                <?php echo( 'email_address' === $field['inputName'] && $is_autofill ? 'readonly' : '' ); ?>
+                                <?php if ( 'email_address' === $field['inputName'] ) : ?>
                                 value="<?php echo esc_html( trim( $email_autofill ) ); ?>" 
-                                <?php elseif ( $field['isDefault'] && 'text' === $field['type'] && str_contains( $field['label'], __( 'First Name', 'yay-wholesale-b2b' ) ) ) : ?>
+                                <?php elseif ( 'first_name' === $field['inputName'] ) : ?>
                                     value="<?php echo esc_html( trim( $first_name_autofill ) ); ?>" 
-                                <?php elseif ( $field['isDefault'] && 'text' === $field['type'] && str_contains( $field['label'], __( 'Last Name', 'yay-wholesale-b2b' ) ) ) : ?>    
+                                <?php elseif ( 'last_name' === $field['inputName'] ) : ?>    
                                     value="<?php echo esc_html( trim( $last_name_autofill ) ); ?>"
                                 <?php endif ?>                                
                                 />
@@ -148,7 +148,7 @@ class RequestForm {
                             <textarea 
                                 id="<?php echo esc_html( $field['id'] ); ?>" 
                                 placeholder="<?php echo esc_html( $field['placeholder'] ); ?>" 
-                                name="<?php echo esc_html( RequestsHelper::label_to_input_name( $field['label'] ) ); ?>" 
+                                name="<?php echo esc_html( $field['inputName'] ); ?>" 
                                 <?php echo( $field['isRequired'] ? 'required' : '' ); ?>
                                 ></textarea>
                         <?php endif ?>

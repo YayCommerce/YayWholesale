@@ -21,3 +21,5 @@ yay-wholesale-lite.zip
 /build
 .prettierrc
 .prettierignore
+readme.txt
+pnpm-lock.yaml

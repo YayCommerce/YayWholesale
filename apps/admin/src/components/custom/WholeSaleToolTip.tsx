@@ -22,7 +22,11 @@ export function WholeSaleToolTip({
         <TooltipTrigger asChild>{trigger}</TooltipTrigger>
         <TooltipContent
           side={side}
-          className={clsx('z-9999 rounded-[4px] p-0', undefined === content && 'hidden', className)}
+          className={clsx(
+            'z-100000 rounded-[4px] p-0',
+            undefined === content && 'hidden',
+            className,
+          )}
         >
           <div className="w-fit p-2.5 text-center text-[12px] leading-[100%]">{content}</div>
         </TooltipContent>

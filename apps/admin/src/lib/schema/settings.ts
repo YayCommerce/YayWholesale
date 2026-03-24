@@ -7,9 +7,13 @@ const fieldSchema = z.object({
     .string()
     .min(1, __('Fill in the field label', 'yay-wholesale-b2b'))
     .regex(
-      /^[a-zA-Z0-9 ]+$/,
-      __('Label must contain only letters and numbers', 'yay-wholesale-b2b'),
+      /^[\p{L}0-9 _\-&:/]+$/u,
+      __(
+        'Label can only contain letters, numbers, spaces, and common symbols (-, _, &, :, /.).',
+        'yay-wholesale-b2b',
+      ),
     ),
+  inputName: z.string(),
   type: z.string(),
   placeholder: z.string(),
   columnWidth: z.string(),
