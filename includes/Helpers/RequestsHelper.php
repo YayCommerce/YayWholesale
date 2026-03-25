@@ -65,17 +65,18 @@ class RequestsHelper {
         foreach ( $general_setting['registration_fields']['fields'] as $gsetting ) {
             $key = $gsetting['inputName'];
             if ( array_key_exists( $key, $form_data ) ) {
+                $data[ $gsetting['label'] ] = [
+                    'type'       => $gsetting['type'],
+                    'is_default' => $gsetting['isDefault'],
+                    'key'        => $key,
+                ];
+
                 if ( 'email_address' === $key ) {
                     update_post_meta( $new_request_id, self::REQUEST_META_EMAIL, $form_data[ $key ] );
                 } elseif ( 'message' === $key ) {
                     update_post_meta( $new_request_id, self::REQUEST_META_MESSAGE, $form_data[ $key ] );
                 } else {
-                    $data[ $gsetting['label'] ] = [
-                        'type'       => $gsetting['type'],
-                        'value'      => $form_data[ $key ],
-                        'is_default' => $gsetting['isDefault'],
-                        'key'        => $key,
-                    ];
+                    $data[ $gsetting['label'] ]['value'] = $form_data[ $key ];
                 }
             }
         }
@@ -190,16 +191,22 @@ class RequestsHelper {
         $status       = get_post_meta( $data->ID, self::REQUEST_META_STATUS, true );
 
         $cleaned = [
-            'id'        => $data->ID,
-            'fields'    => [],
-            'name'      => $display_name,
-            'email'     => $email,
-            'message'   => $message,
-            'status'    => $status,
-            'date'      => $data->post_date,
-            'avatar'    => $data->post_author > 0 ? get_avatar_url( $data->post_author ) : '',
-            'firstName' => '',
-            'lastName'  => '',
+            'id'                 => $data->ID,
+            'fields'             => [],
+            'name'               => $display_name,
+            'email'              => $email,
+            'message'            => $message,
+            'status'             => $status,
+            'date'               => $data->post_date,
+            'avatar'             => $data->post_author > 0 ? get_avatar_url( $data->post_author ) : '',
+            'firstName'          => '',
+            'lastName'           => '',
+            'defaultFieldLabels' => [
+                'firstName' => __( 'First Name', 'yay-wholesale-b2b' ),
+                'lastName'  => __( 'Last Name', 'yay-wholesale-b2b' ),
+                'email'     => __( 'Email address', 'yay-wholesale-b2b' ),
+                'message'   => __( 'Message', 'yay-wholesale-b2b' ),
+            ],
         ];
 
         $last_name_phrase  = __( 'Last Name', 'yay-wholesale-b2b' );
@@ -216,15 +223,27 @@ class RequestsHelper {
                     $cleaned['fields'][] = $tmp;
                 } else {
                     if ( isset( $field['key'] ) && 'first_name' === $field['key'] ) {
-                        $cleaned['firstName'] = $field['value'];
+                        $cleaned['firstName']                       = $field['value'];
+                        $cleaned['defaultFieldLabels']['firstName'] = $key;
                     } elseif ( preg_match( "/(?i)\b$first_name_phrase\b/", $key ) ) {
-                        $cleaned['firstName'] = $field['value'];
+                        $cleaned['firstName']                       = $field['value'];
+                        $cleaned['defaultFieldLabels']['firstName'] = $key;
                     }
 
                     if ( isset( $field['key'] ) && 'last_name' === $field['key'] ) {
-                        $cleaned['lastName'] = $field['value'];
+                        $cleaned['lastName']                       = $field['value'];
+                        $cleaned['defaultFieldLabels']['lastName'] = $key;
                     } elseif ( preg_match( "/(?i)\b$last_name_phrase\b/", $key ) ) {
-                        $cleaned['lastName'] = $field['value'];
+                        $cleaned['lastName']                       = $field['value'];
+                        $cleaned['defaultFieldLabels']['lastName'] = $key;
+                    }
+
+                    if ( isset( $field['key'] ) && 'email_address' === $field['key'] ) {
+                        $cleaned['defaultFieldLabels']['email'] = $key;
+                    }
+
+                    if ( isset( $field['key'] ) && 'message' === $field['key'] ) {
+                        $cleaned['defaultFieldLabels']['message'] = $key;
                     }
                 }//end if
             }//end foreach

@@ -21,6 +21,12 @@ export const requestSchema = z.object({
   date: z.string(),
   avatar: z.string(),
   fields: z.array(requestFieldsSchema),
+  defaultFieldLabels: z.object({
+    email: z.string(),
+    message: z.string(),
+    firstName: z.string(),
+    lastName: z.string(),
+  }),
 });
 
 const paginatedRequestSchema = z.object({

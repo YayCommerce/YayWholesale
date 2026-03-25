@@ -45,6 +45,12 @@ export const DEFAULT_REQUEST: RequestFormValues = {
   date: '',
   avatar: '',
   fields: [],
+  defaultFieldLabels: {
+    email: 'Email Address',
+    message: 'Message',
+    firstName: 'First Name',
+    lastName: 'Last Name',
+  },
 };
 
 const isPhoneField = (field: RequestFieldValues) => {
@@ -155,16 +161,16 @@ export default function RequestsForm() {
         <div className="flex cursor-default flex-col gap-5 overflow-auto p-5">
           <div className="grid cursor-default grid-cols-2 gap-5">
             <div className="flex flex-col gap-2">
-              <Label htmlFor="firstName">{__('First Name', 'yay-wholesale-b2b')}</Label>
+              <Label htmlFor="firstName">{dataDisplay?.defaultFieldLabels.firstName}</Label>
               <Input id="firstName" readOnly value={dataDisplay?.firstName} onChange={() => {}} />
             </div>
             <div className="flex cursor-default flex-col gap-2">
-              <Label htmlFor="lastName">{__('Last Name', 'yay-wholesale-b2b')}</Label>
+              <Label htmlFor="lastName">{dataDisplay?.defaultFieldLabels.lastName}</Label>
               <Input id="lastName" readOnly value={dataDisplay?.lastName} onChange={() => {}} />
             </div>
           </div>
           <div className="flex cursor-default flex-col gap-2">
-            <Label htmlFor="email">{__('Email address', 'yay-wholesale-b2b')}</Label>
+            <Label htmlFor="email">{dataDisplay?.defaultFieldLabels.email}</Label>
             <Input id="email" readOnly value={dataDisplay?.email} onChange={() => {}} />
           </div>
           <div className="flex cursor-default flex-col gap-2">
@@ -191,7 +197,7 @@ export default function RequestsForm() {
           })}
 
           <div className="flex flex-col gap-2">
-            <Label htmlFor="message">{__('Message', 'yay-wholesale-b2b')}</Label>
+            <Label htmlFor="message">{dataDisplay?.defaultFieldLabels.message}</Label>
             <Textarea
               className="h-fit min-h-25 resize-none"
               readOnly
