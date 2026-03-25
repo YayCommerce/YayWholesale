@@ -74,6 +74,7 @@ class RequestsHelper {
                         'type'       => $gsetting['type'],
                         'value'      => $form_data[ $key ],
                         'is_default' => $gsetting['isDefault'],
+                        'key'        => $key,
                     ];
                 }
             }
@@ -214,15 +215,19 @@ class RequestsHelper {
 
                     $cleaned['fields'][] = $tmp;
                 } else {
-                    if ( preg_match( "/(?i)\b$last_name_phrase\b/", $key ) ) {
-                        $cleaned['lastName'] = $field['value'];
-                    }
-
-                    if ( preg_match( "/(?i)\b$first_name_phrase\b/", $key ) ) {
+                    if ( isset( $field['key'] ) && 'first_name' === $field['key'] ) {
+                        $cleaned['firstName'] = $field['value'];
+                    } elseif ( preg_match( "/(?i)\b$first_name_phrase\b/", $key ) ) {
                         $cleaned['firstName'] = $field['value'];
                     }
-                }
-            }
+
+                    if ( isset( $field['key'] ) && 'last_name' === $field['key'] ) {
+                        $cleaned['lastName'] = $field['value'];
+                    } elseif ( preg_match( "/(?i)\b$last_name_phrase\b/", $key ) ) {
+                        $cleaned['lastName'] = $field['value'];
+                    }
+                }//end if
+            }//end foreach
         }//end if
 
         return $cleaned;
