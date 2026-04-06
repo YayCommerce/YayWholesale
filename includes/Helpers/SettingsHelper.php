@@ -21,6 +21,7 @@ class SettingsHelper {
                 'show_wholesale_price' => false,
                 'disable_coupon'       => false,
                 'disable_tax'          => false,
+                'tax_display_mode'     => 'inherit',
             ],
             'display'             => [
                 'price_format'          => 'retail-and-wholesale',
@@ -91,6 +92,11 @@ class SettingsHelper {
 
         if ( version_compare( YAYWHOLESALEB2B_VERSION, '1.0.6', '<=' ) ) {
             $setting = self::add_input_name_for_fields( $setting );
+
+            if ( ! isset( $setting['general']['tax_display_mode'] ) ) {
+                $setting['general']['tax_display_mode'] = 'inherit';
+                update_option( 'yaywholesaleb2b_settings', $setting );
+            }
         }
 
         return $setting;

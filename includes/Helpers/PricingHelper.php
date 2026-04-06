@@ -2,7 +2,6 @@
 
 namespace YayWholesaleB2B\Helpers;
 
-use YayWholesaleB2B\Engine\Frontend\Pricing;
 use YayWholesaleB2B\Helpers\RolesHelper;
 use YayWholesaleB2B\Helpers\SettingsHelper;
 use YayWholesaleB2B\Utils\Utils;
@@ -112,11 +111,18 @@ class PricingHelper {
         }
 
         $apply_to_sale = $role['applyToSalePrice'] ?? false;
-        $regular       = (float) $product->get_regular_price( 'edit' );
-        $sale          = (float) $product->get_price( 'edit' );
-        $base          = ( $apply_to_sale && $sale < $regular ) ? $sale : $regular;
-        $new           = max( 0, ( $base + $extra ) * ( 1 - $discount ) );
-        $new           = apply_filters( 'ywhs_price_handle_processed', $new );
+        $regular       = (float) $product->get_regular_price();
+        $sale          = (float) $product->get_sale_price( 'edit' );
+
+        if ( $sale > 0 ) {
+            $sale = floatval( $price );
+        } else {
+            $regular = floatval( $price );
+        }
+
+        $base = ( $apply_to_sale && $sale > 0 ) ? $sale : $regular;
+
+        $new = max( 0, ( $base + $extra ) * ( 1 - $discount ) );
 
         return wc_format_decimal( $new, wc_get_price_decimals() );
     }
@@ -131,11 +137,13 @@ class PricingHelper {
         $subtotal = 0;
 
         // Calculate the subtotal (in this action, subtotal is not calculated)
+        HooksHelper::remove_price_hooks();
         foreach ( $cart as $cart_item ) {
             $product   = $cart_item['data'];
-            $price     = apply_filters( 'ywhs_price_handle_processed', $product->get_price( 'edit' ) );
+            $price     = $product->get_price();
             $subtotal += $price * $cart_item['quantity'];
         }
+        HooksHelper::add_price_hooks();
 
         return $subtotal;
     }
@@ -152,14 +160,17 @@ class PricingHelper {
         $subtotal = 0;
 
         // Calculate the subtotal with original unit price
+        HooksHelper::remove_price_hooks();
         foreach ( $order->get_items() as $item ) {
             if ( ! $item instanceof \WC_Order_Item_Product ) {
                 continue;
             }
             $product   = $item->get_product();
-            $price     = apply_filters( 'ywhs_price_handle_processed', $product->get_price( 'edit' ) );
+            $price     = $product->get_price();
             $subtotal += $price * $item->get_quantity();
         }
+        HooksHelper::add_price_hooks();
+
         $is_discounted = isset( $wholesale_role ) && self::meets_discount_conditions( $wholesale_role, $quantity, $subtotal );
 
         return $is_discounted;

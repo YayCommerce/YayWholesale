@@ -29,6 +29,7 @@ export const settingsFormSchema = z.object({
     show_wholesale_price: z.boolean(),
     disable_coupon: z.boolean(),
     disable_tax: z.boolean(),
+    tax_display_mode: z.string(),
   }),
   display: z.object({
     price_format: z.string(),

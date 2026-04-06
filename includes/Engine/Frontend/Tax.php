@@ -16,12 +16,16 @@ class Tax {
 
     private $disable_tax;
 
+    private $tax_display_mode;
+
     protected function __construct() {
-        $this->disable_tax = SettingsHelper::get_settings()['general']['disable_tax'] ?? false;
+        $setting                = SettingsHelper::get_settings();
+        $this->disable_tax      = $setting['general']['disable_tax'] ?? false;
+        $this->tax_display_mode = $setting['general']['tax_display_mode'] ?? 'inherit';
 
         add_action( 'wp', [ $this, 'ywhs_set_customer_vat_exempt' ], PHP_INT_MAX );
         add_filter( 'pre_option_woocommerce_tax_display_shop', [ $this, 'ywhs_force_display_excl_tax' ], PHP_INT_MAX );
-        add_filter( 'woocommerce_calc_tax', [ $this, 'ywhs_maybe_disable_tax_calc' ], 9999 );
+        // add_filter( 'woocommerce_calc_tax', [ $this, 'ywhs_maybe_disable_tax_calc' ], 9999 );
         add_filter( 'woocommerce_calc_shipping_tax', [ $this, 'ywhs_maybe_disable_tax_calc' ], 999 );
     }
 
@@ -57,7 +61,7 @@ class Tax {
      * @return string
      */
     public function ywhs_force_display_excl_tax( $pre_option ) {
-        if ( ! is_user_logged_in() ) {
+        if ( ! is_user_logged_in() || is_admin() ) {
             return $pre_option;
         }
 
@@ -65,6 +69,10 @@ class Tax {
 
         if ( $is_wholesale && $this->disable_tax && PricingHelper::meets_discount_conditions( $is_wholesale ) ) {
             return 'excl';
+        }
+
+        if ( $is_wholesale && 'inherit' !== $this->tax_display_mode ) {
+            return $this->tax_display_mode;
         }
 
         return $pre_option;
