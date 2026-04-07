@@ -74,10 +74,10 @@ const { state, callbacks } = store('ywhs_wholesale_requirement', {
     },
     callbacks: {
         async getPriceMap() {
-          let priceMap = JSON.parse(localStorage.getItem("ywhs_origin_prices_map"));
+          let priceMap = JSON.parse(sessionStorage.getItem("ywhs_origin_prices_map"));
 
           if (priceMap  && (isUsingDefaultCurrency !== priceMap["isUsingDefaultCurrency"] || currency !== priceMap["currency"])) {
-            localStorage.removeItem('ywhs_origin_prices_map');
+            sessionStorage.removeItem('ywhs_origin_prices_map');
           }
         },
         async checkMetRequired() {
@@ -87,7 +87,7 @@ const { state, callbacks } = store('ywhs_wholesale_requirement', {
 
             let refetch = false;
 
-            let priceMap = localStorage.getItem("ywhs_origin_prices_map");
+            let priceMap = sessionStorage.getItem("ywhs_origin_prices_map");
             if (!priceMap) {
                 priceMap = {}
             }else {
@@ -122,7 +122,7 @@ const { state, callbacks } = store('ywhs_wholesale_requirement', {
                   const data = await res.json();  
                   priceMap = {...priceMap, ...data.data, isUsingDefaultCurrency, currency};
         
-                  localStorage.setItem("ywhs_origin_prices_map", JSON.stringify(priceMap));
+                  sessionStorage.setItem("ywhs_origin_prices_map", JSON.stringify(priceMap));
               } catch (e) {
                   console.error(e);
               }

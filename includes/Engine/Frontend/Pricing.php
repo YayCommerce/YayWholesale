@@ -22,20 +22,42 @@ class Pricing {
         $this->settings = SettingsHelper::get_settings();
 
         // --- WooCommerce hooks ---
-        add_filter( 'woocommerce_product_get_price', [ $this, 'ywhs_get_price' ], 99, 2 );
-        add_filter( 'woocommerce_product_variation_get_price', [ $this, 'ywhs_get_price' ], 99, 2 );
-        add_filter( 'woocommerce_variation_prices_price', [ $this, 'ywhs_get_price' ], 99, 2 );
+        $this->add_price_hooks();
 
-        add_filter( 'woocommerce_product_get_sale_price', [ $this, 'ywhs_get_sale_price' ], 99, 2 );
-        add_filter( 'woocommerce_product_variation_get_sale_price', [ $this, 'ywhs_get_sale_price' ], 99, 2 );
-        add_filter( 'woocommerce_variation_prices_sale_price', [ $this, 'ywhs_get_sale_price' ], 99, 2 );
+        $this->add_sale_price_hooks();
 
-        add_filter( 'woocommerce_variation_prices_array', [ $this, 'ywhs_variation_prices' ], 99, 2 );
+        add_filter( 'woocommerce_variation_prices_array', [ $this, 'ywhs_variation_prices' ], 999, 2 );
         add_filter( 'woocommerce_get_variation_prices_hash', [ $this, 'ywhs_variation_prices_hash' ], 99, 1 );
 
         add_filter( 'woocommerce_get_price_html', [ $this, 'ywhs_display_wholesale_price_html' ], 999, 2 );
 
         add_action( 'woocommerce_checkout_order_processed', [ $this, 'ywhs_checkout_wholesale_order_handling' ], 999, 3 );
+
+        add_filter( 'woocommerce_product_is_on_sale', [ $this, 'ywhs_is_on_sale_product' ], 10, 2 );
+    }
+
+    protected function remove_price_hooks() {
+        remove_filter( 'woocommerce_product_get_price', [ $this, 'ywhs_get_price' ], 999, 2 );
+        remove_filter( 'woocommerce_product_variation_get_price', [ $this, 'ywhs_get_price' ], 999, 2 );
+        remove_filter( 'woocommerce_variation_prices_price', [ $this, 'ywhs_get_price' ], 999, 2 );
+    }
+
+    protected function add_price_hooks() {
+        add_filter( 'woocommerce_product_get_price', [ $this, 'ywhs_get_price' ], 999, 2 );
+        add_filter( 'woocommerce_product_variation_get_price', [ $this, 'ywhs_get_price' ], 999, 2 );
+        add_filter( 'woocommerce_variation_prices_price', [ $this, 'ywhs_get_price' ], 999, 2 );
+    }
+
+    protected function remove_sale_price_hooks() {
+        remove_filter( 'woocommerce_product_get_sale_price', [ $this, 'ywhs_get_sale_price' ], 999, 2 );
+        remove_filter( 'woocommerce_product_variation_get_sale_price', [ $this, 'ywhs_get_sale_price' ], 999, 2 );
+        remove_filter( 'woocommerce_variation_prices_sale_price', [ $this, 'ywhs_get_sale_price' ], 999, 2 );
+    }
+
+    protected function add_sale_price_hooks() {
+        add_filter( 'woocommerce_product_get_sale_price', [ $this, 'ywhs_get_sale_price' ], 999, 2 );
+        add_filter( 'woocommerce_product_variation_get_sale_price', [ $this, 'ywhs_get_sale_price' ], 999, 2 );
+        add_filter( 'woocommerce_variation_prices_sale_price', [ $this, 'ywhs_get_sale_price' ], 999, 2 );
     }
 
     /**
@@ -136,12 +158,25 @@ class Pricing {
      * @return string The formatted HTML.
      */
     protected function format_retail_only_price_html( \WC_Product $product ): string {
-        $regular = (float) $product->get_regular_price( 'edit' );
-        $sale    = (float) $product->get_sale_price( 'edit' );
+        $this->remove_sale_price_hooks();
+
+        $regular = (float) $product->get_regular_price();
+        $sale    = (float) $product->get_sale_price();
+
+        $tax_display_shop = get_option( 'woocommerce_tax_display_shop', 'excl' );
+        if ( 'incl' === $tax_display_shop ) {
+            $regular_to_show = wc_get_price_including_tax( $product, [ 'price' => $regular ] );
+            $sale_to_show    = wc_get_price_including_tax( $product, [ 'price' => $sale ] );
+        } else {
+            $regular_to_show = wc_get_price_excluding_tax( $product, [ 'price' => $regular ] );
+            $sale_to_show    = wc_get_price_excluding_tax( $product, [ 'price' => $sale ] );
+        }
 
         if ( $sale > 0 && $sale < $regular ) {
-            return wc_format_sale_price( wc_price( $regular ), wc_price( $sale ) );
+            return wc_format_sale_price( wc_price( $regular_to_show ), wc_price( $sale_to_show ) );
         }
+
+        $this->add_sale_price_hooks();
 
         return wc_price( $regular );
     }
@@ -153,8 +188,20 @@ class Pricing {
      * @return string The formatted HTML.
      */
     protected function format_wholesale_only_price_html( \WC_Product $product ): string {
-        $discount = PricingHelper::apply_wholesale_discount( $product->get_price( 'edit' ), $product, true );
-        return $this->get_wholesale_price_html( wc_price( $discount ) );
+        $this->remove_price_hooks();
+
+        $discount = PricingHelper::apply_wholesale_discount( $product->get_price(), $product, true );
+
+        $this->add_price_hooks();
+
+        $tax_display_shop = get_option( 'woocommerce_tax_display_shop', 'excl' );
+        if ( 'incl' === $tax_display_shop ) {
+            $discounted_to_show = wc_get_price_including_tax( $product, [ 'price' => $discount ] );
+        } else {
+            $discounted_to_show = wc_get_price_excluding_tax( $product, [ 'price' => $discount ] );
+        }
+
+        return $this->get_wholesale_price_html( wc_price( $discounted_to_show ) );
     }
 
     /**
@@ -164,19 +211,35 @@ class Pricing {
      * @return string The formatted HTML.
      */
     protected function format_retail_and_wholesale_price_html( \WC_Product $product ): string {
-        $regular    = (float) $product->get_regular_price( 'edit' );
-        $regular    = apply_filters( 'ywhs_price_handle_processed', $regular );
-        $sale       = (float) $product->get_sale_price( 'edit' );
-        $sale       = apply_filters( 'ywhs_price_handle_processed', $sale );
+        $regular = (float) $product->get_regular_price();
+
+        $this->remove_sale_price_hooks();
+
+        $sale = (float) $product->get_sale_price();
+
+        $this->add_sale_price_hooks();
+
         $discounted = PricingHelper::apply_wholesale_discount( $sale > 0 ? $sale : $regular, $product, true );
+
+        $tax_display_shop = get_option( 'woocommerce_tax_display_shop', 'excl' );
+
+        if ( 'incl' === $tax_display_shop ) {
+            $regular_to_show    = wc_get_price_including_tax( $product, [ 'price' => $regular ] );
+            $sale_to_show       = wc_get_price_including_tax( $product, [ 'price' => $sale ] );
+            $discounted_to_show = wc_get_price_including_tax( $product, [ 'price' => $discounted ] );
+        } else {
+            $regular_to_show    = wc_get_price_excluding_tax( $product, [ 'price' => $regular ] );
+            $sale_to_show       = wc_get_price_excluding_tax( $product, [ 'price' => $sale ] );
+            $discounted_to_show = wc_get_price_excluding_tax( $product, [ 'price' => $discounted ] );
+        }
 
         $html  = '<span class="yay-retail-price">Retail: ';
         $html .= ( $sale > 0 && $sale < $regular )
-            ? '<del>' . wc_price( $regular ) . '</del> <ins>' . wc_price( $sale ) . '</ins>'
-            : wc_price( $regular );
+            ? '<del>' . wc_price( $regular_to_show ) . '</del> <ins>' . wc_price( $sale_to_show ) . '</ins>'
+            : wc_price( $regular_to_show );
         $html .= '</span><br>';
         $html .= '<span class="yay-wholesale-price">'
-            . $this->get_wholesale_price_html( wc_price( $discounted ) )
+            . $this->get_wholesale_price_html( wc_price( $discounted_to_show ) )
             . '</span>';
 
         return $html;
@@ -314,5 +377,17 @@ class Pricing {
         PricingHelper::handle_order( $order, $wholesale_role, $is_discounted );
 
         do_action( 'ywhs_new_wholesale_order_placed', $order->get_id(), $order );
+    }
+
+    /**
+     * Exclude sale badge ( Wholesale Price is not a sale price )
+     *
+     * @param bool        $is_on_sale The on-sale status.
+     * @param \WC_Product $product The product.
+     */
+    public function ywhs_is_on_sale_product( $is_on_sale, $product ) {
+        $is_on_sale_from_third_party = apply_filters( 'ywhs_is_on_sale_by_third_party', false );
+
+        return $is_on_sale_from_third_party || $product->is_on_sale( 'edit' );
     }
 }

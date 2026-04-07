@@ -1,6 +1,7 @@
 <?php
 namespace YayWholesaleB2B\Engine\Frontend;
 
+use YayWholesaleB2B\Helpers\HooksHelper;
 use YayWholesaleB2B\Utils\SingletonTrait;
 use YayWholesaleB2B\Helpers\RolesHelper;
 use YayWholesaleB2B\Helpers\PricingHelper;
@@ -181,10 +182,15 @@ class Requirement {
 
             $price_map = [];
             $cart      = WC()->cart->get_cart();
+
+            HooksHelper::remove_price_hooks();
+
             foreach ( $cart as $cart_item_key => $cart_item ) {
                 $product                     = $cart_item['data'];
-                $price_map[ $cart_item_key ] = apply_filters( 'ywhs_price_handle_processed', $product->get_price( 'edit' ) );
+                $price_map[ $cart_item_key ] = $product->get_price();
             }
+
+            HooksHelper::add_price_hooks();
 
             wp_localize_script(
                 $slug,
@@ -240,19 +246,23 @@ class Requirement {
         if ( is_null( WC()->cart ) ) {
             wc_load_cart();
         }
-        WC()->cart->calculate_totals();
 
         $cart = WC()->cart->get_cart();
 
         $price_map = [];
+
+        HooksHelper::remove_price_hooks();
+
         foreach ( $cart as $key => $cart_item ) {
             $product = $cart_item['data'];
             if ( $data['default_currency'] ) {
                 $price_map[ $key ] = $product->get_price( 'edit' );
             } else {
-                $price_map[ $key ] = apply_filters( 'ywhs_price_handle_processed', $product->get_price( 'edit' ) );
+                $price_map[ $key ] = apply_filters( 'ywhs_product_price_ajax_handled', $product, 'price' );
             }
         }
+
+        HooksHelper::add_price_hooks();
 
         wp_send_json_success( $price_map );
     }

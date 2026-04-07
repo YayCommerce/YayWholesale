@@ -5,6 +5,7 @@ use WC_Data_Store;
 use WC_Tax;
 use YayWholesaleB2B\Engine\Compatibles;
 use YayWholesaleB2B\Engine\Frontend\Tax;
+use YayWholesaleB2B\Helpers\HooksHelper;
 use YayWholesaleB2B\Helpers\RolesHelper;
 use YayWholesaleB2B\Helpers\SettingsHelper;
 use YayWholesaleB2B\Helpers\PricingHelper;
@@ -42,7 +43,6 @@ class Orders {
 
         remove_filter( 'woocommerce_order_is_vat_exempt', [ $this, 'ywhs_tax_enabled_handler' ], 999, 2 );
         remove_filter( 'woocommerce_calc_tax', [ Tax::get_instance(), 'ywhs_maybe_disable_tax_calc' ], 9999 );
-        Compatibles::get_instance()->remove_price_related_hooks();
 
         $customer_id        = $order->get_customer_id();
         $wholesale_role     = RolesHelper::is_wholesale_user( $customer_id );
@@ -86,7 +86,6 @@ class Orders {
 
         add_filter( 'woocommerce_order_is_vat_exempt', [ $this, 'ywhs_tax_enabled_handler' ], 999, 2 );
         add_filter( 'woocommerce_calc_tax', [ Tax::get_instance(), 'ywhs_maybe_disable_tax_calc' ], 9999 );
-        Compatibles::get_instance()->add_price_related_hooks();
     }//end ywhs_before_calculate_order()
 
     /**
@@ -170,7 +169,11 @@ class Orders {
             if ( is_admin() ) {
                 $extra = $extra_price_map[ $item->get_id() ] ?? 0;
 
-                $new_price = $product->get_price( 'edit' ) + $extra;
+                HooksHelper::remove_price_hooks();
+
+                $new_price = $product->get_price() + $extra;
+
+                HooksHelper::add_price_hooks();
 
                 if ( $is_discounted ) {
                     $new_price = PricingHelper::calc_discounted_price( $new_price, $wholesale_role, $product, $extra );
