@@ -165,8 +165,11 @@ class PricingHelper {
             if ( ! $item instanceof \WC_Order_Item_Product ) {
                 continue;
             }
-            $product   = $item->get_product();
-            $price     = $product->get_price();
+            $product = $item->get_product();
+            $price   = $product->get_price();
+            if ( is_ajax() ) {
+                $price = apply_filters( 'ywhs_product_price_ajax_handled', $price, $product, 'price' );
+            }
             $subtotal += $price * $item->get_quantity();
         }
         HooksHelper::add_price_hooks();
@@ -218,8 +221,13 @@ class PricingHelper {
                     // (initial price) * (1 - discount) = Unit Price
                     $initial_price = $unit_price / ( 1 - ( $wholesale_role['discount'] / 100 ) );
                 }
-                $initial_price                      = round( $initial_price, wc_get_price_decimals() );
-                $extra_price_map[ $item->get_id() ] = $initial_price - $product->get_price( 'edit' );
+                $initial_price = round( $initial_price, wc_get_price_decimals() );
+
+                HooksHelper::remove_price_hooks();
+
+                $extra_price_map[ $item->get_id() ] = $initial_price - $product->get_price();
+
+                HooksHelper::add_price_hooks();
             }//end foreach
 
             $order->update_meta_data( '_ywhs_extra_price_map', $extra_price_map );

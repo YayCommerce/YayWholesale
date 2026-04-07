@@ -258,7 +258,7 @@ class Requirement {
             if ( $data['default_currency'] ) {
                 $price_map[ $key ] = $product->get_price( 'edit' );
             } else {
-                $price_map[ $key ] = apply_filters( 'ywhs_product_price_ajax_handled', $product, 'price' );
+                $price_map[ $key ] = apply_filters( 'ywhs_product_price_ajax_handled', $product->get_price(), $product, 'price' );
             }
         }
 

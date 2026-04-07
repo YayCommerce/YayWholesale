@@ -30,6 +30,8 @@ class Settings {
         add_action( 'admin_enqueue_scripts', [ $this, 'admin_enqueue_scripts' ] );
 
         add_action( 'admin_enqueue_scripts', [ $this, 'admin_enqueue_admin_styles' ] );
+
+        add_action( 'ywhs_product_price_ajax_handled', [ $this, 'default_value_for_product_price' ], 10, 1 );
     }
 
     public function admin_body_class( $classes ) {
@@ -171,5 +173,9 @@ class Settings {
 
     public function admin_enqueue_admin_styles() {
         wp_enqueue_style( 'yay-wholesale-admin-styles', YAYWHOLESALEB2B_PLUGIN_URL . 'assets/css/admin_styles.css', [], YAYWHOLESALEB2B_VERSION );
+    }
+
+    public function default_value_for_product_price( $price ) {
+        return $price;
     }
 }

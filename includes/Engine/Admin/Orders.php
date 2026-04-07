@@ -171,7 +171,11 @@ class Orders {
 
                 HooksHelper::remove_price_hooks();
 
-                $new_price = $product->get_price() + $extra;
+                $price = $product->get_price();
+                if ( is_ajax() ) {
+                    $price = apply_filters( 'ywhs_product_price_ajax_handled', $price, $product, 'price' );
+                }
+                $new_price = $price + $extra;
 
                 HooksHelper::add_price_hooks();
 

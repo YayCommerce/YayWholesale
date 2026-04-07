@@ -24,7 +24,7 @@ class YayCurrency {
 
         // LITE
         add_filter( 'ywhs_price_handle_processed', [ $this, 'convert_currency_price' ], 10, 1 );
-        add_filter( 'ywhs_product_price_ajax_handled', [ $this, 'product_price_ajax_handle' ], 10, 2 );
+        add_filter( 'ywhs_product_price_ajax_handled', [ $this, 'product_price_ajax_handle' ], 10, 3 );
         add_filter( 'ywhs_ajax_using_default_currency', [ $this, 'is_using_default_price' ], 10, 1 );
         add_filter( 'ywhs_get_currency_by_third_party', [ $this, 'get_currency' ], 10, 1 );
         add_filter( 'YayCurrency/StoreCurrency/GetCartSubtotal', [ $this, 'calculate_cart_subtotal_in_checkout' ], 20, 1 );
@@ -89,7 +89,7 @@ class YayCurrency {
         return $formatted_currency;
     }
 
-    public function product_price_ajax_handle( $product, $type = 'price' ) {
+    public function product_price_ajax_handle( $price, $product, $type = 'price' ) {
 
         $product_price = $product->get_price( 'edit' );
 
