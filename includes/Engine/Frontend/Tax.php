@@ -67,11 +67,11 @@ class Tax {
 
         $is_wholesale = RolesHelper::is_wholesale_user();
 
-        if ( $is_wholesale && $this->disable_tax && PricingHelper::meets_discount_conditions( $is_wholesale ) ) {
+        if ( isset( $is_wholesale ) && $this->disable_tax && PricingHelper::meets_discount_conditions( $is_wholesale ) ) {
             return 'excl';
         }
 
-        if ( $is_wholesale && 'inherit' !== $this->tax_display_mode ) {
+        if ( isset( $is_wholesale ) && 'inherit' !== $this->tax_display_mode ) {
             return $this->tax_display_mode;
         }
 

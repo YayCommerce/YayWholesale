@@ -175,9 +175,10 @@ class Orders {
                 if ( is_ajax() ) {
                     $price = apply_filters( 'ywhs_product_price_ajax_handled', $price, $product, 'price' );
                 }
-                $new_price = $price + $extra;
-
                 HooksHelper::add_price_hooks();
+
+                $price     = wc_get_price_excluding_tax( $product, [ 'price' => $price ] );
+                $new_price = $price + $extra;
 
                 if ( $is_discounted ) {
                     $new_price = PricingHelper::calc_discounted_price( $new_price, $wholesale_role, $product, $extra );
@@ -185,7 +186,7 @@ class Orders {
 
                 $item->set_subtotal( $new_price * $quantity );
                 $item->set_total( $new_price * $quantity - $discounted_coupon );
-            }
+            }//end if
 
             $items[] = $item->get_name() . ' x ' . $quantity;
 

@@ -225,7 +225,13 @@ class PricingHelper {
 
                 HooksHelper::remove_price_hooks();
 
-                $extra_price_map[ $item->get_id() ] = $initial_price - $product->get_price();
+                $is_including_tax = wc_prices_include_tax();
+                $origin_price     = $product->get_price();
+                if ( $is_including_tax ) {
+                    $origin_price = wc_get_price_excluding_tax( $product );
+                }
+
+                $extra_price_map[ $item->get_id() ] = $initial_price - $origin_price;
 
                 HooksHelper::add_price_hooks();
             }//end foreach
