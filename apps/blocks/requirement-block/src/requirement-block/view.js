@@ -81,6 +81,9 @@ const { state, callbacks } = store('ywhs_wholesale_requirement', {
           }
         },
         async checkMetRequired() {
+            if (! wholesaleRole) {
+              return;
+            }
             const cart = wcState?.cart;
             
             if (! cart) return;

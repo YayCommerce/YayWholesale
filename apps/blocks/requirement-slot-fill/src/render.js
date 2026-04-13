@@ -2,13 +2,21 @@ import { sprintf, __ } from  "@wordpress/i18n";
 import { useMemo } from "@wordpress/element";
 import { useSelect } from "@wordpress/data";
 
-const { ExperimentalOrderMeta } = window.wc.blocksCheckout;
 
 const Render = () => {
+    if (! window.wc.blocksCheckout) {
+        return null;
+    }
+
+    const { ExperimentalOrderMeta } = window.wc.blocksCheckout;
     const {
         wholesale,
         priceMap
     } = window.ywhsRequirement;
+
+    if (!wholesale) {
+        return null;
+    }
 
     const { cart, isLoading } = useSelect(
         (select) => {
