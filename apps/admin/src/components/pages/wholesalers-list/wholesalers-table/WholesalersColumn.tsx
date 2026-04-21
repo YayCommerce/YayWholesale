@@ -4,9 +4,8 @@ import { __ } from '@wordpress/i18n';
 import { WholesalerFormValues } from '@/lib/schema/wholesalers';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Label } from '@/components/ui/label';
-import { formatWooPrice } from '@/components/pages/roles/roles.helper';
 
+import { parseWPCurrency } from '../../common.helper';
 import WholesalersRoleColumn from './WholesalersRole';
 
 function AvatarCell({ rowData }: { rowData: WholesalerFormValues }) {
@@ -99,7 +98,7 @@ export const WholesalersColumn: ColumnDef<WholesalerFormValues>[] = [
       return (
         <span
           className="flex justify-center"
-          dangerouslySetInnerHTML={{ __html: formatWooPrice(revenue) }}
+          dangerouslySetInnerHTML={{ __html: parseWPCurrency(revenue) }}
         />
       );
     },

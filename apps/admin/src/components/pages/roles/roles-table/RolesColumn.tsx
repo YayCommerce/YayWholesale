@@ -24,7 +24,7 @@ import { WholeSaleToolTip } from '@/components/custom/WholeSaleToolTip';
 import DeleteIcon from '@/components/icons/DeleteIcon';
 import EditIcon from '@/components/icons/SettingsIcon';
 
-import { formatWooPrice } from '../roles.helper';
+import { parseWPCurrency } from '../../common.helper';
 import RoleStatusSwitch from './RoleStatusSwitch';
 
 export const RolesColumn: ColumnDef<RolesListValues & { count: number }>[] = [
@@ -149,7 +149,7 @@ export const RolesColumn: ColumnDef<RolesListValues & { count: number }>[] = [
     cell: (column) => (
       <div
         className="text-center"
-        dangerouslySetInnerHTML={{ __html: formatWooPrice(column.row.original.minOrderAmount) }}
+        dangerouslySetInnerHTML={{ __html: parseWPCurrency(column.row.original.minOrderAmount) }}
       />
     ),
     meta: { align: 'center' },

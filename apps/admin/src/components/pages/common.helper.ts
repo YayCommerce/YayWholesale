@@ -108,6 +108,8 @@ export function parseWPCurrency(price: string | number) {
       return `${symbol} ${formattedPrice}`;
     case 'right_space':
       return `${formattedPrice} ${symbol}`;
+    default:
+      return `${formattedPrice}`;
   }
 }
 

@@ -93,12 +93,16 @@ export default function TopProducts(props: { reportQuery: ReturnType<typeof useR
                             className="h-full w-full object-cover"
                           />
                         </div>
-                        <div className="flex w-40 items-center gap-1 md:w-15 md:flex-wrap lg:w-40 lg:flex-nowrap">
-                          <span className="text-foreground text-[14px] font-medium whitespace-normal md:text-[13px] lg:text-[14px]">
+                        <div className="flex w-full flex-1 items-center gap-1 md:w-15 md:flex-wrap lg:w-40 lg:flex-nowrap">
+                          <span className="text-foreground line-clamp-3 text-[14px] font-medium whitespace-normal md:text-[13px] lg:text-[14px]">
                             {data.name}
                           </span>
                           {reportData.topProducts.indexOf(data) < 3 && (
-                            <Crown fill="#F9BD09" size={14} className="ml-1 text-[#F9BD09]" />
+                            <Crown
+                              fill="#F9BD09"
+                              size={14}
+                              className="ml-1 min-h-3.5 min-w-3.5 text-[#F9BD09]"
+                            />
                           )}
                         </div>
                       </div>
