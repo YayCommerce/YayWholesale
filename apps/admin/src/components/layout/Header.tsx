@@ -101,11 +101,9 @@ export default function Header() {
   return (
     <header
       className={cn(
-        'bg-background fixed z-50 flex h-[56px] w-full items-center justify-between gap-[5px] pt-0 transition-shadow duration-300',
-        scrolled ? 'top-0 shadow-[0_8px_8px_0_rgba(85,93,102,0.3)]' : 'top-[45px] shadow-none',
-        'sm:top-[45px]',
-        'md:top-8 md:gap-5 md:pr-3',
-        'lg:left-40 lg:w-[calc(100%-160px)]',
+        'bg-background relative z-50 flex h-[56px] items-center justify-between gap-[5px] pt-0',
+        // scrolled ? 'top-0 shadow-[0_8px_8px_0_rgba(85,93,102,0.3)] transition-shadow duration-300' : 'top-[45px] shadow-none',
+        'md:gap-5 md:pr-3',
       )}
     >
       {/* Logo */}
