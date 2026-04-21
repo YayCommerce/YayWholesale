@@ -17,6 +17,9 @@ class Emails {
 
         // Preview emails
         add_filter( 'woocommerce_email_preview_placeholders', [ $this, 'email_preview_placeholders' ], 10, 3 );
+
+        // Disable email
+        add_filter( 'woocommerce_email_enabled_new_order', [ $this, 'ywhs_handle_wc_default_email' ], 10, 2 );
     }
 
     public function ywhs_register_email_classes( $email_classes ) {
@@ -67,5 +70,44 @@ class Emails {
             $placeholders['{set_password_url}'] = admin_url( 'profile.php?action=yay_wholesale_set_password' );
         }
         return $placeholders;
+    }
+
+    /**
+     * Automatically Disable the Woocommerce New Order mail
+     * when the New Wholesale Order email is enabled for a wholesale order.
+     *
+     * @param bool      $enabled
+     * @param \WC_Order $order
+     * @return bool
+     */
+    public function ywhs_handle_wc_default_email( $enabled, $order ) {
+        if ( ( is_admin() && ! wp_doing_ajax() ) || ! $order ) {
+            return $enabled;
+        }
+
+        $wholesale_mail_id      = 'yaywholesaleb2b_new_order_placed';
+        $wholesale_mail_setting = get_option( sprintf( 'woocommerce_%s_settings', $wholesale_mail_id ), [] );
+
+        if ( ! $wholesale_mail_setting ) {
+            $emails = WC()->mailer()->get_emails();
+            foreach ( $emails as $email ) {
+                if ( $email->id === $wholesale_mail_id ) {
+                    $wholesale_mail_setting = $email->settings;
+                }
+            }
+        }
+
+        if ( empty( $wholesale_mail_setting ) ) {
+            return $enabled;
+        }
+
+        if ( $wholesale_mail_setting && 'yes' === $wholesale_mail_setting['enabled'] ) {
+            $is_wholesale_order = $order->get_meta( '_ywhs_wholesale_role' );
+            if ( isset( $is_wholesale_order ) && ! empty( $is_wholesale_order ) ) {
+                return false;
+            }
+        }
+
+        return $enabled;
     }
 }
