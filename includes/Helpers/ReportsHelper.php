@@ -157,7 +157,7 @@ class ReportsHelper {
                 continue;
             }
 
-            $compare_revenue += $p_order->get_subtotal();
+            $compare_revenue += floatval( $p_order->get_total() );
             if ( ! in_array( $p_order->get_customer_id(), $compare_wholesalers, true ) ) {
                 $compare_wholesalers[] = $p_order->get_customer_id();
             }

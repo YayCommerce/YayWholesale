@@ -16,6 +16,11 @@ use YayWholesaleB2B\Helpers\RolesHelper;
 
 $ywhs_wholesale = RolesHelper::is_wholesale_user();
 
+if ($ywhs_wholesale) {
+	$is_hidden_quantity = 0 == $ywhs_wholesale['minOrderQuantity'];
+    $is_hidden_amount   = 0 == $ywhs_wholesale['minOrderAmount'];
+}
+
  wp_interactivity_config(
     'ywhs_wholesale_requirement',
     [
@@ -30,7 +35,7 @@ $ywhs_wholesale = RolesHelper::is_wholesale_user();
     );
 
 ?>
-<?php if ($ywhs_wholesale) : ?>
+<?php if ($ywhs_wholesale && !($is_hidden_quantity && $is_hidden_amount)) : ?>
 <div 
 <?php
 // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped 
@@ -67,6 +72,7 @@ echo get_block_wrapper_attributes( [ 'class' => 'ywhs_requirement_section' ] );
 		</div>
 	</div>
 	<div class="ywhs_requirement_content" style="display: none;">
+		<?php if ( ! $is_hidden_quantity ) : ?>
 		<div class="ywhs_requirement_item">
 			<span><?php echo esc_attr_e( 'Min order quantity:', 'yay-wholesale-b2b' ); ?></span>
 			<span class="ywhs_r_base_notice">
@@ -76,6 +82,9 @@ echo get_block_wrapper_attributes( [ 'class' => 'ywhs_requirement_section' ] );
 				></span> /<span data-wp-text="state.minQty"></span>
 			</span>
 		</div>
+		<?php endif ?>
+
+		<?php if ( ! $is_hidden_amount ) : ?>
 		<div class="ywhs_requirement_item">
 			<span><?php echo esc_attr_e( 'Min order amount:', 'yay-wholesale-b2b' ); ?></span>
 			<span class="ywhs_r_base_notice">
@@ -84,6 +93,8 @@ echo get_block_wrapper_attributes( [ 'class' => 'ywhs_requirement_section' ] );
 					data-wp-text="state.subtotal"
 				></span> /<span data-wp-text="state.minAmount"></span></span>
 		</div>
+		<?php endif ?>
+
 		<div class="ywhs_requirement_item">
 			<span><?php esc_html_e( 'Get discount:', 'yay-wholesale-b2b' ); ?></span>
 			<div

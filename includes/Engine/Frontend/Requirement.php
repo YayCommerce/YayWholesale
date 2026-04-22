@@ -43,6 +43,13 @@ class Requirement {
             return;
         }
 
+        $is_hidden_quantity = 0 == $wholesale['minOrderQuantity'];
+        $is_hidden_amount   = 0 == $wholesale['minOrderAmount'];
+
+        if ( $is_hidden_quantity && $is_hidden_amount ) {
+            return;
+        }
+
         $is_discounted   = isset( $wholesale ) && PricingHelper::meets_discount_conditions( $wholesale );
         $actual_subtotal = PricingHelper::calc_actual_subtotal_of_cart();
         $count           = WC()->cart->get_cart_contents_count();
@@ -140,6 +147,7 @@ class Requirement {
                 </div>
             </div>
             <div class="ywhs_requirement_content" style="display: none;">
+                <?php if ( ! $is_hidden_quantity ) : ?>
                 <div class="ywhs_requirement_item">
                     <span><?php echo esc_attr_e( 'Min order quantity:', 'yay-wholesale-b2b' ); ?></span>
                     <span class="ywhs_r_base_notice">
@@ -147,6 +155,9 @@ class Requirement {
                             <?php echo esc_html( $count ); ?>
                         </span> /<?php echo esc_html( $wholesale['minOrderQuantity'] ); ?> </span>
                 </div>
+                <?php endif ?>
+
+                <?php if ( ! $is_hidden_amount ) : ?>
                 <div class="ywhs_requirement_item">
                     <span><?php echo esc_attr_e( 'Min order amount:', 'yay-wholesale-b2b' ); ?></span>
                     <span class="ywhs_r_base_notice">
@@ -154,6 +165,8 @@ class Requirement {
                             <?php echo wp_kses_post( wc_price( $actual_subtotal ) ); ?>
                         </span> /<?php echo wp_kses_post( wc_price( $wholesale['minOrderAmount'] ) ); ?> </span>
                 </div>
+                <?php endif ?>
+
                 <div class="ywhs_requirement_item">
                     <span><?php echo esc_attr_e( 'Get discount:', 'yay-wholesale-b2b' ); ?></span>
                     <div <?php echo wp_kses_post( $is_discounted ? 'class="ywhs_r_notice"' : 'class="ywhs_r_base_notice"' ); ?>><?php echo esc_attr( str_replace( '%DISCOUNT%', $wholesale['discount'], __( '%DISCOUNT%% Off', 'yay-wholesale-b2b' ) ) ); ?></div>

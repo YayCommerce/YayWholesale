@@ -18,6 +18,13 @@ const Render = () => {
         return null;
     }
 
+    const isHiddenQuantity = wholesale.minOrderQuantity === 0;
+    const isHiddenAmount = wholesale.minOrderAmount === 0;
+
+    if (isHiddenQuantity && isHiddenAmount) {
+        return null;
+    }
+
     const { cart, isLoading } = useSelect(
         (select) => {
           const store = select('wc/store/cart');
@@ -147,6 +154,7 @@ const Render = () => {
                     style={{ display: 'none' }}
                 >
                     {/* Min order quantity */}
+                    {! isHiddenQuantity && 
                     <div className="ywhs_requirement_item">
                         <span>{__('Min order quantity:', 'yay-wholesale-b2b')}</span>
                         <span className="ywhs_r_base_notice">
@@ -156,8 +164,10 @@ const Render = () => {
                             /{wholesale.minOrderQuantity}
                         </span>
                     </div>
+                    }
     
                     {/* Min order amount */}
+                    {!isHiddenAmount && 
                     <div className="ywhs_requirement_item">
                         <span>{__('Min order amount:', 'yay-wholesale-b2b')}</span>
                         <span className="ywhs_r_base_notice">
@@ -167,6 +177,7 @@ const Render = () => {
                             /{parseWPCurrency(wholesale.minOrderAmount)}
                         </span>
                     </div>
+                    }
     
                     {/* Discount */}
                     <div className="ywhs_requirement_item">

@@ -66,14 +66,15 @@ if ( empty( $_COOKIE['yaywholesaleb2b_cid'] ) ) {
 			<?php if ( !$ywhs_field['isHidden'] ) : ?>
 			<div <?php echo esc_html( $ywhs_field['columnWidth'] ) === '50%' ? 'class="ywhs_half"' : 'class="ywhs_full"'; ?> >
 				<label class="ywhs_requirement_title" for="<?php echo esc_html( $ywhs_field['id'] ); ?>" >
-					<?php echo esc_html( $ywhs_field['label'] ); ?>
-					<div style="color: red">
-					<?php
-					if ( $ywhs_field['isRequired'] ) {
-						echo '*';
-					}
-					?>
-					</div>
+					<span>        
+						<?php echo esc_html( $ywhs_field['label'] ); ?>
+						<span style="color: red">
+							<?php
+							if ( $ywhs_field['isRequired'] ) {
+								echo '*';
+							}
+							?>
+					</span>
 				</label>
 				<?php if ( esc_html( $ywhs_field['type'] ) !== 'textarea' ) : ?>
 					<input 

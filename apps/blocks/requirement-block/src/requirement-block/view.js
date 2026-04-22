@@ -58,6 +58,9 @@ const adminUrl = config?.admin_url ?? '';
 const isUsingDefaultCurrency = config?.is_using_defaut_currency ?? false;
 const currency = config?.currency ?? "";
 const nonce = config?.nonce ?? "";
+const isHiddenQuantity = wholesaleRole && wholesaleRole.minOrderQuantity === 0;
+const isHiddenAmount = wholesaleRole && wholesaleRole.minOrderAmount === 0;
+
 
 const { state, callbacks } = store('ywhs_wholesale_requirement', {
     state: {
@@ -84,6 +87,11 @@ const { state, callbacks } = store('ywhs_wholesale_requirement', {
             if (! wholesaleRole) {
               return;
             }
+            
+            if (isHiddenQuantity && isHiddenAmount) {
+              return;
+            }
+
             const cart = wcState?.cart;
             
             if (! cart) return;

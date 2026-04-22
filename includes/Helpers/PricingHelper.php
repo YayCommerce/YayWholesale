@@ -231,6 +231,8 @@ class PricingHelper {
                     $origin_price = wc_get_price_excluding_tax( $product );
                 }
 
+                $origin_price = round( $origin_price, wc_get_price_decimals() );
+
                 $extra_price_map[ $item->get_id() ] = $initial_price - $origin_price;
 
                 HooksHelper::add_price_hooks();

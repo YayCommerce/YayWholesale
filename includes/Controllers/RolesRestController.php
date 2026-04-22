@@ -5,7 +5,6 @@ use YayWholesaleB2B\Utils\SingletonTrait;
 use YayWholesaleB2B\Helpers\RolesHelper;
 use WP_REST_Request;
 use WP_REST_Response;
-use WP_User_Query;
 use YayWholesaleB2B\Helpers\SettingsHelper;
 
 defined( 'ABSPATH' ) || exit;

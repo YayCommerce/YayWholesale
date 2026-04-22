@@ -15,7 +15,10 @@ export async function fetchRoles() {
 }
 
 export async function fetchActiveRoles() {
-  const response = await api.get('roles?active=true');
+  const searchParams = new URLSearchParams({
+    active: 'true',
+  });
+  const response = await api.get('roles', { searchParams });
   const result = await handleResponse<RolesListValues[]>(
     response,
     __('Failed to fetch roles', 'yay-wholesale-b2b'),
