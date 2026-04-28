@@ -1,13 +1,22 @@
 {
-  "editor.formatOnSave": true,
-  "editor.defaultFormatter": "esbenp.prettier-vscode",
-  "phpSniffer.executablesFolder": "tools/vendor/squizlabs/php_codesniffer/bin",
   "[php]": {
-    "editor.defaultFormatter": "wongjn.php-sniffer"
+    "editor.defaultFormatter": "wongjn.php-sniffer",
+    "editor.formatOnSave": true
+  },
+  "[typescript][typescriptreact][postcss][css]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true
+  },
+  "[json][jsonc]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": false
   },
   "phpSniffer.autoDetect": true,
+  
+  "tailwindCSS.experimental.configFile": "./apps/admin/src/main.css",
+  "prettier.ignorePath": "./apps/admin/.prettierignore",
 
-
+  "intelephense.environment.includePaths": ["../../.."],
   "intelephense.stubs": [
     "apache",
     "bcmath",

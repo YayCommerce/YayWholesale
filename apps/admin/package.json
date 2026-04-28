@@ -85,7 +85,7 @@
     "vite-plugin-external": "^6.1.0"
   },
   "prettier": {
-    "printWidth": 100,
+    "printWidth": 120,
     "semi": true,
     "singleQuote": true,
     "tabWidth": 2,
@@ -93,16 +93,15 @@
     "importOrder": [
       "^(react/(.*)$)|^(react$)",
       "<THIRD_PARTY_MODULES>",
+      "^@wordpress/(.*)$",
       "",
       "^types$",
       "^@/types/(.*)$",
-      "^@/config/(.*)$",
       "^@/lib/(.*)$",
       "^@/hooks/(.*)$",
       "^@/components/ui/(.*)$",
       "^@/components/(.*)$",
-      "^@/styles/(.*)$",
-      "",
+      "^@/(.*)$",
       "^[./]"
     ],
     "importOrderSeparation": false,
