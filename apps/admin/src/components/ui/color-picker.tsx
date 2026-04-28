@@ -13,7 +13,7 @@ import { useDebounceFn } from 'ahooks';
 import { Check } from 'lucide-react';
 import { HexAlphaColorPicker, HexColorInput, HexColorPicker } from 'react-colorful';
 
-import { useUncontrolled } from '@/lib/hooks/useUncontrolled';
+import { useUncontrolled } from '@/hooks/useUncontrolled';
 import { cn } from '@/lib/utils';
 import { InputGroup, InputGroupAddon } from '@/components/ui/input-group';
 import { Popover, PopoverContent } from '@/components/ui/popover';

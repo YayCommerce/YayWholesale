@@ -3,7 +3,7 @@ import { format } from 'date-fns';
 import { ArrowRight, Calendar as CalendarIcon } from 'lucide-react';
 import { type DateRange } from 'react-day-picker';
 
-import { useUncontrolled } from '@/lib/hooks/useUncontrolled';
+import { useUncontrolled } from '@/hooks/useUncontrolled';
 import { cn } from '@/lib/utils';
 import { Calendar } from '@/components/ui/calendar';
 import { ComboboxIcon, ComboboxTrigger } from '@/components/ui/combobox';

@@ -2,7 +2,7 @@ import { ComponentProps, createContext, forwardRef, useContext } from 'react';
 import { ChevronDownIcon, ChevronUpIcon } from 'lucide-react';
 import { NumericFormat, NumericFormatProps } from 'react-number-format';
 
-import { useUncontrolled } from '@/lib/hooks/useUncontrolled';
+import { useUncontrolled } from '@/hooks/useUncontrolled';
 import { cn } from '@/lib/utils';
 
 import { InputGroup, InputGroupInput } from './input-group';

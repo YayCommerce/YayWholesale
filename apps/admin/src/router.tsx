@@ -1,13 +1,13 @@
 import { createHashRouter, redirect } from 'react-router-dom';
 
-import DashboardPage from '@/components/pages/dashboard/DashboardPage';
-import RolesPage from '@/components/pages/roles/RolesPage';
-import WholesalersListPage from '@/components/pages/wholesalers-list/WholeSalersListPage';
+import DashboardPage from '@/pages/dashboard/DashboardPage';
+import RolesPage from '@/pages/roles/RolesPage';
+import WholesalersListPage from '@/pages/wholesalers-list/WholeSalersListPage';
 
 import AppLayout from './AppLayout';
-import NotFoundPage from './components/pages/404';
-import RequestsPage from './components/pages/request/RequestsPage';
-import SettingsPage from './components/pages/settings/SettingsPage';
+import NotFoundPage from './pages/404';
+import RequestsPage from './pages/request/RequestsPage';
+import SettingsPage from './pages/settings/SettingsPage';
 
 export function getManagerRouter() {
   return createHashRouter([

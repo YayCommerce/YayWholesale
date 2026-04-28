@@ -2,7 +2,7 @@ import { ComponentProps, useState } from 'react';
 import { format } from 'date-fns';
 import { Calendar as CalendarIcon } from 'lucide-react';
 
-import { useUncontrolled } from '@/lib/hooks/useUncontrolled';
+import { useUncontrolled } from '@/hooks/useUncontrolled';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent } from '@/components/ui/popover';
 

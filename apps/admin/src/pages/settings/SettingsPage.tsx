@@ -10,7 +10,7 @@ import { cn, getSettings } from '@/lib/utils';
 import { Card, CardContent } from '@/components/ui/card';
 import { FormProvider } from '@/components/ui/form';
 import { UnsavedChangeDialog } from '@/components/ui/unsaved-changed-dialog';
-import { useRouteLeaveGuard } from '@/components/custom/UseRouteLeaveGuard';
+import { useRouteLeaveGuard } from '@/hooks/useRouteLeaveGuard';
 
 import DisplayTab from './tabs/DisplayTab';
 import EmailsTab from './tabs/EmailsTab';

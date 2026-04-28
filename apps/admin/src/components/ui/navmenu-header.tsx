@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Slot } from '@radix-ui/react-slot';
 import { useLocation } from 'react-router-dom';
 
-import { useCombinedRefs } from '@/lib/hooks/useCombinedRefs';
+import { useCombinedRefs } from '@/hooks/useCombinedRefs';
 import { cn } from '@/lib/utils';
 
 const HeaderNavMenuList = React.forwardRef<HTMLUListElement, HeaderNavMenuListProps>(
