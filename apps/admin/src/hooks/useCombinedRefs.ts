@@ -1,6 +1,4 @@
-export function useCombinedRefs<T>(
-  ...refs: (React.ForwardedRef<T> | React.MutableRefObject<T | null>)[]
-) {
+export function useCombinedRefs<T>(...refs: (React.ForwardedRef<T> | React.MutableRefObject<T | null>)[]) {
   return (node: T | null) => {
     refs.forEach((r) => {
       if (!r) return;

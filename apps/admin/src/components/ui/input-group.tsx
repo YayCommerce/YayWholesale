@@ -7,7 +7,6 @@ import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-
 import { focusVariants } from './variants/focus.variants';
 import {
   inputGroupAddonVariants,
@@ -17,21 +16,12 @@ import {
   inputVariants,
 } from './variants/input.variants';
 
-function InputGroup({
-  className,
-  size = 'medium',
-  ...props
-}: React.ComponentProps<'div'> & InputGroupVariantProps) {
+function InputGroup({ className, size = 'medium', ...props }: React.ComponentProps<'div'> & InputGroupVariantProps) {
   return (
     <div
       data-slot="input-group"
       role="group"
-      className={cn(
-        inputGroupVariants({ size }),
-        focusVariants(),
-        inputVariants({ variant: 'input' }),
-        className,
-      )}
+      className={cn(inputGroupVariants({ size }), focusVariants(), inputVariants({ variant: 'input' }), className)}
       {...props}
     />
   );
@@ -65,8 +55,7 @@ function InputGroupButton({
   variant = 'ghost',
   size = 'large',
   ...props
-}: Omit<React.ComponentProps<typeof Button>, 'size'> &
-  VariantProps<typeof inputGroupButtonVariants>) {
+}: Omit<React.ComponentProps<typeof Button>, 'size'> & VariantProps<typeof inputGroupButtonVariants>) {
   return (
     <Button
       type={type}
@@ -122,11 +111,4 @@ const InputGroupTextarea = React.forwardRef<HTMLTextAreaElement, React.Component
   },
 );
 
-export {
-  InputGroup,
-  InputGroupAddon,
-  InputGroupButton,
-  InputGroupText,
-  InputGroupInput,
-  InputGroupTextarea,
-};
+export { InputGroup, InputGroupAddon, InputGroupButton, InputGroupText, InputGroupInput, InputGroupTextarea };

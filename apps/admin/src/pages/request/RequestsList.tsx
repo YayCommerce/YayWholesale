@@ -1,8 +1,8 @@
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { flexRender, getCoreRowModel, PaginationState, useReactTable } from '@tanstack/react-table';
+import { ChevronsUpDown, Search } from 'lucide-react';
 import { Spinner } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
-import { ChevronsUpDown, Search } from 'lucide-react';
 
 import {
   useBulkDeleteRequestMutation,
@@ -48,18 +48,10 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { WholeSaleToolTip } from '@/components/custom/WholeSaleToolTip';
 import DeleteIcon from '@/components/icons/DeleteIcon';
 import RequestsStatusIcon from '@/components/icons/RequestStatusIcon';
-
 import { RequestsColumn } from './requests-table/RequestsColumn';
 import requestsStatusMap from './requests-table/RequestsStatusMap';
 
@@ -231,9 +223,7 @@ export default function RequestsList() {
                   <TableHead
                     key={header.id}
                     className={cn(
-                      header.column.columnDef.meta?.align === 'center'
-                        ? 'text-center'
-                        : 'text-left',
+                      header.column.columnDef.meta?.align === 'center' ? 'text-center' : 'text-left',
                       header.column.columnDef.meta?.isCheckbox ? 'w-9' : 'px-3',
                     )}
                   >
@@ -262,10 +252,7 @@ export default function RequestsList() {
                   {row.getVisibleCells().map((cell) => (
                     <TableCell
                       key={cell.id}
-                      className={cn(
-                        'h-14',
-                        cell.column.id === 'actions' ? 'flex w-25 justify-end lg:w-full' : '',
-                      )}
+                      className={cn('h-14', cell.column.id === 'actions' ? 'flex w-25 justify-end lg:w-full' : '')}
                     >
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </TableCell>
@@ -291,10 +278,7 @@ export default function RequestsList() {
             <Separator orientation="vertical" className="ml-2 h-5!" />
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button
-                  variant="ghost"
-                  className="hover:text-primary hover:bg-primary/6 group flex gap-1.5 px-2.5"
-                >
+                <Button variant="ghost" className="hover:text-primary hover:bg-primary/6 group flex gap-1.5 px-2.5">
                   <span className="text-sm font-normal">{__('Status', 'yay-wholesale-b2b')}</span>
                   <span className="group-hover:text-primary text-muted-foreground flex items-center">
                     <ChevronsUpDown className="size-3.5 stroke-[2.5px]" />
@@ -327,10 +311,7 @@ export default function RequestsList() {
                   </DropdownMenuSubContent>
                 </DropdownMenuSub>
 
-                <DropdownMenuItem
-                  className="w-35"
-                  onClick={() => handleBulkStatusChange('rejected')}
-                >
+                <DropdownMenuItem className="w-35" onClick={() => handleBulkStatusChange('rejected')}>
                   <RequestsStatusIcon status="rejected" />
                   {__('Reject', 'yay-wholesale-b2b')}
                 </DropdownMenuItem>
@@ -354,10 +335,7 @@ export default function RequestsList() {
               <DialogContent className="bw:max-w-md">
                 <DialogHeader className="bw:border-b-0">
                   <DialogTitle>
-                    {sprintf(
-                      __(`Are you sure you want to delete %d requests ?`, 'yay-wholesale-b2b'),
-                      selectedCount,
-                    )}
+                    {sprintf(__(`Are you sure you want to delete %d requests ?`, 'yay-wholesale-b2b'), selectedCount)}
                   </DialogTitle>
                   <DialogDescription>
                     {__(

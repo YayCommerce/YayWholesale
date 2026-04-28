@@ -1,8 +1,8 @@
 import { useMemo, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { __, sprintf } from '@wordpress/i18n';
 import { ChevronDown } from 'lucide-react';
 import { useUpdateEffect } from 'react-use';
+import { __, sprintf } from '@wordpress/i18n';
 
 import { useUpdateRequestStatusMutation } from '@/lib/queries/requests';
 import { useActiveRolesQuery, useRolesQuery } from '@/lib/queries/roles';
@@ -21,7 +21,6 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import RequestsStatusIcon from '@/components/icons/RequestStatusIcon';
-
 import requestsStatusMap from './RequestsStatusMap';
 
 export default function RequestsStatusColumn({
@@ -56,10 +55,7 @@ export default function RequestsStatusColumn({
           <Button
             variant="outline"
             className="pointer-events-auto flex w-40 items-center justify-between pr-1.5! font-normal"
-            disabled={
-              updateStatusMutation.isPending ||
-              queryClient.isMutating({ mutationKey: ['requests'] }) > 0
-            }
+            disabled={updateStatusMutation.isPending || queryClient.isMutating({ mutationKey: ['requests'] }) > 0}
           >
             <span className="flex items-center gap-2">
               <RequestsStatusIcon status={status} className="mt-0.5 min-h-4 min-w-4" />
@@ -88,9 +84,7 @@ export default function RequestsStatusColumn({
                           </DropdownMenuItem>
                           <DropdownMenuSeparator />
                           {roles?.map((role) => (
-                            <DropdownMenuItem
-                              onClick={() => handleStatusChange(statusKey, role.id)}
-                            >
+                            <DropdownMenuItem onClick={() => handleStatusChange(statusKey, role.id)}>
                               {icon} {sprintf(__('Approved to %s', 'yay-wholesale-b2b'), role.name)}
                             </DropdownMenuItem>
                           ))}

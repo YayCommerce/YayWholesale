@@ -2,8 +2,8 @@ import * as React from 'react';
 import { Slot } from '@radix-ui/react-slot';
 import { useLocation } from 'react-router-dom';
 
-import { useCombinedRefs } from '@/hooks/useCombinedRefs';
 import { cn } from '@/lib/utils';
+import { useCombinedRefs } from '@/hooks/useCombinedRefs';
 
 const SideNavMenuList = React.forwardRef<HTMLUListElement, SideNavMenuListProps>(
   ({ mode = 'router', activeTab, className, asChild = false, children, ...props }, ref) => {
@@ -20,29 +20,20 @@ const SideNavMenuList = React.forwardRef<HTMLUListElement, SideNavMenuListProps>
       );
 
       if (activeItemElement && activeItemElement instanceof HTMLElement) {
-        activeItemElement.classList.add(
-          'bg-background',
-          'text-primary',
-          'hover:text-primary-accent',
-        );
+        activeItemElement.classList.add('bg-background', 'text-primary', 'hover:text-primary-accent');
       } else {
-        listRef.current
-          .querySelectorAll('[data-slot="side-navigation-menu-item"]')
-          .forEach((item) => {
-            if (item instanceof HTMLElement) {
-              item.classList.remove('bg-background', 'text-primary', 'hover:text-primary-accent');
-            }
-          });
+        listRef.current.querySelectorAll('[data-slot="side-navigation-menu-item"]').forEach((item) => {
+          if (item instanceof HTMLElement) {
+            item.classList.remove('bg-background', 'text-primary', 'hover:text-primary-accent');
+          }
+        });
       }
     }, [pathname, mode]);
 
     return (
       <Comp
         data-slot="side-navigation-menu-list"
-        className={cn(
-          'flex list-none flex-row items-center justify-center gap-1 sm:flex-col',
-          className,
-        )}
+        className={cn('flex list-none flex-row items-center justify-center gap-1 sm:flex-col', className)}
         {...props}
         ref={combinedRef}
       >

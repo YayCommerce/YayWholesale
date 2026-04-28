@@ -1,14 +1,7 @@
 import { __ } from '@wordpress/i18n';
 
 import { Button } from './button';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from './dialog';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from './dialog';
 
 interface UnsavedChangeDialogProps {
   open: boolean;
@@ -25,10 +18,7 @@ export function UnsavedChangeDialog({
   onOpenChange,
   children = (
     <DialogDescription>
-      {__(
-        'You have unsaved changes. Do you want to save them before leaving?',
-        'yay-wholesale-b2b',
-      )}
+      {__('You have unsaved changes. Do you want to save them before leaving?', 'yay-wholesale-b2b')}
     </DialogDescription>
   ),
 }: UnsavedChangeDialogProps) {

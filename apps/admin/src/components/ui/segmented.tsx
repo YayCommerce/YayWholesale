@@ -49,8 +49,7 @@ function Segmented({ className, size, shape, children, ...props }: SegmentedProp
 
 const SegmentedItem = React.forwardRef<
   React.ElementRef<typeof ToggleGroupPrimitive.Item>,
-  React.ComponentPropsWithoutRef<typeof ToggleGroupPrimitive.Item> &
-    VariantProps<typeof segmentedVariants>
+  React.ComponentPropsWithoutRef<typeof ToggleGroupPrimitive.Item> & VariantProps<typeof segmentedVariants>
 >(({ className, children, size, shape, ...props }, ref) => {
   const context = React.useContext(SegmentedContext);
 

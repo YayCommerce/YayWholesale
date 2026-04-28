@@ -3,7 +3,6 @@ import { createHashRouter, redirect } from 'react-router-dom';
 import DashboardPage from '@/pages/dashboard/DashboardPage';
 import RolesPage from '@/pages/roles/RolesPage';
 import WholesalersListPage from '@/pages/wholesalers-list/WholeSalersListPage';
-
 import AppLayout from './AppLayout';
 import NotFoundPage from './pages/404';
 import RequestsPage from './pages/request/RequestsPage';

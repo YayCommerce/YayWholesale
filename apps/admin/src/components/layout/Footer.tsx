@@ -4,7 +4,6 @@ import { __ } from '@wordpress/i18n';
 
 import { markReviewed } from '@/lib/queries/mark-reviewed';
 import { cn } from '@/lib/utils';
-
 import { Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbSeparator } from '../ui/breadcrumb';
 
 export default function Footer({
@@ -117,12 +116,7 @@ export default function Footer({
               <>
                 <BreadcrumbSeparator />
                 <BreadcrumbItem key={menu}>
-                  <span
-                    className={cn(
-                      'text-foreground',
-                      index < currentMenu.length - 1 && 'text-muted-foreground',
-                    )}
-                  >
+                  <span className={cn('text-foreground', index < currentMenu.length - 1 && 'text-muted-foreground')}>
                     {formatMenuLabel(menu)}
                   </span>
                 </BreadcrumbItem>
@@ -152,20 +146,17 @@ export default function Footer({
           </p>
         ) : (
           <p className="text-right text-xs">
-            {createInterpolateElement(
-              __('Thank you for using YayWholesale from <link/>.', 'yay-wholesale-b2b'),
-              {
-                link: (
-                  <a
-                    href="https://yaycommerce.com/"
-                    target="_blank"
-                    className="text-primary cursor-pointer hover:text-[#1b5f97] focus:shadow-none"
-                  >
-                    YayCommerce
-                  </a>
-                ),
-              },
-            )}
+            {createInterpolateElement(__('Thank you for using YayWholesale from <link/>.', 'yay-wholesale-b2b'), {
+              link: (
+                <a
+                  href="https://yaycommerce.com/"
+                  target="_blank"
+                  className="text-primary cursor-pointer hover:text-[#1b5f97] focus:shadow-none"
+                >
+                  YayCommerce
+                </a>
+              ),
+            })}
           </p>
         )}
       </footer>

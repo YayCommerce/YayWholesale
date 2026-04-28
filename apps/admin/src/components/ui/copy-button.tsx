@@ -7,7 +7,6 @@ import { AnimatePresence, HTMLMotionProps } from 'motion/react';
 import * as m from 'motion/react-m';
 
 import { cn } from '@/lib/utils';
-
 import { buttonVariants } from './button';
 
 type CopyButtonProps = Omit<HTMLMotionProps<'button'>, 'children' | 'onCopy'> &

@@ -1,14 +1,13 @@
 import { Dispatch, FC, SetStateAction, useMemo, useState } from 'react';
 import { PopoverClose } from '@radix-ui/react-popover';
-import { __ } from '@wordpress/i18n';
 import { CalendarIcon, ChevronDown } from 'lucide-react';
 import { DateRange } from 'react-day-picker';
+import { __ } from '@wordpress/i18n';
 
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Separator } from '@/components/ui/separator';
-
 import { parseWPDate } from '../common.helper';
 
 interface DashboardDatePickerProps {
@@ -21,10 +20,7 @@ const DashboardDatePicker: FC<DashboardDatePickerProps> = ({ dateRange, setDateR
   const [openPopover, setOpenPopover] = useState(false);
 
   const displayDateRange = useMemo(
-    () =>
-      parseWPDate(dateRange?.from?.toDateString()) +
-      ' - ' +
-      parseWPDate(dateRange?.to?.toDateString()),
+    () => parseWPDate(dateRange?.from?.toDateString()) + ' - ' + parseWPDate(dateRange?.to?.toDateString()),
     [dateRange],
   );
 
@@ -59,10 +55,7 @@ const DashboardDatePicker: FC<DashboardDatePickerProps> = ({ dateRange, setDateR
             <ChevronDown className="text-muted-foreground/70 h-6 w-6 cursor-pointer" />
           </Button>
         </PopoverTrigger>
-        <PopoverContent
-          className="h-fit w-fit px-1 sm:-translate-x-5 lg:-translate-x-6"
-          align="start"
-        >
+        <PopoverContent className="h-fit w-fit px-1 sm:-translate-x-5 lg:-translate-x-6" align="start">
           <Calendar
             mode="range"
             defaultMonth={previewDateRange?.from}

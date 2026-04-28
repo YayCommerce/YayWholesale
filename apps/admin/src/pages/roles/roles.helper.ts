@@ -4,8 +4,7 @@ export function formatWooPrice(value: number): string {
 
   const [intPart, decPart] = value.toFixed(num_decimals).split('.');
 
-  const formatted =
-    intPart.replace(/\B(?=(\d{3})+(?!\d))/g, thousand_sep) + (decPart ? decimal_sep + decPart : '');
+  const formatted = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, thousand_sep) + (decPart ? decimal_sep + decPart : '');
 
   const map: Record<string, string> = {
     left: `${symbol}${formatted}`,

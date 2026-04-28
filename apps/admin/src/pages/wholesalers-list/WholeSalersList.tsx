@@ -1,8 +1,8 @@
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { flexRender, getCoreRowModel, PaginationState, useReactTable } from '@tanstack/react-table';
+import { ChevronsUpDown, Plus, Search } from 'lucide-react';
 import { Spinner } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
-import { ChevronsUpDown, Plus, Search } from 'lucide-react';
 
 import { useActiveRolesQuery } from '@/lib/queries/roles';
 import {
@@ -33,17 +33,9 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { WholeSaleToolTip } from '@/components/custom/WholeSaleToolTip';
 import RolesIcon from '@/components/icons/RolesIcon';
-
 import { WholesalersColumn } from './wholesalers-table/WholesalersColumn';
 
 export default function WholeSalersList() {
@@ -169,11 +161,7 @@ export default function WholeSalersList() {
               </SelectGroup>
             </SelectContent>
           </Select>
-          <a
-            href={window.yayWholesaleB2BAdmin.user_urls.add_new}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
+          <a href={window.yayWholesaleB2BAdmin.user_urls.add_new} target="_blank" rel="noopener noreferrer">
             <Button
               variant="primary-outline"
               className="hover:bg-primary hover:text-primary-foreground gap-0.25 rounded-sm px-4 shadow-xs"
@@ -188,12 +176,7 @@ export default function WholeSalersList() {
       </div>
 
       {/* Table */}
-      <div
-        className={cn(
-          'overflow-x-auto rounded-lg border',
-          isBulkUpdateWholesalersPending && 'relative opacity-50',
-        )}
-      >
+      <div className={cn('overflow-x-auto rounded-lg border', isBulkUpdateWholesalersPending && 'relative opacity-50')}>
         {/* Overlay Spinner */}
         {isBulkUpdateWholesalersPending && (
           <div className="absolute inset-0 z-50 flex items-center justify-center">
@@ -209,9 +192,7 @@ export default function WholeSalersList() {
                     key={header.id}
                     className={cn(
                       'text-foreground-400 py-2 text-sm font-medium',
-                      header.column.columnDef.meta?.align === 'center'
-                        ? 'text-center'
-                        : 'text-left',
+                      header.column.columnDef.meta?.align === 'center' ? 'text-center' : 'text-left',
                       header.column.columnDef.meta?.isCheckbox ? 'w-9' : 'px-3',
                     )}
                   >
@@ -224,10 +205,7 @@ export default function WholeSalersList() {
           <TableBody>
             {isLoadingWholesalers ? (
               <TableRow>
-                <TableCell
-                  colSpan={WholesalersColumn.length}
-                  className="h-32 text-center align-middle"
-                >
+                <TableCell colSpan={WholesalersColumn.length} className="h-32 text-center align-middle">
                   <div className="flex items-center justify-center gap-2">
                     <Spinner className="text-muted-foreground size-6 animate-spin" />
                   </div>
@@ -245,9 +223,7 @@ export default function WholeSalersList() {
                       key={cell.id}
                       className={cn(
                         'h-14',
-                        cell.column.columnDef.meta?.align === 'center'
-                          ? 'text-center'
-                          : 'text-left',
+                        cell.column.columnDef.meta?.align === 'center' ? 'text-center' : 'text-left',
                         cell.column.columnDef.meta?.isCheckbox ? 'w-9' : 'px-3',
                       )}
                     >
@@ -275,13 +251,8 @@ export default function WholeSalersList() {
             <Separator orientation="vertical" className="ml-2 h-5!" />
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button
-                  variant="ghost"
-                  className="hover:text-primary hover:bg-primary/6 group flex gap-1.5 px-2.5"
-                >
-                  <span className="text-sm font-normal">
-                    {__('Wholesaler Role', 'yay-wholesale-b2b')}
-                  </span>
+                <Button variant="ghost" className="hover:text-primary hover:bg-primary/6 group flex gap-1.5 px-2.5">
+                  <span className="text-sm font-normal">{__('Wholesaler Role', 'yay-wholesale-b2b')}</span>
                   <span className="group-hover:text-primary text-muted-foreground flex items-center">
                     <ChevronsUpDown className="size-3.5 stroke-[2.5px]" />
                   </span>

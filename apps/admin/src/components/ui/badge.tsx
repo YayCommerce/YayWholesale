@@ -11,19 +11,16 @@ const badgeVariants = cva(
       variant: {
         outline:
           'bg-background [a&]:hover:bg-accent [a&]:hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50',
-        ghost:
-          'hover:bg-accent text-foreground bg-transparent focus-visible:text-primary border-transparent',
+        ghost: 'hover:bg-accent text-foreground bg-transparent focus-visible:text-primary border-transparent',
         link: 'text-foreground [a&]:hover:text-primary underline-offset-4 hover:underline border-transparent',
-        secondary:
-          'border-transparent bg-secondary text-secondary-foreground [a&]:hover:bg-secondary/90',
+        secondary: 'border-transparent bg-secondary text-secondary-foreground [a&]:hover:bg-secondary/90',
 
         dimmed: 'border-transparent bg-muted-400 text-foreground',
         'dimmed-outline': 'bg-muted-400 text-foreground',
 
         primary: 'border-transparent bg-primary text-primary-foreground hover:bg-primary-accent',
         'primary-soft': 'border-transparent bg-primary/6 text-primary hover:text-primary-accent',
-        'primary-outline':
-          'border border-primary text-primary hover:border-primary-accent hover:text-primary-accent',
+        'primary-outline': 'border border-primary text-primary hover:border-primary-accent hover:text-primary-accent',
 
         destructive:
           'border-transparent bg-destructive text-destructive-foreground hover:bg-destructive-accent ring-destructive/50 hover:ring-destructive-accent/50',
@@ -61,9 +58,7 @@ function Badge({
 }: React.ComponentProps<'span'> & VariantProps<typeof badgeVariants> & { asChild?: boolean }) {
   const Comp = asChild ? Slot : 'span';
 
-  return (
-    <Comp data-slot="badge" className={cn(badgeVariants({ variant }), className)} {...props} />
-  );
+  return <Comp data-slot="badge" className={cn(badgeVariants({ variant }), className)} {...props} />;
 }
 
 export { Badge, badgeVariants };

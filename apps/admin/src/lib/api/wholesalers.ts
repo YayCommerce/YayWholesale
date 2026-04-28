@@ -3,12 +3,7 @@ import { __ } from '@wordpress/i18n';
 import { PaginatedWholesalerListValues, TotalWholesalersValues } from '../schema/wholesalers';
 import { api, handleResponse } from './base';
 
-export async function fetchWholesalersList(
-  search: string,
-  page: number,
-  perPage: number,
-  role: string,
-) {
+export async function fetchWholesalersList(search: string, page: number, perPage: number, role: string) {
   const searchParams = new URLSearchParams({
     search: search,
     page: String(page),

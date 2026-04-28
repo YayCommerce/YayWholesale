@@ -4,7 +4,6 @@ import { cva, VariantProps } from 'class-variance-authority';
 import { Loader2 } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
-
 import { focusVariants } from './variants/focus.variants';
 
 const switchVariants = cva('', {
@@ -48,10 +47,7 @@ const Switch = React.forwardRef<
       >
         {loading ? (
           <Loader2
-            className={cn(
-              'text-primary animate-spin',
-              size === 'sm' ? 'size-4' : size === 'lg' ? 'size-6' : 'size-5',
-            )}
+            className={cn('text-primary animate-spin', size === 'sm' ? 'size-4' : size === 'lg' ? 'size-6' : 'size-5')}
           />
         ) : null}
       </SwitchPrimitive.Thumb>

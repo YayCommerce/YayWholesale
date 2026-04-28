@@ -1,5 +1,5 @@
-import { __ } from '@wordpress/i18n';
 import z from 'zod';
+import { __ } from '@wordpress/i18n';
 
 const requestFieldsSchema = z.object({
   label: z.string(),

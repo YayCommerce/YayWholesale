@@ -3,7 +3,6 @@ import { XIcon } from 'lucide-react';
 import { useUpdateEffect } from 'react-use';
 
 import { cn } from '@/lib/utils';
-
 import { Button } from './button';
 
 type BulkActionBoxProps = {

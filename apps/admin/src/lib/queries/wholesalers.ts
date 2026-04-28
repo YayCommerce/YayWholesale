@@ -1,7 +1,6 @@
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { showToast } from '@/components/custom/showToast';
-
 import {
   bulkUpdateWholesalerRole,
   fetchWholesalersList,

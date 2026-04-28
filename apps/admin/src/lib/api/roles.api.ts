@@ -7,10 +7,7 @@ import type { RoleFormValues, RolesListValues } from '@/lib/schema/roles';
 
 export async function fetchRoles() {
   const response = await api.get('roles');
-  const result = await handleResponse<RolesListValues[]>(
-    response,
-    __('Failed to fetch roles', 'yay-wholesale-b2b'),
-  );
+  const result = await handleResponse<RolesListValues[]>(response, __('Failed to fetch roles', 'yay-wholesale-b2b'));
   return result.data ?? [];
 }
 
@@ -19,50 +16,35 @@ export async function fetchActiveRoles() {
     active: 'true',
   });
   const response = await api.get('roles', { searchParams });
-  const result = await handleResponse<RolesListValues[]>(
-    response,
-    __('Failed to fetch roles', 'yay-wholesale-b2b'),
-  );
+  const result = await handleResponse<RolesListValues[]>(response, __('Failed to fetch roles', 'yay-wholesale-b2b'));
   return result.data ?? [];
 }
 
 // get role by id
 export async function fetchRole(roleId: number) {
   const response = await api.get(`roles/${roleId}`);
-  const result = await handleResponse<RoleFormValues>(
-    response,
-    __('Failed to fetch role', 'yay-wholesale-b2b'),
-  );
+  const result = await handleResponse<RoleFormValues>(response, __('Failed to fetch role', 'yay-wholesale-b2b'));
   return result.data;
 }
 
 // create new role
 export async function postRole(data: RoleFormValues) {
   const response = await api.post('roles', { json: data });
-  const result = await handleResponse<RoleFormValues>(
-    response,
-    __('Failed to create role', 'yay-wholesale-b2b'),
-  );
+  const result = await handleResponse<RoleFormValues>(response, __('Failed to create role', 'yay-wholesale-b2b'));
   return result;
 }
 
 // update role
 export async function updateRole(data: RoleFormValues, roleId: number) {
   const response = await api.put(`roles/${roleId}`, { json: data });
-  const result = await handleResponse<RoleFormValues>(
-    response,
-    __('Failed to update role', 'yay-wholesale-b2b'),
-  );
+  const result = await handleResponse<RoleFormValues>(response, __('Failed to update role', 'yay-wholesale-b2b'));
   return result;
 }
 
 // delete role
 export async function deleteRole(id: number) {
   const response = await api.delete(`roles/${id}`);
-  const result = await handleResponse<RolesListValues[]>(
-    response,
-    __('Failed to delete role', 'yay-wholesale-b2b'),
-  );
+  const result = await handleResponse<RolesListValues[]>(response, __('Failed to delete role', 'yay-wholesale-b2b'));
   return result;
 }
 

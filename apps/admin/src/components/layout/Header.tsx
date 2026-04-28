@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useState } from 'react';
 import { CircleNotchIcon } from '@phosphor-icons/react';
 import { useIsMutating } from '@tanstack/react-query';
-import { __, sprintf } from '@wordpress/i18n';
 import { useMatch, useNavigate } from 'react-router-dom';
+import { __, sprintf } from '@wordpress/i18n';
 
 import { usePendingCountQuery } from '@/lib/queries/requests';
 import { cn } from '@/lib/utils';
@@ -11,7 +11,6 @@ import DashboardIcon from '@/components/icons/DashboardIcon';
 import RequestIcon from '@/components/icons/RequestIcon';
 import RolesIcon from '@/components/icons/RolesIcon';
 import SettingsIcon from '@/components/icons/SettingsIcon';
-
 import { WholeSaleToolTip } from '../custom/WholeSaleToolTip';
 import WholesalersIcon from '../icons/WholesalersIcon';
 import { Badge } from '../ui/badge';
@@ -39,10 +38,7 @@ const NAV_ITEMS = [
           <WholeSaleToolTip
             trigger={
               <div>
-                <Badge
-                  variant="destructive"
-                  className={cn('h-5 min-w-5 px-1 leading-0 tabular-nums', props.classname)}
-                >
+                <Badge variant="destructive" className={cn('h-5 min-w-5 px-1 leading-0 tabular-nums', props.classname)}>
                   {data.count}
                 </Badge>
               </div>

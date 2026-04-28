@@ -1,8 +1,8 @@
 import { useMemo } from 'react';
-import { Spinner } from '@wordpress/components';
-import { __, sprintf } from '@wordpress/i18n';
 import { Ellipsis } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { Spinner } from '@wordpress/components';
+import { __, sprintf } from '@wordpress/i18n';
 
 import { useRequestQuery, useUpdateRequestStatusMutation } from '@/lib/queries/requests';
 import { useActiveRolesQuery } from '@/lib/queries/roles';
@@ -19,18 +19,10 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetFooter,
-  SheetHeader,
-  SheetTitle,
-} from '@/components/ui/sheet';
+import { Sheet, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Textarea } from '@/components/ui/textarea';
 import { WholeSaleToolTip } from '@/components/custom/WholeSaleToolTip';
 import RequestsStatusIcon from '@/components/icons/RequestStatusIcon';
-
 import { parseWPDate, parseWPTime } from '../common.helper';
 import requestsStatusMap from './requests-table/RequestsStatusMap';
 
@@ -54,10 +46,7 @@ export const DEFAULT_REQUEST: RequestFormValues = {
 };
 
 const isPhoneField = (field: RequestFieldValues) => {
-  return (
-    field.label.toLowerCase().includes(__('phone', 'yay-wholesale-b2b')) ||
-    field.type.toLowerCase() === 'phone'
-  );
+  return field.label.toLowerCase().includes(__('phone', 'yay-wholesale-b2b')) || field.type.toLowerCase() === 'phone';
 };
 
 export default function RequestsForm() {
@@ -67,12 +56,7 @@ export default function RequestsForm() {
   const navigate = useNavigate();
   const isOpen = editRequestId !== 0;
 
-  const {
-    data,
-    error,
-    isLoading: isLoadingRequest,
-    isError: isErrorRequest,
-  } = useRequestQuery(editRequestId);
+  const { data, error, isLoading: isLoadingRequest, isError: isErrorRequest } = useRequestQuery(editRequestId);
   const { data: rolesData } = useActiveRolesQuery();
   const updateStatusMutation = useUpdateRequestStatusMutation(editRequestId);
 
@@ -138,10 +122,7 @@ export default function RequestsForm() {
                   <WholeSaleToolTip
                     trigger={
                       <div>
-                        <RequestsStatusIcon
-                          status={dataDisplay?.status ?? 'pending'}
-                          className="h-3.5 w-3.5"
-                        />
+                        <RequestsStatusIcon status={dataDisplay?.status ?? 'pending'} className="h-3.5 w-3.5" />
                       </div>
                     }
                     content={text}
@@ -178,11 +159,7 @@ export default function RequestsForm() {
             <Input
               id="registrationDate"
               readOnly
-              value={
-                dataDisplay?.date
-                  ? parseWPDate(dataDisplay.date) + ' ' + parseWPTime(dataDisplay.date)
-                  : ''
-              }
+              value={dataDisplay?.date ? parseWPDate(dataDisplay.date) + ' ' + parseWPTime(dataDisplay.date) : ''}
               onChange={() => {}}
             />
           </div>

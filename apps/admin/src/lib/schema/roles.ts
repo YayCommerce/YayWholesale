@@ -1,5 +1,5 @@
-import { __ } from '@wordpress/i18n';
 import { z } from 'zod';
+import { __ } from '@wordpress/i18n';
 
 export const roleSchema = z.object({
   id: z.number().min(1),

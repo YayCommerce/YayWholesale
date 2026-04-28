@@ -5,7 +5,6 @@ import { WholesalerFormValues } from '@/lib/schema/wholesalers';
 import { cn } from '@/lib/utils';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Checkbox } from '@/components/ui/checkbox';
-
 import { parseWPCurrency } from '../../common.helper';
 import WholesalersRoleColumn from './WholesalersRole';
 
@@ -81,9 +80,7 @@ export const WholesalersColumn: ColumnDef<WholesalerFormValues>[] = [
   },
   {
     accessorKey: 'completedOrdersCount',
-    header: () => (
-      <span className="flex justify-center">{__('Completed Orders', 'yay-wholesale-b2b')}</span>
-    ),
+    header: () => <span className="flex justify-center">{__('Completed Orders', 'yay-wholesale-b2b')}</span>,
     cell: ({ row }) => {
       const count = row.original.completedOrdersCount ?? 0;
       return (
@@ -109,17 +106,10 @@ export const WholesalersColumn: ColumnDef<WholesalerFormValues>[] = [
   },
   {
     accessorKey: 'wholesaleRevenue',
-    header: () => (
-      <span className="flex justify-center">{__('Wholesale Revenue', 'yay-wholesale-b2b')}</span>
-    ),
+    header: () => <span className="flex justify-center">{__('Wholesale Revenue', 'yay-wholesale-b2b')}</span>,
     cell: ({ row }) => {
       const revenue = row.original.wholesaleRevenue ?? 0;
-      return (
-        <span
-          className="flex justify-center"
-          dangerouslySetInnerHTML={{ __html: parseWPCurrency(revenue) }}
-        />
-      );
+      return <span className="flex justify-center" dangerouslySetInnerHTML={{ __html: parseWPCurrency(revenue) }} />;
     },
   },
 ];

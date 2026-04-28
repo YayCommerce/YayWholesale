@@ -1,9 +1,9 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Spinner } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
 import { Controller, FormProvider, useForm } from 'react-hook-form';
 import { useMatch, useNavigate, useParams } from 'react-router-dom';
 import { useUpdateEffect } from 'react-use';
+import { Spinner } from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
 
 import { useAddRoleMutation, useRoleQuery, useUpdateRoleMutation } from '@/lib/queries/roles';
 import { createRoleSchema, RoleFormValues, roleSchema } from '@/lib/schema/roles';
@@ -50,8 +50,7 @@ export default function RoleForm() {
   const navigate = useNavigate();
 
   const { mutate: addRole, isPending: isAddingRolePending } = useAddRoleMutation();
-  const { mutate: updateRole, isPending: isUpdatingRolePending } =
-    useUpdateRoleMutation(editRoleId);
+  const { mutate: updateRole, isPending: isUpdatingRolePending } = useUpdateRoleMutation(editRoleId);
 
   // Use the custom hook to fetch role data and handle loading and error states
   const { data, isLoading: isLoadingRole, isError: isErrorRole } = useRoleQuery(editRoleId);
@@ -120,15 +119,10 @@ export default function RoleForm() {
               <div className="flex items-start justify-between">
                 <div>
                   <SheetTitle className="text-foreground text-[18px] font-semibold">
-                    {isAddingRole
-                      ? __('Add New Role', 'yay-wholesale-b2b')
-                      : __('Edit Role', 'yay-wholesale-b2b')}
+                    {isAddingRole ? __('Add New Role', 'yay-wholesale-b2b') : __('Edit Role', 'yay-wholesale-b2b')}
                   </SheetTitle>
                   <SheetDescription className="text-muted-foreground mt-[4px] text-sm leading-[20px] font-normal">
-                    {__(
-                      'Enter the information below to add a new wholesale user role',
-                      'yay-wholesale-b2b',
-                    )}
+                    {__('Enter the information below to add a new wholesale user role', 'yay-wholesale-b2b')}
                   </SheetDescription>
                 </div>
               </div>
@@ -210,9 +204,7 @@ export default function RoleForm() {
                         max={100}
                         step={1}
                         placeholder={__('Enter a percentage discount', 'yay-wholesale-b2b')}
-                        decimalSeparator={
-                          window.yayWholesaleB2BAdmin.currency_data.decimal_sep ?? '.'
-                        }
+                        decimalSeparator={window.yayWholesaleB2BAdmin.currency_data.decimal_sep ?? '.'}
                         decimalScale={2}
                         className="h-9 w-full"
                         aria-invalid={invalid}
@@ -247,10 +239,7 @@ export default function RoleForm() {
                           onValueChange={(value) => field.onChange(value)}
                           min={0}
                           step={1}
-                          placeholder={__(
-                            'e.g. 10 (min number of items required per order)',
-                            'yay-wholesale-b2b',
-                          )}
+                          placeholder={__('e.g. 10 (min number of items required per order)', 'yay-wholesale-b2b')}
                           className="h-9 w-full"
                           aria-invalid={invalid}
                         />
@@ -302,27 +291,18 @@ export default function RoleForm() {
                         min={0}
                         fixedDecimalScale={true}
                         decimalScale={window.yayWholesaleB2BAdmin.currency_data.num_decimals ?? 2}
-                        decimalSeparator={
-                          window.yayWholesaleB2BAdmin.currency_data.decimal_sep ?? '.'
-                        }
-                        thousandSeparator={
-                          window.yayWholesaleB2BAdmin.currency_data.thousand_sep ?? ','
-                        }
+                        decimalSeparator={window.yayWholesaleB2BAdmin.currency_data.decimal_sep ?? '.'}
+                        thousandSeparator={window.yayWholesaleB2BAdmin.currency_data.thousand_sep ?? ','}
                         step={1}
                         className="h-9 w-full"
                       >
                         <NumberInputInput
-                          placeholder={__(
-                            'e.g. 200.00 (min total value required per order)',
-                            'yay-wholesale-b2b',
-                          )}
+                          placeholder={__('e.g. 200.00 (min total value required per order)', 'yay-wholesale-b2b')}
                           aria-invalid={invalid}
                         />
                         <div className="absolute inset-y-0 end-0 flex">
                           <NumberInputChevrons hasUnit />
-                          <NumberInputUnit
-                            unit={window.yayWholesaleB2BAdmin.currency_data.symbol ?? '$'}
-                          />
+                          <NumberInputUnit unit={window.yayWholesaleB2BAdmin.currency_data.symbol ?? '$'} />
                         </div>
                       </NumberInputRoot>
                     </FieldContent>
@@ -380,9 +360,7 @@ export default function RoleForm() {
                   className="px-5"
                   disabled={isAddingRolePending || isUpdatingRolePending}
                 >
-                  {isAddingRole
-                    ? __('Add Role', 'yay-wholesale-b2b')
-                    : __('Save changes', 'yay-wholesale-b2b')}
+                  {isAddingRole ? __('Add Role', 'yay-wholesale-b2b') : __('Save changes', 'yay-wholesale-b2b')}
                 </Button>
               </div>
             </SheetFooter>

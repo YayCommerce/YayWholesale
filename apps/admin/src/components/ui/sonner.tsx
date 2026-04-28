@@ -36,8 +36,7 @@ const Toaster = ({ ...props }: ToasterProps) => {
       }
       toastOptions={{
         classNames: {
-          toast:
-            'yay-toast sm:not-has-[.yay-toast-action]:w-max sm:has-[.yay-toast-action]:w-(--width) mx-auto',
+          toast: 'yay-toast sm:not-has-[.yay-toast-action]:w-max sm:has-[.yay-toast-action]:w-(--width) mx-auto',
           actionButton: 'yay-toast-action',
         },
       }}
@@ -46,19 +45,9 @@ const Toaster = ({ ...props }: ToasterProps) => {
   );
 };
 
-function ToastCircleIcon({
-  children,
-  className,
-}: {
-  children: React.ReactNode;
-  className?: string;
-}) {
+function ToastCircleIcon({ children, className }: { children: React.ReactNode; className?: string }) {
   return (
-    <span
-      className={clsx('inline-flex size-4 items-center justify-center rounded-full', className)}
-    >
-      {children}
-    </span>
+    <span className={clsx('inline-flex size-4 items-center justify-center rounded-full', className)}>{children}</span>
   );
 }
 

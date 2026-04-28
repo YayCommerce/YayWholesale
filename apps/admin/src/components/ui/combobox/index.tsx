@@ -2,14 +2,7 @@ import { useState } from 'react';
 import { CaretDownIcon, CheckIcon } from '@phosphor-icons/react';
 
 import { Button } from '@/components/ui/button';
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from '@/components/ui/command';
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 
 export interface ComboboxProps {
@@ -27,12 +20,7 @@ function Combobox({ values, selectedValues, onChange }: ComboboxProps) {
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <Button
-          variant="outline"
-          role="combobox"
-          aria-expanded={open}
-          className="w-fit min-w-[280px] justify-between"
-        >
+        <Button variant="outline" role="combobox" aria-expanded={open} className="w-fit min-w-[280px] justify-between">
           {selectedValues.length > 0
             ? selectedValues.length === values.length
               ? 'All Attributes'

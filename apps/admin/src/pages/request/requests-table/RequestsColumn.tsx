@@ -2,9 +2,9 @@ import { useState } from 'react';
 import { DialogClose } from '@radix-ui/react-dialog';
 import { useQueryClient } from '@tanstack/react-query';
 import { ColumnDef } from '@tanstack/react-table';
-import { __ } from '@wordpress/i18n';
 import { Ellipsis } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { __ } from '@wordpress/i18n';
 
 import { useDeleteRequestMutation } from '@/lib/queries/requests';
 import { RequestFormValues } from '@/lib/schema/requests';
@@ -22,7 +22,6 @@ import {
 import { WholeSaleToolTip } from '@/components/custom/WholeSaleToolTip';
 import DeleteIcon from '@/components/icons/DeleteIcon';
 import SettingsIcon from '@/components/icons/SettingsIcon';
-
 import { parseWPDate, parseWPTime } from '../../common.helper';
 import RequestsStatusColumn from './RequestsStatusColumn';
 
@@ -98,16 +97,13 @@ export const RequestsColumn: ColumnDef<RequestFormValues>[] = [
   {
     accessorKey: 'status',
     header: __('Status', 'yay-wholesale-b2b'),
-    cell: ({ row }) => (
-      <RequestsStatusColumn requestId={row.original.id} defaultValue={row.original.status} />
-    ),
+    cell: ({ row }) => <RequestsStatusColumn requestId={row.original.id} defaultValue={row.original.status} />,
   },
   {
     id: 'actions',
     header: '',
     cell: ({ row }) => {
-      const { mutate: deleteRequest, isPending: isDeletingRequestPending } =
-        useDeleteRequestMutation(row.original.id);
+      const { mutate: deleteRequest, isPending: isDeletingRequestPending } = useDeleteRequestMutation(row.original.id);
       const navigate = useNavigate();
       const queryClient = useQueryClient();
 
@@ -141,10 +137,7 @@ export const RequestsColumn: ColumnDef<RequestFormValues>[] = [
                     variant="ghost"
                     className="hover:text-destructive text-muted-foreground m-0 h-8 w-8 hover:bg-white hover:shadow-xs"
                     onClick={() => setOpenDialog(true)}
-                    disabled={
-                      isDeletingRequestPending ||
-                      queryClient.isMutating({ mutationKey: ['requests'] }) > 0
-                    }
+                    disabled={isDeletingRequestPending || queryClient.isMutating({ mutationKey: ['requests'] }) > 0}
                   >
                     <DeleteIcon className="h-4 w-4" />
                   </Button>
@@ -155,9 +148,7 @@ export const RequestsColumn: ColumnDef<RequestFormValues>[] = [
           </div>
           <DialogContent className="bw:max-w-md">
             <DialogHeader className="bw:border-b-0">
-              <DialogTitle>
-                {__('Are you sure you want to delete this request?', 'yay-wholesale-b2b')}
-              </DialogTitle>
+              <DialogTitle>{__('Are you sure you want to delete this request?', 'yay-wholesale-b2b')}</DialogTitle>
               <DialogDescription>
                 {__(
                   'This action cannot be undone. This will permanently delete this request and remove data from servers',

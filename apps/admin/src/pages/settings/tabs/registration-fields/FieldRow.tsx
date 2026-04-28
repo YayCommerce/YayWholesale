@@ -1,9 +1,9 @@
 import { useMemo } from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { __ } from '@wordpress/i18n';
 import { CirclePlus, Eye, EyeOff, GripVertical, Info } from 'lucide-react';
 import { Controller, useFormContext } from 'react-hook-form';
+import { __ } from '@wordpress/i18n';
 
 import { SettingsFormData } from '@/lib/schema/settings';
 import { cn } from '@/lib/utils';
@@ -19,13 +19,7 @@ import {
 import { Field, FieldContent, FieldError, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { WholeSaleToolTip } from '@/components/custom/WholeSaleToolTip';
@@ -147,11 +141,7 @@ export function FieldRow({
                   {__('Type', 'yay-wholesale-b2b')}
                 </FieldLabel>
                 <FieldContent>
-                  <Select
-                    value={field.value}
-                    onValueChange={field.onChange}
-                    disabled={isDefault || isHidden}
-                  >
+                  <Select value={field.value} onValueChange={field.onChange} disabled={isDefault || isHidden}>
                     <SelectTrigger className="bg-background h-9 w-full rounded-sm text-sm font-normal disabled:cursor-default">
                       <SelectValue placeholder="Select an option" />
                     </SelectTrigger>

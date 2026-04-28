@@ -12,11 +12,9 @@ import { CaretDownIcon, CaretUpIcon } from '@phosphor-icons/react';
 import { NumericFormat, NumericFormatProps } from 'react-number-format';
 
 import { cn } from '@/lib/utils';
-
 import { Input } from '../input';
 
-interface InputNumberContextValue
-  extends Omit<NumericFormatProps, 'value' | 'onValueChange' | 'className' | 'step'> {
+interface InputNumberContextValue extends Omit<NumericFormatProps, 'value' | 'onValueChange' | 'className' | 'step'> {
   defaultValue?: number;
   value?: number; // Controlled value
   onValueChange?: (value: number | undefined) => void; // Controlled change.
@@ -37,8 +35,7 @@ const useInputNumberContext = () => {
   return ctx;
 };
 
-interface InputNumberRootProps
-  extends Omit<NumericFormatProps, 'value' | 'onValueChange' | 'step'> {
+interface InputNumberRootProps extends Omit<NumericFormatProps, 'value' | 'onValueChange' | 'step'> {
   defaultValue?: number;
   value?: number; // Controlled value
   onValueChange?: (value: number | undefined) => void; // Controlled change.
@@ -67,9 +64,7 @@ function InputNumberRoot({
     ...restContextProps
   } = contextProps;
 
-  const [internalValue, setInternalValue] = useState<number | undefined>(
-    controlledValue ?? defaultValue,
-  );
+  const [internalValue, setInternalValue] = useState<number | undefined>(controlledValue ?? defaultValue);
 
   useEffect(() => {
     if (controlledValue !== undefined) {
@@ -106,10 +101,7 @@ function InputNumberRoot({
         ...restContextProps,
       }}
     >
-      <div
-        data-slot="input-number"
-        className={cn('group/input-number relative inline-flex', className)}
-      >
+      <div data-slot="input-number" className={cn('group/input-number relative inline-flex', className)}>
         {children}
       </div>
     </InputNumberContext.Provider>
@@ -120,71 +112,69 @@ type InputNumberInputProps = Omit<
   ComponentProps<'input'>,
   'value' | 'onValueChange' | 'defaultValue' | 'type' | 'min' | 'max'
 >;
-const InputNumberInput = forwardRef<HTMLInputElement, InputNumberInputProps>(
-  ({ className, ...inputProps }, ref) => {
-    const {
-      internalValue,
-      setInternalValue,
-      value: controlledValue,
-      onValueChange,
-      min,
-      max,
-      handleIncrement,
-      handleDecrement,
-      ...contextProps
-    } = useInputNumberContext();
+const InputNumberInput = forwardRef<HTMLInputElement, InputNumberInputProps>(({ className, ...inputProps }, ref) => {
+  const {
+    internalValue,
+    setInternalValue,
+    value: controlledValue,
+    onValueChange,
+    min,
+    max,
+    handleIncrement,
+    handleDecrement,
+    ...contextProps
+  } = useInputNumberContext();
 
-    const handleChange = (values: { value: string; floatValue: number | undefined }) => {
-      const newValue = values.floatValue === undefined ? undefined : values.floatValue;
-      setInternalValue(newValue);
-      if (onValueChange) {
-        onValueChange(newValue);
+  const handleChange = (values: { value: string; floatValue: number | undefined }) => {
+    const newValue = values.floatValue === undefined ? undefined : values.floatValue;
+    setInternalValue(newValue);
+    if (onValueChange) {
+      onValueChange(newValue);
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'ArrowUp') {
+      handleIncrement();
+    } else if (e.key === 'ArrowDown') {
+      handleDecrement();
+    }
+  };
+
+  const handleBlur = () => {
+    if (internalValue !== undefined) {
+      if (internalValue < min) {
+        setInternalValue(min);
+        (ref as React.RefObject<HTMLInputElement>).current!.value = String(min);
+      } else if (internalValue > max) {
+        setInternalValue(max);
+        (ref as React.RefObject<HTMLInputElement>).current!.value = String(max);
       }
-    };
+    }
+  };
 
-    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-      if (e.key === 'ArrowUp') {
-        handleIncrement();
-      } else if (e.key === 'ArrowDown') {
-        handleDecrement();
-      }
-    };
-
-    const handleBlur = () => {
-      if (internalValue !== undefined) {
-        if (internalValue < min) {
-          setInternalValue(min);
-          (ref as React.RefObject<HTMLInputElement>).current!.value = String(min);
-        } else if (internalValue > max) {
-          setInternalValue(max);
-          (ref as React.RefObject<HTMLInputElement>).current!.value = String(max);
-        }
-      }
-    };
-
-    return (
-      <NumericFormat
-        data-slot="input-number-input"
-        className={cn(
-          'peer/input-number-input [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none',
-          'focus:border-foreground focus:shadow-none focus:outline-none',
-          'aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive',
-          className,
-        )}
-        min={min}
-        max={max}
-        value={internalValue}
-        onValueChange={handleChange}
-        onKeyDown={handleKeyDown}
-        onBlur={handleBlur}
-        customInput={Input}
-        getInputRef={ref}
-        {...contextProps}
-        {...inputProps}
-      />
-    );
-  },
-);
+  return (
+    <NumericFormat
+      data-slot="input-number-input"
+      className={cn(
+        'peer/input-number-input [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none',
+        'focus:border-foreground focus:shadow-none focus:outline-none',
+        'aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive',
+        className,
+      )}
+      min={min}
+      max={max}
+      value={internalValue}
+      onValueChange={handleChange}
+      onKeyDown={handleKeyDown}
+      onBlur={handleBlur}
+      customInput={Input}
+      getInputRef={ref}
+      {...contextProps}
+      {...inputProps}
+    />
+  );
+});
 
 function InputNumberCarets({ className, children, ...props }: ComponentProps<'div'>) {
   return (
@@ -245,22 +235,13 @@ function InputNumberCaretDown({ className, children, ...props }: ComponentProps<
 interface InputNumberProps extends InputNumberRootProps {
   placeholder?: string;
 }
-const InputNumber = forwardRef<HTMLInputElement, InputNumberProps>(
-  ({ placeholder, className, ...rootProps }, ref) => {
-    return (
-      <InputNumberRoot {...rootProps}>
-        <InputNumberInput placeholder={placeholder} className={className} ref={ref} />
-        <InputNumberCarets />
-      </InputNumberRoot>
-    );
-  },
-);
+const InputNumber = forwardRef<HTMLInputElement, InputNumberProps>(({ placeholder, className, ...rootProps }, ref) => {
+  return (
+    <InputNumberRoot {...rootProps}>
+      <InputNumberInput placeholder={placeholder} className={className} ref={ref} />
+      <InputNumberCarets />
+    </InputNumberRoot>
+  );
+});
 
-export {
-  InputNumber,
-  InputNumberRoot,
-  InputNumberInput,
-  InputNumberCarets,
-  InputNumberCaretUp,
-  InputNumberCaretDown,
-};
+export { InputNumber, InputNumberRoot, InputNumberInput, InputNumberCarets, InputNumberCaretUp, InputNumberCaretDown };

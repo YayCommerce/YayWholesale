@@ -1,17 +1,11 @@
 import { useMemo } from 'react';
-import { __ } from '@wordpress/i18n';
 import { Controller, useFormContext } from 'react-hook-form';
+import { __ } from '@wordpress/i18n';
 
 import { useActiveRolesQuery, useRolesQuery } from '@/lib/queries/roles';
 import { SettingsFormData } from '@/lib/schema/settings';
 import { Field, FieldContent, FieldLabel } from '@/components/ui/field';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 
 export default function GeneralTab() {
@@ -129,10 +123,7 @@ export default function GeneralTab() {
                 {__('Display prices in the shop', 'yay-wholesale-b2b')}
               </h2>
               <p className="text-muted-foreground mt-2 text-xs font-normal">
-                {__(
-                  'Display product prices Including or Excluding tax for wholesalers in shop',
-                  'yay-wholesale-b2b',
-                )}
+                {__('Display product prices Including or Excluding tax for wholesalers in shop', 'yay-wholesale-b2b')}
               </p>
             </div>
             <Select value={field.value ? field.value : 'inherit'} onValueChange={field.onChange}>

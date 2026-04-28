@@ -38,9 +38,7 @@ export function useUncontrolled<T>({
   finalValue,
   onChange = () => {},
 }: UseUncontrolledOptions<T>): UseUncontrolledReturnValue<T> {
-  const [uncontrolledValue, setUncontrolledValue] = useState(
-    defaultValue !== undefined ? defaultValue : finalValue,
-  );
+  const [uncontrolledValue, setUncontrolledValue] = useState(defaultValue !== undefined ? defaultValue : finalValue);
 
   const handleUncontrolledChange = (val: T, ...payload: any[]) => {
     setUncontrolledValue(val);

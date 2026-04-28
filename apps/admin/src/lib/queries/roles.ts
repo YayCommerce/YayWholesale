@@ -1,6 +1,6 @@
 import { queryOptions, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { __ } from '@wordpress/i18n';
 import { useNavigate } from 'react-router-dom';
+import { __ } from '@wordpress/i18n';
 
 import {
   bulkUpdateRoleStatus,
@@ -14,7 +14,6 @@ import {
   updateRoleStatus,
 } from '@/lib/api/roles.api';
 import { showToast } from '@/components/custom/showToast';
-
 import { RoleFormValues } from '../schema/roles';
 import { getRoles, handleErrorMessage } from '../utils';
 
@@ -139,8 +138,7 @@ export function useUpdateRoleStatusMutation(roleId: number) {
 export function useBulkUpdateRoleStatusMutation() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ ids, status }: { ids: number[]; status: boolean }) =>
-      bulkUpdateRoleStatus(ids, status),
+    mutationFn: ({ ids, status }: { ids: number[]; status: boolean }) => bulkUpdateRoleStatus(ids, status),
     onSuccess: (response) => {
       showToast.success(response.message);
       if (!queryClient.isFetching({ queryKey: QUERY_KEY })) {

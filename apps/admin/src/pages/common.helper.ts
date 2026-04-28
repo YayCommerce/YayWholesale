@@ -91,8 +91,7 @@ export function parseWPCurrency(price: string | number) {
     price = parseFloat(price);
   }
 
-  const { symbol, position, thousand_sep, decimal_sep, num_decimals } =
-    window.yayWholesaleB2BAdmin.currency_data;
+  const { symbol, position, thousand_sep, decimal_sep, num_decimals } = window.yayWholesaleB2BAdmin.currency_data;
 
   const formattedPrice = price
     .toFixed(num_decimals)

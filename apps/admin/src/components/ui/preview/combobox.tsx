@@ -1,5 +1,4 @@
 import { cn } from '@/lib/utils';
-
 import { Button } from '../button';
 import { PopoverTrigger } from '../popover';
 
@@ -31,14 +30,7 @@ function ComboboxTrigger({
   );
 }
 
-function ComboboxCheckbox({
-  className,
-  children,
-  ...props
-}: {
-  className?: string;
-  children: React.ReactNode;
-}) {
+function ComboboxCheckbox({ className, children, ...props }: { className?: string; children: React.ReactNode }) {
   return (
     <div
       className={cn(

@@ -5,13 +5,9 @@ import { Calendar as CalendarIcon } from 'lucide-react';
 import { useUncontrolled } from '@/hooks/useUncontrolled';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent } from '@/components/ui/popover';
-
 import { ComboboxIcon, ComboboxTrigger } from './combobox';
 
-export type DatePickerProps = Omit<
-  ComponentProps<typeof ComboboxTrigger>,
-  'value' | 'defaultValue'
-> & {
+export type DatePickerProps = Omit<ComponentProps<typeof ComboboxTrigger>, 'value' | 'defaultValue'> & {
   value?: Date | undefined;
   defaultValue?: Date | undefined;
   onValueChange?: (value: Date | undefined) => void;
@@ -40,12 +36,7 @@ export function DatePicker({
         </div>
         <ComboboxIcon />
       </ComboboxTrigger>
-      <PopoverContent
-        side="bottom"
-        align="start"
-        sideOffset={5}
-        className="w-auto min-w-0 overflow-hidden p-0"
-      >
+      <PopoverContent side="bottom" align="start" sideOffset={5} className="w-auto min-w-0 overflow-hidden p-0">
         <Calendar
           mode="single"
           selected={date}

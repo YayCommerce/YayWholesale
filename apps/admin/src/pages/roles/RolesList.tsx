@@ -7,16 +7,12 @@ import {
   getPaginationRowModel,
   useReactTable,
 } from '@tanstack/react-table';
-import { Spinner } from '@wordpress/components';
-import { __, sprintf } from '@wordpress/i18n';
 import { ChevronsUpDown, Plus, Search } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { Spinner } from '@wordpress/components';
+import { __, sprintf } from '@wordpress/i18n';
 
-import {
-  useBulkUpdateRoleStatusMutation,
-  useDeleteManyRolesMutation,
-  useRolesQuery,
-} from '@/lib/queries/roles';
+import { useBulkUpdateRoleStatusMutation, useDeleteManyRolesMutation, useRolesQuery } from '@/lib/queries/roles';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { BulkActionBox, BulkActionCloseButton } from '@/components/ui/bulk-actions';
@@ -40,17 +36,9 @@ import {
 import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group';
 import { Pagination } from '@/components/ui/pagination';
 import { Separator } from '@/components/ui/separator';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { WholeSaleToolTip } from '@/components/custom/WholeSaleToolTip';
 import DeleteIcon from '@/components/icons/DeleteIcon';
-
 import { RolesColumn } from './roles-table/RolesColumn';
 
 export default function RolesList() {
@@ -58,8 +46,7 @@ export default function RolesList() {
   const { data, isLoading: isLoadingRoles, isFetching: isFetchingRoles } = useRolesQuery();
   const queryClient = useQueryClient();
 
-  const { mutate: deleteManyRolesByIds, isPending: isDeletingManyRolesPending } =
-    useDeleteManyRolesMutation();
+  const { mutate: deleteManyRolesByIds, isPending: isDeletingManyRolesPending } = useDeleteManyRolesMutation();
   const { mutate: bulkUpdateRoleStatus, isPending: isBulkUpdatingRoleStatusPending } =
     useBulkUpdateRoleStatusMutation();
 
@@ -181,9 +168,7 @@ export default function RolesList() {
                   <TableHead
                     key={header.id}
                     className={cn(
-                      header.column.columnDef.meta?.align === 'center'
-                        ? 'text-center'
-                        : 'text-left',
+                      header.column.columnDef.meta?.align === 'center' ? 'text-center' : 'text-left',
                       header.column.columnDef.meta?.isCheckbox ? 'w-9' : 'px-3',
                     )}
                   >
@@ -197,10 +182,7 @@ export default function RolesList() {
           <TableBody>
             {isLoadingRoles ? (
               <TableRow>
-                <TableCell
-                  colSpan={table.getAllColumns().length}
-                  className="h-32 text-center align-middle"
-                >
+                <TableCell colSpan={table.getAllColumns().length} className="h-32 text-center align-middle">
                   <div className="flex items-center justify-center gap-2">
                     <Spinner className="text-muted-foreground size-6 animate-spin" />
                   </div>
@@ -213,13 +195,10 @@ export default function RolesList() {
                     <TableCell
                       key={cell.id}
                       className={cn(
-                        cell.column.columnDef.meta?.align === 'center'
-                          ? 'text-center'
-                          : 'text-left',
+                        cell.column.columnDef.meta?.align === 'center' ? 'text-center' : 'text-left',
                         cell.column.columnDef.meta?.isCheckbox ? 'w-9' : 'px-3',
                         cell.column.id === 'actions' && 'm-0 flex w-25 justify-end lg:w-full',
-                        ['select', 'actions', 'status'].indexOf(cell.column.id) < 0 &&
-                          'cursor-pointer',
+                        ['select', 'actions', 'status'].indexOf(cell.column.id) < 0 && 'cursor-pointer',
                       )}
                       onClick={() => {
                         if (['select', 'actions', 'status'].indexOf(cell.column.id) < 0) {
@@ -235,10 +214,7 @@ export default function RolesList() {
               ))
             ) : (
               <TableRow>
-                <TableCell
-                  colSpan={table.getAllColumns().length}
-                  className="h-32 text-center align-middle"
-                >
+                <TableCell colSpan={table.getAllColumns().length} className="h-32 text-center align-middle">
                   {__('No roles found.', 'yay-wholesale-b2b')}
                 </TableCell>
               </TableRow>
@@ -258,10 +234,7 @@ export default function RolesList() {
             <Separator orientation="vertical" className="ml-2 h-5!" />
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button
-                  variant="ghost"
-                  className="hover:text-primary hover:bg-primary/6 group flex gap-1.5 px-2.5"
-                >
+                <Button variant="ghost" className="hover:text-primary hover:bg-primary/6 group flex gap-1.5 px-2.5">
                   <span className="text-sm font-normal">{__('Status', 'yay-wholesale-b2b')}</span>
                   <span className="group-hover:text-primary text-muted-foreground flex items-center">
                     <ChevronsUpDown className="size-3.5 stroke-[2.5px]" />
@@ -271,12 +244,7 @@ export default function RolesList() {
               <DropdownMenuContent align="start" sideOffset={9} className="w-fit min-w-[20px] p-1">
                 <DropdownMenuItem
                   onClick={() => {
-                    if (
-                      isDeletingManyRolesPending ||
-                      isBulkUpdatingRoleStatusPending ||
-                      isFetchingRoles
-                    )
-                      return;
+                    if (isDeletingManyRolesPending || isBulkUpdatingRoleStatusPending || isFetchingRoles) return;
                     bulkUpdateRoleStatus(
                       { ids: selectedRowsIds, status: true },
                       {
@@ -292,12 +260,7 @@ export default function RolesList() {
 
                 <DropdownMenuItem
                   onClick={() => {
-                    if (
-                      isDeletingManyRolesPending ||
-                      isBulkUpdatingRoleStatusPending ||
-                      isFetchingRoles
-                    )
-                      return;
+                    if (isDeletingManyRolesPending || isBulkUpdatingRoleStatusPending || isFetchingRoles) return;
                     bulkUpdateRoleStatus(
                       { ids: selectedRowsIds, status: false },
                       {
@@ -331,10 +294,7 @@ export default function RolesList() {
               <DialogContent className="bw:max-w-md">
                 <DialogHeader className="bw:border-b-0">
                   <DialogTitle>
-                    {sprintf(
-                      __(`Are you sure you want to delete %d roles ?`, 'yay-wholesale-b2b'),
-                      selectedCount,
-                    )}
+                    {sprintf(__(`Are you sure you want to delete %d roles ?`, 'yay-wholesale-b2b'), selectedCount)}
                   </DialogTitle>
                   <DialogDescription>
                     {__(

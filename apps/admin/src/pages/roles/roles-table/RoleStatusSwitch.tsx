@@ -29,7 +29,5 @@ export default function RoleStatusSwitch({
     }
   };
 
-  return (
-    <Switch loading={isPending} checked={checked} onCheckedChange={onToggle} disabled={isDefault} />
-  );
+  return <Switch loading={isPending} checked={checked} onCheckedChange={onToggle} disabled={isDefault} />;
 }

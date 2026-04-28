@@ -3,18 +3,14 @@ import { format } from 'date-fns';
 import { ArrowRight, Calendar as CalendarIcon } from 'lucide-react';
 import { type DateRange } from 'react-day-picker';
 
-import { useUncontrolled } from '@/hooks/useUncontrolled';
 import { cn } from '@/lib/utils';
+import { useUncontrolled } from '@/hooks/useUncontrolled';
 import { Calendar } from '@/components/ui/calendar';
 import { ComboboxIcon, ComboboxTrigger } from '@/components/ui/combobox';
 import { Popover, PopoverContent } from '@/components/ui/popover';
-
 import { Button } from './button';
 
-export type DateRangePickerProps = Omit<
-  ComponentProps<typeof ComboboxTrigger>,
-  'value' | 'defaultValue'
-> & {
+export type DateRangePickerProps = Omit<ComponentProps<typeof ComboboxTrigger>, 'value' | 'defaultValue'> & {
   dayPickerProps?: Omit<ComponentProps<typeof Calendar>, 'mode' | 'selected' | 'onSelect'>;
   value?: DateRange;
   defaultValue?: DateRange;

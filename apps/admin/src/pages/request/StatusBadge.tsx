@@ -1,7 +1,6 @@
 import { RequestFormValues } from '@/lib/schema/requests';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
-
 import requestsStatusMap from './requests-table/RequestsStatusMap';
 
 interface StatusBadgeProps {

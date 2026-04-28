@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { ColumnDef } from '@tanstack/react-table';
-import { __ } from '@wordpress/i18n';
 import { PencilLine } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { __ } from '@wordpress/i18n';
 
 import { useDeleteRoleMutation } from '@/lib/queries/roles';
 import { RolesListValues } from '@/lib/schema/roles';
@@ -22,7 +22,6 @@ import {
 import { WholeSaleToolTip } from '@/components/custom/WholeSaleToolTip';
 import DeleteIcon from '@/components/icons/DeleteIcon';
 import EditIcon from '@/components/icons/SettingsIcon';
-
 import { parseWPCurrency } from '../../common.helper';
 import RoleStatusSwitch from './RoleStatusSwitch';
 
@@ -94,10 +93,7 @@ export const RolesColumn: ColumnDef<RolesListValues & { count: number }>[] = [
           className={cn('text-center', count > 0 ? 'cursor-pointer hover:underline' : '')}
           onClick={() => {
             if (count > 0) {
-              window.open(
-                window.yayWholesaleB2BAdmin.user_urls.list + '?role=' + column.row.original.slug,
-                '_blank',
-              );
+              window.open(window.yayWholesaleB2BAdmin.user_urls.list + '?role=' + column.row.original.slug, '_blank');
             }
           }}
         >
@@ -159,11 +155,7 @@ export const RolesColumn: ColumnDef<RolesListValues & { count: number }>[] = [
     accessorKey: 'status',
     header: __('Status', 'yay-wholesale-b2b'),
     cell: ({ row }) => (
-      <RoleStatusSwitch
-        id={row.original.id}
-        status={row.original.status}
-        isDefault={row.original.isDefault ?? false}
-      />
+      <RoleStatusSwitch id={row.original.id} status={row.original.status} isDefault={row.original.isDefault ?? false} />
     ),
     size: 80,
   },
@@ -171,9 +163,7 @@ export const RolesColumn: ColumnDef<RolesListValues & { count: number }>[] = [
     id: 'actions',
     header: '',
     cell: ({ row }) => {
-      const { mutate: deleteRoleById, isPending: isDeletingRolePending } = useDeleteRoleMutation(
-        row.original.id,
-      );
+      const { mutate: deleteRoleById, isPending: isDeletingRolePending } = useDeleteRoleMutation(row.original.id);
       const navigate = useNavigate();
       const [openDialog, setOpenDialog] = useState(false);
       const queryClient = useQueryClient();
@@ -220,9 +210,7 @@ export const RolesColumn: ColumnDef<RolesListValues & { count: number }>[] = [
           </div>
           <DialogContent className="bw:max-w-md">
             <DialogHeader className="bw:border-b-0">
-              <DialogTitle>
-                {__('Are you sure you want to delete this role?', 'yay-wholesale-b2b')}
-              </DialogTitle>
+              <DialogTitle>{__('Are you sure you want to delete this role?', 'yay-wholesale-b2b')}</DialogTitle>
               <DialogDescription>
                 {__(
                   'This action cannot be undone. This will permanently delete this request and remove data from servers',

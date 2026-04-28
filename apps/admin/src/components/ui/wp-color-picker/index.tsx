@@ -109,15 +109,9 @@ export function ColorPicker({
         <Button
           variant="outline"
           disabled={disabled}
-          className={cn(
-            'h-8.5 w-[110px] justify-start rounded-sm p-1 hover:bg-[#F9F9F9]',
-            className,
-          )}
+          className={cn('h-8.5 w-[110px] justify-start rounded-sm p-1 hover:bg-[#F9F9F9]', className)}
         >
-          <span
-            className="h-6.5 w-6.5 rounded-[4px] border"
-            style={{ backgroundColor: displayColor }}
-          />
+          <span className="h-6.5 w-6.5 rounded-[4px] border" style={{ backgroundColor: displayColor }} />
           <span className="text-start font-normal">{displayColor}</span>
         </Button>
       </PopoverTrigger>

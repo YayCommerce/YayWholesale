@@ -1,18 +1,9 @@
 import { __ } from '@wordpress/i18n';
 
-import {
-  PaginatedRequestListValues,
-  RequestFormValues,
-  RequestsCountValues,
-} from '../schema/requests';
+import { PaginatedRequestListValues, RequestFormValues, RequestsCountValues } from '../schema/requests';
 import { api, handleResponse } from './base';
 
-export async function fetchRequests(
-  keyword: string,
-  page: number,
-  perPage: number,
-  status: string,
-) {
+export async function fetchRequests(keyword: string, page: number, perPage: number, status: string) {
   const searchParams = new URLSearchParams({
     kw: keyword,
     page: String(page),
@@ -30,36 +21,23 @@ export async function fetchRequests(
 
 export async function fetchRequestById(requestId: number) {
   const response = await api.get(`requests/${requestId}`);
-  const result = await handleResponse<RequestFormValues>(
-    response,
-    __('Failed to fetch request', 'yay-wholesale-b2b'),
-  );
+  const result = await handleResponse<RequestFormValues>(response, __('Failed to fetch request', 'yay-wholesale-b2b'));
   return result.data;
 }
 
 export async function updateRequestById(data: RequestFormValues, requestId: number) {
   const response = await api.put(`requests/${requestId}`, { json: data });
-  const result = await handleResponse<RequestFormValues>(
-    response,
-    __('Failed to update request', 'yay-wholesale-b2b'),
-  );
+  const result = await handleResponse<RequestFormValues>(response, __('Failed to update request', 'yay-wholesale-b2b'));
   return result;
 }
 
 export async function deleteRequestById(requestId: number) {
   const response = await api.delete(`requests/${requestId}`);
-  const result = await handleResponse<RequestFormValues>(
-    response,
-    __('Failed to delete request', 'yay-wholesale-b2b'),
-  );
+  const result = await handleResponse<RequestFormValues>(response, __('Failed to delete request', 'yay-wholesale-b2b'));
   return result;
 }
 
-export async function updateRequestStatusById(
-  requestId: number,
-  status: RequestFormValues['status'],
-  roleId: number,
-) {
+export async function updateRequestStatusById(requestId: number, status: RequestFormValues['status'], roleId: number) {
   let data = { role_id: roleId };
 
   if (status === 'approved') {

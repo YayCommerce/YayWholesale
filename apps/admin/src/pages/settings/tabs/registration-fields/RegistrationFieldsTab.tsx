@@ -9,15 +9,14 @@ import {
   useSensors,
 } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
-import { __ } from '@wordpress/i18n';
 import { Plus } from 'lucide-react';
 import { useFieldArray, useFormContext } from 'react-hook-form';
 import { v4 as uuidv4 } from 'uuid';
+import { __ } from '@wordpress/i18n';
 
 import type { SettingsFormData } from '@/lib/schema/settings';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-
 import { FieldRow } from './FieldRow';
 
 export default function RegistrationFieldsTab() {
@@ -86,10 +85,7 @@ export default function RegistrationFieldsTab() {
               onDragEnd={handleDragEnd}
               autoScroll={false}
             >
-              <SortableContext
-                items={fields.map((f) => f.id)}
-                strategy={verticalListSortingStrategy}
-              >
+              <SortableContext items={fields.map((f) => f.id)} strategy={verticalListSortingStrategy}>
                 {fields.map((field, index) => (
                   <FieldRow
                     key={field.id}

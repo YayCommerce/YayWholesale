@@ -3,7 +3,6 @@ import { HTTPError } from 'ky';
 import { twMerge } from 'tailwind-merge';
 
 import { showToast } from '@/components/custom/showToast';
-
 import { RolesListValues } from './schema/roles';
 import { SettingsFormData } from './schema/settings';
 

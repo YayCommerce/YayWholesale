@@ -37,20 +37,10 @@ function Pagination({
       </span>
 
       <div className="flex items-center gap-1">
-        <Button
-          variant="outline"
-          size="icon"
-          onClick={onPreviousPage}
-          disabled={!canPreviousPage || disabled}
-        >
+        <Button variant="outline" size="icon" onClick={onPreviousPage} disabled={!canPreviousPage || disabled}>
           <ChevronLeftIcon className="size-4" />
         </Button>
-        <Button
-          variant="outline"
-          size="icon"
-          onClick={onNextPage}
-          disabled={!canNextPage || disabled}
-        >
+        <Button variant="outline" size="icon" onClick={onNextPage} disabled={!canNextPage || disabled}>
           <ChevronRightIcon className="size-4" />
         </Button>
       </div>

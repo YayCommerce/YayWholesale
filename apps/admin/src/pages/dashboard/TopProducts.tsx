@@ -1,21 +1,13 @@
 import { useMemo } from 'react';
+import { Crown } from 'lucide-react';
 import { Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { Crown } from 'lucide-react';
 
 import { useReportsQuery } from '@/lib/queries/reports';
 import { TopProductValue } from '@/lib/schema/reports';
 import { cn } from '@/lib/utils';
 import { Card, CardContent } from '@/components/ui/card';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
-
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { parseWPCurrency } from '../common.helper';
 
 export default function TopProducts(props: { reportQuery: ReturnType<typeof useReportsQuery> }) {
@@ -26,9 +18,7 @@ export default function TopProducts(props: { reportQuery: ReturnType<typeof useR
       <CardContent className="flex min-h-0 flex-1 flex-col gap-5">
         {/* Header */}
         <div className="flex items-center justify-between">
-          <h3 className="text-foreground text-[16px] font-semibold">
-            {__('Top Products', 'yay-wholesale-b2b')}
-          </h3>
+          <h3 className="text-foreground text-[16px] font-semibold">{__('Top Products', 'yay-wholesale-b2b')}</h3>
         </div>
 
         {/* DataTable */}
@@ -42,13 +32,9 @@ export default function TopProducts(props: { reportQuery: ReturnType<typeof useR
             <TableHeader className="text-foreground bg-muted-400 h-10">
               <TableRow className="text-foreground border-divider border-b text-[14px] font-semibold">
                 <TableHead className="text-foreground text-[14px]">
-                  <span className="flex items-center justify-center font-medium">
-                    {__('No', 'yay-wholesale-b2b')}
-                  </span>
+                  <span className="flex items-center justify-center font-medium">{__('No', 'yay-wholesale-b2b')}</span>
                 </TableHead>
-                <TableHead className="text-foreground text-[14px]">
-                  {__('Product', 'yay-wholesale-b2b')}
-                </TableHead>
+                <TableHead className="text-foreground text-[14px]">{__('Product', 'yay-wholesale-b2b')}</TableHead>
                 <TableHead className="text-foreground text-[14px]">
                   <span className="flex items-center justify-center font-medium">
                     {__('Item Sold', 'yay-wholesale-b2b')}
@@ -102,11 +88,7 @@ export default function TopProducts(props: { reportQuery: ReturnType<typeof useR
                             {data.name}
                           </span>
                           {reportData.topProducts.indexOf(data) < 3 && (
-                            <Crown
-                              fill="#F9BD09"
-                              size={14}
-                              className="ml-1 min-h-3.5 min-w-3.5 text-[#F9BD09]"
-                            />
+                            <Crown fill="#F9BD09" size={14} className="ml-1 min-h-3.5 min-w-3.5 text-[#F9BD09]" />
                           )}
                         </div>
                       </div>

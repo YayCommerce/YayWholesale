@@ -17,29 +17,24 @@ const buttonVariants = cva(
         link: 'text-foreground hover:text-primary underline-offset-4 hover:underline',
         secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/80',
 
-        primary:
-          'bg-primary text-primary-foreground shadow-xs hover:bg-primary-accent border border-transparent',
+        primary: 'bg-primary text-primary-foreground shadow-xs hover:bg-primary-accent border border-transparent',
         'primary-soft': 'bg-primary/6 text-primary hover:text-primary-accent',
-        'primary-outline':
-          'border border-primary text-primary hover:border-primary-accent hover:text-primary-accent',
+        'primary-outline': 'border border-primary text-primary hover:border-primary-accent hover:text-primary-accent',
         'primary-outline-fill':
           'border border-primary text-primary hover:bg-primary hover:text-primary-foreground hover:border-transparent',
 
-        destructive:
-          'bg-destructive text-destructive-foreground shadow-xs hover:bg-destructive-accent',
+        destructive: 'bg-destructive text-destructive-foreground shadow-xs hover:bg-destructive-accent',
         'destructive-soft': 'bg-destructive/6 text-destructive hover:text-destructive-accent',
         'destructive-outline':
           'border border-destructive text-destructive hover:border-destructive-accent hover:text-destructive-accent',
 
         success: 'bg-success text-success-foreground shadow-xs hover:bg-success-accent',
         'success-soft': 'bg-success/6 text-success hover:text-success-accent',
-        'success-outline':
-          'border border-success text-success hover:border-success-accent hover:text-success-accent',
+        'success-outline': 'border border-success text-success hover:border-success-accent hover:text-success-accent',
 
         warning: 'bg-warning text-warning-foreground shadow-xs hover:bg-warning-accent',
         'warning-soft': 'bg-warning/6 text-warning hover:text-warning-accent',
-        'warning-outline':
-          'border border-warning text-warning hover:border-warning-accent hover:text-warning-accent',
+        'warning-outline': 'border border-warning text-warning hover:border-warning-accent hover:text-warning-accent',
       },
       size: {
         default: 'h-9 px-4 py-2 has-[>svg]:px-3',
@@ -57,9 +52,7 @@ const buttonVariants = cva(
   },
 );
 
-interface ButtonProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
-    VariantProps<typeof buttonVariants> {
+interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement>, VariantProps<typeof buttonVariants> {
   asChild?: boolean;
 }
 
@@ -81,14 +74,8 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   },
 );
 
-function getButtonFocusVariant(
-  variant: ButtonProps['variant'],
-): VariantProps<typeof focusVariants>['variant'] {
-  if (
-    variant === 'destructive' ||
-    variant === 'destructive-outline' ||
-    variant === 'destructive-soft'
-  ) {
+function getButtonFocusVariant(variant: ButtonProps['variant']): VariantProps<typeof focusVariants>['variant'] {
+  if (variant === 'destructive' || variant === 'destructive-outline' || variant === 'destructive-soft') {
     return 'destructive';
   } else if (variant === 'success' || variant === 'success-outline' || variant === 'success-soft') {
     return 'success';

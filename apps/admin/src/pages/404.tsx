@@ -1,5 +1,5 @@
-import { __ } from '@wordpress/i18n';
 import { useNavigate } from 'react-router-dom';
+import { __ } from '@wordpress/i18n';
 
 export default function NotFoundPage() {
   const navigate = useNavigate();

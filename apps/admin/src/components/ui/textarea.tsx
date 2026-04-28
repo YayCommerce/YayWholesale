@@ -1,7 +1,6 @@
 import * as React from 'react';
 
 import { cn } from '@/lib/utils';
-
 import { focusVariants } from './variants/focus.variants';
 import { inputVariants } from './variants/input.variants';
 

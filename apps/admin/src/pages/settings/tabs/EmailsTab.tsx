@@ -3,14 +3,7 @@ import { __ } from '@wordpress/i18n';
 
 import { useUpdateEmailStatusMutation, useWholesaleEmailsQuery } from '@/lib/queries/emails';
 import { Switch } from '@/components/ui/switch';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
 export default function EmailsTab() {
   const [loadingId, setLoadingId] = useState<string | null>(null);
@@ -40,10 +33,7 @@ export default function EmailsTab() {
                   loading={isPending && loadingId === email.id}
                   onCheckedChange={(checked) => {
                     setLoadingId(email.id);
-                    mutate(
-                      { emailId: email.id, status: checked },
-                      { onSettled: () => setLoadingId(null) },
-                    );
+                    mutate({ emailId: email.id, status: checked }, { onSettled: () => setLoadingId(null) });
                   }}
                 />
               </TableCell>

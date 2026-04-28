@@ -4,10 +4,7 @@ import { DateRange } from 'react-day-picker';
 
 import { fetchReports } from '../api/reports.api';
 
-export const useReportsQuery = (
-  dateRange: DateRange | undefined,
-  compareDateRange: DateRange | undefined,
-) => {
+export const useReportsQuery = (dateRange: DateRange | undefined, compareDateRange: DateRange | undefined) => {
   const startDate = dayjs(dateRange?.from).format('YYYY-MM-DD');
   const endDate = dayjs(dateRange?.to).format('YYYY-MM-DD');
   const compareStartDate = dayjs(compareDateRange?.from).format('YYYY-MM-DD');

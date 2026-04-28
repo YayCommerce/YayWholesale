@@ -3,8 +3,7 @@ import { cva, VariantProps } from 'class-variance-authority';
 export const inputVariants = cva('border-input', {
   variants: {
     variant: {
-      input:
-        'focus-visible:ring-ring has-[[data-slot=input-group-control]:focus-visible]:ring-ring',
+      input: 'focus-visible:ring-ring has-[[data-slot=input-group-control]:focus-visible]:ring-ring',
       picker: 'cursor-pointer shadow-xs hover:bg-muted-400 focus-visible:ring-ring',
 
       /* Shadcn variants: override ring-offset */
@@ -51,8 +50,7 @@ export const inputGroupAddonVariants = cva(
         'inline-end': 'order-last pr-3 has-[>button]:mr-[-0.45rem] has-[>kbd]:mr-[-0.35rem]',
         'block-start':
           'order-first w-full justify-start px-3 pt-3 [.border-b]:pb-3 group-has-[>input]/input-group:pt-2.5',
-        'block-end':
-          'order-last w-full justify-start px-3 pb-3 [.border-t]:pt-3 group-has-[>input]/input-group:pb-2.5',
+        'block-end': 'order-last w-full justify-start px-3 pb-3 [.border-t]:pt-3 group-has-[>input]/input-group:pb-2.5',
       },
     },
     defaultVariants: {

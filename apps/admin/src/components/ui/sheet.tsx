@@ -16,10 +16,7 @@ const SheetTrigger = forwardRef<
   React.ComponentPropsWithoutRef<typeof SheetPrimitive.Trigger>
 >(({ ...props }, ref) => <SheetPrimitive.Trigger ref={ref} data-slot="sheet-trigger" {...props} />);
 
-function SheetCloseIcon({
-  className,
-  ...props
-}: React.ComponentProps<typeof SheetPrimitive.Close>) {
+function SheetCloseIcon({ className, ...props }: React.ComponentProps<typeof SheetPrimitive.Close>) {
   return (
     <SheetPrimitive.Close
       data-slot="sheet-close"
@@ -124,10 +121,7 @@ function SheetTitle({ className, ...props }: React.ComponentProps<typeof SheetPr
   );
 }
 
-function SheetDescription({
-  className,
-  ...props
-}: React.ComponentProps<typeof SheetPrimitive.Description>) {
+function SheetDescription({ className, ...props }: React.ComponentProps<typeof SheetPrimitive.Description>) {
   return (
     <SheetPrimitive.Description
       data-slot="sheet-description"

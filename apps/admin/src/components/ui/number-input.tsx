@@ -2,14 +2,12 @@ import { ComponentProps, createContext, forwardRef, useContext } from 'react';
 import { ChevronDownIcon, ChevronUpIcon } from 'lucide-react';
 import { NumericFormat, NumericFormatProps } from 'react-number-format';
 
-import { useUncontrolled } from '@/hooks/useUncontrolled';
 import { cn } from '@/lib/utils';
-
+import { useUncontrolled } from '@/hooks/useUncontrolled';
 import { InputGroup, InputGroupInput } from './input-group';
 import { InputGroupVariantProps } from './variants/input.variants';
 
-interface NumberInputContextValue
-  extends Omit<NumericFormatProps, 'value' | 'onValueChange' | 'className' | 'step'> {
+interface NumberInputContextValue extends Omit<NumericFormatProps, 'value' | 'onValueChange' | 'className' | 'step'> {
   defaultValue: number;
   value: number;
   setValue: (value: number) => void;
@@ -106,17 +104,8 @@ type NumberInputInputProps = Omit<
 >;
 const NumberInputInput = forwardRef<HTMLInputElement, NumberInputInputProps>(
   ({ className, onBlur, ...inputProps }, ref) => {
-    const {
-      value,
-      setValue,
-      defaultValue,
-      min,
-      disabled,
-      max,
-      handleIncrement,
-      handleDecrement,
-      ...contextProps
-    } = useNumberInputContext();
+    const { value, setValue, defaultValue, min, disabled, max, handleIncrement, handleDecrement, ...contextProps } =
+      useNumberInputContext();
 
     const handleChange = (values: { value: string; floatValue: number | undefined }) => {
       setValue(values.floatValue ?? defaultValue);
@@ -167,12 +156,7 @@ const NumberInputInput = forwardRef<HTMLInputElement, NumberInputInputProps>(
 interface NumberInputChevronsProps extends ComponentProps<'div'> {
   hasUnit?: boolean;
 }
-function NumberInputChevrons({
-  className,
-  children,
-  hasUnit = false,
-  ...props
-}: NumberInputChevronsProps) {
+function NumberInputChevrons({ className, children, hasUnit = false, ...props }: NumberInputChevronsProps) {
   return (
     <div
       data-slot="number-input-chevrons"
@@ -260,18 +244,16 @@ function NumberInputUnit({ className, children, unit, ...props }: NumberInputUni
 interface NumberInputProps extends NumberInputRootProps {
   inputProps?: Omit<NumberInputInputProps, 'size'> & { size: InputGroupVariantProps['size'] };
 }
-const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
-  ({ inputProps, ...rootProps }, ref) => {
-    const { size, ..._inputProps } = inputProps ?? {};
+const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(({ inputProps, ...rootProps }, ref) => {
+  const { size, ..._inputProps } = inputProps ?? {};
 
-    return (
-      <NumberInputRoot size={size} {...rootProps}>
-        <NumberInputInput ref={ref} {..._inputProps} />
-        <NumberInputChevrons />
-      </NumberInputRoot>
-    );
-  },
-);
+  return (
+    <NumberInputRoot size={size} {...rootProps}>
+      <NumberInputInput ref={ref} {..._inputProps} />
+      <NumberInputChevrons />
+    </NumberInputRoot>
+  );
+});
 
 export {
   NumberInput,

@@ -1,20 +1,13 @@
-import { __ } from '@wordpress/i18n';
 import { Controller, useFormContext } from 'react-hook-form';
+import { __ } from '@wordpress/i18n';
 
 import { SettingsFormData } from '@/lib/schema/settings';
 import { AddToCartSkeleton, ProductImageSkeleton } from '@/components/ui/custom/shop-skeleton';
 import { Field, FieldContent, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ColorPicker } from '@/components/ui/wp-color-picker';
-
 import { parseWPCurrency } from '../../common.helper';
 
 export default function DisplayTab() {
@@ -48,9 +41,7 @@ export default function DisplayTab() {
                     <SelectItem value="wholesale-only">
                       {__('Show only wholesale prices', 'yay-wholesale-b2b')}
                     </SelectItem>
-                    <SelectItem value="retail-only">
-                      {__('Show only retail prices', 'yay-wholesale-b2b')}
-                    </SelectItem>
+                    <SelectItem value="retail-only">{__('Show only retail prices', 'yay-wholesale-b2b')}</SelectItem>
                   </SelectContent>
                 </Select>
               </FieldContent>
@@ -111,9 +102,7 @@ export default function DisplayTab() {
           </div>
           {['retail-and-wholesale', 'retail-only'].includes(displayFormat) && (
             <p className="flex gap-1.5 text-[14px] leading-3.5 text-[#A0A0A7]">
-              {displayFormat === 'retail-and-wholesale' && (
-                <span>{__('Retail:', 'yay-wholesale-b2b')}</span>
-              )}
+              {displayFormat === 'retail-and-wholesale' && <span>{__('Retail:', 'yay-wholesale-b2b')}</span>}
               <del> {parseWPCurrency(20)} </del>
               <span>{parseWPCurrency(18)}</span>
             </p>

@@ -1,5 +1,5 @@
-import { __ } from '@wordpress/i18n';
 import ky, { Options, ResponsePromise } from 'ky';
+import { __ } from '@wordpress/i18n';
 
 const YayWholesaleConfig = window?.yayWholesaleB2BAdmin || {};
 
@@ -147,10 +147,7 @@ export interface ApiResponse<T> {
   data: T;
 }
 
-export async function handleResponse<T>(
-  response: Response,
-  errorMessage: string,
-): Promise<ApiResponse<T>> {
+export async function handleResponse<T>(response: Response, errorMessage: string): Promise<ApiResponse<T>> {
   if (!response.ok) {
     throw new Error(__(errorMessage, 'yay-wholesale-b2b'));
   }

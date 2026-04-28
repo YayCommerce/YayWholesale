@@ -2,8 +2,8 @@ import * as React from 'react';
 import { Slot } from '@radix-ui/react-slot';
 import { useLocation } from 'react-router-dom';
 
-import { useCombinedRefs } from '@/hooks/useCombinedRefs';
 import { cn } from '@/lib/utils';
+import { useCombinedRefs } from '@/hooks/useCombinedRefs';
 
 const HeaderNavMenuList = React.forwardRef<HTMLUListElement, HeaderNavMenuListProps>(
   ({ mode = 'router', activeTab, className, asChild = false, children, ...props }, ref) => {
@@ -48,10 +48,7 @@ const HeaderNavMenuList = React.forwardRef<HTMLUListElement, HeaderNavMenuListPr
     return (
       <Comp
         data-slot="header-navigation-menu-list"
-        className={cn(
-          'relative flex h-13.5 flex-1 list-none items-stretch justify-start gap-0',
-          className,
-        )}
+        className={cn('relative flex h-13.5 flex-1 list-none items-stretch justify-start gap-0', className)}
         {...props}
         ref={combinedRef}
       >

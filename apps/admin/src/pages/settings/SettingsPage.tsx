@@ -1,17 +1,16 @@
 import { useEffect } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { __ } from '@wordpress/i18n';
 import { useForm } from 'react-hook-form';
 import { Link, useParams } from 'react-router-dom';
+import { __ } from '@wordpress/i18n';
 
 import { useSaveSettingsMutation } from '@/lib/queries/settings';
 import { SettingsFormData, settingsFormSchema } from '@/lib/schema/settings';
 import { cn, getSettings } from '@/lib/utils';
+import { useRouteLeaveGuard } from '@/hooks/useRouteLeaveGuard';
 import { Card, CardContent } from '@/components/ui/card';
 import { FormProvider } from '@/components/ui/form';
 import { UnsavedChangeDialog } from '@/components/ui/unsaved-changed-dialog';
-import { useRouteLeaveGuard } from '@/hooks/useRouteLeaveGuard';
-
 import DisplayTab from './tabs/DisplayTab';
 import EmailsTab from './tabs/EmailsTab';
 import GeneralTab from './tabs/GeneralTab';
@@ -48,9 +47,7 @@ export default function SettingsPage() {
     form.reset(data);
   }
 
-  const { showDialog, confirmLeave, cancelLeave } = useRouteLeaveGuard(form.formState.isDirty, [
-    '/settings/*',
-  ]);
+  const { showDialog, confirmLeave, cancelLeave } = useRouteLeaveGuard(form.formState.isDirty, ['/settings/*']);
 
   useEffect(() => {
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
@@ -79,8 +76,7 @@ export default function SettingsPage() {
                         className={cn(
                           'text-foreground-400 justify-start rounded-none border-none p-4 py-2.5 text-left text-sm font-normal text-nowrap ring-0 outline-none focus:ring-0 focus:outline-none sm:text-wrap',
                           'hover:text-primary hover:rounded-md hover:bg-white',
-                          tab.path === subMenu &&
-                            'text-primary rounded-md bg-white font-medium shadow-none',
+                          tab.path === subMenu && 'text-primary rounded-md bg-white font-medium shadow-none',
                         )}
                       >
                         {tab.label}

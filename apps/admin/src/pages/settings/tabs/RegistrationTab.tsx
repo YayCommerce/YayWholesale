@@ -1,5 +1,5 @@
-import { __ } from '@wordpress/i18n';
 import { Controller, useFormContext } from 'react-hook-form';
+import { __ } from '@wordpress/i18n';
 
 import { SettingsFormData } from '@/lib/schema/settings';
 import { Field, FieldContent, FieldLabel } from '@/components/ui/field';
@@ -23,10 +23,7 @@ export default function RegistrationTab() {
                 {__('Moderate new registrations', 'yay-wholesale-b2b')}
               </h2>
               <p className="text-muted-foreground mt-2 text-xs font-normal">
-                {__(
-                  'Hold new wholesale registrations for moderation by an administrator.',
-                  'yay-wholesale-b2b',
-                )}
+                {__('Hold new wholesale registrations for moderation by an administrator.', 'yay-wholesale-b2b')}
               </p>
             </div>
             <Switch checked={field.value} onCheckedChange={field.onChange} />

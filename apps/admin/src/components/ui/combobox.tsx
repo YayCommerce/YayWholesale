@@ -4,7 +4,6 @@ import { CheckIcon, ChevronDown, XIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { PopoverTrigger } from '@/components/ui/popover';
-
 import { Badge } from './badge';
 import { inputVariants } from './variants/input.variants';
 
@@ -38,23 +37,14 @@ function ComboboxBadge({ className, children }: { className?: string; children: 
   return (
     <Badge
       variant="dimmed-outline"
-      className={cn(
-        'h-6.5 gap-0.5 rounded-sm has-[svg]:pe-1 [&>svg]:pointer-events-auto',
-        className,
-      )}
+      className={cn('h-6.5 gap-0.5 rounded-sm has-[svg]:pe-1 [&>svg]:pointer-events-auto', className)}
     >
       {children}
     </Badge>
   );
 }
 
-function ComboboxRemove({
-  className,
-  onRemove,
-}: {
-  className?: string;
-  onRemove: (e: React.MouseEvent) => void;
-}) {
+function ComboboxRemove({ className, onRemove }: { className?: string; onRemove: (e: React.MouseEvent) => void }) {
   return (
     <XIcon
       onMouseDown={(e) => {
