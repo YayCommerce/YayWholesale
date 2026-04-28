@@ -8,6 +8,7 @@ import { __ } from '@wordpress/i18n';
 import { SettingsFormData } from '@/lib/schema/settings';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
+import { WholeSaleToolTip } from '@/components/ui/custom/WholeSaleToolTip';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -22,7 +23,6 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
-import { WholeSaleToolTip } from '@/components/custom/WholeSaleToolTip';
 import DeleteIcon from '@/components/icons/DeleteIcon';
 import EllipsisIcon from '@/components/icons/EllipsisIcon';
 

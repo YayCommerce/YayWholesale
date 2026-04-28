@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { __ } from '@wordpress/i18n';
 
-import { showToast } from '@/components/custom/showToast';
+import { toast } from '@/components/ui/sonner';
 import { updateEmailStatus } from '../api/emails.api';
 import { handleErrorMessage } from '../utils';
 
@@ -41,7 +41,7 @@ export function useUpdateEmailStatusMutation() {
     },
 
     onSuccess: () => {
-      showToast.success(__('Email status updated!', 'yay-wholesale-b2b'));
+      toast.success(__('Email status updated!', 'yay-wholesale-b2b'));
     },
   });
 }

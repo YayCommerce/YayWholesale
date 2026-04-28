@@ -13,7 +13,7 @@ import {
   updateRole,
   updateRoleStatus,
 } from '@/lib/api/roles.api';
-import { showToast } from '@/components/custom/showToast';
+import { toast } from '@/components/ui/sonner';
 import { RoleFormValues } from '../schema/roles';
 import { getRoles, handleErrorMessage } from '../utils';
 
@@ -67,7 +67,7 @@ export function useAddRoleMutation() {
   return useMutation({
     mutationFn: postRole,
     onSuccess: (response) => {
-      showToast.success(response.message);
+      toast.success(response.message);
       queryClient.invalidateQueries({ queryKey: QUERY_KEY });
       navigate('/roles');
     },
@@ -82,7 +82,7 @@ export function useUpdateRoleMutation(roleId: number) {
   return useMutation({
     mutationFn: (data: RoleFormValues) => updateRole(data, roleId),
     onSuccess: (response) => {
-      showToast.success(response.message);
+      toast.success(response.message);
       queryClient.invalidateQueries({ queryKey: ['role', roleId] });
       queryClient.invalidateQueries({ queryKey: QUERY_KEY });
       navigate('/roles');
@@ -97,7 +97,7 @@ export function useDeleteRoleMutation(roleId: number) {
   return useMutation({
     mutationFn: () => deleteRole(roleId),
     onSuccess: (response) => {
-      showToast.success(response.message);
+      toast.success(response.message);
       queryClient.invalidateQueries({ queryKey: QUERY_KEY });
     },
     onError: handleErrorMessage,
@@ -110,7 +110,7 @@ export function useDeleteManyRolesMutation() {
   return useMutation({
     mutationFn: deleteManyRoles,
     onSuccess: (response) => {
-      showToast.success(response.message);
+      toast.success(response.message);
       if (!queryClient.isFetching({ queryKey: QUERY_KEY })) {
         queryClient.invalidateQueries({ queryKey: QUERY_KEY });
       }
@@ -125,7 +125,7 @@ export function useUpdateRoleStatusMutation(roleId: number) {
   return useMutation({
     mutationFn: (status: boolean) => updateRoleStatus(roleId, status),
     onSuccess: (response) => {
-      showToast.success(response.message);
+      toast.success(response.message);
       queryClient.invalidateQueries({ queryKey: ['role', roleId] });
       queryClient.invalidateQueries({ queryKey: QUERY_KEY });
       queryClient.invalidateQueries({ queryKey: ['wholesalers'] });
@@ -140,7 +140,7 @@ export function useBulkUpdateRoleStatusMutation() {
   return useMutation({
     mutationFn: ({ ids, status }: { ids: number[]; status: boolean }) => bulkUpdateRoleStatus(ids, status),
     onSuccess: (response) => {
-      showToast.success(response.message);
+      toast.success(response.message);
       if (!queryClient.isFetching({ queryKey: QUERY_KEY })) {
         queryClient.invalidateQueries({ queryKey: QUERY_KEY });
       }

@@ -37,7 +37,7 @@ import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/in
 import { Pagination } from '@/components/ui/pagination';
 import { Separator } from '@/components/ui/separator';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { WholeSaleToolTip } from '@/components/custom/WholeSaleToolTip';
+import { WholeSaleToolTip } from '@/components/ui/custom/WholeSaleToolTip';
 import DeleteIcon from '@/components/icons/DeleteIcon';
 import { RolesColumn } from './roles-table/RolesColumn';
 

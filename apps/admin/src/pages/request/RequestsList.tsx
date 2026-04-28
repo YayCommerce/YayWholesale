@@ -17,6 +17,7 @@ import { Badge } from '@/components/ui/badge';
 import { BulkActionBox, BulkActionCloseButton } from '@/components/ui/bulk-actions';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { WholeSaleToolTip } from '@/components/ui/custom/WholeSaleToolTip';
 import {
   Dialog,
   DialogClose,
@@ -49,7 +50,6 @@ import {
 } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { WholeSaleToolTip } from '@/components/custom/WholeSaleToolTip';
 import DeleteIcon from '@/components/icons/DeleteIcon';
 import RequestsStatusIcon from '@/components/icons/RequestStatusIcon';
 import { RequestsColumn } from './requests-table/RequestsColumn';

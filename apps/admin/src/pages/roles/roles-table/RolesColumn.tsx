@@ -10,6 +10,7 @@ import { RolesListValues } from '@/lib/schema/roles';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
+import { WholeSaleToolTip } from '@/components/ui/custom/WholeSaleToolTip';
 import {
   Dialog,
   DialogClose,
@@ -19,7 +20,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { WholeSaleToolTip } from '@/components/custom/WholeSaleToolTip';
 import DeleteIcon from '@/components/icons/DeleteIcon';
 import EditIcon from '@/components/icons/SettingsIcon';
 import { parseWPCurrency } from '../../common.helper';

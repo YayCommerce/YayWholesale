@@ -2,7 +2,7 @@ import { clsx, type ClassValue } from 'clsx';
 import { HTTPError } from 'ky';
 import { twMerge } from 'tailwind-merge';
 
-import { showToast } from '@/components/custom/showToast';
+import { toast } from '@/components/ui/sonner';
 import { RolesListValues } from './schema/roles';
 import { SettingsFormData } from './schema/settings';
 
@@ -29,5 +29,5 @@ export const handleErrorMessage = async (error: Error) => {
       errorMessage = body.message;
     }
   }
-  showToast.error(errorMessage);
+  toast.error(errorMessage);
 };

@@ -1,6 +1,6 @@
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
-import { showToast } from '@/components/custom/showToast';
+import { toast } from '@/components/ui/sonner';
 import {
   bulkUpdateWholesalerRole,
   fetchWholesalersList,
@@ -32,7 +32,7 @@ export function useUpdateWholesalersRoleMutation(userId: number) {
     mutationKey: ['wholesalers', userId, 'update-role'],
     mutationFn: ({ roleSlug }: { roleSlug: string }) => updateWholesalerRole(userId, roleSlug),
     onSuccess: (response) => {
-      showToast.success(response.message);
+      toast.success(response.message);
       queryClient.invalidateQueries({ queryKey: ['wholesalers', userId] });
       if (!queryClient.isFetching({ queryKey: ['wholesalers'] })) {
         queryClient.invalidateQueries({ queryKey: ['wholesalers'] });
@@ -48,7 +48,7 @@ export function useBulkUpdateWholesalersRoleMutation(userIds: number[]) {
     mutationKey: ['wholesalers', 'bulk-update-roles'],
     mutationFn: ({ roleSlug }: { roleSlug: string }) => bulkUpdateWholesalerRole(userIds, roleSlug),
     onSuccess: (response) => {
-      showToast.success(response.message);
+      toast.success(response.message);
       if (!queryClient.isFetching({ queryKey: ['wholesalers'] })) {
         queryClient.invalidateQueries({ queryKey: ['wholesalers'] });
       }

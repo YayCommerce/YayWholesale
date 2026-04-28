@@ -21,7 +21,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Sheet, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Textarea } from '@/components/ui/textarea';
-import { WholeSaleToolTip } from '@/components/custom/WholeSaleToolTip';
+import { WholeSaleToolTip } from '@/components/ui/custom/WholeSaleToolTip';
 import RequestsStatusIcon from '@/components/icons/RequestStatusIcon';
 import { parseWPDate, parseWPTime } from '../common.helper';
 import requestsStatusMap from './requests-table/RequestsStatusMap';

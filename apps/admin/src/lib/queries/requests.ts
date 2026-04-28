@@ -1,6 +1,6 @@
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
-import { showToast } from '@/components/custom/showToast';
+import { toast } from '@/components/ui/sonner';
 import {
   bulkDeleteRequest,
   bulkUpdateRequestStatus,
@@ -52,7 +52,7 @@ export function useUpdateRequestMutation(requestId: number) {
     mutationKey: ['request', requestId, 'update'],
     mutationFn: (data: RequestFormValues) => updateRequestById(data, requestId),
     onSuccess: (response) => {
-      showToast.success(response.message);
+      toast.success(response.message);
       queryClient.invalidateQueries({ queryKey: ['request', requestId] });
       queryClient.invalidateQueries({ queryKey: ['requests'] });
       queryClient.invalidateQueries({ queryKey: ['roles'] });
@@ -67,7 +67,7 @@ export function useDeleteRequestMutation(requestId: number) {
     mutationKey: ['request', requestId, 'delete'],
     mutationFn: () => deleteRequestById(requestId),
     onSuccess: (response) => {
-      showToast.success(response.message);
+      toast.success(response.message);
       queryClient.invalidateQueries({ queryKey: ['request', requestId] });
       queryClient.invalidateQueries({ queryKey: ['requests'] });
       queryClient.invalidateQueries({ queryKey: ['roles'] });
@@ -83,7 +83,7 @@ export function useUpdateRequestStatusMutation(requestId: number) {
     mutationFn: ({ status, roleId }: { status: RequestFormValues['status']; roleId: number }) =>
       updateRequestStatusById(requestId, status, roleId),
     onSuccess: (response) => {
-      showToast.success(response.message);
+      toast.success(response.message);
       queryClient.invalidateQueries({ queryKey: ['request', requestId] });
       queryClient.invalidateQueries({ queryKey: ['requests'] });
       queryClient.invalidateQueries({ queryKey: ['roles'] });
@@ -100,7 +100,7 @@ export function useBulkUpdateRequestStatusMutation(ids: number[]) {
     mutationFn: ({ status, roleId }: { status: RequestFormValues['status']; roleId: number }) =>
       bulkUpdateRequestStatus(ids, status, roleId),
     onSuccess: (response) => {
-      showToast.success(response.message);
+      toast.success(response.message);
       queryClient.invalidateQueries({ queryKey: ['requests'] });
       queryClient.invalidateQueries({ queryKey: ['roles'] });
       queryClient.invalidateQueries({ queryKey: ['wholesalers'] });
@@ -115,7 +115,7 @@ export function useBulkDeleteRequestMutation(ids: number[]) {
     mutationKey: ['requests', 'bulk-delete'],
     mutationFn: () => bulkDeleteRequest(ids),
     onSuccess: (response) => {
-      showToast.success(response.message);
+      toast.success(response.message);
       queryClient.invalidateQueries({ queryKey: ['requests'] });
       queryClient.invalidateQueries({ queryKey: ['roles'] });
     },
