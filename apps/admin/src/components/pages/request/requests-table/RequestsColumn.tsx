@@ -19,7 +19,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { Label } from '@/components/ui/label';
 import { WholeSaleToolTip } from '@/components/custom/WholeSaleToolTip';
 import DeleteIcon from '@/components/icons/DeleteIcon';
 import SettingsIcon from '@/components/icons/SettingsIcon';
@@ -153,14 +152,6 @@ export const RequestsColumn: ColumnDef<RequestFormValues>[] = [
                 content={<span>{__('Delete request', 'yay-wholesale-b2b')}</span>}
               />
             </div>
-
-            <Button
-              size="icon"
-              variant="ghost"
-              className="text-muted-foreground absolute z-1 flex h-8 w-8 group-hover:-z-10 peer-has-data-[state='delayed-open']:-z-10 peer-has-data-[state='instant-open']:-z-10"
-            >
-              <Ellipsis className="h-4 w-4" />
-            </Button>
           </div>
           <DialogContent className="bw:max-w-md">
             <DialogHeader className="bw:border-b-0">

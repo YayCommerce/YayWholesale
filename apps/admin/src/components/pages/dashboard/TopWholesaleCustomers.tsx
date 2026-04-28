@@ -1,9 +1,13 @@
+import { useMemo } from 'react';
 import { Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import dayjs from 'dayjs';
 import { Crown } from 'lucide-react';
+import { DateRange } from 'react-day-picker';
 
 import { useReportsQuery } from '@/lib/queries/reports';
 import { cn } from '@/lib/utils';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import {
@@ -17,8 +21,15 @@ import {
 
 export default function TopWholesaleCustomers(props: {
   reportQuery: ReturnType<typeof useReportsQuery>;
+  dateRange: DateRange | undefined;
 }) {
   const { data: reportData, isFetching, isLoading } = props.reportQuery;
+
+  const startDate = useMemo(
+    () => dayjs(props.dateRange?.from).format('YYYY-MM-DD'),
+    [props.dateRange],
+  );
+  const endDate = useMemo(() => dayjs(props.dateRange?.to).format('YYYY-MM-DD'), [props.dateRange]);
 
   return (
     <Card className="mt-0 flex h-full flex-col rounded-lg shadow-none">
@@ -79,17 +90,17 @@ export default function TopWholesaleCustomers(props: {
                     </TableCell>
                     <TableCell className="text-foreground py-3 text-[14px]">
                       <div className="flex items-center gap-3">
-                        <div className="h-8 w-8">
-                          <img
-                            src={data.avatar}
-                            alt={data.name}
-                            className={cn(
-                              'h-full w-full rounded-full object-cover',
-                              reportData.topWholesalers.indexOf(data) < 3 &&
-                                'border-ring ring-1 ring-[#F9BD09] ring-offset-1',
-                            )}
-                          />
-                        </div>
+                        <Avatar
+                          className={cn(
+                            'h-8 w-8',
+                            reportData.topWholesalers.indexOf(data) < 3 &&
+                              'border-ring ring-1 ring-[#F9BD09] ring-offset-1',
+                          )}
+                        >
+                          <AvatarImage src={data.avatar} alt={data.name} />
+                          <AvatarFallback>{data.name.charAt(0)}</AvatarFallback>
+                        </Avatar>
+
                         <div className="flex w-40 items-center gap-1 md:w-15 md:flex-wrap lg:w-40 lg:flex-nowrap">
                           <span className="text-foreground text-[14px] font-medium whitespace-normal md:text-[13px] lg:text-[14px]">
                             {data.name}
@@ -101,7 +112,31 @@ export default function TopWholesaleCustomers(props: {
                       </div>
                     </TableCell>
                     <TableCell className="text-foreground py-3 text-[14px]">
-                      <span className="flex justify-center">{data.orderCount}</span>
+                      <span
+                        className={cn(
+                          'flex justify-center',
+                          data.orderCount > 0 && data.id > 0
+                            ? 'cursor-pointer hover:underline'
+                            : '',
+                        )}
+                        onClick={() => {
+                          if (data.orderCount > 0 && data.id > 0) {
+                            window.open(
+                              window.yayWholesaleB2BAdmin.order_urls.list +
+                                '&_ywhs_order_type=wholesale' +
+                                '&_customer_user=' +
+                                data.id +
+                                '&_ywhs_order_from=' +
+                                startDate +
+                                '&_ywhs_order_to=' +
+                                endDate,
+                              '_blank',
+                            );
+                          }
+                        }}
+                      >
+                        {data.orderCount}
+                      </span>
                     </TableCell>
                     <TableCell className="text-foreground py-3 text-[14px]">
                       <div className="flex justify-center">

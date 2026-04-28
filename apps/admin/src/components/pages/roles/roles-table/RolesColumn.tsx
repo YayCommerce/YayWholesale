@@ -2,10 +2,10 @@ import { useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { ColumnDef } from '@tanstack/react-table';
 import { __ } from '@wordpress/i18n';
-import { Ellipsis, PencilLine } from 'lucide-react';
+import { PencilLine } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
-import { useDeleteRoleMutation, useUpdateRoleStatusMutation } from '@/lib/queries/roles';
+import { useDeleteRoleMutation } from '@/lib/queries/roles';
 import { RolesListValues } from '@/lib/schema/roles';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -19,7 +19,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { Label } from '@/components/ui/label';
 import { WholeSaleToolTip } from '@/components/custom/WholeSaleToolTip';
 import DeleteIcon from '@/components/icons/DeleteIcon';
 import EditIcon from '@/components/icons/SettingsIcon';
@@ -200,48 +199,24 @@ export const RolesColumn: ColumnDef<RolesListValues & { count: number }>[] = [
                 content={<span>{__('Edit role', 'yay-wholesale-b2b')}</span>}
               />
 
-              {!row.original.isDefault ? (
-                <WholeSaleToolTip
-                  trigger={
-                    <Button
-                      size="icon"
-                      variant="ghost"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setOpenDialog(true);
-                      }}
-                      disabled={isDeletingRolePending}
-                      className="hover:text-destructive text-muted-foreground hover:bg-white hover:shadow-xs"
-                    >
-                      <DeleteIcon className="size-4" />
-                    </Button>
-                  }
-                  content={<span>{__('Delete role', 'yay-wholesale-b2b')}</span>}
-                />
-              ) : (
-                <WholeSaleToolTip
-                  trigger={
-                    <Button
-                      size="icon"
-                      variant="ghost"
-                      onClick={() => navigate(`/settings/general`)}
-                      className="hover:text-primary text-muted-foreground transition hover:bg-white hover:shadow-xs"
-                    >
-                      <EditIcon className="size-4" />
-                    </Button>
-                  }
-                  content={<span>{__('Setting', 'yay-wholesale-b2b')}</span>}
-                />
-              )}
+              <WholeSaleToolTip
+                trigger={
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setOpenDialog(true);
+                    }}
+                    disabled={isDeletingRolePending || row.original.isDefault}
+                    className="hover:text-destructive text-muted-foreground hover:bg-white hover:shadow-xs"
+                  >
+                    <DeleteIcon className="size-4" />
+                  </Button>
+                }
+                content={<span>{__('Delete role', 'yay-wholesale-b2b')}</span>}
+              />
             </div>
-
-            <Button
-              size="icon"
-              variant="ghost"
-              className="text-muted-foreground absolute z-1 mr-0.5 flex h-8 w-8 duration-75 group-hover:-z-10 peer-has-data-[state='delayed-open']:-z-10 peer-has-data-[state='instant-open']:-z-10"
-            >
-              <Ellipsis className="h-4 w-4" />
-            </Button>
           </div>
           <DialogContent className="bw:max-w-md">
             <DialogHeader className="bw:border-b-0">

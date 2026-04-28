@@ -1,6 +1,7 @@
 import { z } from 'zod';
 
 const topWholesaler = z.object({
+  id: z.number(),
   name: z.string(),
   avatar: z.string(),
   role: z.string(),

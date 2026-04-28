@@ -124,15 +124,18 @@ class ReportsHelper {
                 continue;
             }
 
-            $revenue    += $order->get_total();
+            $revenue    += apply_filters( 'ywhs_convert_price_from_order', $order->get_total(), $order, true );
             $customer_id = $order->get_customer_id();
             $order_role  = $order->get_meta( '_ywhs_wholesale_role' );
             if ( isset( $top_wholesaler[ $customer_id ] ) ) {
                 $top_wholesaler[ $customer_id ]['orderCount'] += 1;
             } else {
                 $top_wholesaler[ $customer_id ] = [
+                    'id'         => 0,
                     'role'       => $order_role,
                     'orderCount' => 1,
+                    'name'       => __( 'Unknown User', 'yay-wholesale-b2b' ),
+                    'avatar'     => '',
                 ];
             }
 
@@ -142,9 +145,12 @@ class ReportsHelper {
                 }
 
                 $product_id                 = $item->get_product_id();
+                $line_item_revenue          = apply_filters( 'ywhs_convert_price_from_order', $item->get_total() + $item->get_total_tax(), $order, true );
                 $top_product[ $product_id ] = [
+                    'name'       => __( 'Unknown Product', 'yay-wholesale-b2b' ),
+                    'image'      => '',
                     'orderCount' => isset( $top_product[ $product_id ] ) ? $top_product[ $product_id ]['orderCount'] + $item->get_quantity() : $item->get_quantity(),
-                    'netSale'    => isset( $top_product[ $product_id ] ) ? $top_product[ $product_id ]['netSale'] + $item->get_total() + $item->get_total_tax() : $item->get_total() + $item->get_total_tax(),
+                    'netSale'    => isset( $top_product[ $product_id ] ) ? $top_product[ $product_id ]['netSale'] + $line_item_revenue : $line_item_revenue,
                 ];
             }
         }//end foreach
@@ -157,7 +163,7 @@ class ReportsHelper {
                 continue;
             }
 
-            $compare_revenue += floatval( $p_order->get_total() );
+            $compare_revenue += floatval( apply_filters( 'ywhs_convert_price_from_order', $p_order->get_total(), $p_order, true ) );
             if ( ! in_array( $p_order->get_customer_id(), $compare_wholesalers, true ) ) {
                 $compare_wholesalers[] = $p_order->get_customer_id();
             }
@@ -231,6 +237,7 @@ class ReportsHelper {
                     $role = RolesHelper::get_role_by_slug( $roles, $user_role[0] )['name'];
                 }
                 $top_wholesaler[ $user->ID ] = [
+                    'id'         => $user->ID,
                     'name'       => $user->display_name,
                     'avatar'     => get_avatar_url( $user->ID ),
                     'role'       => $role,
@@ -258,7 +265,7 @@ class ReportsHelper {
                     $top_product[ $product->get_id() ],
                     [
                         'name'  => $product->get_name(),
-                        'image' => wp_get_attachment_url( $product->get_image_id() ),
+                        'image' => wp_get_attachment_url( $product->get_image_id() ) ? wp_get_attachment_url( $product->get_image_id() ) : '',
                     ]
                 );
             }

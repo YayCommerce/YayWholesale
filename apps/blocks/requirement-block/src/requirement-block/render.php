@@ -35,7 +35,9 @@ if ($ywhs_wholesale) {
     );
 
 ?>
-<?php if ($ywhs_wholesale && !($is_hidden_quantity && $is_hidden_amount)) : ?>
+<?php if ($ywhs_wholesale 
+	// && !($is_hidden_quantity && $is_hidden_amount)
+) : ?>
 <div 
 <?php
 // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped 

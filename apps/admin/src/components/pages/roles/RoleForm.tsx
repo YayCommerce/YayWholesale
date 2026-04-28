@@ -91,7 +91,16 @@ export default function RoleForm() {
         id="role-form"
         onSubmit={form.handleSubmit(onSubmit, onError)}
         className="flex h-full flex-col"
+        onKeyDown={(e) => {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            if (!isUpdatingRolePending && form.formState.isDirty) {
+              form.handleSubmit(onSubmit, onError)();
+            }
+          }
+        }}
       >
+        <button type="submit" hidden />
         <Sheet
           open={isSheetOpen}
           onOpenChange={(open) => {

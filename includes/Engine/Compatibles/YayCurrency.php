@@ -4,7 +4,6 @@ namespace YayWholesaleB2B\Engine\Compatibles;
 use YayWholesaleB2B\Utils\SingletonTrait;
 
 use Yay_Currency\Helpers\YayCurrencyHelper;
-use Yay_Currency\Helpers\FixedPriceHelper;
 use Yay_Currency\Helpers\SupportHelper;
 use YayWholesaleB2B\Helpers\PricingHelper;
 use YayWholesaleB2B\Helpers\RolesHelper;
@@ -18,6 +17,9 @@ class YayCurrency {
     use SingletonTrait;
 
     protected function __construct() {
+
+        add_filter( 'ywhs_convert_price_from_order', [ $this, 'convert_revenue_in_order' ], 10, 3 );
+
         if ( ! defined( 'YAY_CURRENCY_VERSION' ) ) {
             return;
         }
@@ -33,10 +35,27 @@ class YayCurrency {
         add_filter( 'yay_currency_get_approximately_formatted_price', [ $this, 'get_approximately_formatted_price' ], 10, 4 );
     }
 
+    // Order have Meta-data: yay_currency_order_rate to revert the original price of order
+    public function convert_revenue_in_order( $price, \WC_Order $order, $is_reverting_to_original_currency ) {
+        $rate = $order->get_meta( 'yay_currency_order_rate' );
+
+        if ( ! isset( $rate ) ) {
+            return $price;
+        }
+
+        if ( $is_reverting_to_original_currency ) {
+            $price = floatval( $price ) / max( 1, floatval( $rate ) );
+        } else {
+            $price = floatval( $price ) * max( 1, floatval( $rate ) );
+        }
+
+        return round( $price, wc_get_price_decimals() );
+    }
+
     /* Convert the final price with YayCurrency */
     public function convert_currency_price( $price ) {
         if ( ! defined( 'YAY_CURRENCY_VERSION' ) ) {
-            return;
+            return $price;
         }
 
         if ( is_checkout() || self::is_checkout_blocks() ) {
@@ -105,7 +124,9 @@ class YayCurrency {
 
         if ( $apply_currency ) {
             $product_price = YayCurrencyHelper::calculate_price_by_currency( $product_price, false, $apply_currency );
-            $product_price = FixedPriceHelper::get_price_fixed_by_apply_currency( $product, $product_price, $apply_currency );
+            if ( class_exists( 'Yay_Currency\Helpers\FixedPriceHelper' ) ) {
+                $product_price = \Yay_Currency\Helpers\FixedPriceHelper::get_price_fixed_by_apply_currency( $product, $product_price, $apply_currency );
+            }
         }
 
         return (float) $product_price;

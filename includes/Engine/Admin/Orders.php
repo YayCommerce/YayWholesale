@@ -1,15 +1,12 @@
 <?php
 namespace YayWholesaleB2B\Engine\Admin;
 
-use WC_Data_Store;
-use WC_Tax;
-use YayWholesaleB2B\Engine\Compatibles;
-use YayWholesaleB2B\Engine\Frontend\Tax;
 use YayWholesaleB2B\Helpers\HooksHelper;
 use YayWholesaleB2B\Helpers\RolesHelper;
 use YayWholesaleB2B\Helpers\SettingsHelper;
 use YayWholesaleB2B\Helpers\PricingHelper;
 use YayWholesaleB2B\Utils\SingletonTrait;
+use YayWholesaleB2B\Utils\Utils;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -26,7 +23,7 @@ class Orders {
 
         add_action( 'woocommerce_order_list_table_restrict_manage_orders', [ $this, 'ywhs_admin_wc_orders_wholesale_filter_html' ], 10, 1 );
 
-        add_filter( 'woocommerce_order_query', [ $this, 'ywhs_admin_wc_orders_wholesale_filtered' ], 999, 2 );
+        add_filter( 'woocommerce_order_query_args', [ $this, 'ywhs_admin_wc_orders_wholesale_filtered' ], 999, 1 );
 
         add_filter( 'woocommerce_shop_order_list_table_columns', [ $this, 'ywhs_edit_shop_order_columns' ], 999, 1 );
 
@@ -41,13 +38,9 @@ class Orders {
      */
     public function ywhs_before_calculate_order( $and_taxes, \WC_Order $order ) {
 
-        remove_filter( 'woocommerce_order_is_vat_exempt', [ $this, 'ywhs_tax_enabled_handler' ], 999, 2 );
-        remove_filter( 'woocommerce_calc_tax', [ Tax::get_instance(), 'ywhs_maybe_disable_tax_calc' ], 9999 );
-
         $customer_id        = $order->get_customer_id();
         $wholesale_role     = RolesHelper::is_wholesale_user( $customer_id );
         $setting            = SettingsHelper::get_settings();
-        $is_disabled_tax    = $setting['general']['disable_tax'] ?? false;
         $is_disabled_coupon = $setting['general']['disable_coupon'] ?? false;
         $items              = [];
 
@@ -57,35 +50,18 @@ class Orders {
 
         $is_discounted = PricingHelper::check_is_discounted( $order, $wholesale_role );
 
-        // Force tax exempted (default is the value of 'is_vat_exempt' in meta_data of order)
-        $is_force_tax_exempt = apply_filters( 'woocommerce_order_is_vat_exempt', 'yes' === $order->get_meta( 'is_vat_exempt' ), $order );
-
-        $this->calculate_price_and_tax_of_items(
+        $this->calculate_price_of_items(
             $order,
             $is_discounted,
             $is_disabled_coupon,
             $wholesale_role,
-            $is_disabled_tax,
-            $is_force_tax_exempt,
             $items
         );
-
-        // update "Items" displaying and calculate taxes in shipping items
-        $this->calculate_tax_of_shippings( $order, $items, $is_discounted, $is_disabled_tax, $is_force_tax_exempt );
-
-        // calculate taxes in fee items
-        $this->calculate_tax_of_fees( $order, $is_discounted, $is_disabled_tax, $is_force_tax_exempt );
-
-        // Update taxes
-        $order->update_taxes();
 
         // Update meta data for filter
         if ( isset( $_SERVER['REQUEST_METHOD'] ) && 'POST' === $_SERVER['REQUEST_METHOD'] ) {
             PricingHelper::handle_order( $order, $wholesale_role, $is_discounted );
         }
-
-        add_filter( 'woocommerce_order_is_vat_exempt', [ $this, 'ywhs_tax_enabled_handler' ], 999, 2 );
-        add_filter( 'woocommerce_calc_tax', [ Tax::get_instance(), 'ywhs_maybe_disable_tax_calc' ], 9999 );
     }//end ywhs_before_calculate_order()
 
     /**
@@ -123,17 +99,13 @@ class Orders {
      * @param bool      $is_discounted the status of order that meet the discount requirement.
      * @param bool      $is_disabled_coupon the disabled coupon setting.
      * @param array     $wholesale_role wholesale role of owner.
-     * @param bool      $is_disabled_tax the disabled tax setting.
-     * @param bool      $is_force_tax_exempt the tax exemption flag.
      * @param array     $items the items array to statistic items in order.
      */
-    protected function calculate_price_and_tax_of_items(
+    protected function calculate_price_of_items(
         \WC_Order $order,
         bool $is_discounted,
         bool $is_disabled_coupon,
         array $wholesale_role,
-        bool $is_disabled_tax,
-        bool $is_force_tax_exempt,
         array &$items
     ) {
         $coupons         = $order->get_items( 'coupon' );
@@ -163,9 +135,8 @@ class Orders {
                 continue;
             }
 
-            $quantity        = $item->get_quantity();
-            $product         = $item->get_product();
-            $is_removing_tax = false;
+            $quantity = $item->get_quantity();
+            $product  = $item->get_product();
             if ( is_admin() ) {
                 $extra = $extra_price_map[ $item->get_id() ] ?? 0;
 
@@ -176,6 +147,8 @@ class Orders {
                     $price = apply_filters( 'ywhs_product_price_ajax_handled', $price, $product, 'price' );
                 }
                 HooksHelper::add_price_hooks();
+
+                $price = apply_filters( 'ywhs_convert_price_from_order', $price, $order, false );
 
                 $price     = wc_get_price_excluding_tax( $product, [ 'price' => $price ] );
                 $new_price = $price + $extra;
@@ -189,105 +162,8 @@ class Orders {
             }//end if
 
             $items[] = $item->get_name() . ' x ' . $quantity;
-
-            if ( ( $is_discounted && $is_disabled_tax ) ||
-            ( $is_force_tax_exempt ) ) {
-                $item->set_taxes(
-                    [
-                        'total'    => [],
-                        'subtotal' => [],
-                    ]
-                );
-                $is_removing_tax = true;
-            } else {
-                $tax_rates = WC_Tax::get_rates( $item->get_tax_class() );
-                $taxes     = WC_Tax::calc_tax( $item->get_subtotal(), $tax_rates, false );
-                $item->set_taxes(
-                    [
-                        'total'    => $taxes,
-                        'subtotal' => $taxes,
-                    ]
-                );
-            }//end if
         }//end foreach
-        if ( $is_removing_tax ) {
-            $order->remove_order_items( 'tax' );
-        }
-    }
-
-    /**
-     * Calculate the tax of order shipping items
-     *
-     * @param \WC_Order $order the order object.
-     * @param array     $items the items array to statistic items in order.
-     * @param bool      $is_discounted the status of order that meet the discount requirement.
-     * @param bool      $is_disabled_tax the disabled tax setting.
-     * @param bool      $is_force_tax_exempt the tax exemption flag.
-     */
-    protected function calculate_tax_of_shippings(
-        \WC_Order $order,
-        array $items,
-        bool $is_discounted,
-        bool $is_disabled_tax,
-        bool $is_force_tax_exempt
-    ) {
-        foreach ( $order->get_items( 'shipping' ) as $shipping ) {
-            $shipping->update_meta_data( 'Items', implode( ', ', $items ) );
-
-            if ( ! $shipping instanceof \WC_Order_Item_Shipping ) {
-                continue;
-            }
-
-            if ( ( $is_discounted && $is_disabled_tax ) ||
-            ( $is_force_tax_exempt ) ) {
-                $shipping->set_taxes( [] );
-            } else {
-                $tax_rates = WC_Tax::get_shipping_tax_rates( $shipping->get_tax_class() );
-                $taxes     = WC_Tax::calc_tax( $shipping->get_total(), $tax_rates, false );
-                $shipping->set_taxes(
-                    [
-                        'total'    => $taxes,
-                        'subtotal' => $taxes,
-                    ]
-                );
-            }//end if
-        }//end foreach
-    }
-
-    /**
-     * Calculate the tax of order fee items
-     *
-     * @param \WC_Order $order the order object.
-     * @param bool      $is_discounted the status of order that meet the discount requirement.
-     * @param bool      $is_disabled_tax the disabled tax setting.
-     * @param bool      $is_force_tax_exempt the tax exemption flag.
-     */
-    protected function calculate_tax_of_fees(
-        \WC_Order $order,
-        bool $is_discounted,
-        bool $is_disabled_tax,
-        bool $is_force_tax_exempt
-    ) {
-        foreach ( $order->get_items( 'fee' ) as $fee ) {
-            if ( ! $fee instanceof \WC_Order_Item_Fee ) {
-                continue;
-            }
-
-            if ( ( $is_discounted && $is_disabled_tax ) ||
-            ( $is_force_tax_exempt ) ) {
-                $fee->set_taxes( [] );
-            } else {
-                $tax_rates = WC_Tax::get_rates( $fee->get_tax_class() );
-                $taxes     = WC_Tax::calc_tax( $fee->get_total(), $tax_rates, false );
-                $fee->set_taxes(
-                    [
-                        'total'    => $taxes,
-                        'subtotal' => $taxes,
-                    ]
-                );
-            }//end if
-        }//end foreach
-    }
+    }//end calculate_price_of_items()
 
     /**
      * Add the wholesale and retail order filter to admin WC order list page
@@ -313,14 +189,37 @@ class Orders {
     /**
      * Filter WC Orders data by yay wholesaler role
      *
-     * @param array $result The WC default result.
      * @param array $args The arguments.
      */
-    public function ywhs_admin_wc_orders_wholesale_filtered( $result, $args ) {
+    public function ywhs_admin_wc_orders_wholesale_filtered( $args ) {
         $order_type = filter_input( INPUT_GET, '_ywhs_order_type', FILTER_SANITIZE_SPECIAL_CHARS );
 
+        // Link from dashboard
+        $start_date = filter_input( INPUT_GET, '_ywhs_order_from', FILTER_SANITIZE_SPECIAL_CHARS );
+        $end_date   = filter_input( INPUT_GET, '_ywhs_order_to', FILTER_SANITIZE_SPECIAL_CHARS );
+
+        $date_query  = [];
+        $blank_count = 0;
+        if ( Utils::is_valid_date_format( $start_date ) ) {
+            $date_query[] = $start_date;
+        } else {
+            $date_query[] = '';
+            ++$blank_count;
+        }
+
+        if ( Utils::is_valid_date_format( $end_date ) ) {
+            $date_query[] = $end_date;
+        } else {
+            $date_query[] = '';
+            ++$blank_count;
+        }
+
+        if ( $blank_count < 2 ) {
+            $args['date_created'] = implode( '...', $date_query );
+        }
+
         if ( ! isset( $order_type ) || 'all' === $order_type ) {
-            return $result;
+            return $args;
         }
 
         if ( 'wholesale' === $order_type ) {
@@ -330,11 +229,9 @@ class Orders {
                 'key'     => '_ywhs_wholesale_role',
                 'compare' => 'NOT EXISTS',
             ];
-        }
+        }//end if
 
-        $result = WC_Data_Store::load( 'order' )->query( $args );
-
-        return $result;
+        return $args;
     }
 
     /**

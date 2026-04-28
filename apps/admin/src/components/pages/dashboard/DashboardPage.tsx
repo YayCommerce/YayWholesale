@@ -42,7 +42,7 @@ export default function DashboardPage() {
       <DashboardSummary reportQuery={reportQuery} />
 
       <div className="grid items-stretch gap-6 md:grid-cols-2">
-        <TopWholesaleCustomers reportQuery={reportQuery} />
+        <TopWholesaleCustomers reportQuery={reportQuery} dateRange={dateRange} />
         <TopProducts reportQuery={reportQuery} />
       </div>
     </div>

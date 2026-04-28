@@ -4,7 +4,7 @@ export const inputVariants = cva('border-input', {
   variants: {
     variant: {
       input:
-        'hover:border-muted-foreground focus-visible:ring-ring has-[[data-slot=input-group-control]:focus-visible]:ring-ring',
+        'focus-visible:ring-ring has-[[data-slot=input-group-control]:focus-visible]:ring-ring',
       picker: 'cursor-pointer shadow-xs hover:bg-muted-400 focus-visible:ring-ring',
 
       /* Shadcn variants: override ring-offset */

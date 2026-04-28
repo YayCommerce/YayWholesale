@@ -29,7 +29,6 @@ body.yay-ui {
     color: inherit;
     opacity: 1;
     background-color: #0000;
-    border-radius: 0;
   }
 
   input:focus,
@@ -72,4 +71,13 @@ body.yay-ui {
 #screen-meta,
 #screen-meta-links {
   display: none !important;
+}
+
+#adminmenu div.wp-menu-image:has(img) {
+  display: flex;
+  justify-content: center;
+}
+
+#adminmenu div.wp-menu-image img {
+  align-self: flex-start;
 }

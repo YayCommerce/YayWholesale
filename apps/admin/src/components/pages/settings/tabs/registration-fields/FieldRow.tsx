@@ -233,7 +233,12 @@ export function FieldRow({
       <div className="flex shrink-0 items-center justify-center">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" disabled={isDefault}>
+            <Button
+              variant="ghost"
+              size="icon"
+              disabled={isDefault}
+              // className="focus-visible:ring-0"
+            >
               <EllipsisIcon />
             </Button>
           </DropdownMenuTrigger>
@@ -258,7 +263,7 @@ export function FieldRow({
             <DropdownMenuSeparator className="mx-0.25 mt-1" />
             <DropdownMenuGroup>
               <DropdownMenuItem onClick={append} disabled={isHidden} className="mt-1">
-                <CirclePlus className="translate-y-0.5" />
+                <CirclePlus />
                 {__('Add new field', 'yay-wholesale-b2b')}
               </DropdownMenuItem>
               <Controller
@@ -273,12 +278,12 @@ export function FieldRow({
                   >
                     {isHidden ? (
                       <>
-                        <Eye className="translate-y-0.5" />
+                        <Eye />
                         {__('Show field', 'yay-wholesale-b2b')}
                       </>
                     ) : (
                       <>
-                        <EyeOff className="translate-y-0.5" />
+                        <EyeOff />
                         {__('Hide field', 'yay-wholesale-b2b')}
                       </>
                     )}

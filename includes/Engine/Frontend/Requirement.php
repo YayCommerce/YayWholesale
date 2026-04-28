@@ -46,9 +46,9 @@ class Requirement {
         $is_hidden_quantity = 0 == $wholesale['minOrderQuantity'];
         $is_hidden_amount   = 0 == $wholesale['minOrderAmount'];
 
-        if ( $is_hidden_quantity && $is_hidden_amount ) {
-            return;
-        }
+        // if ( $is_hidden_quantity && $is_hidden_amount ) {
+        // return;
+        // }
 
         $is_discounted   = isset( $wholesale ) && PricingHelper::meets_discount_conditions( $wholesale );
         $actual_subtotal = PricingHelper::calc_actual_subtotal_of_cart();

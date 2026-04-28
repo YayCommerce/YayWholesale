@@ -2,6 +2,7 @@ import { ColumnDef } from '@tanstack/react-table';
 import { __ } from '@wordpress/i18n';
 
 import { WholesalerFormValues } from '@/lib/schema/wholesalers';
+import { cn } from '@/lib/utils';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Checkbox } from '@/components/ui/checkbox';
 
@@ -85,7 +86,25 @@ export const WholesalersColumn: ColumnDef<WholesalerFormValues>[] = [
     ),
     cell: ({ row }) => {
       const count = row.original.completedOrdersCount ?? 0;
-      return <span className="flex justify-center">{count}</span>;
+      return (
+        <span
+          className={cn('flex justify-center', count > 0 ? 'cursor-pointer hover:underline' : '')}
+          onClick={() => {
+            if (count > 0) {
+              window.open(
+                window.yayWholesaleB2BAdmin.order_urls.list +
+                  '&_ywhs_order_type=wholesale' +
+                  '&_customer_user=' +
+                  row.original.id +
+                  '&status=wc-completed',
+                '_blank',
+              );
+            }
+          }}
+        >
+          {count}
+        </span>
+      );
     },
   },
   {
