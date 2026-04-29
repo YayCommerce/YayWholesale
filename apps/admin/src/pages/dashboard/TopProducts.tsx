@@ -75,7 +75,7 @@ export default function TopProducts(props: { reportQuery: ReturnType<typeof useR
                             src={
                               data.image
                                 ? data.image
-                                : `${window.yayWholesaleB2BAdmin.plugin_url}/assets/images/favicon.svg`
+                                : `${window.yayWholesaleB2BMeta.wholesaleMeta.assetsUrl}/images/favicon.svg`
                             }
                             alt={data.name}
                             className="h-full w-full object-cover"

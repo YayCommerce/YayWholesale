@@ -22,7 +22,7 @@ class RolesRestController extends BaseRestController {
     protected function init_hooks(): void {
         // GET /roles, POST /roles
         register_rest_route(
-            $this->namespace,
+            self::REST_NAMESPACE,
             '/roles',
             [
                 [
@@ -40,7 +40,7 @@ class RolesRestController extends BaseRestController {
 
         // Bulk delete
         register_rest_route(
-            $this->namespace,
+            self::REST_NAMESPACE,
             '/roles/bulk',
             [
                 'methods'             => 'DELETE',
@@ -51,7 +51,7 @@ class RolesRestController extends BaseRestController {
 
         // Bulk status update
         register_rest_route(
-            $this->namespace,
+            self::REST_NAMESPACE,
             '/roles/bulk-status',
             [
                 'methods'             => 'PUT',
@@ -62,7 +62,7 @@ class RolesRestController extends BaseRestController {
 
         // Single role
         register_rest_route(
-            $this->namespace,
+            self::REST_NAMESPACE,
             '/roles/(?P<roleId>\d+)',
             [
                 [

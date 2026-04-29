@@ -19,7 +19,7 @@ class SettingsRestController extends BaseRestController {
 
     protected function init_hooks(): void {
         register_rest_route(
-            $this->namespace,
+            self::REST_NAMESPACE,
             '/settings',
             [
                 [
@@ -31,7 +31,7 @@ class SettingsRestController extends BaseRestController {
         );
 
         register_rest_route(
-            $this->namespace,
+            self::REST_NAMESPACE,
             '/mark-reviewed',
             [
                 'methods'             => 'POST',
@@ -41,7 +41,7 @@ class SettingsRestController extends BaseRestController {
         );
 
         register_rest_route(
-            $this->namespace,
+            self::REST_NAMESPACE,
             '/emails/update-status',
             [
                 'methods'             => 'POST',

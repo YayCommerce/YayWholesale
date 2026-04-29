@@ -26,7 +26,7 @@ class WholeSalersController extends BaseRestController {
      */
     protected function init_hooks(): void {
         register_rest_route(
-            $this->namespace,
+            self::REST_NAMESPACE,
             '/wholesalers',
             [
 
@@ -38,7 +38,7 @@ class WholeSalersController extends BaseRestController {
             ]
         );
         register_rest_route(
-            $this->namespace,
+            self::REST_NAMESPACE,
             '/wholesalers/(?P<user_id>\d+)',
             [
                 'methods'             => 'PUT',
@@ -48,7 +48,7 @@ class WholeSalersController extends BaseRestController {
         );
 
         register_rest_route(
-            $this->namespace,
+            self::REST_NAMESPACE,
             '/wholesalers/bulk-role',
             [
                 [
@@ -60,7 +60,7 @@ class WholeSalersController extends BaseRestController {
         );
 
         register_rest_route(
-            $this->namespace,
+            self::REST_NAMESPACE,
             '/wholesalers/total',
             [
                 [

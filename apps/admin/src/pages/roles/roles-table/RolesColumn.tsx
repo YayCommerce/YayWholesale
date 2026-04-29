@@ -92,7 +92,10 @@ export const RolesColumn: ColumnDef<RolesListValues & { count: number }>[] = [
           className={cn('text-center', count > 0 ? 'cursor-pointer hover:underline' : '')}
           onClick={() => {
             if (count > 0) {
-              window.open(window.yayWholesaleB2BAdmin.user_urls.list + '?role=' + column.row.original.slug, '_blank');
+              window.open(
+                window.yayWholesaleB2BMeta.wpMeta.usersUrl.list + '?role=' + column.row.original.slug,
+                '_blank',
+              );
             }
           }}
         >

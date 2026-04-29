@@ -6,6 +6,7 @@ use YayWholesaleB2B\Helpers\SettingsHelper;
 use YayWholesaleB2B\Engine\Register\ScriptName;
 use YayWholesaleB2B\Helpers\RequestsHelper;
 use YayWholesaleB2B\Helpers\RolesHelper;
+use YayWholesaleB2B\Services\LocalizeService;
 use YayWholesaleB2B\Utils\Utils;
 
 defined( 'ABSPATH' ) || exit;
@@ -15,7 +16,11 @@ defined( 'ABSPATH' ) || exit;
 class Settings {
     use SingletonTrait;
 
+    private LocalizeService $localize_service;
+
     protected function __construct() {
+        $this->localize_service = LocalizeService::get_instance();
+
         add_filter( 'admin_body_class', [ $this, 'admin_body_class' ] );
 
         // Register Custom Post Type
@@ -116,55 +121,16 @@ class Settings {
             return;
         }
 
-        $settings = SettingsHelper::get_settings();
-        $roles    = get_option( 'yaywholesaleb2b_roles', [] );
+        wp_localize_script(
+            ScriptName::PAGE_SETTINGS,
+            LocalizeService::VAR_ADMIN,
+            $this->localize_service->get_admin_data(),
+        );
 
         wp_localize_script(
             ScriptName::PAGE_SETTINGS,
-            'yayWholesaleB2BAdmin',
-            [
-                'user_urls'        => [
-                    'list'    => esc_url_raw( admin_url( 'users.php' ) ),
-                    'add_new' => esc_url_raw(
-                        add_query_arg(
-                            [
-                                'wholesaler' => 'yay_wholesale_b2b',
-                                '_wpnonce'   => wp_create_nonce( 'yay-wholesale-create-user' ),
-                            ],
-                            admin_url( 'user-new.php' )
-                        )
-                    ),
-                    'edit'    => esc_url_raw(
-                        add_query_arg(
-                            [
-                                'user_id' => '%USER_ID%',
-                            ],
-                            admin_url( 'user-edit.php' )
-                        )
-                    ),
-                ],
-                'order_urls'       => [
-                    'list' => esc_url_raw( admin_url( 'edit.php?post_type=shop_order' ) ),
-                ],
-                'plugin_url'       => YAYWHOLESALEB2B_PLUGIN_URL,
-                'rest_url'         => esc_url_raw( rest_url() ),
-                'rest_nonce'       => wp_create_nonce( 'wp_rest' ),
-                'rest_base'        => 'yay-wholesale/v1',
-                'currency_data'    => [
-                    'currency'     => get_woocommerce_currency(),
-                    'symbol'       => html_entity_decode( \get_woocommerce_currency_symbol(), ENT_COMPAT ),
-                    'position'     => get_option( 'woocommerce_currency_pos' ),
-                    'thousand_sep' => get_option( 'woocommerce_price_thousand_sep' ),
-                    'decimal_sep'  => get_option( 'woocommerce_price_decimal_sep' ),
-                    'num_decimals' => intval( get_option( 'woocommerce_price_num_decimals' ) ),
-                ],
-                'settings'         => $settings,
-                'wholesale_emails' => SettingsHelper::get_email_templates(),
-                'roles'            => RolesHelper::handle_roles_data( $roles, $settings ),
-                'reviewed'         => get_option( 'yaywholesaleb2b_reviewed', false ),
-                'day_format'       => get_option( 'date_format' ),
-                'time_format'      => get_option( 'time_format' ),
-            ]
+            LocalizeService::VAR_META,
+            $this->localize_service->get_meta(),
         );
 
         wp_enqueue_script( ScriptName::PAGE_SETTINGS );
