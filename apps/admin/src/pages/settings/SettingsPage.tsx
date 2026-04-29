@@ -62,7 +62,7 @@ export default function SettingsPage() {
   return (
     <FormProvider {...form}>
       <form id="settings-form" onSubmit={form.handleSubmit(onSubmit)}>
-        <div className="mx-auto mt-[84px] flex max-w-7xl flex-col gap-6 px-6">
+        <div className="mx-auto mt-[28px] flex max-w-7xl flex-col gap-6 px-6">
           <div className="flex w-full flex-col gap-8 sm:flex-row">
             {/* Left Sidebar - Tab List */}
             <div className="shrink-0 sm:w-[176px]">
