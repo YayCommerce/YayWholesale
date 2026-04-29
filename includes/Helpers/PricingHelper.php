@@ -45,8 +45,12 @@ class PricingHelper {
      * @return bool True if the cart conditions are met, false otherwise.
      */
     public static function meets_discount_conditions( array $role, int $quantity = -1, float $subtotal = -1 ): bool {
-        if ( ! class_exists( 'WC_Cart' ) || ! WC()->cart ) {
-            return true;
+        if ( ! did_action( 'wp_loaded' ) ) {
+            return false;
+        }
+
+        if ( ( $quantity <= 0 || $subtotal <= 0 ) && ( ! class_exists( 'WC_Cart' ) || ! WC()->cart ) ) {
+            return false;
         }
 
         $qty   = $quantity >= 0 ? $quantity : WC()->cart->get_cart_contents_count();
@@ -102,9 +106,10 @@ class PricingHelper {
      * @param array       $role The wholesale role.
      * @param \WC_Product $product The product object.
      * @param float       $extra The extra price in order.
+     * @param \WC_Order   $order The parent Order.
      * @return float The discounted price.
      */
-    public static function calc_discounted_price( $price, array $role, \WC_Product $product, $extra = 0 ) {
+    public static function calc_discounted_price( $price, array $role, \WC_Product $product, $extra = 0, $order = null ) {
         $discount = isset( $role['discount'] ) ? ( (float) $role['discount'] / 100 ) : 0;
         if ( $discount <= 0 ) {
             return $price;
@@ -113,6 +118,11 @@ class PricingHelper {
         $apply_to_sale = $role['applyToSalePrice'] ?? false;
         $regular       = (float) $product->get_regular_price();
         $sale          = (float) $product->get_sale_price( 'edit' );
+
+        if ( isset( $order ) ) {
+            $regular = apply_filters( 'ywhs_convert_price_from_order', $regular, $order, false );
+            $sale    = apply_filters( 'ywhs_convert_price_from_order', $sale, $order, false );
+        }
 
         if ( $sale > 0 ) {
             $sale = floatval( $price );
@@ -165,11 +175,9 @@ class PricingHelper {
             if ( ! $item instanceof \WC_Order_Item_Product ) {
                 continue;
             }
-            $product = $item->get_product();
-            $price   = $product->get_price();
-            if ( is_ajax() ) {
-                $price = apply_filters( 'ywhs_product_price_ajax_handled', $price, $product, 'price' );
-            }
+            $product   = $item->get_product();
+            $price     = $product->get_price();
+            $price     = apply_filters( 'ywhs_convert_price_from_order', $price, $order, false );
             $subtotal += $price * $item->get_quantity();
         }
         HooksHelper::add_price_hooks();

@@ -31,7 +31,7 @@ class Settings {
 
         add_action( 'admin_enqueue_scripts', [ $this, 'admin_enqueue_admin_styles' ] );
 
-        add_action( 'ywhs_product_price_ajax_handled', [ $this, 'default_value_for_product_price' ], 10, 1 );
+        add_filter( 'ywhs_product_price_ajax_handled', [ $this, 'default_value_for_product_price' ], 10, 1 );
     }
 
     public function admin_body_class( $classes ) {
@@ -90,7 +90,7 @@ class Settings {
     public function add_document_support_links( $links, $file ) {
         if ( strpos( $file, YAYWHOLESALEB2B_BASE_NAME ) !== false ) {
             $new_links = [
-                'doc'     => '<a href="https://yaycommerce.com/ " target="_blank">' . __( 'Docs', 'yay-wholesale-b2b' ) . '</a>',
+                'doc'     => '<a href="https://docs.yaycommerce.com/yay-wholesale-b2b " target="_blank">' . __( 'Docs', 'yay-wholesale-b2b' ) . '</a>',
                 'support' => '<a href="https://yaycommerce.com/support/" target="_blank" aria-label="' . esc_attr__( 'Visit community forums', 'yay-wholesale-b2b' ) . '">' . esc_html__( 'Support', 'yay-wholesale-b2b' ) . '</a>',
             ];
             $links     = array_merge( $links, $new_links );

@@ -18,7 +18,7 @@ class YayCurrency {
 
     protected function __construct() {
 
-        add_filter( 'ywhs_convert_price_from_order', [ $this, 'convert_revenue_in_order' ], 10, 3 );
+        add_filter( 'ywhs_convert_price_from_order', [ $this, 'convert_price_in_order' ], 10, 3 );
 
         if ( ! defined( 'YAY_CURRENCY_VERSION' ) ) {
             return;
@@ -36,20 +36,34 @@ class YayCurrency {
     }
 
     // Order have Meta-data: yay_currency_order_rate to revert the original price of order
-    public function convert_revenue_in_order( $price, \WC_Order $order, $is_reverting_to_original_currency ) {
-        $rate = $order->get_meta( 'yay_currency_order_rate' );
+    public function convert_price_in_order( $price, \WC_Order $order, $is_reverting_to_original_currency ) {
+        if ( defined( 'YAY_CURRENCY_VERSION' ) && class_exists( 'Yay_Currency\Helpers\YayCurrencyHelper' ) ) {
+            $apply_currency = YayCurrencyHelper::get_currency_by_currency_code( $order->get_currency() );
 
-        if ( ! isset( $rate ) ) {
-            return $price;
-        }
+            if ( $apply_currency ) {
+                if ( $is_reverting_to_original_currency ) {
+                    $price = YayCurrencyHelper::reverse_calculate_price_by_currency( $price, $apply_currency );
+                } else {
+                    $price = YayCurrencyHelper::calculate_price_by_currency( $price, false, $apply_currency );
+                }
+            }
 
-        if ( $is_reverting_to_original_currency ) {
-            $price = floatval( $price ) / max( 1, floatval( $rate ) );
+            return (float) $price;
         } else {
-            $price = floatval( $price ) * max( 1, floatval( $rate ) );
-        }
+            $rate = $order->get_meta( 'yay_currency_order_rate' );
 
-        return round( $price, wc_get_price_decimals() );
+            if ( ! isset( $rate ) ) {
+                return $price;
+            }
+
+            if ( $is_reverting_to_original_currency ) {
+                $price = floatval( $price ) / max( 1, floatval( $rate ) );
+            } else {
+                $price = floatval( $price ) * max( 1, floatval( $rate ) );
+            }
+
+            return $price;
+        }//end if
     }
 
     /* Convert the final price with YayCurrency */

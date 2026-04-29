@@ -33,30 +33,35 @@ class Orders {
     /**
      * Set the order data discounted when the admin recalculates orders or new order has just created
      *
-     * @param bool      $and_taxes the taxes included flag.
-     * @param \WC_Order $order The order object.
+     * @param bool                     $and_taxes the taxes included flag.
+     * @param WC_Order|WC_Order_Refund $order The order object.
      */
-    public function ywhs_before_calculate_order( $and_taxes, \WC_Order $order ) {
+    public function ywhs_before_calculate_order( $and_taxes, $order ) {
+        if ( $order instanceof \WC_Order ) {
+            $customer_id        = $order->get_customer_id();
+            $wholesale_role     = RolesHelper::is_wholesale_user( $customer_id );
+            $setting            = SettingsHelper::get_settings();
+            $is_disabled_coupon = $setting['general']['disable_coupon'] ?? false;
+            $items              = [];
 
-        $customer_id        = $order->get_customer_id();
-        $wholesale_role     = RolesHelper::is_wholesale_user( $customer_id );
-        $setting            = SettingsHelper::get_settings();
-        $is_disabled_coupon = $setting['general']['disable_coupon'] ?? false;
-        $items              = [];
+            if ( ! isset( $wholesale_role ) ) {
+                return;
+            }
 
-        if ( ! isset( $wholesale_role ) ) {
-            return;
-        }
+            if ( is_admin() ) {
+                $wholesale_role['minOrderAmount'] = apply_filters( 'ywhs_convert_price_from_order', $wholesale_role['minOrderAmount'], $order, false );
+            }
 
-        $is_discounted = PricingHelper::check_is_discounted( $order, $wholesale_role );
+            $is_discounted = PricingHelper::check_is_discounted( $order, $wholesale_role );
 
-        $this->calculate_price_of_items(
-            $order,
-            $is_discounted,
-            $is_disabled_coupon,
-            $wholesale_role,
-            $items
-        );
+            $this->calculate_price_of_items(
+                $order,
+                $is_discounted,
+                $is_disabled_coupon,
+                $wholesale_role,
+                $items
+            );
+        }//end if
 
         // Update meta data for filter
         if ( isset( $_SERVER['REQUEST_METHOD'] ) && 'POST' === $_SERVER['REQUEST_METHOD'] ) {
@@ -115,20 +120,6 @@ class Orders {
             $extra_price_map = [];
         }
 
-        $discounted_coupon = 0;
-        if ( $is_discounted && $is_disabled_coupon ) {
-            $order->remove_order_items( 'coupon' );
-        } else {
-            foreach ( $coupons as $coupon_item ) {
-                /** @var WC_Order_Item_Coupon $coupon_item */
-
-                $code   = $coupon_item->get_code();
-                $amount = $coupon_item->get_discount();
-
-                $discounted_coupon += $amount;
-            }
-        }
-
         // Handeling price and tax
         foreach ( $order->get_items() as $item ) {
             if ( ! $item instanceof \WC_Order_Item_Product ) {
@@ -140,29 +131,40 @@ class Orders {
             if ( is_admin() ) {
                 $extra = $extra_price_map[ $item->get_id() ] ?? 0;
 
-                HooksHelper::remove_price_hooks();
-
-                $price = $product->get_price();
-                if ( is_ajax() ) {
-                    $price = apply_filters( 'ywhs_product_price_ajax_handled', $price, $product, 'price' );
-                }
-                HooksHelper::add_price_hooks();
-
-                $price = apply_filters( 'ywhs_convert_price_from_order', $price, $order, false );
+                $init_price = $product->get_price( 'edit' );
+                $price      = apply_filters( 'ywhs_convert_price_from_order', $init_price, $order, false );
 
                 $price     = wc_get_price_excluding_tax( $product, [ 'price' => $price ] );
                 $new_price = $price + $extra;
 
                 if ( $is_discounted ) {
-                    $new_price = PricingHelper::calc_discounted_price( $new_price, $wholesale_role, $product, $extra );
+                    $new_price = PricingHelper::calc_discounted_price( $new_price, $wholesale_role, $product, $extra, $order );
                 }
 
                 $item->set_subtotal( $new_price * $quantity );
-                $item->set_total( $new_price * $quantity - $discounted_coupon );
+                $item->set_total( $new_price * $quantity );
             }//end if
 
             $items[] = $item->get_name() . ' x ' . $quantity;
         }//end foreach
+
+        // Update the shipping meta data
+        foreach ( $order->get_items( 'shipping' ) as $shipping ) {
+            $shipping->update_meta_data( 'Items', implode( ', ', $items ) );
+        }
+
+        $order->remove_order_items( 'coupon' );
+        if ( ! $is_discounted || ! $is_disabled_coupon ) {
+            remove_action( 'woocommerce_order_before_calculate_totals', [ $this, 'ywhs_before_calculate_order' ] );
+            foreach ( $coupons as $coupon_item ) {
+                /** @var \WC_Order_Item_Coupon $coupon_item */
+
+                $code = $coupon_item->get_code();
+                $order->apply_coupon( $code );
+
+            }
+            add_action( 'woocommerce_order_before_calculate_totals', [ $this, 'ywhs_before_calculate_order' ], 999, 2 );
+        }
     }//end calculate_price_of_items()
 
     /**
