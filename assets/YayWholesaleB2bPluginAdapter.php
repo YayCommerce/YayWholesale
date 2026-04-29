@@ -6,18 +6,34 @@
 
 defined( 'ABSPATH' ) || exit;
 
-class YayWholesaleB2bProPluginAdapter implements \YayWholesaleB2BScoped\YayCommerce\AdminShell\License\Contracts\LicenseConfigAdapter {
+/**
+ * YayWholesaleB2b Adapter (Pro)
+ */
+class YayWholesaleB2bPluginAdapter implements \YayWholesaleB2BScoped\YayCommerce\AdminShell\License\Contracts\LicenseConfigAdapter {
     // --- Menu methods ---
-    public function get_menu_title(): string         { return 'YayWholesale'; }
-    public function get_page_title(): string         { return 'Yay Wholesale B2B Pro'; }
-    public function get_menu_slug(): string          { return 'yay-wholesale-b2b-settings'; }
-    public function get_settings_page_callback(): ?callable { return null; } // Set your render callback here
-    public function get_settings_page_position(): ?int { return null; }
-    public function get_capability(): string         { return 'manage_options'; }
-    public function get_plugin_basename(): string    { return YAYWHOLESALEB2B_BASE_NAME; }
-    public function get_settings_label(): string     { return 'Settings'; }
-    public function get_docs_url(): string           { return 'https://docs.yaycommerce.com/yaywholesale/'; }
-    public function get_pro_url(): string            { return ''; }
+    public function get_menu_title(): string {
+        return 'Yay Wholesale B2B'; }
+    public function get_page_title(): string {
+        return 'Yay Wholesale B2B'; }
+    public function get_menu_slug(): string {
+        return 'yay_wholesale_b2b'; }
+    public function get_settings_page_callback(): ?callable {
+        return function () {
+            echo '<div id="yay-wholesale-b2b"></div>';
+        };
+    } // Set your render callback here
+    public function get_settings_page_position(): ?int {
+        return null; }
+    public function get_capability(): string {
+        return 'manage_woocommerce'; }
+    public function get_plugin_basename(): string {
+        return YAYWHOLESALEB2B_BASE_NAME; }
+    public function get_settings_label(): string {
+        return 'Settings'; }
+    public function get_docs_url(): string {
+        return 'https://docs.yaycommerce.com/yaywholesale/'; }
+    public function get_pro_url(): string {
+        return ''; }
 
     // --- License methods ---
     public function get_plugin_slug(): string        { return 'yay-wholesale-b2b-pro'; }

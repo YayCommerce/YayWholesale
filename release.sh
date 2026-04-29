@@ -160,17 +160,16 @@ rm -rf "$DEST_PATH/includes/Engine/Register/RegisterDev.php"
 #
 # Remove adapter by version (Lite / Pro)
 #
-if [ "$IS_PRO" = "false" ]; then
-    TARGET="$DEST_PATH/YayWholesaleB2bProPluginAdapter.php"
+TARGET="$DEST_PATH/assets/YayWholesaleB2bPluginAdapter.php"
+if [ "$IS_PRO" = "true" ]; then
+    DEST="$DEST_PATH/YayWholesaleB2bPluginAdapter.php"
 
-    if [ -f "$TARGET" ]; then
-        rm -rf "$TARGET" && echo "Removed: $TARGET (and its content)"
+    if [ -f "$DEST" ]; then
+        mv -f "$TARGET" "$DEST" && echo "Switched to Pro Plugin Adapter"
     fi
 else 
-    TARGET="$DEST_PATH/YayWholesaleB2bPluginAdapter.php"
-
     if [ -f "$TARGET" ]; then
-        rm -rf "$TARGET" && echo "Removed: $TARGET (and its content)"
+        rm -rf "$TARGET" && echo "Removed: $TARGET"
     fi
 fi
 

@@ -6,6 +6,9 @@
 
 defined( 'ABSPATH' ) || exit;
 
+/**
+ * YayWholesaleB2b Adapter (Lite)
+ */
 class YayWholesaleB2bPluginAdapter implements \YayWholesaleB2BScoped\YayCommerce\AdminShell\Contracts\PluginMenuAdapter {
     // --- Menu methods ---
     public function get_menu_title(): string {
@@ -13,13 +16,16 @@ class YayWholesaleB2bPluginAdapter implements \YayWholesaleB2BScoped\YayCommerce
     public function get_page_title(): string {
         return 'Yay Wholesale B2B'; }
     public function get_menu_slug(): string {
-        return 'yay-wholesale-b2b-settings'; }
+        return 'yay_wholesale_b2b'; }
     public function get_settings_page_callback(): ?callable {
-        return null; } // Set your render callback here
+        return function () {
+            echo '<div id="yay-wholesale-b2b"></div>';
+        };
+    } // Set your render callback here
     public function get_settings_page_position(): ?int {
         return null; }
     public function get_capability(): string {
-        return 'manage_options'; }
+        return 'manage_woocommerce'; }
     public function get_plugin_basename(): string {
         return YAYWHOLESALEB2B_BASE_NAME; }
     public function get_settings_label(): string {
@@ -27,5 +33,5 @@ class YayWholesaleB2bPluginAdapter implements \YayWholesaleB2BScoped\YayCommerce
     public function get_docs_url(): string {
         return 'https://docs.yaycommerce.com/yaywholesale/'; }
     public function get_pro_url(): string {
-        return ''; }
+        return 'https://yaycommerce.com/yay-wholesale-b2b-for-woocommerce/'; }
 }

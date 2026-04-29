@@ -13,7 +13,7 @@ return [
     'exclude-namespaces' => [],
     'exclude-classes'    => [
         'WP_Error', 'WP_REST_Request', 'WP_REST_Response', 'WP_REST_Server', 'WP_Ajax_Upgrader_Skin', 'Plugin_Upgrader',
-        'EDD_SL_Plugin_Updater', 'YayWholesaleB2bProPluginAdapter',
+        'EDD_SL_Plugin_Updater', 'YayWholesaleB2bPluginAdapter',
     ],
     'exclude-functions'  => [
         'wp_.*', 'get_.*', 'add_.*', 'remove_.*', 'apply_filters', 'do_action',

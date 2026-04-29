@@ -107,12 +107,12 @@ if ( ! function_exists( 'YayWholesaleB2B\\plugin_init' ) ) {
             define( 'YAYWHOLESALEB2B_IS_PRO', true );
 
             // // Pro License handler
-            require_once __DIR__ . '/YayWholesaleB2bProPluginAdapter.php';
+            require_once __DIR__ . '/YayWholesaleB2bPluginAdapter.php';
             \YayWholesaleB2BScoped\YayCommerce\AdminShell\AdminShell::register_plugin(
-                new \YayWholesaleB2bProPluginAdapter()
+                new \YayWholesaleB2bPluginAdapter()
             );
 
-            if ( ! \YayWholesaleB2bProPluginAdapter::is_licensed() ) {
+            if ( ! \YayWholesaleB2bPluginAdapter::is_licensed() ) {
                 return;
             }
 
