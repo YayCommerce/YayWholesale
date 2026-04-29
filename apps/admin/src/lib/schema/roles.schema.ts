@@ -1,0 +1,29 @@
+import { z } from 'zod';
+import { __ } from '@wordpress/i18n';
+
+export const roleSchema = z.object({
+  name: z.string().min(1, { message: __('Role name is required', 'yay-wholesale-b2b') }),
+  description: z.string(),
+  discount: z
+    .number({ required_error: __('Discount is required', 'yay-wholesale-b2b') })
+    .min(0, { message: __('Discount must be between 0 and 100', 'yay-wholesale-b2b') })
+    .max(100, { message: __('Discount must be between 0 and 100', 'yay-wholesale-b2b') }),
+
+  minOrderQuantity: z
+    .number({ required_error: __('Minimum order quantity is required', 'yay-wholesale-b2b') })
+    .min(0, { message: __('Minimum order quantity must be greater than 0', 'yay-wholesale-b2b') }),
+  minOrderAmount: z
+    .number({ required_error: __('Minimum order amount is required', 'yay-wholesale-b2b') })
+    .min(0, { message: __('Minimum order amount must be greater than 0', 'yay-wholesale-b2b') }),
+  applyToSalePrice: z.boolean(),
+});
+
+export type RoleFormValues = z.infer<typeof roleSchema>;
+
+export type Role = RoleFormValues & {
+  id: number;
+  slug: string;
+  status: boolean;
+  count: number;
+  isDefault: boolean;
+};

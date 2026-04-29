@@ -4,12 +4,12 @@ import { useNavigate } from 'react-router-dom';
 import { Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
+import { parseWPCurrency, parseWPDecimal } from '@/lib/helpers/format.helper';
 import { useReportsQuery } from '@/lib/queries/reports';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { parseWPCurrency, parseWPDecimal } from '../common.helper';
 
 export default function DashboardSummary(props: { reportQuery: ReturnType<typeof useReportsQuery> }) {
   const { data: reportData, isFetching, isLoading } = props.reportQuery;

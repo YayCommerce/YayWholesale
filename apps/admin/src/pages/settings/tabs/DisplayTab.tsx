@@ -1,6 +1,7 @@
 import { Controller, useFormContext } from 'react-hook-form';
 import { __ } from '@wordpress/i18n';
 
+import { parseWPCurrency } from '@/lib/helpers/format.helper';
 import { SettingsFormData } from '@/lib/schema/settings';
 import { AddToCartSkeleton, ProductImageSkeleton } from '@/components/ui/custom/shop-skeleton';
 import { Field, FieldContent, FieldLabel } from '@/components/ui/field';
@@ -8,7 +9,6 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ColorPicker } from '@/components/ui/wp-color-picker';
-import { parseWPCurrency } from '../../common.helper';
 
 export default function DisplayTab() {
   const { control, watch } = useFormContext<SettingsFormData>();

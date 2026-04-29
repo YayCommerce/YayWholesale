@@ -4,11 +4,11 @@ import { CalendarIcon, ChevronDown } from 'lucide-react';
 import { DateRange } from 'react-day-picker';
 import { __ } from '@wordpress/i18n';
 
+import { parseWPDate } from '@/lib/helpers/format.helper';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Separator } from '@/components/ui/separator';
-import { parseWPDate } from '../common.helper';
 
 interface DashboardDatePickerProps {
   dateRange: DateRange | undefined;
