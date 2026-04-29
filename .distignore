@@ -23,3 +23,7 @@ yay-wholesale-lite.zip
 .prettierignore
 readme.txt
 pnpm-lock.yaml
+vendor/*
+scoper.inc.php
+composer.json
+composer.lock

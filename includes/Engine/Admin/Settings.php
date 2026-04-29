@@ -21,7 +21,7 @@ class Settings {
         // Register Custom Post Type
         add_action( 'init', [ $this, 'register_ywhs_request_post_type' ] );
 
-        add_action( 'admin_menu', [ $this, 'admin_menu' ], YAYWHOLESALEB2B_MENU_PRIORITY );
+        add_action( 'admin_menu', [ $this, 'admin_menu' ], 90 );
 
         add_filter( 'plugin_action_links_' . YAYWHOLESALEB2B_BASE_NAME, [ $this, 'add_action_links' ] );
 

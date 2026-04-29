@@ -1,5 +1,5 @@
 <?php
-namespace YayWholesaleB2B\Engine\ProFeatures;
+namespace YayWholesaleB2B\ProEngine;
 
 use YayWholesaleB2B\Utils\SingletonTrait;
 

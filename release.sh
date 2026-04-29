@@ -103,10 +103,23 @@ pnpm build
 cd "$PROJECT_PATH"
 
 #
+# 6) Convert if endline is CRLF -> LF
+#
+set -euo pipefail
+# cd "$(dirname "$0")/.."
+if [ "${os#CYGWIN}" != "$os" ] || [ "${os#MINGW}" != "$os" ] || [ "${os#MSYS}" != "$os" ]; then
+    sh "$PROJECT_PATH/vendor/bin/yaycommerce-prerelease" 
+else
+    ./vendor/bin/yaycommerce-prerelease 
+fi
+
+#
 # 5) Copy files
 #
 echo "Syncing files..."
 rsync -rc --exclude-from="$PROJECT_PATH/.distignore" "$PROJECT_PATH/" "$DEST_PATH/" --delete --delete-excluded
+rsync "$PROJECT_PATH/vendor/autoload.php" "$DEST_PATH/vendor/"
+rsync -r "$PROJECT_PATH/vendor/composer" "$DEST_PATH/vendor/"
 
 #
 # 6) Convert if endline is CRLF -> LF
@@ -121,7 +134,7 @@ fi
 # 7) Delete Pro folder if building Lite ver
 #
 if [ "$IS_PRO" = "false" ]; then
-    TARGET="$DEST_PATH/includes/Engine/ProFeatures"
+    TARGET="$DEST_PATH/includes/ProEngine"
 
     if [ -d "$TARGET" ]; then
         rm -rf "$TARGET" && echo "Removed: $TARGET (and its content)"
@@ -143,6 +156,23 @@ fi
 #
 sed -i "/'YAYWHOLESALEB2B_IS_DEVELOPMENT', true/d" "$DEST_PATH/yay-wholesale-b2b.php"
 rm -rf "$DEST_PATH/includes/Engine/Register/RegisterDev.php"
+
+#
+# Remove adapter by version (Lite / Pro)
+#
+if [ "$IS_PRO" = "false" ]; then
+    TARGET="$DEST_PATH/YayWholesaleB2bProPluginAdapter.php"
+
+    if [ -f "$TARGET" ]; then
+        rm -rf "$TARGET" && echo "Removed: $TARGET (and its content)"
+    fi
+else 
+    TARGET="$DEST_PATH/YayWholesaleB2bPluginAdapter.php"
+
+    if [ -f "$TARGET" ]; then
+        rm -rf "$TARGET" && echo "Removed: $TARGET (and its content)"
+    fi
+fi
 
 #
 # 10) Generate ZIP
