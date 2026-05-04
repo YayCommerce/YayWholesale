@@ -15,7 +15,14 @@ abstract class BaseRestController {
 
     public const REST_NAMESPACE = 'yay-wholesale/v1';
 
-    protected function success( array $data = [], string $message = '' ): WP_REST_Response {
+    /**
+     * Return a success response.
+     *
+     * @param array|boolean $data    The data to return.
+     * @param string        $message The success message.
+     * @return WP_REST_Response The response object.
+     */
+    protected function success( $data = [], string $message = '' ): WP_REST_Response {
         return rest_ensure_response(
             array_filter(
                 [

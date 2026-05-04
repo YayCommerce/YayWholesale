@@ -1,14 +1,28 @@
 import { useState } from 'react';
 import { __ } from '@wordpress/i18n';
 
-import { useUpdateEmailStatusMutation, useWholesaleEmailsQuery } from '@/lib/queries/emails';
+import { getErrorMsg } from '@/lib/helpers/response.helper';
+import { useUpdateEmailStatusMutation, useWholesaleEmailsQuery } from '@/lib/queries/emails.queries';
+import { toast } from '@/components/ui/sonner';
 import { Switch } from '@/components/ui/switch';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
 export default function EmailsTab() {
   const [loadingId, setLoadingId] = useState<string | null>(null);
   const { data: emails } = useWholesaleEmailsQuery();
-  const { mutate, isPending } = useUpdateEmailStatusMutation();
+  const updateEmailStatusMutation = useUpdateEmailStatusMutation();
+
+  async function handleStatusChange(emailId: string, status: boolean) {
+    setLoadingId(emailId);
+    try {
+      await updateEmailStatusMutation.mutateAsync({ emailId, status });
+      toast.success(__('Email status updated!', 'yay-wholesale-b2b'));
+    } catch (error) {
+      toast.error(await getErrorMsg(error));
+    } finally {
+      setLoadingId(null);
+    }
+  }
 
   return (
     <div className="overflow-x-auto rounded-lg border bg-white shadow-xs">
@@ -30,11 +44,8 @@ export default function EmailsTab() {
                 <Switch
                   disabled={loadingId === email.id}
                   checked={email.status}
-                  loading={isPending && loadingId === email.id}
-                  onCheckedChange={(checked) => {
-                    setLoadingId(email.id);
-                    mutate({ emailId: email.id, status: checked }, { onSettled: () => setLoadingId(null) });
-                  }}
+                  loading={updateEmailStatusMutation.isPending && loadingId === email.id}
+                  onCheckedChange={(checked) => handleStatusChange(email.id, checked)}
                 />
               </TableCell>
 

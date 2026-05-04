@@ -78,7 +78,7 @@ class SettingsRestController extends BaseRestController {
      */
     public function mark_reviewed(): WP_REST_Response {
         update_option( 'yaywholesaleb2b_reviewed', true );
-        return $this->success();
+        return $this->success( true );
     }
 
     public function get_email_settings_by_id( string $email_id ): array {
@@ -137,7 +137,7 @@ class SettingsRestController extends BaseRestController {
         $settings['enabled'] = $status ? 'yes' : 'no';
         update_option( $option_key, $settings, 'yes' );
 
-        return $this->success( [], __( 'Email status updated!', 'yay-wholesale-b2b' ) );
+        return $this->success( true, __( 'Email status updated!', 'yay-wholesale-b2b' ) );
     }
 
     /**

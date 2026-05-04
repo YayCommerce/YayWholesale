@@ -9,7 +9,7 @@ export function useSettings() {
   return useQuery({
     queryKey: ['settings'],
     queryFn: () => window.yayWholesaleB2BAdmin.settings,
-    placeholderData: window.yayWholesaleB2BAdmin.settings,
+    initialData: window.yayWholesaleB2BAdmin.settings,
   });
 }
 

@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { createInterpolateElement } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
-import { markReviewed } from '@/lib/queries/mark-reviewed';
+import { markReviewed } from '@/lib/api/settings.api';
 import { cn } from '@/lib/utils';
 import { Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbSeparator } from '../ui/breadcrumb';
 
