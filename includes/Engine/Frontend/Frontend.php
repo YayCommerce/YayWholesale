@@ -2,6 +2,7 @@
 namespace YayWholesaleB2B\Engine\Frontend;
 
 use YayWholesaleB2B\Utils\SingletonTrait;
+use YayWholesaleB2B\Services\LocalizeService;
 
 defined( 'ABSPATH' ) || exit;
 /**
@@ -10,7 +11,11 @@ defined( 'ABSPATH' ) || exit;
 class Frontend {
     use SingletonTrait;
 
+    private LocalizeService $localize_service;
+
     protected function __construct() {
+        $this->localize_service = LocalizeService::get_instance();
+
         add_action( 'wp_enqueue_scripts', [ $this, 'ywhs_enqueue_scripts' ] );
     }
 
@@ -24,8 +29,10 @@ class Frontend {
 
         $currency         = apply_filters( 'ywhs_get_currency_by_third_party', [] );
         $default_currency = apply_filters( 'ywhs_ajax_using_default_currency', false );
+
+        $meta = $this->localize_service->get_meta();
         if ( ! empty( $currency ) && ! $default_currency ) {
-            $currency_data = [
+            $meta['wcMeta']['currency_data'] = [
                 'currency'     => $currency['currency'],
                 'symbol'       => html_entity_decode( $currency['symbol'], ENT_COMPAT ),
                 'position'     => $currency['position'],
@@ -33,26 +40,12 @@ class Frontend {
                 'decimal_sep'  => $currency['decimal_sep'],
                 'num_decimals' => intval( $currency['num_decimals'] ),
             ];
-        } else {
-            $currency_data = [
-                'currency'     => get_woocommerce_currency(),
-                'symbol'       => html_entity_decode( \get_woocommerce_currency_symbol(), ENT_COMPAT ),
-                'position'     => get_option( 'woocommerce_currency_pos' ),
-                'thousand_sep' => get_option( 'woocommerce_price_thousand_sep' ),
-                'decimal_sep'  => get_option( 'woocommerce_price_decimal_sep' ),
-                'num_decimals' => intval( get_option( 'woocommerce_price_num_decimals' ) ),
-            ];
-        }//end if
+        }
 
         wp_localize_script(
             $script_handle,
-            'yayWholesaleB2B',
-            [
-                'rest_url'      => esc_url_raw( rest_url() ),
-                'rest_nonce'    => wp_create_nonce( 'wp_rest' ),
-                'rest_base'     => 'yay-wholesale/v1',
-                'currency_data' => $currency_data,
-            ]
+            LocalizeService::VAR_META,
+            $meta,
         );
     }
 }

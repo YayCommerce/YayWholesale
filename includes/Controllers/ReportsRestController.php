@@ -21,7 +21,7 @@ class ReportsRestController extends BaseRestController {
 
     protected function init_hooks(): void {
         register_rest_route(
-            $this->namespace,
+            self::REST_NAMESPACE,
             '/reports',
             [
                 [

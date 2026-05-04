@@ -99,7 +99,7 @@ export default function TopWholesaleCustomers(props: {
                         onClick={() => {
                           if (data.orderCount > 0 && data.id > 0) {
                             window.open(
-                              window.yayWholesaleB2BAdmin.order_urls.list +
+                              window.yayWholesaleB2BMeta.wcMeta.ordersUrl.list +
                                 '&_ywhs_order_type=wholesale' +
                                 '&_customer_user=' +
                                 data.id +

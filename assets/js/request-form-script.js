@@ -4,22 +4,18 @@ jQuery(document).ready(() => {
     jQuery("#ywhs_request_form").on("submit", function (e) {
         e.preventDefault();
         const {__} = window.wp.i18n;
-
-        var formData = jQuery(this).serialize();
-        var yayWholesaleB2B = window.yayWholesaleB2B;
+        const formData = jQuery(this).serialize();
+        const {restRoot, restBase, restNonce} = window.yayWholesaleB2BMeta.wpMeta;
 
         jQuery("#ywhs_request_form button[type='submit']").css('opacity', '0.5');
 
         jQuery("#ywhs_request_form button[type='submit']").attr("disabled", "disabled");
 
         jQuery.ajax({
-            url: `${yayWholesaleB2B.rest_url}${yayWholesaleB2B.rest_base}/requests`, 
+            url: `${restRoot}${restBase}/requests`, 
             type: 'POST',
             beforeSend: function(xhr) {
-                if (!yayWholesaleB2B || !yayWholesaleB2B.rest_nonce)
-                    return;
-
-                xhr.setRequestHeader('X-WP-Nonce', yayWholesaleB2B.rest_nonce);
+                xhr.setRequestHeader('X-WP-Nonce', restNonce);
               },
             data: formData,
             success: (response) => {
@@ -55,7 +51,7 @@ const parseWPCurrency = (price) => {
     }
   
     const { symbol, position, thousand_sep, decimal_sep, num_decimals } =
-      window.yayWholesaleB2B.currency_data;
+      window.yayWholesaleB2BMeta.wcMeta.currency_data;
   
     const formattedPrice = price
       .toFixed(num_decimals)

@@ -5,6 +5,7 @@ import { PencilLine } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { __ } from '@wordpress/i18n';
 
+import { parseWPCurrency } from '@/lib/helpers/format.helper';
 import { useDeleteRoleMutation } from '@/lib/queries/roles';
 import { RolesListValues } from '@/lib/schema/roles';
 import { cn } from '@/lib/utils';
@@ -21,8 +22,6 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import DeleteIcon from '@/components/icons/DeleteIcon';
-import EditIcon from '@/components/icons/SettingsIcon';
-import { parseWPCurrency } from '../../common.helper';
 import RoleStatusSwitch from './RoleStatusSwitch';
 
 export const RolesColumn: ColumnDef<RolesListValues & { count: number }>[] = [
@@ -93,7 +92,10 @@ export const RolesColumn: ColumnDef<RolesListValues & { count: number }>[] = [
           className={cn('text-center', count > 0 ? 'cursor-pointer hover:underline' : '')}
           onClick={() => {
             if (count > 0) {
-              window.open(window.yayWholesaleB2BAdmin.user_urls.list + '?role=' + column.row.original.slug, '_blank');
+              window.open(
+                window.yayWholesaleB2BMeta.wpMeta.usersUrl.list + '?role=' + column.row.original.slug,
+                '_blank',
+              );
             }
           }}
         >

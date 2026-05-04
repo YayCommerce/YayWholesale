@@ -1,12 +1,10 @@
 import ky, { Options, ResponsePromise } from 'ky';
 import { __ } from '@wordpress/i18n';
 
-const YayWholesaleConfig = window?.yayWholesaleB2BAdmin || {};
-
 let _ky = ky.create({
-  prefixUrl: YayWholesaleConfig.rest_url,
+  prefixUrl: window.yayWholesaleB2BMeta.wpMeta.restRoot,
   headers: {
-    'X-WP-Nonce': YayWholesaleConfig.rest_nonce,
+    'X-WP-Nonce': window.yayWholesaleB2BMeta.wpMeta.restNonce,
   },
   hooks: {
     afterResponse: [
@@ -40,7 +38,7 @@ interface AbstractApi {
 class PrettyApi implements AbstractApi {
   readonly base: string;
 
-  constructor(base = YayWholesaleConfig.rest_base) {
+  constructor(base = window.yayWholesaleB2BMeta.wpMeta.restBase) {
     this.base = base;
   }
 
@@ -118,7 +116,7 @@ class UglyApi implements AbstractApi {
 }
 
 export function createApi(base: string): AbstractApi {
-  const baseUrl = new URL(`${YayWholesaleConfig.rest_url}${base}`);
+  const baseUrl = new URL(`${window.yayWholesaleB2BMeta.wpMeta.restRoot}${base}`);
   const restRoute = baseUrl.searchParams.get('rest_route');
 
   if (!restRoute) {
@@ -128,7 +126,7 @@ export function createApi(base: string): AbstractApi {
   }
 }
 
-export const yayWholesaleApi = createApi(YayWholesaleConfig.rest_base);
+export const yayWholesaleApi = createApi(window.yayWholesaleB2BMeta.wpMeta.restBase);
 export const wordpressApi = createApi('wp/v2');
 
 export const api = yayWholesaleApi;

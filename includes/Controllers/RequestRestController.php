@@ -23,7 +23,7 @@ class RequestRestController extends BaseRestController {
 
     protected function init_hooks(): void {
         register_rest_route(
-            $this->namespace,
+            self::REST_NAMESPACE,
             '/requests',
             [
                 [
@@ -40,7 +40,7 @@ class RequestRestController extends BaseRestController {
         );
 
         register_rest_route(
-            $this->namespace,
+            self::REST_NAMESPACE,
             '/requests/(?P<request_id>\d+)',
             [
                 [
@@ -62,7 +62,7 @@ class RequestRestController extends BaseRestController {
         );
 
         register_rest_route(
-            $this->namespace,
+            self::REST_NAMESPACE,
             '/requests/(?P<request_id>\d+)/approve',
             [
                 [
@@ -74,7 +74,7 @@ class RequestRestController extends BaseRestController {
         );
 
         register_rest_route(
-            $this->namespace,
+            self::REST_NAMESPACE,
             '/requests/(?P<request_id>\d+)/reject',
             [
                 [
@@ -86,7 +86,7 @@ class RequestRestController extends BaseRestController {
         );
 
         register_rest_route(
-            $this->namespace,
+            self::REST_NAMESPACE,
             '/requests/bulk-approve',
             [
                 [
@@ -98,7 +98,7 @@ class RequestRestController extends BaseRestController {
         );
 
         register_rest_route(
-            $this->namespace,
+            self::REST_NAMESPACE,
             '/requests/bulk-reject',
             [
                 [
@@ -110,7 +110,7 @@ class RequestRestController extends BaseRestController {
         );
 
         register_rest_route(
-            $this->namespace,
+            self::REST_NAMESPACE,
             '/requests/bulk-status',
             [
                 [
@@ -122,7 +122,7 @@ class RequestRestController extends BaseRestController {
         );
 
         register_rest_route(
-            $this->namespace,
+            self::REST_NAMESPACE,
             '/requests/bulk-delete',
             [
                 [
@@ -134,7 +134,7 @@ class RequestRestController extends BaseRestController {
         );
 
         register_rest_route(
-            $this->namespace,
+            self::REST_NAMESPACE,
             '/requests/pending',
             [
                 [
@@ -146,7 +146,7 @@ class RequestRestController extends BaseRestController {
         );
 
         register_rest_route(
-            $this->namespace,
+            self::REST_NAMESPACE,
             '/requests/total',
             [
                 [

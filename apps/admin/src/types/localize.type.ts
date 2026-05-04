@@ -1,0 +1,57 @@
+import { Role } from '@/lib/schema/roles.schema';
+import { Settings } from '@/lib/schema/settings.schema';
+
+export type Meta = {
+  wpMeta: {
+    siteUrl: string;
+    adminUrl: string;
+    ajaxUrl: string;
+
+    restRoot: string;
+    restBase: string;
+    restNonce: string;
+
+    usersUrl: {
+      list: string;
+      new: string;
+      edit: string;
+    };
+
+    dayFormat: string;
+    timeFormat: string;
+  };
+  wholesaleMeta: {
+    pluginUrl: string;
+    assetsUrl: string;
+
+    version: string;
+    reviewed: boolean;
+  };
+  wcMeta: {
+    ordersUrl: {
+      list: string;
+    };
+    currency_data: {
+      currency: string;
+      symbol: string;
+      position: string;
+      thousand_sep: string;
+      decimal_sep: string;
+      num_decimals: number;
+    };
+  };
+};
+
+export type AdminData = {
+  roles: Role[];
+  settings: Settings;
+  wholesale_emails: {
+    id: string;
+    status: boolean;
+    title: string;
+    description: string;
+    type: string;
+    recipients: string;
+    url: string;
+  }[];
+};

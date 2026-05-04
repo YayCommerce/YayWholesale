@@ -161,7 +161,7 @@ export default function WholeSalersList() {
               </SelectGroup>
             </SelectContent>
           </Select>
-          <a href={window.yayWholesaleB2BAdmin.user_urls.add_new} target="_blank" rel="noopener noreferrer">
+          <a href={window.yayWholesaleB2BMeta.wpMeta.usersUrl.new} target="_blank" rel="noopener noreferrer">
             <Button
               variant="primary-outline"
               className="hover:bg-primary hover:text-primary-foreground gap-0.25 rounded-sm px-4 shadow-xs"

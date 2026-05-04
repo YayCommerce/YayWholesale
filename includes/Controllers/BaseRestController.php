@@ -13,7 +13,7 @@ defined( 'ABSPATH' ) || exit;
  */
 abstract class BaseRestController {
 
-    protected string $namespace = 'yay-wholesale/v1';
+    public const REST_NAMESPACE = 'yay-wholesale/v1';
 
     protected function success( array $data = [], string $message = '' ): WP_REST_Response {
         return rest_ensure_response(

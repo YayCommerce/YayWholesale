@@ -1,14 +1,12 @@
-import { useMemo } from 'react';
 import { Crown } from 'lucide-react';
 import { Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
+import { parseWPCurrency } from '@/lib/helpers/format.helper';
 import { useReportsQuery } from '@/lib/queries/reports';
-import { TopProductValue } from '@/lib/schema/reports';
 import { cn } from '@/lib/utils';
 import { Card, CardContent } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { parseWPCurrency } from '../common.helper';
 
 export default function TopProducts(props: { reportQuery: ReturnType<typeof useReportsQuery> }) {
   const { data: reportData, isFetching, isLoading } = props.reportQuery;
@@ -77,7 +75,7 @@ export default function TopProducts(props: { reportQuery: ReturnType<typeof useR
                             src={
                               data.image
                                 ? data.image
-                                : `${window.yayWholesaleB2BAdmin.plugin_url}/assets/images/favicon.svg`
+                                : `${window.yayWholesaleB2BMeta.wholesaleMeta.assetsUrl}/images/favicon.svg`
                             }
                             alt={data.name}
                             className="h-full w-full object-cover"

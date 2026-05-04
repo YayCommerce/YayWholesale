@@ -4,12 +4,12 @@ import { useNavigate } from 'react-router-dom';
 import { Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
+import { parseWPCurrency, parseWPDecimal } from '@/lib/helpers/format.helper';
 import { useReportsQuery } from '@/lib/queries/reports';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { parseWPCurrency, parseWPDecimal } from '../common.helper';
 
 export default function DashboardSummary(props: { reportQuery: ReturnType<typeof useReportsQuery> }) {
   const { data: reportData, isFetching, isLoading } = props.reportQuery;
@@ -40,7 +40,7 @@ export default function DashboardSummary(props: { reportQuery: ReturnType<typeof
         percent: reportData?.orderIncreaseRate ?? 0,
         desc: 'Total Orders',
         button: () => (
-          <a href={window.yayWholesaleB2BAdmin.order_urls.list} target="_blank" rel="noopener noreferrer">
+          <a href={window.yayWholesaleB2BMeta.wcMeta.ordersUrl.list} target="_blank" rel="noopener noreferrer">
             <Button variant="outline" size="sm" className="text-foreground h-9 leading-0">
               {__('View all orders', 'yay-wholesale-b2b')}
             </Button>
@@ -54,7 +54,7 @@ export default function DashboardSummary(props: { reportQuery: ReturnType<typeof
         percent: reportData?.revenueIncreaseRate ?? 0,
         desc: 'Total Revenue',
         button: () => (
-          <a href={window.yayWholesaleB2BAdmin.order_urls.list} target="_blank" rel="noopener noreferrer">
+          <a href={window.yayWholesaleB2BMeta.wcMeta.ordersUrl.list} target="_blank" rel="noopener noreferrer">
             <Button variant="outline" size="sm" className="text-foreground h-9 leading-0">
               {__('View all revenue', 'yay-wholesale-b2b')}
             </Button>
