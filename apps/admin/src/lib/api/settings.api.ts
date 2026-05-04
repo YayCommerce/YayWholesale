@@ -1,7 +1,7 @@
-import { SettingsFormData } from '../schema/settings';
+import { Settings } from '@/lib/schema/settings.schema';
+import type { Response } from './api.type';
 import { api } from './base';
 
-export async function postSettings(data: SettingsFormData): Promise<SettingsFormData> {
-  const response = await api.post('settings', { json: data });
-  return response.json();
+export async function postSettings(data: Settings) {
+  return await api.post('settings', { json: data }).json<Response<Settings>>();
 }

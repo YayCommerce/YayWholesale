@@ -2,14 +2,14 @@ import { useMemo } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { __ } from '@wordpress/i18n';
 
-import { useActiveRolesQuery, useRolesQuery } from '@/lib/queries/roles';
-import { SettingsFormData } from '@/lib/schema/settings';
-import { Field, FieldContent, FieldLabel } from '@/components/ui/field';
+import { useActiveRolesQuery } from '@/lib/queries/roles';
+import type { Settings } from '@/lib/schema/settings.schema';
+import { Field, FieldContent, FieldError, FieldLabel } from '@/components/ui/field';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 
 export default function GeneralTab() {
-  const { control } = useFormContext<SettingsFormData>();
+  const { control } = useFormContext<Settings>();
 
   const { data: activeRoles } = useActiveRolesQuery();
 
@@ -30,7 +30,7 @@ export default function GeneralTab() {
       <Controller
         control={control}
         name={`general.default_role`}
-        render={({ field }) => (
+        render={({ field, fieldState }) => (
           <Field className="flex w-full flex-col gap-2.5">
             <FieldLabel className="text-xs font-medium">
               {__('Default role for new user', 'yay-wholesale-b2b')}
@@ -49,6 +49,7 @@ export default function GeneralTab() {
                 </SelectContent>
               </Select>
             </FieldContent>
+            {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
           </Field>
         )}
       />

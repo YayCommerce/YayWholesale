@@ -4,6 +4,7 @@ namespace YayWholesaleB2B\Controllers;
 use YayWholesaleB2B\Utils\SingletonTrait;
 use WP_REST_Request;
 use WP_REST_Response;
+use YayWholesaleB2B\Helpers\SettingsHelper;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -64,9 +65,10 @@ class SettingsRestController extends BaseRestController {
             return $this->error( __( 'Invalid settings data', 'yay-wholesale-b2b' ) );
         }
 
-        update_option( 'yaywholesaleb2b_settings', $params );
+        SettingsHelper::update_settings( $params );
+        $settings = SettingsHelper::get_settings();
 
-        return $this->success( [], __( 'Settings saved!', 'yay-wholesale-b2b' ) );
+        return $this->success( $settings, __( 'Settings saved!', 'yay-wholesale-b2b' ) );
     }
 
     /**

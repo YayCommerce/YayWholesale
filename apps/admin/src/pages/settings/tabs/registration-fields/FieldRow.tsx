@@ -1,11 +1,11 @@
 import { useMemo } from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { CirclePlus, Eye, EyeOff, GripVertical, Info } from 'lucide-react';
+import { CirclePlus, Eye, EyeOff, GripVertical } from 'lucide-react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { __ } from '@wordpress/i18n';
 
-import { SettingsFormData } from '@/lib/schema/settings';
+import type { Settings } from '@/lib/schema/settings.schema';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { WholeSaleToolTip } from '@/components/ui/custom/WholeSaleToolTip';
@@ -39,7 +39,7 @@ export function FieldRow({
   remove: (index: number) => void;
   append: () => void;
 }) {
-  const { control, watch } = useFormContext<SettingsFormData>();
+  const { control, watch } = useFormContext<Settings>();
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: field.id,
   });

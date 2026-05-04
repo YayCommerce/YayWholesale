@@ -1,14 +1,14 @@
 import { Controller, useFormContext } from 'react-hook-form';
 import { __ } from '@wordpress/i18n';
 
-import { SettingsFormData } from '@/lib/schema/settings';
+import type { Settings } from '@/lib/schema/settings.schema';
 import { Field, FieldContent, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 
 export default function RegistrationTab() {
-  const { control } = useFormContext<SettingsFormData>();
+  const { control } = useFormContext<Settings>();
 
   return (
     <div className="flex flex-col gap-6">

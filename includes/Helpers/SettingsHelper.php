@@ -102,6 +102,10 @@ class SettingsHelper {
         return $setting;
     }
 
+    public static function update_settings( array $settings ): bool {
+        return update_option( 'yaywholesaleb2b_settings', $settings );
+    }
+
     public static function get_email_content_type( $type ): string {
         switch ( $type ) {
             case 'html':

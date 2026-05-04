@@ -1,6 +1,6 @@
 import { __ } from '@wordpress/i18n';
 
-import { DashboardReportsValue } from '../schema/reports';
+import { DashboardReports } from '../schema/reports.type';
 import { api, handleResponse } from './base';
 
 export async function fetchReports(
@@ -20,9 +20,6 @@ export async function fetchReports(
   const response = await api.get('reports', {
     searchParams,
   });
-  const result = await handleResponse<DashboardReportsValue>(
-    response,
-    __('Failed to fetch reports', 'yay-wholesale-b2b'),
-  );
+  const result = await handleResponse<DashboardReports>(response, __('Failed to fetch reports', 'yay-wholesale-b2b'));
   return result.data ?? {};
 }

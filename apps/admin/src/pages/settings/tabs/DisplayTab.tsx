@@ -2,7 +2,7 @@ import { Controller, useFormContext } from 'react-hook-form';
 import { __ } from '@wordpress/i18n';
 
 import { parseWPCurrency } from '@/lib/helpers/format.helper';
-import { SettingsFormData } from '@/lib/schema/settings';
+import type { Settings } from '@/lib/schema/settings.schema';
 import { AddToCartSkeleton, ProductImageSkeleton } from '@/components/ui/custom/shop-skeleton';
 import { Field, FieldContent, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
@@ -11,7 +11,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { ColorPicker } from '@/components/ui/wp-color-picker';
 
 export default function DisplayTab() {
-  const { control, watch } = useFormContext<SettingsFormData>();
+  const { control, watch } = useFormContext<Settings>();
 
   const displayFormat = watch('display.price_format');
   const priceLabel = watch('display.wholesale_price_label');

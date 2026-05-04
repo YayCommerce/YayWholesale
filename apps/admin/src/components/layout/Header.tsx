@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useState } from 'react';
 import { CircleNotchIcon } from '@phosphor-icons/react';
-import { useIsMutating } from '@tanstack/react-query';
 import { useMatch, useNavigate } from 'react-router-dom';
 import { __, sprintf } from '@wordpress/i18n';
 
 import { usePendingCountQuery } from '@/lib/queries/requests';
+import { useIsMutatingSettings } from '@/lib/queries/settings.queries';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { WholeSaleToolTip } from '@/components/ui/custom/WholeSaleToolTip';
@@ -85,7 +85,7 @@ export default function Header() {
   const navigate = useNavigate();
   const scrolled = useScrolled();
   const isSettingRoute = useMatch({ path: '/settings/*' });
-  const isSavingSettings = useIsMutating({ mutationKey: ['settings'] }) > 0;
+  const isSavingSettings = useIsMutatingSettings() > 0;
 
   const handleNavClick = useCallback((to: string) => navigate(to), [navigate]);
 
