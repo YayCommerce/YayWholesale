@@ -197,14 +197,6 @@ class PricingHelper {
     public static function handle_order( $order, $wholesale_role, $is_discounted ) {
         if ( $is_discounted ) {
             $order->update_meta_data( '_ywhs_wholesale_role', $wholesale_role['name'] );
-
-            // Send email when new wholesale order has just been placed
-            $email_trigger = (int) $order->get_meta( '_ywhs_wholesale_email_trigger' );
-
-            if ( ( ! isset( $email_trigger ) || $email_trigger < 1 ) ) {
-                do_action( 'ywhs_new_wholesale_order_placed', $order->get_id(), $order );
-                $order->update_meta_data( '_ywhs_wholesale_email_trigger', ++$email_trigger );
-            }
         } else {
             $order->delete_meta_data( '_ywhs_wholesale_role' );
         }

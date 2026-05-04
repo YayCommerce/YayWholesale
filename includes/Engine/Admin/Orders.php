@@ -28,6 +28,8 @@ class Orders {
         add_filter( 'woocommerce_shop_order_list_table_columns', [ $this, 'ywhs_edit_shop_order_columns' ], 999, 1 );
 
         add_action( 'woocommerce_shop_order_list_table_custom_column', [ $this, 'ywhs_shop_order_custom_column' ], 999, 2 );
+
+        add_action( 'woocommerce_order_status_changed', [ $this, 'ywhs_send_wholesale_order_email' ], 999, 3 );
     }
 
     /**
@@ -272,5 +274,24 @@ class Orders {
             </span>
         </div>
         <?php
+    }
+
+    /**
+     * Send wholesale mail by status of order
+     *
+     * @param mixed  $order_id  The key of column.
+     * @param string $old_status The status before changed.
+     * @param string $new_status The status after changed.
+     */
+    public function ywhs_send_wholesale_order_email( $order_id, $old_status, $new_status ) {
+        $order            = wc_get_order( $order_id );
+        $email_trigger    = (int) $order->get_meta( '_ywhs_wholesale_email_trigger' );
+        $permitted_status = apply_filters( 'ywhs_permitted_status_for_wholesale_order_email', [ 'on-hold', 'processing', 'completed' ] );
+
+        if ( ( 'cancelled' === $old_status || $email_trigger < 1 ) && in_array( $new_status, $permitted_status, true ) ) {
+            do_action( 'ywhs_new_wholesale_order_placed', $order_id, $order );
+            $order->update_meta_data( '_ywhs_wholesale_email_trigger', ++$email_trigger );
+            $order->save_meta_data();
+        }
     }
 }

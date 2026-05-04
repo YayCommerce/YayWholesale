@@ -37,9 +37,9 @@ class Pricing {
     }
 
     protected function remove_price_hooks() {
-        remove_filter( 'woocommerce_product_get_price', [ $this, 'ywhs_get_price' ], 999, 2 );
-        remove_filter( 'woocommerce_product_variation_get_price', [ $this, 'ywhs_get_price' ], 999, 2 );
-        remove_filter( 'woocommerce_variation_prices_price', [ $this, 'ywhs_get_price' ], 999, 2 );
+        remove_filter( 'woocommerce_product_get_price', [ $this, 'ywhs_get_price' ], 999 );
+        remove_filter( 'woocommerce_product_variation_get_price', [ $this, 'ywhs_get_price' ], 999 );
+        remove_filter( 'woocommerce_variation_prices_price', [ $this, 'ywhs_get_price' ], 999 );
     }
 
     protected function add_price_hooks() {
@@ -49,9 +49,9 @@ class Pricing {
     }
 
     protected function remove_sale_price_hooks() {
-        remove_filter( 'woocommerce_product_get_sale_price', [ $this, 'ywhs_get_sale_price' ], 999, 2 );
-        remove_filter( 'woocommerce_product_variation_get_sale_price', [ $this, 'ywhs_get_sale_price' ], 999, 2 );
-        remove_filter( 'woocommerce_variation_prices_sale_price', [ $this, 'ywhs_get_sale_price' ], 999, 2 );
+        remove_filter( 'woocommerce_product_get_sale_price', [ $this, 'ywhs_get_sale_price' ], 999 );
+        remove_filter( 'woocommerce_product_variation_get_sale_price', [ $this, 'ywhs_get_sale_price' ], 999 );
+        remove_filter( 'woocommerce_variation_prices_sale_price', [ $this, 'ywhs_get_sale_price' ], 999 );
     }
 
     protected function add_sale_price_hooks() {
@@ -375,8 +375,6 @@ class Pricing {
         $is_discounted = PricingHelper::check_is_discounted( $order, $wholesale_role );
 
         PricingHelper::handle_order( $order, $wholesale_role, $is_discounted );
-
-        do_action( 'ywhs_new_wholesale_order_placed', $order->get_id(), $order );
     }
 
     /**
