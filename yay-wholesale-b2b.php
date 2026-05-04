@@ -10,10 +10,10 @@
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain:       yay-wholesale-b2b
  * Domain Path:       /languages
- * Requires at least: 3.0
- * Requires PHP: 7.0
- * WC requires at least: 3.0.0
- * WC tested up to: 10.2.2
+ * Requires at least: 6.5
+ * Requires PHP: 7.4
+ * WC requires at least: 10.0.0
+ * WC tested up to: 10.7.0
  *
  * @package yaycommerce/yay-wholesale
  */
@@ -31,7 +31,6 @@ if ( function_exists( 'YayWholesaleB2B\\plugin_init' ) ) {
         }
     );
 }
-
 
 if ( ! defined( 'YAYWHOLESALEB2B_FILE' ) ) {
     define( 'YAYWHOLESALEB2B_FILE', __FILE__ );

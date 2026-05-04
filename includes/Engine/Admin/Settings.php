@@ -2,11 +2,9 @@
 namespace YayWholesaleB2B\Engine\Admin;
 
 use YayWholesaleB2B\Utils\SingletonTrait;
-use YayWholesaleB2B\Helpers\SettingsHelper;
+use YayWholesaleB2B\Helpers\LocalizeHelper;
 use YayWholesaleB2B\Engine\Register\ScriptName;
 use YayWholesaleB2B\Helpers\RequestsHelper;
-use YayWholesaleB2B\Helpers\RolesHelper;
-use YayWholesaleB2B\Services\LocalizeService;
 use YayWholesaleB2B\Utils\Utils;
 
 defined( 'ABSPATH' ) || exit;
@@ -16,10 +14,7 @@ defined( 'ABSPATH' ) || exit;
 class Settings {
     use SingletonTrait;
 
-    private LocalizeService $localize_service;
-
     protected function __construct() {
-        $this->localize_service = LocalizeService::get_instance();
 
         add_filter( 'admin_body_class', [ $this, 'admin_body_class' ] );
 
@@ -39,7 +34,7 @@ class Settings {
         add_action( 'ywhs_product_price_ajax_handled', [ $this, 'default_value_for_product_price' ], 10, 1 );
     }
 
-    public function admin_body_class( $classes ) {
+    public function admin_body_class( string $classes ): string {
         if ( strpos( $classes, 'yay-ui' ) === false ) {
             $classes .= ' yay-ui';
         }
@@ -113,24 +108,24 @@ class Settings {
         echo '<div id="yay-wholesale-b2b"></div>';
     }
 
-    public function admin_enqueue_scripts( $hook_suffix ) {
+    public function admin_enqueue_scripts( string $hook_suffix ) {
 
         $allow_hook_suffixes = [ 'yaycommerce_page_yay_wholesale' ];
 
-        if ( ! in_array( $hook_suffix, $allow_hook_suffixes ) ) {
+        if ( ! in_array( $hook_suffix, $allow_hook_suffixes, true ) ) {
             return;
         }
 
         wp_localize_script(
             ScriptName::PAGE_SETTINGS,
-            LocalizeService::VAR_ADMIN,
-            $this->localize_service->get_admin_data(),
+            LocalizeHelper::VAR_ADMIN,
+            LocalizeHelper::get_admin_data(),
         );
 
         wp_localize_script(
             ScriptName::PAGE_SETTINGS,
-            LocalizeService::VAR_META,
-            $this->localize_service->get_meta(),
+            LocalizeHelper::VAR_META,
+            LocalizeHelper::get_meta(),
         );
 
         wp_enqueue_script( ScriptName::PAGE_SETTINGS );

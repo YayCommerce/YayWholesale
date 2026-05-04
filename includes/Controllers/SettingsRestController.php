@@ -143,7 +143,7 @@ class SettingsRestController extends BaseRestController {
     /**
      * Check if the user has the necessary permissions to access the settings endpoints.
      *
-     * @return bool|WP_Error True if the user has the necessary permissions, otherwise a WP_Error object.
+     * @return bool|\WP_Error True if the user has the necessary permissions, otherwise a WP_Error object.
      */
     public function can_manage_settings() {
         if ( ! current_user_can( 'manage_options' ) || ! current_user_can( 'manage_woocommerce' ) ) {
