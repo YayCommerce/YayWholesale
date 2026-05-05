@@ -21,6 +21,10 @@ export const getRoles = (): RolesListValues[] => {
   return window.yayWholesaleB2BAdmin.roles;
 };
 
+export const getPagesForWholesaleStore = () => {
+  return window.yayWholesaleB2BAdmin.valid_wholesale_store_pages;
+};
+
 export const handleErrorMessage = async (error: Error) => {
   let errorMessage = error.message ?? 'An Error has occurred!';
   if (error instanceof HTTPError) {

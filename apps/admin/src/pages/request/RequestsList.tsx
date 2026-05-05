@@ -191,7 +191,7 @@ export default function RequestsList() {
               </SelectGroup>
             </SelectContent>
           </Select>
-          {(table.getPageCount() == 1 || keyword !== '') && (
+          {(table.getPageCount() > 1 || keyword !== '') && (
             <InputGroup className="w-full md:w-76">
               <InputGroupInput placeholder="Search" value={search} onChange={handleChangeSearch} />
               <InputGroupAddon align="inline-end">

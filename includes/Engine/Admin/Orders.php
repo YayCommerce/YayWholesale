@@ -159,7 +159,7 @@ class Orders {
         if ( ! $is_discounted || ! $is_disabled_coupon ) {
             remove_action( 'woocommerce_order_before_calculate_totals', [ $this, 'ywhs_before_calculate_order' ] );
             foreach ( $coupons as $coupon_item ) {
-                /** @var \WC_Order_Item_Coupon $coupon_item */
+                /** @var WC_Order_Item_Coupon $coupon_item */
 
                 $code = $coupon_item->get_code();
                 $order->apply_coupon( $code );

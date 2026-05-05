@@ -31,6 +31,10 @@ export type Meta = {
     ordersUrl: {
       list: string;
     };
+    setting_urls: {
+      payment: string;
+      shipping: string;
+    };
     currency_data: {
       currency: string;
       symbol: string;
@@ -53,5 +57,10 @@ export type AdminData = {
     type: string;
     recipients: string;
     url: string;
+  }[];
+  valid_wholesale_store_pages: {
+    id: string;
+    title: string;
+    slug: string;
   }[];
 };

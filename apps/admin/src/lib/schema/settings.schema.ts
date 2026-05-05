@@ -20,6 +20,29 @@ const fieldSchema = z.object({
   isHidden: z.boolean(),
 });
 
+const roleRelatedSettingSchema = z.object({
+  slug: z.string(),
+  name: z.string(),
+});
+const paymentMethodSettingSchema = z.object({
+  method_id: z.string(),
+  method_title: z.string(),
+  title: z.string().optional(),
+  description: z.string().optional(),
+  roles: z.array(roleRelatedSettingSchema).optional(),
+});
+
+const shippingMethodSettingSchema = z.object({
+  instance_id: z.number(),
+  instance_name: z.string(),
+  method_id: z.string(),
+  method_name: z.string(),
+  description: z.string().optional(),
+  zone_id: z.number(),
+  zone_name: z.string(),
+  roles: z.array(roleRelatedSettingSchema).optional(),
+});
+
 export const settingsFormSchema = z.object({
   general: z.object({
     default_role: z.string(),
@@ -27,6 +50,7 @@ export const settingsFormSchema = z.object({
     disable_coupon: z.boolean(),
     disable_tax: z.boolean(),
     tax_display_mode: z.string(),
+    wholesale_store_page: z.string(),
   }),
   display: z.object({
     price_format: z.string(),
@@ -56,6 +80,8 @@ export const settingsFormSchema = z.object({
       });
     }),
   }),
+  payment_roles: z.array(paymentMethodSettingSchema).optional(),
+  shipping_roles: z.array(shippingMethodSettingSchema).optional(),
 });
 
 export type Settings = z.infer<typeof settingsFormSchema>;

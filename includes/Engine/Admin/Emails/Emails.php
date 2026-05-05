@@ -81,7 +81,7 @@ class Emails {
      * @return bool
      */
     public function ywhs_handle_wc_default_email( $enabled, $order ) {
-        if ( ! $order ) {
+        if ( ! isset($order) ) {
             return $enabled;
         }
 

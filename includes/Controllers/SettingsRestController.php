@@ -64,7 +64,15 @@ class SettingsRestController extends BaseRestController {
             return $this->error( __( 'Invalid settings data', 'yay-wholesale-b2b' ) );
         }
 
+        $payment_roles = $params['payment_roles'];
+        unset( $params['payment_roles'] );
+
+        $shipping_roles = $params['shipping_roles'];
+        unset( $params['shipping_roles'] );
+
         update_option( 'yaywholesaleb2b_settings', $params );
+        update_option( 'yaywholesaleb2b_payment_roles', $payment_roles );
+        update_option( 'yaywholesaleb2b_shipping_roles', $shipping_roles );
 
         return $this->success( [], __( 'Settings saved!', 'yay-wholesale-b2b' ) );
     }

@@ -223,12 +223,7 @@ export function FieldRow({
       <div className="flex shrink-0 items-center justify-center">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button
-              variant="ghost"
-              size="icon"
-              disabled={isDefault}
-              // className="focus-visible:ring-0"
-            >
+            <Button variant="ghost" size="icon" disabled={isDefault}>
               <EllipsisIcon />
             </Button>
           </DropdownMenuTrigger>
