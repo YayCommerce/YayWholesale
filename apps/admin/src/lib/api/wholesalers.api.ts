@@ -1,7 +1,6 @@
-import { __ } from '@wordpress/i18n';
-
 import { PaginatedWholesalerListValues, TotalWholesalersValues } from '../schema/wholesalers.type';
-import { api, handleResponse } from './api';
+import { api } from './api';
+import type { ApiResponse } from './api.type';
 
 export async function fetchWholesalersList(search: string, page: number, perPage: number, role: string) {
   const searchParams = new URLSearchParams({
@@ -10,43 +9,19 @@ export async function fetchWholesalersList(search: string, page: number, perPage
     per_page: String(perPage),
     role: role,
   });
-
-  const response = await api.get('wholesalers', { searchParams });
-  const result = await handleResponse<PaginatedWholesalerListValues>(
-    response,
-    __('Failed to fetch wholesalers', 'yay-wholesale-b2b'),
-  );
-  return result.data ?? {};
+  return await api.get('wholesalers', { searchParams }).json<ApiResponse<PaginatedWholesalerListValues>>();
 }
 
 export async function updateWholesalerRole(userId: number, roleSlug: string) {
-  let data = { role_slug: roleSlug };
-  const response = await api.put(`wholesalers/${userId}`, { json: data });
-  const result = await handleResponse<{ message: string }>(
-    response,
-    __('Failed to update wholesaler role', 'yay-wholesale-b2b'),
-  );
-
-  return result;
+  return await api.put(`wholesalers/${userId}`, { json: { role_slug: roleSlug } }).json<ApiResponse<boolean>>();
 }
 
 export async function bulkUpdateWholesalerRole(userIds: number[], roleSlug: string) {
-  let data = { ids: userIds, role_slug: roleSlug };
-
-  const response = await api.put('wholesalers/bulk-role', { json: data });
-  const result = await handleResponse<{ message: string }>(
-    response,
-    __('Failed to update wholesaler role', 'yay-wholesale-b2b'),
-  );
-
-  return result;
+  return await api
+    .put('wholesalers/bulk-role', { json: { ids: userIds, role_slug: roleSlug } })
+    .json<ApiResponse<boolean>>();
 }
 
 export async function getTotalCountWholesalers() {
-  const response = await api.get('wholesalers/total');
-  const result = await handleResponse<TotalWholesalersValues>(
-    response,
-    __('Failed to count the totals of wholesalers', 'yay-wholesale-b2b'),
-  );
-  return result.data;
+  return await api.get('wholesalers/total').json<ApiResponse<TotalWholesalersValues>>();
 }

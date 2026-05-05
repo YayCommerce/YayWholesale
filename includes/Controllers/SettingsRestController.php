@@ -9,6 +9,16 @@ use YayWholesaleB2B\Helpers\SettingsHelper;
 defined( 'ABSPATH' ) || exit;
 
 /**
+ * Refactor note: API controller.
+ * 1. success data default true, not an empty array.
+ * Refactor note: js.
+ * 1. schemas: use normal type instead of schema, if not using any form validation.
+ * 2. api client layer: only params, response type. do not handdle error here
+ * 3. query layer: only invalidate, define cache key, initial data. do not handle toast here
+ * 4. component layer: handle toast, call mutateAsync to handle error
+ */
+
+/**
  * Handles Wholesale Settings API endpoints.
  */
 class SettingsRestController extends BaseRestController {

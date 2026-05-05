@@ -18,11 +18,11 @@ abstract class BaseRestController {
     /**
      * Return a success response.
      *
-     * @param array|boolean $data    The data to return.
-     * @param string        $message The success message.
+     * @param array|boolean|int $data    The data to return.
+     * @param string            $message The success message.
      * @return WP_REST_Response The response object.
      */
-    protected function success( $data = [], string $message = '' ): WP_REST_Response {
+    protected function success( $data = true, string $message = '' ): WP_REST_Response {
         return rest_ensure_response(
             array_filter(
                 [

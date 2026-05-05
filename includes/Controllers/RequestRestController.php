@@ -211,7 +211,7 @@ class RequestRestController extends BaseRestController {
             do_action( 'ywhs_account_registration_pending', $wholesale_id );
         }//end if
 
-        return $this->success( [], __( 'Request Saved', 'yay-wholesale-b2b' ) );
+        return $this->success( true, __( 'Request Saved', 'yay-wholesale-b2b' ) );
     }
 
     /**
@@ -278,7 +278,7 @@ class RequestRestController extends BaseRestController {
         if ( ! $result ) {
             return $this->error( __( 'Cannot save the request', 'yay-wholesale-b2b' ) );
         }
-        return $this->success( [], __( 'Request has been updated successfully', 'yay-wholesale-b2b' ) );
+        return $this->success( true, __( 'Request has been updated successfully', 'yay-wholesale-b2b' ) );
     }
 
     /**
@@ -294,7 +294,7 @@ class RequestRestController extends BaseRestController {
         if ( ! $result ) {
             return $this->error( __( 'Cannot delete the request', 'yay-wholesale-b2b' ) );
         }
-        return $this->success( [], __( 'Request has been deleted successfully', 'yay-wholesale-b2b' ) );
+        return $this->success( true, __( 'Request has been deleted successfully', 'yay-wholesale-b2b' ) );
     }
 
     /**
@@ -343,7 +343,7 @@ class RequestRestController extends BaseRestController {
         // Trigger the email when a wholesale account is approved.
         do_action( 'ywhs_account_registration_approved', $id );
 
-        return $this->success( [], __( 'Request status has been updated successfully', 'yay-wholesale-b2b' ) );
+        return $this->success( true, __( 'Request status has been updated successfully', 'yay-wholesale-b2b' ) );
     }
 
     /**
@@ -363,7 +363,7 @@ class RequestRestController extends BaseRestController {
         // Trigger the email when a wholesale account is rejected.
         do_action( 'ywhs_account_registration_rejected', $id );
 
-        return $this->success( [], __( 'Request status has been updated successfully', 'yay-wholesale-b2b' ) );
+        return $this->success( true, __( 'Request status has been updated successfully', 'yay-wholesale-b2b' ) );
     }
 
     /**
@@ -425,14 +425,14 @@ class RequestRestController extends BaseRestController {
         }
 
         if ( count( $ids ) === $updated ) {
-            return $this->success( [], __( 'Requests status have been updated successfully', 'yay-wholesale-b2b' ) );
+            return $this->success( true, __( 'Requests status have been updated successfully', 'yay-wholesale-b2b' ) );
         }
 
         // Translators: 1: number of requests successfully updated; 2: number of requests that have add/remove role; 3: number of requests that failed.
         $message = __( '%1$d request(s) updated, %2$d request(s) changed role but failed updated status, %3$d request(s) failed', 'yay-wholesale-b2b' );
         $message = sprintf( $message, $updated, $failed_partially, $failed_totally );
 
-        return $this->success( [], $message );
+        return $this->success( true, $message );
     }
 
     /**
@@ -462,14 +462,14 @@ class RequestRestController extends BaseRestController {
         }
 
         if ( count( $ids ) === $updated ) {
-            return $this->success( [], __( 'Requests status have been updated successfully', 'yay-wholesale-b2b' ) );
+            return $this->success( true, __( 'Requests status have been updated successfully', 'yay-wholesale-b2b' ) );
         }
 
         // Translators: 1: number of requests successfully updated; 2: number of requests that have failed.
         $message = __( '%1$d request(s) updated, %2$d request(s) failed', 'yay-wholesale-b2b' );
         $message = sprintf( $message, $updated, $failed_totally );
 
-        return $this->success( [], $message );
+        return $this->success( true, $message );
     }
 
     /**
@@ -498,14 +498,14 @@ class RequestRestController extends BaseRestController {
         }
 
         if ( count( $ids ) === $deleted ) {
-            return $this->success( [], __( 'Requests have been deleted successfully', 'yay-wholesale-b2b' ) );
+            return $this->success( true, __( 'Requests have been deleted successfully', 'yay-wholesale-b2b' ) );
         }
 
         // Translators: 1: number of requests successfully deleted; 2: number of requests that failed.
         $message = __( '%1$d request(s) deleted, %2$d request(s) failed', 'yay-wholesale-b2b' );
         $message = sprintf( $message, $deleted, $failed );
 
-        return $this->success( [], $message );
+        return $this->success( true, $message );
     }
 
     /**

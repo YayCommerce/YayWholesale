@@ -3,7 +3,6 @@ import { __ } from '@wordpress/i18n';
 
 import { postSettings } from '@/lib/api/settings.api';
 import type { Settings } from '@/lib/schema/settings.schema';
-import { toast } from '@/components/ui/sonner';
 
 export function useSettings() {
   return useQuery({
@@ -26,9 +25,6 @@ export function useSaveSettingsMutation() {
       if (!queryClient.isFetching({ queryKey: ['roles'] })) {
         queryClient.invalidateQueries({ queryKey: ['roles'] });
       }
-    },
-    onError: () => {
-      toast.error(__('Oops! Something went wrong!', 'yay-wholesale-b2b'));
     },
   });
 }

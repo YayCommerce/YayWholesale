@@ -128,7 +128,7 @@ class WholeSalersController extends BaseRestController {
 
         $user->add_role( $role_slug );
 
-        return $this->success( [], __( 'Wholesaler role updated successfully', 'yay-wholesale-b2b' ) );
+        return $this->success( true, __( 'Wholesaler role updated successfully', 'yay-wholesale-b2b' ) );
     }
 
     /**
@@ -162,7 +162,7 @@ class WholeSalersController extends BaseRestController {
             $user->add_role( $role_slug );
         }
 
-        return $this->success( [], __( 'Wholesalers role updated successfully', 'yay-wholesale-b2b' ) );
+        return $this->success( true, __( 'Wholesalers role updated successfully', 'yay-wholesale-b2b' ) );
     }
 
     /**
