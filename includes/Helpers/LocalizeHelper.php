@@ -4,6 +4,7 @@ namespace YayWholesaleB2B\Helpers;
 use YayWholesaleB2B\Controllers\BaseRestController;
 use YayWholesaleB2B\Helpers\SettingsHelper;
 use YayWholesaleB2B\Helpers\RolesHelper;
+use YayWholesaleB2B\Helpers\SupportHelper;
 
 /**
  * Get Localize value
@@ -12,14 +13,16 @@ class LocalizeHelper {
     public const VAR_ADMIN = 'yayWholesaleB2BAdmin';
     public const VAR_META  = 'yayWholesaleB2BMeta';
 
-    public static function get_admin_data() {
-        $settings = SettingsHelper::get_settings();
+    public function get_admin_data() {
+        $settings = SettingsHelper::get_settings( true );
         $roles    = get_option( 'yaywholesaleb2b_roles', [] );
+        $pages    = SupportHelper::get_valid_pages_for_wholesale_store();
 
         $admin_data = [
-            'settings'         => $settings,
-            'wholesale_emails' => SettingsHelper::get_email_templates(),
-            'roles'            => RolesHelper::handle_roles_data( $roles, $settings ),
+            'settings'                    => $settings,
+            'wholesale_emails'            => SettingsHelper::get_email_templates(),
+            'roles'                       => RolesHelper::handle_roles_data( $roles, $settings ),
+            'valid_wholesale_store_pages' => $pages,
         ];
 
         return $admin_data;
@@ -71,6 +74,10 @@ class LocalizeHelper {
             'wcMeta'        => [
                 'ordersUrl'     => [
                     'list' => esc_url_raw( admin_url( 'edit.php?post_type=shop_order' ) ),
+                ],
+                'setting_urls'  => [
+                    'payment'  => esc_url_raw( admin_url( 'admin.php?page=wc-settings&tab=checkout' ) ),
+                    'shipping' => esc_url_raw( admin_url( 'admin.php?page=wc-settings&tab=shipping' ) ),
                 ],
                 'currency_data' => [
                     'currency'     => get_woocommerce_currency(),

@@ -61,7 +61,11 @@ class Tax {
      * @return string
      */
     public function ywhs_force_display_excl_tax( $pre_option ) {
-        if ( ! is_user_logged_in() || is_admin() ) {
+        if ( ! is_user_logged_in() ) {
+            return $pre_option;
+        }
+
+        if ( is_admin() && ! wp_doing_ajax() ) {
             return $pre_option;
         }
 

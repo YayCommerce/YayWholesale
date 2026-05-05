@@ -4,6 +4,7 @@ import { __ } from '@wordpress/i18n';
 
 import { useActiveRolesQuery } from '@/lib/queries/roles.queries';
 import type { Settings } from '@/lib/schema/settings.schema';
+import { getPagesForWholesaleStore } from '@/lib/utils';
 import { Field, FieldContent, FieldError, FieldLabel } from '@/components/ui/field';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
@@ -21,6 +22,8 @@ export default function GeneralTab() {
       })) ?? []
     );
   }, [activeRoles]);
+
+  const validPagesforWholesaleStore = getPagesForWholesaleStore();
 
   // const roleSlugs = useMemo(() => new Set(rolesList.map((r) => r.slug)), [rolesList]);
 
@@ -51,6 +54,36 @@ export default function GeneralTab() {
             </FieldContent>
             {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
           </Field>
+        )}
+      />
+
+      <Controller
+        control={control}
+        name={`general.wholesale_store_page`}
+        render={({ field }) => (
+          <div className="flex items-center justify-between rounded-md border p-4">
+            <div>
+              <h2 className="text-foreground-400 text-sm leading-3.5 font-medium">
+                {__('Wholesale Shop Page', 'yay-wholesale-b2b')}
+              </h2>
+              <p className="text-muted-foreground mt-2 text-xs font-normal">
+                {__('Set your wholesale shop page for wholesaler logged in', 'yay-wholesale-b2b')}
+              </p>
+            </div>
+            <Select value={String(field.value) ?? 'inherit'} onValueChange={field.onChange}>
+              <SelectTrigger className="w-53 text-sm font-normal">
+                <SelectValue placeholder={__('Select your page', 'yay-wholesale-b2b')} />
+              </SelectTrigger>
+              <SelectContent align="end">
+                <SelectItem value="inherit">{__('WooCommerce shop page', 'yay-wholesale-b2b')}</SelectItem>
+                {validPagesforWholesaleStore.map((page) => (
+                  <SelectItem key={page.id} value={String(page.id)}>
+                    {page.title}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         )}
       />
 
@@ -118,7 +151,7 @@ export default function GeneralTab() {
         control={control}
         name={`general.tax_display_mode`}
         render={({ field }) => (
-          <div className="flex items-center justify-between rounded-md border p-4">
+          <div className="flex items-center justify-between gap-5 rounded-md border p-4">
             <div>
               <h2 className="text-foreground-400 text-sm leading-3.5 font-medium">
                 {__('Display prices in the shop', 'yay-wholesale-b2b')}
@@ -128,13 +161,11 @@ export default function GeneralTab() {
               </p>
             </div>
             <Select value={field.value ? field.value : 'inherit'} onValueChange={field.onChange}>
-              <SelectTrigger className="min-w-40 text-sm font-normal">
+              <SelectTrigger className="min-w-20 text-sm font-normal sm:min-w-40">
                 <SelectValue placeholder={__('Select the display mode', 'yay-wholesale-b2b')} />
               </SelectTrigger>
               <SelectContent align="end">
-                <SelectItem value="inherit">
-                  {__('Inherit from the storewide tax settings [the default]', 'yay-wholesale-b2b')}
-                </SelectItem>
+                <SelectItem value="inherit">{__('Inherit (default)', 'yay-wholesale-b2b')}</SelectItem>
                 <SelectItem value="incl">{__('Including tax', 'yay-wholesale-b2b')}</SelectItem>
                 <SelectItem value="excl">{__('Excluding tax', 'yay-wholesale-b2b')}</SelectItem>
               </SelectContent>

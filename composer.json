@@ -1,0 +1,22 @@
+{
+  "name": "yaycommerce/yay-wholesale-b2b",
+  "type": "wordpress-plugin",
+  "require": {
+    "yaycommerce/admin-shell": "^2.5"
+  },
+  "repositories": {
+    "admin-shell": {
+      "type": "vcs",
+      "url": "https://github.com/YayCommerce/yaycommerce-plugin-admin-shell.git"
+    }
+  },
+  "require-dev": {
+    "humbug/php-scoper": "^0.18.7"
+  },
+  "autoload": {
+    "classmap": [
+      "vendor-prefixed/src",
+      "YayWholesaleB2bPluginAdapter.php"
+    ]
+  }
+}

@@ -16,19 +16,35 @@ import { UnsavedChangeDialog } from '@/components/ui/unsaved-changed-dialog';
 import DisplayTab from './tabs/DisplayTab';
 import EmailsTab from './tabs/EmailsTab';
 import GeneralTab from './tabs/GeneralTab';
+import PaymentRolesTab from './tabs/PaymentRolesTabs';
 import RegistrationFieldsTab from './tabs/registration-fields/RegistrationFieldsTab';
 import RegistrationTab from './tabs/RegistrationTab';
+import ShippingRolesTab from './tabs/ShippingRolesTabs';
 
 const tabs = [
-  { path: 'general', label: 'General', component: <GeneralTab /> },
-  { path: 'display', label: 'Display', component: <DisplayTab /> },
-  { path: 'registration', label: 'Registration', component: <RegistrationTab /> },
+  { path: 'general', label: __('General', 'yay_wholesale_b2b'), component: <GeneralTab /> },
+  { path: 'display', label: __('Display', 'yay_wholesale_b2b'), component: <DisplayTab /> },
+  {
+    path: 'registration',
+    label: __('Registration', 'yay_wholesale_b2b'),
+    component: <RegistrationTab />,
+  },
   {
     path: 'registration-fields',
-    label: 'Registration Fields',
+    label: __('Registration Fields', 'yay_wholesale_b2b'),
     component: <RegistrationFieldsTab />,
   },
-  { path: 'emails', label: 'Emails', component: <EmailsTab /> },
+  { path: 'emails', label: __('Emails', 'yay_wholesale_b2b'), component: <EmailsTab /> },
+  {
+    path: 'payment-roles',
+    label: __('Payment Roles', 'yay_wholesale_b2b'),
+    component: <PaymentRolesTab />,
+  },
+  {
+    path: 'shipping-roles',
+    label: __('Shipping Roles', 'yay_wholesale_b2b'),
+    component: <ShippingRolesTab />,
+  },
 ];
 
 export default function SettingsPage() {
@@ -69,7 +85,7 @@ export default function SettingsPage() {
   return (
     <FormProvider {...form}>
       <form id="settings-form" onSubmit={form.handleSubmit(onSubmit, (err) => console.log(err))}>
-        <div className="mx-auto mt-[84px] flex max-w-7xl flex-col gap-6 px-6">
+        <div className="mx-auto flex max-w-7xl flex-col gap-6 px-6">
           <div className="flex w-full flex-col gap-8 sm:flex-row">
             {/* Left Sidebar - Tab List */}
             <div className="shrink-0 sm:w-[176px]">

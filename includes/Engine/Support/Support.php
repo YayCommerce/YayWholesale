@@ -1,5 +1,5 @@
 <?php
-namespace YayWholesaleB2B\Engine\ProFeatures;
+namespace YayWholesaleB2B\Engine\Support;
 
 use YayWholesaleB2B\Utils\SingletonTrait;
 
@@ -8,11 +8,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Pro Features Initalize
+ * Support class
  */
-class ProInitialize {
+class Support {
     use SingletonTrait;
 
     protected function __construct() {
+        StorePage::get_instance();
     }
 }

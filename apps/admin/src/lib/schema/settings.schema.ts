@@ -11,13 +11,36 @@ const fieldSchema = z.object({
       __('Label can only contain letters, numbers, spaces, and common symbols (-, _, &, :, /.).', 'yay-wholesale-b2b'),
     ),
   inputName: z.string(),
-  type: z.string(),
+  type: z.enum(['text', 'email', 'number', 'phone', 'date', 'textarea', 'select']),
   placeholder: z.string(),
-  columnWidth: z.string(),
+  columnWidth: z.enum(['50%', '100%']),
   deletable: z.boolean(),
   isDefault: z.boolean(),
   isRequired: z.boolean(),
   isHidden: z.boolean(),
+});
+
+const roleRelatedSettingSchema = z.object({
+  slug: z.string(),
+  name: z.string(),
+});
+const paymentMethodSettingSchema = z.object({
+  method_id: z.string(),
+  method_title: z.string(),
+  title: z.string().optional(),
+  description: z.string().optional(),
+  roles: z.array(roleRelatedSettingSchema).optional(),
+});
+
+const shippingMethodSettingSchema = z.object({
+  instance_id: z.number(),
+  instance_name: z.string(),
+  method_id: z.string(),
+  method_name: z.string(),
+  description: z.string().optional(),
+  zone_id: z.number(),
+  zone_name: z.string(),
+  roles: z.array(roleRelatedSettingSchema).optional(),
 });
 
 export const settingsFormSchema = z.object({
@@ -26,7 +49,8 @@ export const settingsFormSchema = z.object({
     show_wholesale_price: z.boolean(),
     disable_coupon: z.boolean(),
     disable_tax: z.boolean(),
-    tax_display_mode: z.string(),
+    tax_display_mode: z.enum(['inherit', 'excl', 'incl']),
+    wholesale_store_page: z.string(),
   }),
   display: z.object({
     price_format: z.string(),
@@ -56,6 +80,8 @@ export const settingsFormSchema = z.object({
       });
     }),
   }),
+  payment_roles: z.array(paymentMethodSettingSchema).optional(),
+  shipping_roles: z.array(shippingMethodSettingSchema).optional(),
 });
 
 export type Settings = z.infer<typeof settingsFormSchema>;

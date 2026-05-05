@@ -81,7 +81,7 @@ class Emails {
      * @return bool
      */
     public function ywhs_handle_wc_default_email( $enabled, $order ) {
-        if ( ( is_admin() && ! wp_doing_ajax() ) || ! $order ) {
+        if ( ! isset($order) ) {
             return $enabled;
         }
 

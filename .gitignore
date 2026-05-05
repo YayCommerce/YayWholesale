@@ -13,3 +13,4 @@ yay-wholesale-lite.zip
 package-lock.json
 .DS_Store
 .vscode/launch.json
+vendor-prefixed/

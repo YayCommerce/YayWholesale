@@ -103,13 +103,26 @@ pnpm build
 cd "$PROJECT_PATH"
 
 #
-# 5) Copy files
+# 5) Update License Handler core
+#
+set -euo pipefail
+# cd "$(dirname "$0")/.."
+if [ "${os#CYGWIN}" != "$os" ] || [ "${os#MINGW}" != "$os" ] || [ "${os#MSYS}" != "$os" ]; then
+    sh "$PROJECT_PATH/vendor/bin/yaycommerce-prerelease" 
+else
+    ./vendor/bin/yaycommerce-prerelease 
+fi
+
+#
+# 6) Copy files
 #
 echo "Syncing files..."
 rsync -rc --exclude-from="$PROJECT_PATH/.distignore" "$PROJECT_PATH/" "$DEST_PATH/" --delete --delete-excluded
+rsync "$PROJECT_PATH/vendor/autoload.php" "$DEST_PATH/vendor/"
+rsync -r "$PROJECT_PATH/vendor/composer" "$DEST_PATH/vendor/"
 
 #
-# 6) Convert if endline is CRLF -> LF
+# 7) Convert if endline is CRLF -> LF
 #
 if [ "${os#CYGWIN}" != "$os" ] || [ "${os#MINGW}" != "$os" ] || [ "${os#MSYS}" != "$os" ]; then
 find "$DEST_PATH" \( -name "*.js" -o -name "*.css" -o -name "*.php" -o -name "*.json" \) -type f | while read -r file; do
@@ -118,10 +131,10 @@ done
 fi
 
 #
-# 7) Delete Pro folder if building Lite ver
+# 8) Delete Pro folder if building Lite ver
 #
 if [ "$IS_PRO" = "false" ]; then
-    TARGET="$DEST_PATH/includes/Engine/ProFeatures"
+    TARGET="$DEST_PATH/includes/ProEngine"
 
     if [ -d "$TARGET" ]; then
         rm -rf "$TARGET" && echo "Removed: $TARGET (and its content)"
@@ -129,7 +142,7 @@ if [ "$IS_PRO" = "false" ]; then
 fi
 
 #
-# 8) Run code formatter if tools directory exists before running lint
+# 9) Run code formatter if tools directory exists before running lint
 #
 if [ -d "$PROJECT_PATH/tools" ]; then
     echo "Running PHP Code Beautifier..."
@@ -139,13 +152,29 @@ if [ -d "$PROJECT_PATH/tools" ]; then
 fi
 
 #
-# 9) Remove development-only code
+# 10) Remove development-only code
 #
 sed -i "/'YAYWHOLESALEB2B_IS_DEVELOPMENT', true/d" "$DEST_PATH/yay-wholesale-b2b.php"
 rm -rf "$DEST_PATH/includes/Engine/Register/RegisterDev.php"
 
 #
-# 10) Generate ZIP
+# 11) License Adapter by version (Lite / Pro)
+#
+TARGET="$DEST_PATH/assets/YayWholesaleB2bPluginAdapter.php"
+if [ "$IS_PRO" = "false" ]; then
+    DEST="$DEST_PATH/YayWholesaleB2bPluginAdapter.php"
+
+    if [ -f "$DEST" ]; then
+        mv -f "$TARGET" "$DEST" && echo "License Adapter: Switched to Lite Plugin Adapter"
+    fi
+else 
+    if [ -f "$TARGET" ]; then
+        rm -rf "$TARGET" && echo "License Adapter: Removed Lite Plugin Adapter"
+    fi
+fi
+
+#
+# 12) Generate ZIP
 #
 echo "Generating zip file..."
 cd "$BUILD_PATH" || exit

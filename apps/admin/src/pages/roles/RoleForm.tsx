@@ -99,7 +99,6 @@ export default function RoleForm() {
           }
         }}
       >
-        <button type="submit" hidden />
         <Sheet
           open={isSheetOpen}
           onOpenChange={(open) => {

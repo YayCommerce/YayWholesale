@@ -8,12 +8,14 @@ use WC_Email;
  */
 class SettingsHelper {
 
+    public const B2C_ROLE_SLUG = 'ywhs_retail';
+
     /**
      * Get the settings
      *
      * @return array The settings.
      */
-    public static function get_settings(): array {
+    public static function get_settings( $is_fetch_all = false ): array {
 
         $data = [
             'general'             => [
@@ -22,6 +24,7 @@ class SettingsHelper {
                 'disable_coupon'       => false,
                 'disable_tax'          => false,
                 'tax_display_mode'     => 'inherit',
+                'wholesale_store_page' => 'inherit',
             ],
             'display'             => [
                 'price_format'          => 'retail-and-wholesale',
@@ -86,6 +89,7 @@ class SettingsHelper {
                     ],
                 ],
             ],
+
         ];
 
         $setting = get_option( 'yaywholesaleb2b_settings', $data );
@@ -97,12 +101,30 @@ class SettingsHelper {
                 $setting['general']['tax_display_mode'] = 'inherit';
                 update_option( 'yaywholesaleb2b_settings', $setting );
             }
+
+            if ( ! isset( $setting['general']['wholesale_store_page'] ) ) {
+                $setting['general']['wholesale_store_page'] = 'inherit';
+                update_option( 'yaywholesaleb2b_settings', $setting );
+            }
+        }
+
+        if ( $is_fetch_all ) {
+            $setting['payment_roles']  = PaymentGatewayHelper::get_payment_roles_setting();
+            $setting['shipping_roles'] = ShippingHelper::get_shipping_roles_setting();
         }
 
         return $setting;
     }
 
     public static function update_settings( array $settings ): bool {
+        $payment_roles = $settings['payment_roles'];
+        unset( $settings['payment_roles'] );
+
+        $shipping_roles = $settings['shipping_roles'];
+        unset( $settings['shipping_roles'] );
+
+        update_option( 'yaywholesaleb2b_payment_roles', $payment_roles );
+        update_option( 'yaywholesaleb2b_shipping_roles', $shipping_roles );
         return update_option( 'yaywholesaleb2b_settings', $settings );
     }
 
