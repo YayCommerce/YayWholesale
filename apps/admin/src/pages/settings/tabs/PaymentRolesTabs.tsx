@@ -5,8 +5,8 @@ import { InfoIcon, WalletCards } from 'lucide-react';
 import { useFieldArray, useFormContext } from 'react-hook-form';
 import { __ } from '@wordpress/i18n';
 
-import { useRolesQuery } from '@/lib/queries/roles';
-import { RoleRelatedSetting, SettingsFormData } from '@/lib/schema/settings';
+import { useRolesQuery } from '@/lib/queries/roles.queries';
+import { RoleRelatedSetting, Settings } from '@/lib/schema/settings.schema';
 import { cn } from '@/lib/utils';
 import { useUncontrolled } from '@/hooks/useUncontrolled';
 import { Button } from '@/components/ui/button';
@@ -24,7 +24,7 @@ import { Popover, PopoverContent } from '@/components/ui/popover';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
 export default function PaymentRolesTab() {
-  const { control } = useFormContext<SettingsFormData>();
+  const { control } = useFormContext<Settings>();
 
   const { fields, update } = useFieldArray({
     control,

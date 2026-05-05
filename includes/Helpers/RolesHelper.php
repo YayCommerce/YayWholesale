@@ -226,4 +226,15 @@ class RolesHelper {
 
         return $roles;
     }
+
+    public static function count_users_by_role( string $role_slug ) {
+        $user_query = new WP_User_Query(
+            [
+                'role'   => $role_slug,
+                'fields' => 'ID',
+                'number' => -1,
+            ]
+        );
+        return $user_query->get_total();
+    }
 }

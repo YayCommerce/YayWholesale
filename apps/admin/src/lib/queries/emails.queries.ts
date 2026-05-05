@@ -2,7 +2,6 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { __ } from '@wordpress/i18n';
 
 import { updateEmailStatus } from '@/lib/api/settings.api';
-import { handleErrorMessage } from '../utils';
 
 export function useWholesaleEmailsQuery() {
   return useQuery({
@@ -36,7 +35,6 @@ export function useUpdateEmailStatusMutation() {
       if (context?.previousData) {
         queryClient.setQueryData(['wholesale_emails'], context.previousData);
       }
-      handleErrorMessage(err);
     },
   });
 }

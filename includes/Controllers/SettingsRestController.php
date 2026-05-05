@@ -34,8 +34,13 @@ class SettingsRestController extends BaseRestController {
             '/settings',
             [
                 [
+                    'methods'             => 'GET',
+                    'callback'            => [ $this, 'get_settings' ],
+                    'permission_callback' => [ $this, 'can_manage_settings' ],
+                ],
+                [
                     'methods'             => 'POST',
-                    'callback'            => [ $this, 'manage_settings' ],
+                    'callback'            => [ $this, 'update_settings' ],
                     'permission_callback' => [ $this, 'can_manage_settings' ],
                 ],
             ]
@@ -63,12 +68,22 @@ class SettingsRestController extends BaseRestController {
     }
 
     /**
-     * Manage the settings.
+     * Get settings.
+     *
+     * @return WP_REST_Response The response object.
+     */
+    public function get_settings(): WP_REST_Response {
+        $settings = SettingsHelper::get_settings();
+        return $this->success( $settings );
+    }
+
+    /**
+     * Update the settings.
      *
      * @param WP_REST_Request $request The request object.
      * @return WP_REST_Response The response object.
      */
-    public function manage_settings( WP_REST_Request $request ): WP_REST_Response {
+    public function update_settings( WP_REST_Request $request ): WP_REST_Response {
         $params = $this->get_json_params( $request );
 
         if ( empty( $params ) ) {

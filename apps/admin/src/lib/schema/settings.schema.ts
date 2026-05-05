@@ -85,3 +85,4 @@ export const settingsFormSchema = z.object({
 });
 
 export type Settings = z.infer<typeof settingsFormSchema>;
+export type RoleRelatedSetting = z.infer<typeof roleRelatedSettingSchema>;

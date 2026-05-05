@@ -5,7 +5,6 @@ use YayWholesaleB2B\Utils\SingletonTrait;
 use YayWholesaleB2B\Helpers\RolesHelper;
 use WP_REST_Request;
 use WP_REST_Response;
-use YayWholesaleB2B\Helpers\SettingsHelper;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -28,7 +27,6 @@ class RolesRestController extends BaseRestController {
     }
 
     protected function init_hooks(): void {
-        // GET /roles, POST /roles
         register_rest_route(
             self::REST_NAMESPACE,
             '/roles',
@@ -46,18 +44,33 @@ class RolesRestController extends BaseRestController {
             ]
         );
 
-        // Bulk delete
         register_rest_route(
             self::REST_NAMESPACE,
-            '/roles/bulk',
+            '/roles/(?P<roleId>\d+)',
+            [
+                [
+                    'methods'             => 'PUT',
+                    'callback'            => [ $this, 'update_role' ],
+                    'permission_callback' => [ $this, 'can_manage_roles' ],
+                ],
+                [
+                    'methods'             => 'DELETE',
+                    'callback'            => [ $this, 'delete_role' ],
+                    'permission_callback' => [ $this, 'can_manage_roles' ],
+                ],
+            ]
+        );
+
+        register_rest_route(
+            self::REST_NAMESPACE,
+            '/roles/bulk-delete',
             [
                 'methods'             => 'DELETE',
-                'callback'            => [ $this, 'delete_roles_bulk' ],
+                'callback'            => [ $this, 'bulk_delete_roles' ],
                 'permission_callback' => [ $this, 'can_manage_roles' ],
             ]
         );
 
-        // Bulk status update
         register_rest_route(
             self::REST_NAMESPACE,
             '/roles/bulk-status',
@@ -68,24 +81,13 @@ class RolesRestController extends BaseRestController {
             ]
         );
 
-        // Single role
         register_rest_route(
             self::REST_NAMESPACE,
-            '/roles/(?P<roleId>\d+)',
+            '/roles/count-users',
             [
                 [
                     'methods'             => 'GET',
-                    'callback'            => [ $this, 'get_role' ],
-                    'permission_callback' => [ $this, 'can_get_roles' ],
-                ],
-                [
-                    'methods'             => 'PUT',
-                    'callback'            => [ $this, 'update_role' ],
-                    'permission_callback' => [ $this, 'can_manage_roles' ],
-                ],
-                [
-                    'methods'             => 'DELETE',
-                    'callback'            => [ $this, 'delete_role' ],
+                    'callback'            => [ $this, 'count_users_by_roles' ],
                     'permission_callback' => [ $this, 'can_manage_roles' ],
                 ],
             ]
@@ -99,37 +101,7 @@ class RolesRestController extends BaseRestController {
      * @return WP_REST_Response The response object.
      */
     public function get_roles( WP_REST_Request $request ): WP_REST_Response {
-        $roles    = get_option( 'yaywholesaleb2b_roles', [] );
-        $settings = SettingsHelper::get_settings();
-
-        $active_filter = $request->get_param( 'active' );
-
-        if ( isset( $active_filter ) ) {
-            $roles = array_values( array_filter( $roles, fn( $r ) => $r['status'] === (bool) $active_filter ) );
-        }
-
-        $handled_roles = RolesHelper::handle_roles_data( $roles, $settings );
-
-        return $this->success( $handled_roles );
-    }
-
-    /**
-     * Get a role by ID.
-     *
-     * @param WP_REST_Request $request The request object.
-     * @return WP_REST_Response The response object.
-     */
-    public function get_role( WP_REST_Request $request ): WP_REST_Response {
-        $role_id = (int) $request->get_param( 'roleId' );
-        $roles   = get_option( 'yaywholesaleb2b_roles', [] );
-
-        $role = array_values( array_filter( $roles, fn( $r ) => (int) ( $r['id'] ?? 0 ) === $role_id ) )[0] ?? null;
-
-        if ( ! $role ) {
-            return $this->error( __( 'Role not found', 'yay-wholesale-b2b' ), 404 );
-        }
-
-        return $this->success( $role );
+        return $this->success( RolesHelper::get_wholesale_roles() );
     }
 
     /**
@@ -146,7 +118,7 @@ class RolesRestController extends BaseRestController {
             return $this->error( __( 'Missing role name', 'yay-wholesale-b2b' ) );
         }
 
-        $roles = get_option( 'yaywholesaleb2b_roles', [] );
+        $roles = RolesHelper::get_wholesale_roles();
         $slug  = RolesHelper::generate_unique_role_slug( $role_name, $roles );
 
         if ( ! get_role( $slug ) ) {
@@ -160,11 +132,10 @@ class RolesRestController extends BaseRestController {
                 'slug' => $slug,
             ]
         );
+        $roles[]  = $new_role;
 
-        $roles[] = $new_role;
-        update_option( 'yaywholesaleb2b_roles', $roles );
-
-        return $this->success( $new_role, __( 'Role created successfully', 'yay-wholesale-b2b' ) );
+        RolesHelper::save_wholesale_roles( $roles );
+        return $this->success( RolesHelper::get_wholesale_roles() );
     }
 
     /**
@@ -190,9 +161,9 @@ class RolesRestController extends BaseRestController {
             return $this->error( __( 'Role not found', 'yay-wholesale-b2b' ), 404 );
         }
 
-        update_option( 'yaywholesaleb2b_roles', $roles );
+        RolesHelper::save_wholesale_roles( $roles );
 
-        return $this->success( $updated_role, __( 'Role updated successfully', 'yay-wholesale-b2b' ) );
+        return $this->success( RolesHelper::get_wholesale_roles() );
     }
 
     /**
@@ -203,7 +174,7 @@ class RolesRestController extends BaseRestController {
      */
     public function delete_role( WP_REST_Request $request ): WP_REST_Response {
         $role_id      = (int) $request->get_param( 'roleId' );
-        $roles        = get_option( 'yaywholesaleb2b_roles', [] );
+        $roles        = RolesHelper::get_wholesale_roles();
         $deleted_role = false;
 
         foreach ( $roles as $key => $role ) {
@@ -218,9 +189,9 @@ class RolesRestController extends BaseRestController {
             return $this->error( __( 'Role not found', 'yay-wholesale-b2b' ), 404 );
         }
 
-        update_option( 'yaywholesaleb2b_roles', array_values( $roles ) );
+        RolesHelper::save_wholesale_roles( array_values( $roles ) );
 
-        return $this->success( true, __( 'Role deleted successfully', 'yay-wholesale-b2b' ) );
+        return $this->success( RolesHelper::get_wholesale_roles() );
     }
 
     /**
@@ -229,9 +200,9 @@ class RolesRestController extends BaseRestController {
      * @param WP_REST_Request $request The request object.
      * @return WP_REST_Response The response object.
      */
-    public function delete_roles_bulk( WP_REST_Request $request ): WP_REST_Response {
+    public function bulk_delete_roles( WP_REST_Request $request ): WP_REST_Response {
         $ids                = array_map( 'intval', (array) $request->get_param( 'ids' ) );
-        $roles              = get_option( 'yaywholesaleb2b_roles', [] );
+        $roles              = RolesHelper::get_wholesale_roles();
         $deleted_role_count = 0;
 
         foreach ( $roles as $key => $role ) {
@@ -242,9 +213,8 @@ class RolesRestController extends BaseRestController {
             }
         }
 
-        update_option( 'yaywholesaleb2b_roles', array_values( $roles ) );
-
-        return $this->success( $deleted_role_count, __( 'Roles deleted successfully', 'yay-wholesale-b2b' ) );
+        RolesHelper::save_wholesale_roles( array_values( $roles ) );
+        return $this->success( RolesHelper::get_wholesale_roles() );
     }
 
     /**
@@ -262,7 +232,7 @@ class RolesRestController extends BaseRestController {
             return $this->error( __( 'Invalid parameters', 'yay-wholesale-b2b' ) );
         }
 
-        $roles         = get_option( 'yaywholesaleb2b_roles', [] );
+        $roles         = RolesHelper::get_wholesale_roles();
         $updated_count = 0;
 
         foreach ( $roles as &$role ) {
@@ -272,14 +242,30 @@ class RolesRestController extends BaseRestController {
             }
         }
 
-        update_option( 'yaywholesaleb2b_roles', $roles );
-        return $this->success( $updated_count, __( 'Statuses updated successfully', 'yay-wholesale-b2b' ) );
+        RolesHelper::save_wholesale_roles( $roles );
+        return $this->success( RolesHelper::get_wholesale_roles() );
+    }
+
+    /**
+     * Count the number of users for each role.
+     *
+     * @return WP_REST_Response The response object.
+     */
+    public function count_users_by_roles(): WP_REST_Response {
+        $roles        = RolesHelper::get_wholesale_roles();
+        $users_counts = [ 'noop' => 0 ];
+
+        foreach ( $roles as $role ) {
+            $users_counts[ $role['slug'] ] = RolesHelper::count_users_by_role( $role['slug'] );
+        }
+
+        return $this->success( $users_counts );
     }
 
     /**
      * Check if the user has the necessary permissions to access the roles endpoints (action: get, search).
      *
-     * @return bool|WP_Error True if the user has the necessary permissions, otherwise a WP_Error object.
+     * @return bool|\WP_Error True if the user has the necessary permissions, otherwise a WP_Error object.
      */
     public function can_manage_roles() {
         if ( ! current_user_can( 'manage_options' ) || ! current_user_can( 'manage_woocommerce' ) ) {
@@ -292,7 +278,7 @@ class RolesRestController extends BaseRestController {
     /**
      * Check if the user has the necessary permissions to access the roles endpoints (actions: get, search).
      *
-     * @return bool|WP_Error True if the user has the necessary permissions, otherwise a WP_Error object.
+     * @return bool|\WP_Error True if the user has the necessary permissions, otherwise a WP_Error object.
      */
     public function can_get_roles() {
         if ( ! current_user_can( 'edit_posts' ) || ! current_user_can( 'manage_woocommerce' ) ) {

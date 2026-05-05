@@ -1,151 +1,149 @@
-import { queryOptions, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { useNavigate } from 'react-router-dom';
+import { queryOptions, useIsMutating, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { __ } from '@wordpress/i18n';
 
 import {
+  addRole,
+  bulkDeleteRoles,
   bulkUpdateRoleStatus,
-  deleteManyRoles,
+  countRolesUser,
   deleteRole,
-  fetchActiveRoles,
-  fetchRole,
-  fetchRoles,
-  postRole,
+  getAllRoles,
   updateRole,
   updateRoleStatus,
 } from '@/lib/api/roles.api';
-import { toast } from '@/components/ui/sonner';
-import { RoleFormValues } from '../schema/roles.legacy';
-import { getRoles, handleErrorMessage } from '../utils';
-
-const QUERY_KEY = ['roles'];
+import { Role, RoleFormValues } from '@/lib/schema/roles.schema';
 
 function rolesOptions() {
   return queryOptions({
     queryKey: ['roles'],
-    queryFn: () => fetchRoles(),
-    staleTime: 15 * 60 * 1000,
-    placeholderData: (previousData) => previousData ?? getRoles(),
+    queryFn: () => getAllRoles().then((res) => res.data),
+    initialData: window.yayWholesaleB2BAdmin.roles,
   });
 }
 
-// Query all roles
-export function useRolesQuery() {
+/** Queries */
+
+export function useAllRolesQuery() {
   return useQuery(rolesOptions());
 }
 
 export function useActiveRolesQuery() {
   return useQuery({
-    queryKey: ['roles', { active: true }],
-    queryFn: () => fetchActiveRoles(),
-    placeholderData: (previousData) => previousData ?? getRoles().filter((role) => role.status),
+    ...rolesOptions(),
+    select: (data) => data.filter((role) => role.status),
   });
 }
 
-/**
- * Query to fetch Role by ID
- * @param roleId - ID of the Role
- * @returns Query to fetch Role data
- */
-export function useRoleQuery(roleId: number | null) {
+export function useRoleQuery(roleId: number) {
   return useQuery({
-    queryKey: ['role', roleId],
-    queryFn: async () => {
-      if (!roleId) {
-        throw new Error('No role ID provided');
-      }
-      const response = await fetchRole(roleId);
-      return response;
-    },
-    enabled: !!roleId,
+    ...rolesOptions(),
+    select: (data) => data.find((role) => role.id === roleId) ?? null,
   });
 }
 
-// Mutation: create new role
+export function useUserCountByRole() {
+  return useQuery({
+    queryKey: ['user-count-by-role'],
+    queryFn: () => countRolesUser().then((res) => res.data),
+  });
+}
+
+/** Mutations */
+
 export function useAddRoleMutation() {
   const queryClient = useQueryClient();
-  const navigate = useNavigate();
   return useMutation({
-    mutationFn: postRole,
-    onSuccess: (response) => {
-      toast.success(response.message);
-      queryClient.invalidateQueries({ queryKey: QUERY_KEY });
-      navigate('/roles');
+    mutationKey: ['roles', 'add'],
+    mutationFn: addRole,
+    onSuccess: (res) => {
+      queryClient.setQueryData(['roles'], res.data);
     },
-    onError: handleErrorMessage,
   });
 }
 
-// Mutation: update role
 export function useUpdateRoleMutation(roleId: number) {
   const queryClient = useQueryClient();
-  const navigate = useNavigate();
   return useMutation({
-    mutationFn: (data: RoleFormValues) => updateRole(data, roleId),
-    onSuccess: (response) => {
-      toast.success(response.message);
-      queryClient.invalidateQueries({ queryKey: ['role', roleId] });
-      queryClient.invalidateQueries({ queryKey: QUERY_KEY });
-      navigate('/roles');
+    mutationKey: ['roles', roleId, 'update'],
+    mutationFn: (data: RoleFormValues) => updateRole(roleId, data),
+    onSuccess: (res) => {
+      queryClient.setQueryData(['roles'], res.data);
     },
-    onError: handleErrorMessage,
-  });
-}
-
-// Mutation: delete role
-export function useDeleteRoleMutation(roleId: number) {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: () => deleteRole(roleId),
-    onSuccess: (response) => {
-      toast.success(response.message);
-      queryClient.invalidateQueries({ queryKey: QUERY_KEY });
-    },
-    onError: handleErrorMessage,
-  });
-}
-
-// Mutation: delete many roles
-export function useDeleteManyRolesMutation() {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: deleteManyRoles,
-    onSuccess: (response) => {
-      toast.success(response.message);
-      if (!queryClient.isFetching({ queryKey: QUERY_KEY })) {
-        queryClient.invalidateQueries({ queryKey: QUERY_KEY });
-      }
-    },
-    onError: handleErrorMessage,
   });
 }
 
 export function useUpdateRoleStatusMutation(roleId: number) {
   const queryClient = useQueryClient();
-  const navigate = useNavigate();
   return useMutation({
+    mutationKey: ['roles', roleId, 'update-status'],
     mutationFn: (status: boolean) => updateRoleStatus(roleId, status),
-    onSuccess: (response) => {
-      toast.success(response.message);
-      queryClient.invalidateQueries({ queryKey: ['role', roleId] });
-      queryClient.invalidateQueries({ queryKey: QUERY_KEY });
-      queryClient.invalidateQueries({ queryKey: ['wholesalers'] });
-      navigate('/roles');
+
+    // Optimistic update
+    onMutate: (status) => {
+      const previousData = queryClient.getQueryData<Role[]>(['roles']);
+
+      queryClient.setQueryData<Role[]>(['roles'], (old) => {
+        return old?.map((role) => {
+          if (role.id === roleId) {
+            return { ...role, status };
+          }
+          return role;
+        });
+      });
+
+      return { previousData };
     },
-    onError: handleErrorMessage,
+
+    onError: (err, _, context) => {
+      if (context?.previousData) {
+        queryClient.setQueryData(['roles'], context.previousData);
+      }
+    },
+    onSuccess: (res) => {
+      queryClient.setQueryData(['roles'], res.data);
+    },
+  });
+}
+
+export function useDeleteRoleMutation(roleId: number) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationKey: ['roles', roleId, 'delete'],
+    mutationFn: () => deleteRole(roleId),
+    onSuccess: (res) => {
+      queryClient.setQueryData(['roles'], res.data);
+    },
+  });
+}
+
+export function useBulkDeleteRolesMutation() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationKey: ['roles', 'bulk-delete'],
+    mutationFn: bulkDeleteRoles,
+    onSuccess: (res) => {
+      queryClient.setQueryData(['roles'], res.data);
+    },
   });
 }
 
 export function useBulkUpdateRoleStatusMutation() {
   const queryClient = useQueryClient();
   return useMutation({
+    mutationKey: ['roles', 'bulk-update-status'],
     mutationFn: ({ ids, status }: { ids: number[]; status: boolean }) => bulkUpdateRoleStatus(ids, status),
-    onSuccess: (response) => {
-      toast.success(response.message);
-      if (!queryClient.isFetching({ queryKey: QUERY_KEY })) {
-        queryClient.invalidateQueries({ queryKey: QUERY_KEY });
-      }
-      queryClient.invalidateQueries({ queryKey: ['wholesalers'] });
+    onSuccess: (res) => {
+      queryClient.setQueryData(['roles'], res.data);
     },
-    onError: handleErrorMessage,
   });
+}
+
+/** Mutate Status */
+
+export function useIsMutatingRoles() {
+  return useIsMutating({ mutationKey: ['roles'] });
+}
+
+export function useIsMutatingRole(roleId: number) {
+  return useIsMutating({ mutationKey: ['roles', roleId] });
 }
