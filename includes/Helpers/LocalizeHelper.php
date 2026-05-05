@@ -13,7 +13,7 @@ class LocalizeHelper {
     public const VAR_ADMIN = 'yayWholesaleB2BAdmin';
     public const VAR_META  = 'yayWholesaleB2BMeta';
 
-    public function get_admin_data() {
+    public static function get_admin_data() {
         $settings = SettingsHelper::get_settings( true );
         $roles    = get_option( 'yaywholesaleb2b_roles', [] );
         $pages    = SupportHelper::get_valid_pages_for_wholesale_store();
