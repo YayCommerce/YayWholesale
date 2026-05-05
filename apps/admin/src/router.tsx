@@ -5,6 +5,7 @@ import RolesPage from '@/pages/roles/RolesPage';
 import WholesalersListPage from '@/pages/wholesalers-list/WholeSalersListPage';
 import AppLayout from './AppLayout';
 import NotFoundPage from './pages/404';
+import ErrorPage from './pages/500';
 import RequestsPage from './pages/request/RequestsPage';
 import SettingsPage from './pages/settings/SettingsPage';
 
@@ -13,7 +14,7 @@ export function getManagerRouter() {
     {
       path: '/',
       element: <AppLayout />,
-      errorElement: <NotFoundPage />,
+      errorElement: <ErrorPage />,
       children: [
         {
           index: true,
@@ -74,6 +75,10 @@ export function getManagerRouter() {
               element: <SettingsPage />,
             },
           ],
+        },
+        {
+          path: '*',
+          element: <NotFoundPage />,
         },
       ],
     },

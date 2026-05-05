@@ -5,8 +5,8 @@ import { useUpdateEffect } from 'react-use';
 import { Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
-import { useAddRoleMutation, useRoleQuery, useUpdateRoleMutation } from '@/lib/queries/roles';
-import { createRoleSchema, RoleFormValues, roleSchema } from '@/lib/schema/roles';
+import { useAddRoleMutation, useRoleQuery, useUpdateRoleMutation } from '@/lib/queries/roles.queries';
+import { createRoleSchema, RoleFormValues, roleSchema } from '@/lib/schema/roles.legacy';
 import { isPro } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -160,7 +160,7 @@ export default function RoleForm() {
 
               <Controller
                 control={form.control}
-                name={`description`}
+                name="description"
                 render={({ field: { ref, ...field }, fieldState: { error, invalid } }) => (
                   <Field className="w-full gap-2.5">
                     <FieldLabel className="text-foreground-400 text-xs font-medium">
@@ -189,7 +189,7 @@ export default function RoleForm() {
 
               <Controller
                 control={form.control}
-                name={`discount`}
+                name="discount"
                 render={({ field: { ref, ...field }, fieldState: { error, invalid } }) => (
                   <Field className="w-full gap-2.5">
                     <FieldLabel className="text-foreground-400 text-xs font-medium">
@@ -225,7 +225,7 @@ export default function RoleForm() {
 
               <Controller
                 control={form.control}
-                name={`minOrderQuantity`}
+                name="minOrderQuantity"
                 render={({ field: { ref, ...field }, fieldState: { error, invalid } }) =>
                   isPro ? (
                     <Field className="w-full gap-2.5">
@@ -277,7 +277,7 @@ export default function RoleForm() {
 
               <Controller
                 control={form.control}
-                name={`minOrderAmount`}
+                name="minOrderAmount"
                 render={({ field: { ref, ...field }, fieldState: { error, invalid } }) => (
                   <Field className="w-full gap-2.5">
                     <FieldLabel className="text-foreground-400 text-xs font-medium">
@@ -320,7 +320,7 @@ export default function RoleForm() {
 
               <Controller
                 control={form.control}
-                name={`applyToSalePrice`}
+                name="applyToSalePrice"
                 render={({ field: { ref, ...field }, fieldState: { error } }) => (
                   <Field className="w-full gap-2.5">
                     <FieldContent>

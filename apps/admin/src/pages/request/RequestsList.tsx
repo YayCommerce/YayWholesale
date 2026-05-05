@@ -9,9 +9,9 @@ import {
   useBulkUpdateRequestStatusMutation,
   useRequestsQuery,
   useTotalCountQuery,
-} from '@/lib/queries/requests';
-import { useActiveRolesQuery } from '@/lib/queries/roles';
-import { RequestFormValues } from '@/lib/schema/requests';
+} from '@/lib/queries/requests.queries';
+import { useActiveRolesQuery } from '@/lib/queries/roles.queries';
+import { RequestFormValues } from '@/lib/schema/requests.type';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { BulkActionBox } from '@/components/ui/bulk-actions';

@@ -12,7 +12,11 @@ import { useNavigate } from 'react-router-dom';
 import { Spinner } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 
-import { useBulkUpdateRoleStatusMutation, useDeleteManyRolesMutation, useRolesQuery } from '@/lib/queries/roles';
+import {
+  useBulkUpdateRoleStatusMutation,
+  useDeleteManyRolesMutation,
+  useRolesQuery,
+} from '@/lib/queries/roles.queries';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { BulkActionBox } from '@/components/ui/bulk-actions';

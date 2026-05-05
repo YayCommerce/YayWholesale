@@ -24,6 +24,6 @@ export type Role = RoleFormValues & {
   id: number;
   slug: string;
   status: boolean;
-  count: number;
-  isDefault: boolean;
 };
+
+export type RoleUserCount = Record<string, number>;

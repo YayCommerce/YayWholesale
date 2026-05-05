@@ -5,7 +5,7 @@ import { Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 import { parseWPCurrency, parseWPDecimal } from '@/lib/helpers/format.helper';
-import { useReportsQuery } from '@/lib/queries/reports';
+import { useReportsQuery } from '@/lib/queries/reports.queries';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';

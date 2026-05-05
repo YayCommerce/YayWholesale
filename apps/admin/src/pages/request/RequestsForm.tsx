@@ -5,9 +5,9 @@ import { Spinner } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 
 import { parseWPDate, parseWPTime } from '@/lib/helpers/format.helper';
-import { useRequestQuery, useUpdateRequestStatusMutation } from '@/lib/queries/requests';
-import { useActiveRolesQuery } from '@/lib/queries/roles';
-import { RequestFieldValues, RequestFormValues } from '@/lib/schema/requests';
+import { useRequestQuery, useUpdateRequestStatusMutation } from '@/lib/queries/requests.queries';
+import { useActiveRolesQuery } from '@/lib/queries/roles.queries';
+import { RequestFieldValues, RequestFormValues } from '@/lib/schema/requests.type';
 import { Button } from '@/components/ui/button';
 import { ButtonGroup } from '@/components/ui/button-group';
 import { WholeSaleToolTip } from '@/components/ui/custom/WholeSaleToolTip';

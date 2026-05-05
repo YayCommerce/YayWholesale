@@ -12,7 +12,7 @@ import {
   updateRequestById,
   updateRequestStatusById,
 } from '../api/requests.api';
-import { RequestFormValues } from '../schema/requests';
+import { RequestFormValues } from '../schema/requests.type';
 import { handleErrorMessage } from '../utils';
 
 export function useRequestsQuery(

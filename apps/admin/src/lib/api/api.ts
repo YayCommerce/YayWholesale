@@ -130,15 +130,7 @@ export const yayWholesaleApi = createApi(window.yayWholesaleB2BMeta.wpMeta.restB
 export const wordpressApi = createApi('wp/v2');
 
 export const api = yayWholesaleApi;
-export { HTTPError } from 'ky';
 
-/**
- * Handles API response parsing and error handling
- * @param response - Response object from fetch request
- * @param defaultMessage - Default message to show if no message in response
- * @returns Parsed response data with success, message and data fields
- * @throws Error if response is not ok
- */
 export interface ApiResponse<T> {
   success: boolean;
   message: string;

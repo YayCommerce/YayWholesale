@@ -1,5 +1,11 @@
-export type Response<T> = {
+export interface ApiResponse<T> {
   success: true;
   data: T;
-  message: string;
-};
+}
+
+export interface PaginatedResponse<T> {
+  currentPage: number;
+  totalPage: number;
+  totalItems: number;
+  data: T;
+}

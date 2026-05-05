@@ -1,18 +1,19 @@
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useRouteError } from 'react-router-dom';
 import { __ } from '@wordpress/i18n';
 
 import { Button } from '@/components/ui/button';
 
-export default function NotFoundPage() {
+export default function ErrorPage() {
   const navigate = useNavigate();
+  const error = useRouteError() as { message: string };
 
   return (
     <div className="flex h-[80vh] flex-col items-center justify-center gap-6">
       <div className="text-center">
-        <h1 className="text-primary mb-2 text-6xl font-bold">404</h1>
-        <h2 className="text-foreground mb-4 text-xl font-semibold">Page Not Found</h2>
+        <h1 className="text-primary mb-2 text-6xl font-bold">500</h1>
+        <h2 className="text-foreground mb-4 text-xl font-semibold">{error?.message || 'Something went wrong'}</h2>
         <p className="text-muted-foreground text-sm">
-          {__("The page you are looking for doesn't exist or has been moved.", 'yay-wholesale-b2b')}
+          {__('Something went wrong. Please try again later.', 'yay-wholesale-b2b')}
         </p>
       </div>
 

@@ -159,9 +159,8 @@ class RequestsHelper {
             'type'    => 'CHAR',
         ];
 
-        $query       = new WP_Query( $args );
-        $data_list   = $query->posts;
-        $total_pages = $query->max_num_pages;
+        $query     = new WP_Query( $args );
+        $data_list = $query->posts;
 
         $cleaned = [];
         foreach ( $data_list as $data ) {
@@ -170,7 +169,8 @@ class RequestsHelper {
 
         $response = [
             'currentPage' => $page,
-            'totalPage'   => $total_pages,
+            'totalPage'   => $query->max_num_pages,
+            'totalItems'  => $query->found_posts,
             'data'        => $cleaned,
         ];
         return $response;

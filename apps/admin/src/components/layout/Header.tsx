@@ -3,7 +3,7 @@ import { CircleNotchIcon } from '@phosphor-icons/react';
 import { useMatch, useNavigate } from 'react-router-dom';
 import { __, sprintf } from '@wordpress/i18n';
 
-import { usePendingCountQuery } from '@/lib/queries/requests';
+import { usePendingCountQuery } from '@/lib/queries/requests.queries';
 import { useIsMutatingSettings } from '@/lib/queries/settings.queries';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';

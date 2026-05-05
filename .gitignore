@@ -1,5 +1,6 @@
 /vendor/
 node_modules
+
 /assets/dist/*
 /release/dest/*
 /release/*.zip
@@ -14,3 +15,5 @@ package-lock.json
 .DS_Store
 .vscode/launch.json
 vendor-prefixed/
+
+.env.local

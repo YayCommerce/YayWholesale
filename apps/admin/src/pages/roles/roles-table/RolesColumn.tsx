@@ -6,8 +6,8 @@ import { useNavigate } from 'react-router-dom';
 import { __ } from '@wordpress/i18n';
 
 import { parseWPCurrency } from '@/lib/helpers/format.helper';
-import { useDeleteRoleMutation } from '@/lib/queries/roles';
-import { RolesListValues } from '@/lib/schema/roles';
+import { useDeleteRoleMutation } from '@/lib/queries/roles.queries';
+import { RolesListValues } from '@/lib/schema/roles.legacy';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';

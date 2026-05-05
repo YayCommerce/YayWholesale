@@ -14,7 +14,7 @@ import {
   updateRoleStatus,
 } from '@/lib/api/roles.api';
 import { toast } from '@/components/ui/sonner';
-import { RoleFormValues } from '../schema/roles';
+import { RoleFormValues } from '../schema/roles.legacy';
 import { getRoles, handleErrorMessage } from '../utils';
 
 const QUERY_KEY = ['roles'];

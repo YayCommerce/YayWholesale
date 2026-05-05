@@ -2,8 +2,8 @@ import { useState } from 'react';
 import { SelectGroup } from '@radix-ui/react-select';
 import { useUpdateEffect } from 'react-use';
 
-import { useActiveRolesQuery } from '@/lib/queries/roles';
-import { useUpdateWholesalersRoleMutation } from '@/lib/queries/wholesalers';
+import { useActiveRolesQuery } from '@/lib/queries/roles.queries';
+import { useUpdateWholesalersRoleMutation } from '@/lib/queries/wholesalers.queries';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import RolesIcon from '@/components/icons/RolesIcon';
 

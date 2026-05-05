@@ -3,7 +3,7 @@ import { Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 import { parseWPCurrency } from '@/lib/helpers/format.helper';
-import { useReportsQuery } from '@/lib/queries/reports';
+import { useReportsQuery } from '@/lib/queries/reports.queries';
 import { cn } from '@/lib/utils';
 import { Card, CardContent } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';

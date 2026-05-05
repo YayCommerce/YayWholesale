@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { __ } from '@wordpress/i18n';
 
-import { useActiveRolesQuery } from '@/lib/queries/roles';
+import { useActiveRolesQuery } from '@/lib/queries/roles.queries';
 import type { Settings } from '@/lib/schema/settings.schema';
 import { getPagesForWholesaleStore } from '@/lib/utils';
 import { Field, FieldContent, FieldError, FieldLabel } from '@/components/ui/field';
