@@ -15,9 +15,10 @@ import { __, sprintf } from '@wordpress/i18n';
 import { useBulkUpdateRoleStatusMutation, useDeleteManyRolesMutation, useRolesQuery } from '@/lib/queries/roles';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
-import { BulkActionBox, BulkActionCloseButton } from '@/components/ui/bulk-actions';
+import { BulkActionBox } from '@/components/ui/bulk-actions';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { WholeSaleToolTip } from '@/components/ui/custom/WholeSaleToolTip';
 import {
   Dialog,
   DialogClose,
@@ -37,7 +38,6 @@ import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/in
 import { Pagination } from '@/components/ui/pagination';
 import { Separator } from '@/components/ui/separator';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { WholeSaleToolTip } from '@/components/ui/custom/WholeSaleToolTip';
 import DeleteIcon from '@/components/icons/DeleteIcon';
 import { RolesColumn } from './roles-table/RolesColumn';
 
@@ -101,7 +101,7 @@ export default function RolesList() {
   return (
     <Card className="gap-4 shadow-sm">
       {/* Header */}
-      <div className="flex flex-nowrap items-center justify-between gap-3">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-2">
           <h1 className="text-2xl font-bold">{__('Roles', 'yay-wholesale-b2b')}</h1>
           {filteredData && totalCount > 0 && (
@@ -122,7 +122,7 @@ export default function RolesList() {
             />
           )}
         </div>
-        <div className="flex flex-col-reverse flex-nowrap items-end gap-4 sm:flex-row sm:items-center">
+        <div className="flex flex-1 flex-col-reverse flex-nowrap items-end gap-4 sm:flex-row sm:items-center">
           {roles.length > 10 && (
             <InputGroup className="w-full sm:w-80">
               <InputGroupInput
@@ -228,8 +228,7 @@ export default function RolesList() {
       {/* Pagination Footer */}
       {(table.getPageCount() > 1 || selectedCount > 1) && (
         <div className="relative flex flex-col items-center gap-3 sm:flex-row">
-          <BulkActionBox visible={selectedCount > 1}>
-            <BulkActionCloseButton onClick={() => table.resetRowSelection()} />
+          <BulkActionBox selected={selectedCount} onClose={() => table.resetRowSelection()}>
             <span>{sprintf(__('%d selected', 'yay-wholesale-b2b'), selectedCount)}</span>
             <Separator orientation="vertical" className="ml-2 h-5!" />
             <DropdownMenu>

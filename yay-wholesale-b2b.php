@@ -96,8 +96,6 @@ if ( ! function_exists( 'YayWholesaleB2B\\plugin_init' ) ) {
         require_once __DIR__ . '/vendor/autoload.php';
         \YayWholesaleB2BScoped\YayCommerce\AdminShell\AdminShell::boot();
 
-        // \YayWholesaleB2B\YayCommerceMenu\RegisterMenu::get_instance();
-
         if ( ! function_exists( 'WC' ) ) {
             add_action( 'admin_notices', [ \YayWholesaleB2B\Engine\ActDeact::class, 'install_yaywholesaleb2b_admin_notice' ] );
             return;

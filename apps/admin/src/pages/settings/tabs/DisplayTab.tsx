@@ -97,8 +97,8 @@ export default function DisplayTab() {
         <div className="flex flex-col gap-4">
           <ProductImageSkeleton />
           <div className="flex flex-col gap-2.5">
-            <Skeleton className="h-2 w-[65px] animate-none" />
-            <Skeleton className="h-2 w-[130px] animate-none" />
+            <Skeleton className="h-2 w-[65px] animate-none bg-[#F1F3F6]" />
+            <Skeleton className="h-2 w-[130px] animate-none bg-[#F1F3F6]" />
           </div>
           {['retail-and-wholesale', 'retail-only'].includes(displayFormat) && (
             <p className="flex gap-1.5 text-[14px] leading-3.5 text-[#A0A0A7]">

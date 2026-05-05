@@ -39,6 +39,30 @@ body.yay-ui {
   :where(button, code, form, h1, h2, h3, h4, h5, h6, input, ul, ol, li, nav, p, textarea) {
     @apply m-0 p-0 text-inherit;
   }
+
+  /* if browser supports "Anchor" properties then make the header fixed else fallback to relative header */
+  #wpbody-content header {
+    position: static;
+  }
+
+  #wpbody-content main {
+    padding-top: 28px;
+  }
+
+  #wpbody-content {
+    anchor-name: --yay-ui-anchor;
+  }
+
+  @supports (anchor-name: --yay-ui-anchor) {
+    #wpbody-content header {
+      position: fixed;
+      width: anchor-size(--yay-ui-anchor width);
+    }
+
+    #wpbody-content main {
+      padding-top: 84px;
+    }
+  }
 }
 
 * {
@@ -59,15 +83,6 @@ body.yay-ui {
   z-index: 100 !important;
 }
 
-.notice,
-.notice-info,
-.notice-warning,
-.notice-error,
-.notice-success,
-.error,
-.success,
-.info,
-.warning,
 #screen-meta,
 #screen-meta-links {
   display: none !important;

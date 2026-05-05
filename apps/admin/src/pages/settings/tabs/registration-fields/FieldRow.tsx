@@ -152,7 +152,7 @@ export function FieldRow({
                       <SelectItem value="phone">Phone</SelectItem>
                       <SelectItem value="date">Date</SelectItem>
                       <SelectItem value="textarea">Textarea</SelectItem>
-                      <SelectItem value="select">Select</SelectItem>
+                      {/* <SelectItem value="select">Select</SelectItem> */}
                     </SelectContent>
                   </Select>
                 </FieldContent>

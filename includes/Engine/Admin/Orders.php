@@ -199,8 +199,9 @@ class Orders {
         $order_type = filter_input( INPUT_GET, '_ywhs_order_type', FILTER_SANITIZE_SPECIAL_CHARS );
 
         // Link from dashboard
-        $start_date = filter_input( INPUT_GET, '_ywhs_order_from', FILTER_SANITIZE_SPECIAL_CHARS );
-        $end_date   = filter_input( INPUT_GET, '_ywhs_order_to', FILTER_SANITIZE_SPECIAL_CHARS );
+        $start_date        = filter_input( INPUT_GET, '_ywhs_order_from', FILTER_SANITIZE_SPECIAL_CHARS );
+        $end_date          = filter_input( INPUT_GET, '_ywhs_order_to', FILTER_SANITIZE_SPECIAL_CHARS );
+        $is_from_dashboard = filter_input( INPUT_GET, '_ywhs_from_dashboard', FILTER_SANITIZE_SPECIAL_CHARS );
 
         $date_query  = [];
         $blank_count = 0;
@@ -220,6 +221,10 @@ class Orders {
 
         if ( $blank_count < 2 ) {
             $args['date_created'] = implode( '...', $date_query );
+        }
+
+        if ( 'true' === $is_from_dashboard ) {
+            $args['status'] = [ 'pending', 'on-hold', 'processing', 'completed' ];
         }
 
         if ( ! isset( $order_type ) || 'all' === $order_type ) {

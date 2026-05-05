@@ -12,7 +12,7 @@ import {
 } from '@/lib/queries/wholesalers';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
-import { BulkActionBox, BulkActionCloseButton } from '@/components/ui/bulk-actions';
+import { BulkActionBox } from '@/components/ui/bulk-actions';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { WholeSaleToolTip } from '@/components/ui/custom/WholeSaleToolTip';
@@ -109,7 +109,7 @@ export default function WholeSalersList() {
   return (
     <Card className="gap-4 shadow-sm">
       {/* Header */}
-      <div className="flex flex-nowrap items-center justify-between gap-3">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-2">
           <h1 className="text-2xl font-bold">{__('Wholesalers List', 'yay-wholesale-b2b')}</h1>
           {totalCount && totalCount.count > 0 && (
@@ -130,7 +130,7 @@ export default function WholeSalersList() {
             />
           )}
         </div>
-        <div className="flex flex-col-reverse items-end gap-4 lg:flex-row">
+        <div className="flex flex-1 flex-col-reverse items-end gap-4 lg:flex-0 lg:flex-row">
           {(table.getPageCount() > 1 || keyword !== '') && (
             <InputGroup className="w-full sm:w-80">
               <InputGroupInput
@@ -144,7 +144,7 @@ export default function WholeSalersList() {
             </InputGroup>
           )}
           <Select value={roleFilter} onValueChange={(value) => onFilterChanged(value)}>
-            <SelectTrigger className="w-45.5">
+            <SelectTrigger className="w-full sm:w-45.5">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -245,8 +245,7 @@ export default function WholeSalersList() {
       {/* Footer */}
       {(table.getPageCount() > 1 || selectedCount > 1) && (
         <div className="relative flex flex-col items-center gap-3 sm:flex-row">
-          <BulkActionBox visible={selectedCount > 1}>
-            <BulkActionCloseButton onClick={() => table.resetRowSelection()} />
+          <BulkActionBox selected={selectedCount} onClose={() => table.resetRowSelection()}>
             <span>{sprintf(__('%d selected', 'yay-wholesale-b2b'), selectedCount)}</span>
             <Separator orientation="vertical" className="ml-2 h-5!" />
             <DropdownMenu>

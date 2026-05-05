@@ -14,7 +14,7 @@ import { useActiveRolesQuery } from '@/lib/queries/roles';
 import { RequestFormValues } from '@/lib/schema/requests';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
-import { BulkActionBox, BulkActionCloseButton } from '@/components/ui/bulk-actions';
+import { BulkActionBox } from '@/components/ui/bulk-actions';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { WholeSaleToolTip } from '@/components/ui/custom/WholeSaleToolTip';
@@ -148,7 +148,7 @@ export default function RequestsList() {
   return (
     <Card className="gap-4 shadow-sm">
       {/* Header */}
-      <div className="flex flex-nowrap items-center justify-between gap-3">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-2">
           <h1 className="text-2xl font-bold">{__('Wholesaler Requests', 'yay-wholesale-b2b')}</h1>
           {totalCount && totalCount.count > 0 && (
@@ -169,9 +169,9 @@ export default function RequestsList() {
             />
           )}
         </div>
-        <div className="flex flex-col items-end gap-4 md:flex-row">
+        <div className="flex flex-1 flex-col items-end gap-4 lg:flex-0 lg:flex-row">
           <Select value={statusFilter} onValueChange={(value) => onFilterChanged(value)}>
-            <SelectTrigger className="w-40">
+            <SelectTrigger className="w-full sm:w-40">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -191,7 +191,7 @@ export default function RequestsList() {
               </SelectGroup>
             </SelectContent>
           </Select>
-          {(table.getPageCount() > 1 || keyword !== '') && (
+          {(table.getPageCount() == 1 || keyword !== '') && (
             <InputGroup className="w-full md:w-76">
               <InputGroupInput placeholder="Search" value={search} onChange={handleChangeSearch} />
               <InputGroupAddon align="inline-end">
@@ -272,8 +272,7 @@ export default function RequestsList() {
       {/* Footer */}
       {(table.getPageCount() > 1 || selectedCount > 1) && (
         <div className="relative flex flex-col items-center gap-3 sm:flex-row">
-          <BulkActionBox visible={selectedCount > 1}>
-            <BulkActionCloseButton onClick={() => table.resetRowSelection()} />
+          <BulkActionBox selected={selectedCount} onClose={() => table.resetRowSelection()}>
             <span>{sprintf(__('%d selected', 'yay-wholesale-b2b'), selectedCount)}</span>
             <Separator orientation="vertical" className="ml-2 h-5!" />
             <DropdownMenu>

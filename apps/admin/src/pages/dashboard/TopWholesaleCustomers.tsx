@@ -106,7 +106,8 @@ export default function TopWholesaleCustomers(props: {
                                 '&_ywhs_order_from=' +
                                 startDate +
                                 '&_ywhs_order_to=' +
-                                endDate,
+                                endDate +
+                                '&_ywhs_from_dashboard=true',
                               '_blank',
                             );
                           }

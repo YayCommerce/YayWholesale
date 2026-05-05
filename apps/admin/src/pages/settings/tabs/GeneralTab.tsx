@@ -117,7 +117,7 @@ export default function GeneralTab() {
         control={control}
         name={`general.tax_display_mode`}
         render={({ field }) => (
-          <div className="flex items-center justify-between rounded-md border p-4">
+          <div className="flex items-center justify-between gap-5 rounded-md border p-4">
             <div>
               <h2 className="text-foreground-400 text-sm leading-3.5 font-medium">
                 {__('Display prices in the shop', 'yay-wholesale-b2b')}
@@ -127,13 +127,11 @@ export default function GeneralTab() {
               </p>
             </div>
             <Select value={field.value ? field.value : 'inherit'} onValueChange={field.onChange}>
-              <SelectTrigger className="min-w-40 text-sm font-normal">
+              <SelectTrigger className="min-w-20 text-sm font-normal sm:min-w-40">
                 <SelectValue placeholder={__('Select the display mode', 'yay-wholesale-b2b')} />
               </SelectTrigger>
               <SelectContent align="end">
-                <SelectItem value="inherit">
-                  {__('Inherit from the storewide tax settings [the default]', 'yay-wholesale-b2b')}
-                </SelectItem>
+                <SelectItem value="inherit">{__('Inherit (default)', 'yay-wholesale-b2b')}</SelectItem>
                 <SelectItem value="incl">{__('Including tax', 'yay-wholesale-b2b')}</SelectItem>
                 <SelectItem value="excl">{__('Excluding tax', 'yay-wholesale-b2b')}</SelectItem>
               </SelectContent>

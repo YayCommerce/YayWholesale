@@ -97,8 +97,9 @@ export default function Header() {
   return (
     <header
       className={cn(
-        'bg-background relative z-50 flex h-[56px] items-center justify-between gap-[5px] pt-0',
-        // scrolled ? 'top-0 shadow-[0_8px_8px_0_rgba(85,93,102,0.3)] transition-shadow duration-300' : 'top-[45px] shadow-none',
+        'bg-background z-50 flex h-[56px] w-full items-center justify-between gap-[5px] pt-0 transition-shadow duration-300',
+        scrolled ? 'top-0 shadow-[0_8px_8px_0_rgba(85,93,102,0.3)]' : 'top-11.5 shadow-none',
+        'sm:top-11.5 md:top-8',
         'md:gap-5 md:pr-3',
       )}
     >
