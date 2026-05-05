@@ -1,26 +1,17 @@
-import { useState } from 'react';
-import {
-  closestCenter,
-  DndContext,
-  DragEndEvent,
-  DragStartEvent,
-  PointerSensor,
-  useSensor,
-  useSensors,
-} from '@dnd-kit/core';
+import { closestCenter, DndContext, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { Plus } from 'lucide-react';
 import { useFieldArray, useFormContext } from 'react-hook-form';
 import { v4 as uuidv4 } from 'uuid';
 import { __ } from '@wordpress/i18n';
 
-import type { SettingsFormData } from '@/lib/schema/settings';
+import type { Settings } from '@/lib/schema/settings.schema';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { FieldRow } from './FieldRow';
 
 export default function RegistrationFieldsTab() {
-  const { control } = useFormContext<SettingsFormData>();
+  const { control } = useFormContext<Settings>();
 
   const { fields, append, remove, move, update } = useFieldArray({
     control,

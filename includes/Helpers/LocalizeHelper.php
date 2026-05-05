@@ -1,7 +1,6 @@
 <?php
-namespace YayWholesaleB2B\Services;
+namespace YayWholesaleB2B\Helpers;
 
-use YayWholesaleB2B\Utils\SingletonTrait;
 use YayWholesaleB2B\Controllers\BaseRestController;
 use YayWholesaleB2B\Helpers\SettingsHelper;
 use YayWholesaleB2B\Helpers\RolesHelper;
@@ -9,12 +8,8 @@ use YayWholesaleB2B\Helpers\SupportHelper;
 
 /**
  * Get Localize value
- *
- * @method static LocalizeService get_instance()
  */
-class LocalizeService {
-    use SingletonTrait;
-
+class LocalizeHelper {
     public const VAR_ADMIN = 'yayWholesaleB2BAdmin';
     public const VAR_META  = 'yayWholesaleB2BMeta';
 
@@ -33,7 +28,7 @@ class LocalizeService {
         return $admin_data;
     }
 
-    public function get_meta() {
+    public static function get_meta() {
         $meta = [
             'wpMeta'        => [
                 'siteUrl'      => esc_url_raw( site_url() ),

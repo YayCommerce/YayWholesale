@@ -1,13 +1,12 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { __ } from '@wordpress/i18n';
 
-import { toast } from '@/components/ui/sonner';
-import { updateEmailStatus } from '../api/emails.api';
+import { updateEmailStatus } from '@/lib/api/settings.api';
 import { handleErrorMessage } from '../utils';
 
 export function useWholesaleEmailsQuery() {
   return useQuery({
-    queryKey: ['wholesale_emails'],
+    queryKey: ['wholesale-emails'],
     queryFn: async () => window.yayWholesaleB2BAdmin.wholesale_emails,
     initialData: window.yayWholesaleB2BAdmin.wholesale_emails,
   });
@@ -17,16 +16,16 @@ export function useUpdateEmailStatusMutation() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationKey: ['update_email_status'],
+    mutationKey: ['wholesale-emails', 'update-status'],
     mutationFn: async ({ emailId, status }: { emailId: string; status: boolean }) => updateEmailStatus(emailId, status),
 
     // Optimistic update
     onMutate: async ({ emailId, status }) => {
-      await queryClient.cancelQueries({ queryKey: ['wholesale_emails'] });
+      await queryClient.cancelQueries({ queryKey: ['wholesale-emails'] });
 
-      const previousData = queryClient.getQueryData<{ id: string; status: boolean }[]>(['wholesale_emails']);
+      const previousData = queryClient.getQueryData<{ id: string; status: boolean }[]>(['wholesale-emails']);
 
-      queryClient.setQueryData<{ id: string; status: boolean }[]>(['wholesale_emails'], (old) =>
+      queryClient.setQueryData<{ id: string; status: boolean }[]>(['wholesale-emails'], (old) =>
         old?.map((e) => (e.id === emailId ? { ...e, status } : e)),
       );
 
@@ -38,10 +37,6 @@ export function useUpdateEmailStatusMutation() {
         queryClient.setQueryData(['wholesale_emails'], context.previousData);
       }
       handleErrorMessage(err);
-    },
-
-    onSuccess: () => {
-      toast.success(__('Email status updated!', 'yay-wholesale-b2b'));
     },
   });
 }

@@ -4,6 +4,7 @@ namespace YayWholesaleB2B\Controllers;
 use YayWholesaleB2B\Utils\SingletonTrait;
 use WP_REST_Request;
 use WP_REST_Response;
+use YayWholesaleB2B\Helpers\SettingsHelper;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -64,17 +65,10 @@ class SettingsRestController extends BaseRestController {
             return $this->error( __( 'Invalid settings data', 'yay-wholesale-b2b' ) );
         }
 
-        $payment_roles = $params['payment_roles'];
-        unset( $params['payment_roles'] );
+        SettingsHelper::update_settings( $params );
+        $settings = SettingsHelper::get_settings();
 
-        $shipping_roles = $params['shipping_roles'];
-        unset( $params['shipping_roles'] );
-
-        update_option( 'yaywholesaleb2b_settings', $params );
-        update_option( 'yaywholesaleb2b_payment_roles', $payment_roles );
-        update_option( 'yaywholesaleb2b_shipping_roles', $shipping_roles );
-
-        return $this->success( [], __( 'Settings saved!', 'yay-wholesale-b2b' ) );
+        return $this->success( $settings, __( 'Settings saved!', 'yay-wholesale-b2b' ) );
     }
 
     /**
@@ -84,7 +78,7 @@ class SettingsRestController extends BaseRestController {
      */
     public function mark_reviewed(): WP_REST_Response {
         update_option( 'yaywholesaleb2b_reviewed', true );
-        return $this->success();
+        return $this->success( true );
     }
 
     public function get_email_settings_by_id( string $email_id ): array {
@@ -143,13 +137,13 @@ class SettingsRestController extends BaseRestController {
         $settings['enabled'] = $status ? 'yes' : 'no';
         update_option( $option_key, $settings, 'yes' );
 
-        return $this->success( [], __( 'Email status updated!', 'yay-wholesale-b2b' ) );
+        return $this->success( true, __( 'Email status updated!', 'yay-wholesale-b2b' ) );
     }
 
     /**
      * Check if the user has the necessary permissions to access the settings endpoints.
      *
-     * @return bool|WP_Error True if the user has the necessary permissions, otherwise a WP_Error object.
+     * @return bool|\WP_Error True if the user has the necessary permissions, otherwise a WP_Error object.
      */
     public function can_manage_settings() {
         if ( ! current_user_can( 'manage_options' ) || ! current_user_can( 'manage_woocommerce' ) ) {

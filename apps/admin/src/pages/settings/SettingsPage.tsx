@@ -2,11 +2,13 @@ import { useEffect } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { Link, useParams } from 'react-router-dom';
+import { toast } from 'sonner';
 import { __ } from '@wordpress/i18n';
 
-import { useSaveSettingsMutation } from '@/lib/queries/settings';
-import { SettingsFormData, settingsFormSchema } from '@/lib/schema/settings';
-import { cn, getSettings } from '@/lib/utils';
+import { getErrorMsg } from '@/lib/helpers/response.helper';
+import { useIsMutatingSettings, useSaveSettingsMutation, useSettings } from '@/lib/queries/settings.queries';
+import { Settings, settingsFormSchema } from '@/lib/schema/settings.schema';
+import { cn } from '@/lib/utils';
 import { useRouteLeaveGuard } from '@/hooks/useRouteLeaveGuard';
 import { Card, CardContent } from '@/components/ui/card';
 import { FormProvider } from '@/components/ui/form';
@@ -48,19 +50,24 @@ const tabs = [
 export default function SettingsPage() {
   const { subMenu } = useParams();
 
-  const form = useForm<SettingsFormData>({
+  const { data: settings } = useSettings();
+  const saveMutation = useSaveSettingsMutation();
+  const isMutating = useIsMutatingSettings();
+
+  const form = useForm<Settings>({
     resolver: zodResolver(settingsFormSchema),
-    defaultValues: getSettings(),
+    defaultValues: settings,
   });
 
-  const saveMutation = useSaveSettingsMutation();
+  async function onSubmit(data: Settings) {
+    if (isMutating > 0) return;
 
-  async function onSubmit(data: SettingsFormData) {
-    if (saveMutation.isPending) return;
-
-    await saveMutation.mutateAsync(data);
-    window.yayWholesaleB2BAdmin.settings = data;
-    form.reset(data);
+    try {
+      await saveMutation.mutateAsync(data);
+      toast.success(__('Settings saved!', 'yay-wholesale-b2b'));
+    } catch (error) {
+      toast.error(await getErrorMsg(error));
+    }
   }
 
   const { showDialog, confirmLeave, cancelLeave } = useRouteLeaveGuard(form.formState.isDirty, ['/settings/*']);
@@ -77,7 +84,7 @@ export default function SettingsPage() {
 
   return (
     <FormProvider {...form}>
-      <form id="settings-form" onSubmit={form.handleSubmit(onSubmit)}>
+      <form id="settings-form" onSubmit={form.handleSubmit(onSubmit, (err) => console.log(err))}>
         <div className="mx-auto flex max-w-7xl flex-col gap-6 px-6">
           <div className="flex w-full flex-col gap-8 sm:flex-row">
             {/* Left Sidebar - Tab List */}

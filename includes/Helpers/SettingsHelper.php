@@ -116,6 +116,18 @@ class SettingsHelper {
         return $setting;
     }
 
+    public static function update_settings( array $settings ): bool {
+        $payment_roles = $settings['payment_roles'];
+        unset( $settings['payment_roles'] );
+
+        $shipping_roles = $settings['shipping_roles'];
+        unset( $settings['shipping_roles'] );
+
+        update_option( 'yaywholesaleb2b_payment_roles', $payment_roles );
+        update_option( 'yaywholesaleb2b_shipping_roles', $shipping_roles );
+        return update_option( 'yaywholesaleb2b_settings', $settings );
+    }
+
     public static function get_email_content_type( $type ): string {
         switch ( $type ) {
             case 'html':

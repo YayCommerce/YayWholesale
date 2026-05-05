@@ -2,7 +2,7 @@
 namespace YayWholesaleB2B\Engine\Frontend;
 
 use YayWholesaleB2B\Utils\SingletonTrait;
-use YayWholesaleB2B\Services\LocalizeService;
+use YayWholesaleB2B\Helpers\LocalizeHelper;
 
 defined( 'ABSPATH' ) || exit;
 /**
@@ -11,11 +11,7 @@ defined( 'ABSPATH' ) || exit;
 class Frontend {
     use SingletonTrait;
 
-    private LocalizeService $localize_service;
-
     protected function __construct() {
-        $this->localize_service = LocalizeService::get_instance();
-
         add_action( 'wp_enqueue_scripts', [ $this, 'ywhs_enqueue_scripts' ] );
     }
 
@@ -30,7 +26,7 @@ class Frontend {
         $currency         = apply_filters( 'ywhs_get_currency_by_third_party', [] );
         $default_currency = apply_filters( 'ywhs_ajax_using_default_currency', false );
 
-        $meta = $this->localize_service->get_meta();
+        $meta = LocalizeHelper::get_meta();
         if ( ! empty( $currency ) && ! $default_currency ) {
             $meta['wcMeta']['currency_data'] = [
                 'currency'     => $currency['currency'],
@@ -44,7 +40,7 @@ class Frontend {
 
         wp_localize_script(
             $script_handle,
-            LocalizeService::VAR_META,
+            LocalizeHelper::VAR_META,
             $meta,
         );
     }
