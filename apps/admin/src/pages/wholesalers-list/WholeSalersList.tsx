@@ -4,12 +4,12 @@ import { ChevronsUpDown, Plus, Search } from 'lucide-react';
 import { Spinner } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 
-import { useActiveRolesQuery } from '@/lib/queries/roles';
+import { useActiveRolesQuery } from '@/lib/queries/roles.queries';
 import {
   useBulkUpdateWholesalersRoleMutation,
   useTotalCountQuery,
   useWholesalersQuery,
-} from '@/lib/queries/wholesalers';
+} from '@/lib/queries/wholesalers.queries';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { BulkActionBox, BulkActionCloseButton } from '@/components/ui/bulk-actions';

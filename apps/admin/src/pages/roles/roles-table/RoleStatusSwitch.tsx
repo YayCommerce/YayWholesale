@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import { useUpdateRoleStatusMutation } from '@/lib/queries/roles';
+import { useUpdateRoleStatusMutation } from '@/lib/queries/roles.queries';
 import { Switch } from '@/components/ui/switch';
 
 export default function RoleStatusSwitch({

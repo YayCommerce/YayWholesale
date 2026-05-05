@@ -4,9 +4,9 @@ import { ChevronDown } from 'lucide-react';
 import { useUpdateEffect } from 'react-use';
 import { __, sprintf } from '@wordpress/i18n';
 
-import { useUpdateRequestStatusMutation } from '@/lib/queries/requests';
-import { useActiveRolesQuery, useRolesQuery } from '@/lib/queries/roles';
-import { RequestFormValues } from '@/lib/schema/requests';
+import { useUpdateRequestStatusMutation } from '@/lib/queries/requests.queries';
+import { useActiveRolesQuery, useRolesQuery } from '@/lib/queries/roles.queries';
+import { RequestFormValues } from '@/lib/schema/requests.type';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,

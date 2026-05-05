@@ -1,4 +1,4 @@
-import { RequestFormValues } from '@/lib/schema/requests';
+import { RequestFormValues } from '@/lib/schema/requests.type';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import requestsStatusMap from './requests-table/RequestsStatusMap';

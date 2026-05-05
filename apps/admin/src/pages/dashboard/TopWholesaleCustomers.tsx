@@ -5,7 +5,7 @@ import { DateRange } from 'react-day-picker';
 import { Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
-import { useReportsQuery } from '@/lib/queries/reports';
+import { useReportsQuery } from '@/lib/queries/reports.queries';
 import { cn } from '@/lib/utils';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';

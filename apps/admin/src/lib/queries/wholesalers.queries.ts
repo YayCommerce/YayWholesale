@@ -6,7 +6,7 @@ import {
   fetchWholesalersList,
   getTotalCountWholesalers,
   updateWholesalerRole,
-} from '../api/wholesalers';
+} from '../api/wholesalers.api';
 import { handleErrorMessage } from '../utils';
 
 export function useWholesalersQuery(

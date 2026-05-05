@@ -5,8 +5,8 @@ import { useUpdateEffect } from 'react-use';
 import { Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
-import { useAddRoleMutation, useRoleQuery, useUpdateRoleMutation } from '@/lib/queries/roles';
-import { createRoleSchema, RoleFormValues, roleSchema } from '@/lib/schema/roles';
+import { useAddRoleMutation, useRoleQuery, useUpdateRoleMutation } from '@/lib/queries/roles.queries';
+import { createRoleSchema, RoleFormValues, roleSchema } from '@/lib/schema/roles.legacy';
 import { isPro } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';

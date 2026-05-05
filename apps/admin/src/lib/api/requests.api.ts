@@ -1,7 +1,7 @@
 import { __ } from '@wordpress/i18n';
 
-import { PaginatedRequestListValues, RequestFormValues, RequestsCountValues } from '../schema/requests';
-import { api, handleResponse } from './base';
+import { PaginatedRequestListValues, RequestFormValues, RequestsCountValues } from '../schema/requests.type';
+import { api, handleResponse } from './api';
 
 export async function fetchRequests(keyword: string, page: number, perPage: number, status: string) {
   const searchParams = new URLSearchParams({

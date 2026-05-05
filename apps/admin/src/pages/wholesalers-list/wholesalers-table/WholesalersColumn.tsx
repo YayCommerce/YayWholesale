@@ -2,7 +2,7 @@ import { ColumnDef } from '@tanstack/react-table';
 import { __ } from '@wordpress/i18n';
 
 import { parseWPCurrency } from '@/lib/helpers/format.helper';
-import { WholesalerFormValues } from '@/lib/schema/wholesalers';
+import { WholesalerFormValues } from '@/lib/schema/wholesalers.type';
 import { cn } from '@/lib/utils';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Checkbox } from '@/components/ui/checkbox';

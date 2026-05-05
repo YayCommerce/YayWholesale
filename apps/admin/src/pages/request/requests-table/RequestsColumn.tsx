@@ -6,8 +6,8 @@ import { useNavigate } from 'react-router-dom';
 import { __ } from '@wordpress/i18n';
 
 import { parseWPDate, parseWPTime } from '@/lib/helpers/format.helper';
-import { useDeleteRequestMutation } from '@/lib/queries/requests';
-import { RequestFormValues } from '@/lib/schema/requests';
+import { useDeleteRequestMutation } from '@/lib/queries/requests.queries';
+import { RequestFormValues } from '@/lib/schema/requests.type';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';

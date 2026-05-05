@@ -12,12 +12,17 @@ import { useNavigate } from 'react-router-dom';
 import { Spinner } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 
-import { useBulkUpdateRoleStatusMutation, useDeleteManyRolesMutation, useRolesQuery } from '@/lib/queries/roles';
+import {
+  useBulkUpdateRoleStatusMutation,
+  useDeleteManyRolesMutation,
+  useRolesQuery,
+} from '@/lib/queries/roles.queries';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { BulkActionBox, BulkActionCloseButton } from '@/components/ui/bulk-actions';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { WholeSaleToolTip } from '@/components/ui/custom/WholeSaleToolTip';
 import {
   Dialog,
   DialogClose,
@@ -37,7 +42,6 @@ import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/in
 import { Pagination } from '@/components/ui/pagination';
 import { Separator } from '@/components/ui/separator';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { WholeSaleToolTip } from '@/components/ui/custom/WholeSaleToolTip';
 import DeleteIcon from '@/components/icons/DeleteIcon';
 import { RolesColumn } from './roles-table/RolesColumn';
 

@@ -1,7 +1,7 @@
 import { __ } from '@wordpress/i18n';
 
 import { DashboardReports } from '../schema/reports.type';
-import { api, handleResponse } from './base';
+import { api, handleResponse } from './api';
 
 export async function fetchReports(
   startDate: string,

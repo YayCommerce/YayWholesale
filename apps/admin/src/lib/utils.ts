@@ -3,7 +3,7 @@ import { HTTPError } from 'ky';
 import { twMerge } from 'tailwind-merge';
 
 import { toast } from '@/components/ui/sonner';
-import { RolesListValues } from './schema/roles';
+import { RolesListValues } from './schema/roles.legacy';
 
 export const isPro = import.meta.env.VITE_IS_PRO === 'true';
 export const isLite = !isPro;

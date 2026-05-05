@@ -1,7 +1,7 @@
 import { __ } from '@wordpress/i18n';
 
-import { api, ApiResponse, handleResponse } from '@/lib/api/base';
-import type { RoleFormValues, RolesListValues } from '@/lib/schema/roles';
+import { api, ApiResponse, handleResponse } from '@/lib/api/api';
+import type { RoleFormValues, RolesListValues } from '@/lib/schema/roles.legacy';
 
 // get all roles
 

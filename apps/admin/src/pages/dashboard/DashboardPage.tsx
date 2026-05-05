@@ -3,7 +3,7 @@ import dayjs from 'dayjs';
 import { DateRange } from 'react-day-picker';
 import { __ } from '@wordpress/i18n';
 
-import { useReportsQuery } from '@/lib/queries/reports';
+import { useReportsQuery } from '@/lib/queries/reports.queries';
 import DashboardDatePicker from './DashboardDatePicker';
 import DashboardSummary from './DashboardSummary';
 import TopProducts from './TopProducts';
