@@ -162,7 +162,7 @@ class RolesRestController extends BaseRestController {
         );
 
         $roles[] = $new_role;
-        update_option( 'yaywholesaleb2b_roles', $roles );
+        RolesHelper::save_wholesale_roles( $roles );
 
         return $this->success( $new_role, __( 'Role created successfully', 'yay-wholesale-b2b' ) );
     }
@@ -190,7 +190,7 @@ class RolesRestController extends BaseRestController {
             return $this->error( __( 'Role not found', 'yay-wholesale-b2b' ), 404 );
         }
 
-        update_option( 'yaywholesaleb2b_roles', $roles );
+        RolesHelper::save_wholesale_roles( $roles );
 
         return $this->success( $updated_role, __( 'Role updated successfully', 'yay-wholesale-b2b' ) );
     }
@@ -272,7 +272,7 @@ class RolesRestController extends BaseRestController {
             }
         }
 
-        update_option( 'yaywholesaleb2b_roles', $roles );
+        RolesHelper::save_wholesale_roles( $roles );
         return $this->success( $updated_count, __( 'Statuses updated successfully', 'yay-wholesale-b2b' ) );
     }
 

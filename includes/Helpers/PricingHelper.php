@@ -12,31 +12,6 @@ use YayWholesaleB2B\Utils\Utils;
 class PricingHelper {
 
     /**
-     * Get the effective role
-     *
-     * @param bool $allow_default Allow default role.
-     * @return array|null The effective role or null if not found.
-     */
-    public static function get_effective_role( bool $allow_default = false ): ?array {
-        $role = RolesHelper::is_wholesale_user();
-
-        if ( ! $role && $allow_default && ! empty( SettingsHelper::get_settings()['general']['default_role'] ) ) {
-            $roles = get_option( 'yaywholesaleb2b_roles', [] );
-            $role  = RolesHelper::get_role_by_slug( $roles, SettingsHelper::get_settings()['general']['default_role'] );
-            if ( ! $role || empty( $role['status'] ) ) {
-                return null;
-            }
-            // Handle price (Compatible to other price-related plugins)
-            $role['minOrderAmount'] = apply_filters( 'ywhs_price_handle_processed', $role['minOrderAmount'] );
-
-            if ( ! Utils::is_pro() ) {
-                $role['minOrderQuantity'] = 0;
-            }
-        }
-        return $role;
-    }
-
-    /**
      * Check if the cart conditions are met
      *
      * @param array $role The role array.
@@ -77,9 +52,9 @@ class PricingHelper {
     public static function apply_wholesale_discount( $price, \WC_Product $product, bool $is_preview = false ) {
         $show_to_all = SettingsHelper::get_settings()['general']['show_wholesale_price'] ?? false;
 
-        $role = self::get_effective_role( false );
+        $role = CustomerHelper::get_current_user_wholesale_role();
         if ( ! $role && $is_preview && $show_to_all ) {
-            $role = self::get_effective_role( true );
+            $role = RolesHelper::get_default_wholesale_role();
         }
 
         if ( ! $role ) {
@@ -91,7 +66,7 @@ class PricingHelper {
             return $price;
         }
 
-        $is_actual_wholesale = (bool) self::get_effective_role( false );
+        $is_actual_wholesale = CustomerHelper::is_current_wholesale_customer();
         if ( $is_actual_wholesale && ! self::meets_discount_conditions( $role ) ) {
             return $price;
         }
@@ -147,13 +122,11 @@ class PricingHelper {
         $subtotal = 0;
 
         // Calculate the subtotal (in this action, subtotal is not calculated)
-        HooksHelper::remove_price_hooks();
         foreach ( $cart as $cart_item ) {
             $product   = $cart_item['data'];
             $price     = $product->get_price();
             $subtotal += $price * $cart_item['quantity'];
         }
-        HooksHelper::add_price_hooks();
 
         return $subtotal;
     }
@@ -170,7 +143,6 @@ class PricingHelper {
         $subtotal = 0;
 
         // Calculate the subtotal with original unit price
-        HooksHelper::remove_price_hooks();
         foreach ( $order->get_items() as $item ) {
             if ( ! $item instanceof \WC_Order_Item_Product ) {
                 continue;
@@ -180,7 +152,6 @@ class PricingHelper {
             $price     = apply_filters( 'ywhs_convert_price_from_order', $price, $order, false );
             $subtotal += $price * $item->get_quantity();
         }
-        HooksHelper::add_price_hooks();
 
         $is_discounted = isset( $wholesale_role ) && self::meets_discount_conditions( $wholesale_role, $quantity, $subtotal );
 
@@ -223,8 +194,6 @@ class PricingHelper {
                 }
                 $initial_price = round( $initial_price, wc_get_price_decimals() );
 
-                HooksHelper::remove_price_hooks();
-
                 $is_including_tax = wc_prices_include_tax();
                 $origin_price     = $product->get_price();
                 if ( $is_including_tax ) {
@@ -235,7 +204,6 @@ class PricingHelper {
 
                 $extra_price_map[ $item->get_id() ] = $initial_price - $origin_price;
 
-                HooksHelper::add_price_hooks();
             }//end foreach
 
             $order->update_meta_data( '_ywhs_extra_price_map', $extra_price_map );

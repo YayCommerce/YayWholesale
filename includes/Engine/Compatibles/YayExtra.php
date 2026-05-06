@@ -1,6 +1,7 @@
 <?php
 namespace YayWholesaleB2B\Engine\Compatibles;
 
+use YayWholesaleB2B\Helpers\CustomerHelper;
 use YayWholesaleB2B\Helpers\PricingHelper;
 use YayWholesaleB2B\Utils\SingletonTrait;
 
@@ -28,7 +29,7 @@ class YayExtra {
         $dep           = [ 'jquery', 'wp-i18n', 'wp-hooks' ];
         $script_handle = 'yay-extra-compatible';
 
-        $wholesale_role = PricingHelper::get_effective_role();
+        $wholesale_role = CustomerHelper::get_current_user_wholesale_role();
         $product        = wc_get_product( get_the_ID() );
 
         if ( isset( $wholesale_role ) ) {

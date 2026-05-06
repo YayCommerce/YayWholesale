@@ -5,8 +5,8 @@ use YayWholesaleB2B\Utils\SingletonTrait;
 
 use Yay_Currency\Helpers\YayCurrencyHelper;
 use Yay_Currency\Helpers\SupportHelper;
+use YayWholesaleB2B\Helpers\CustomerHelper;
 use YayWholesaleB2B\Helpers\PricingHelper;
-use YayWholesaleB2B\Helpers\RolesHelper;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -199,7 +199,7 @@ class YayCurrency {
             return $formatted_price;
         }
 
-        $wholesale_role = RolesHelper::is_wholesale_user();
+        $wholesale_role = CustomerHelper::get_current_user_wholesale_role();
 
         if ( ! $wholesale_role ) {
             return $formatted_price;
