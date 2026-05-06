@@ -3,20 +3,9 @@ namespace YayWholesaleB2B\Controllers;
 
 use YayWholesaleB2B\Utils\SingletonTrait;
 use WP_REST_Request;
-use WP_REST_Response;
 use YayWholesaleB2B\Helpers\SettingsHelper;
 
 defined( 'ABSPATH' ) || exit;
-
-/**
- * Refactor note: API controller.
- * 1. success data default true, not an empty array.
- * Refactor note: js.
- * 1. schemas: use normal type instead of schema, if not using any form validation.
- * 2. api client layer: only params, response type. do not handdle error here
- * 3. query layer: only invalidate, define cache key, initial data. do not handle toast here
- * 4. component layer: handle toast, call mutateAsync to handle error
- */
 
 /**
  * Handles Wholesale Settings API endpoints.
@@ -67,112 +56,66 @@ class SettingsRestController extends BaseRestController {
         );
     }
 
-    /**
-     * Get settings.
-     *
-     * @return WP_REST_Response The response object.
-     */
-    public function get_settings(): WP_REST_Response {
-        $settings = SettingsHelper::get_settings();
-        return $this->success( $settings );
+    public function get_settings() {
+        return SettingsHelper::get_settings();
     }
 
-    /**
-     * Update the settings.
-     *
-     * @param WP_REST_Request $request The request object.
-     * @return WP_REST_Response The response object.
-     */
-    public function update_settings( WP_REST_Request $request ): WP_REST_Response {
-        $params = $this->get_json_params( $request );
+    public function update_settings( WP_REST_Request $request ) {
+        $payload = $request->get_json_params();
 
-        if ( empty( $params ) ) {
-            return $this->error( __( 'Invalid settings data', 'yay-wholesale-b2b' ) );
+        if ( empty( $payload ) ) {
+            return $this->error_invalid_arguments();
         }
 
-        SettingsHelper::update_settings( $params );
-        $settings = SettingsHelper::get_settings();
-
-        return $this->success( $settings, __( 'Settings saved!', 'yay-wholesale-b2b' ) );
+        SettingsHelper::update_settings( $payload );
+        return SettingsHelper::get_settings();
     }
 
-    /**
-     * Mark the plugin as reviewed.
-     *
-     * @return WP_REST_Response The response object.
-     */
-    public function mark_reviewed(): WP_REST_Response {
+    public function mark_reviewed() {
         update_option( 'yaywholesaleb2b_reviewed', true );
-        return $this->success( true );
+        return true;
     }
 
-    public function get_email_settings_by_id( string $email_id ): array {
-        $emails = WC()->mailer()->get_emails();
-        foreach ( $emails as $email ) {
-            if ( $email->id === $email_id ) {
-                return $email->settings;
-            }
-        }
-        return [];
-    }
+    public function update_email_status( WP_REST_Request $request ) {
+        $payload = $request->get_json_params();
 
-    /**
-     * Update the status of an email.
-     *
-     * @param WP_REST_Request $request The request object.
-     * @return WP_REST_Response The response object.
-     */
-    public function update_email_status( WP_REST_Request $request ): WP_REST_Response {
-        $params = $this->get_json_params( $request );
-
-        $email_id = isset( $params['emailId'] ) ? sanitize_text_field( $params['emailId'] ) : '';
-        $status   = isset( $params['status'] ) ? filter_var( $params['status'], FILTER_VALIDATE_BOOLEAN ) : false;
+        $email_id = isset( $payload['emailId'] ) ? sanitize_text_field( $payload['emailId'] ) : '';
+        $status   = isset( $payload['status'] ) ? filter_var( $payload['status'], FILTER_VALIDATE_BOOLEAN ) : false;
 
         if ( empty( $email_id ) || ! is_bool( $status ) ) {
-            return $this->error( __( 'Invalid parameters', 'yay-wholesale-b2b' ) );
+            return $this->error_invalid_arguments();
         }
 
         // Compose the option key used by WooCommerce for single-email settings
         $option_key = sprintf( 'woocommerce_%s_settings', $email_id );
 
-        // Retrieve existing option. Use get_option with default array to avoid falsey returns.
-        $settings = get_option( $option_key, [] );
+        $mail_settings = get_option( $option_key );
 
-        if ( ! $settings ) {
-            // get settings by email id
-            $settings = $this->get_email_settings_by_id( $email_id );
-
-            if ( empty( $settings ) ) {
-                return $this->error( __( 'Email settings not found for this email ID', 'yay-wholesale-b2b' ), 404 );
+        if ( $mail_settings === false ) {
+            $wc_emails = WC()->mailer()->get_emails();
+            foreach ( $wc_emails as $wc_email ) {
+                if ( $wc_email->id === $email_id ) {
+                    $mail_settings = $wc_email;
+                }
             }
+        } elseif ( is_object( $mail_settings ) ) {
+            $mail_settings = (array) $mail_settings;
         }
 
-        // Ensure settings is an array (when stored as serialized array or object)
-        if ( ! is_array( $settings ) ) {
-            // If it's an object (rare), cast to array
-            if ( is_object( $settings ) ) {
-                $settings = (array) $settings;
-            } else {
-                // Can't safely operate on non-array settings
-                return $this->error( __( 'Stored email settings are in an unsupported format.', 'yay-wholesale-b2b' ) );
-            }
+        if ( empty( $mail_settings ) ) {
+            return $this->error_invalid_arguments();
         }
 
         // Update the enabled key
-        $settings['enabled'] = $status ? 'yes' : 'no';
-        update_option( $option_key, $settings, 'yes' );
+        $mail_settings['enabled'] = $status ? 'yes' : 'no';
+        update_option( $option_key, $mail_settings, 'yes' );
 
-        return $this->success( true, __( 'Email status updated!', 'yay-wholesale-b2b' ) );
+        return true;
     }
 
-    /**
-     * Check if the user has the necessary permissions to access the settings endpoints.
-     *
-     * @return bool|\WP_Error True if the user has the necessary permissions, otherwise a WP_Error object.
-     */
     public function can_manage_settings() {
         if ( ! current_user_can( 'manage_options' ) || ! current_user_can( 'manage_woocommerce' ) ) {
-            return new \WP_Error( 'rest_forbidden', esc_html__( 'Forbidden.', 'yay-wholesale-b2b' ), [ 'status' => 401 ] );
+            return $this->error_forbidden();
         }
 
         return true;

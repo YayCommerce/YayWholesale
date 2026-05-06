@@ -130,22 +130,3 @@ export const yayWholesaleApi = createApi(window.yayWholesaleB2BMeta.wpMeta.restB
 export const wordpressApi = createApi('wp/v2');
 
 export const api = yayWholesaleApi;
-
-export interface ApiResponse<T> {
-  success: boolean;
-  message: string;
-  data: T;
-}
-
-export async function handleResponse<T>(response: Response, errorMessage: string): Promise<ApiResponse<T>> {
-  if (!response.ok) {
-    throw new Error(__(errorMessage, 'yay-wholesale-b2b'));
-  }
-
-  const result = await response.json();
-  if (!result.success) {
-    throw new Error(__(result.message || errorMessage, 'yay-wholesale-b2b'));
-  }
-
-  return result;
-}

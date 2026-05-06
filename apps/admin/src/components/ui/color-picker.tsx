@@ -41,6 +41,7 @@ export function ColorPicker({
   });
   const debouncedSetValue = useDebounceFn(setValue, { wait: 200, maxWait: 500 });
   const [open, setOpen] = useState(false);
+
   return (
     <ColorPickerContext.Provider
       value={{

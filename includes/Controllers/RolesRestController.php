@@ -259,7 +259,7 @@ class RolesRestController extends BaseRestController {
             $users_counts[ $role['slug'] ] = RolesHelper::count_users_by_role( $role['slug'] );
         }
 
-        return $this->success( $users_counts );
+        return $users_counts;
     }
 
     /**

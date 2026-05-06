@@ -1,9 +1,6 @@
 <?php
 namespace YayWholesaleB2B\Controllers;
 
-use WP_REST_Request;
-use WP_REST_Response;
-
 defined( 'ABSPATH' ) || exit;
 
 /**
@@ -15,59 +12,65 @@ abstract class BaseRestController {
 
     public const REST_NAMESPACE = 'yay-wholesale/v1';
 
-    /**
-     * Return a success response.
-     *
-     * @param array|boolean|int $data    The data to return.
-     * @param string            $message The success message.
-     * @return WP_REST_Response The response object.
-     */
-    protected function success( $data = true, string $message = '' ): WP_REST_Response {
-        return rest_ensure_response(
-            array_filter(
-                [
-                    'success' => true,
-                    'message' => $message,
-                    'data'    => $data,
-                ]
-            )
-        );
+    protected function error_unauthorized( $message = 'You are not allowed to perform this action.' ) {
+        return new \WP_Error( 'unauthorized', $message, [ 'status' => 401 ] );
+    }
+
+    protected function error_forbidden( $message = 'You are not allowed to perform this action.' ) {
+        return new \WP_Error( 'forbidden', $message, [ 'status' => 403 ] );
+    }
+
+    protected function error_not_found( $message = 'Not Found.' ) {
+        return new \WP_Error( 'not_found', $message, [ 'status' => 404 ] );
+    }
+
+    protected function error_invalid_arguments( $message = 'Invalid Arguments.' ) {
+        return new \WP_Error( 'invalid_arguments', $message, [ 'status' => 400 ] );
     }
 
     /**
-     * Return an error response.
+     * Execute Routes which DO NOT Write to DB.
+     * Treat deep thrown error as internal_error
      *
-     * @param string $message The error message.
-     * @param int    $status The HTTP status code.
-     * @return WP_REST_Response The response object.
+     * @param  callable         $callback
+     * @param  \WP_REST_Request $request
+     * @return \WP_REST_Response|\WP_Error|void
      */
-    protected function error( string $message, int $status = 400 ): WP_REST_Response {
-        return new WP_REST_Response(
-            [
-                'success' => false,
-                'message' => $message,
-            ],
-            $status
-        );
+    public function exec_read( $callback, \WP_REST_Request $request ) {
+        try {
+            if ( is_callable( $callback ) ) {
+                $response = $callback( $request );
+                return rest_ensure_response( $response );
+            }
+        } catch ( \Throwable $ex ) {
+            return new \WP_Error( 'internal_error', $ex->getMessage(), [ 'status' => 500 ] );
+        }
     }
 
     /**
-     * Get the JSON parameters from the request.
+     * Execute Routes which DO Write to DB, auto-rollback on error.
+     * Treat deep thrown error as internal_error
      *
-     * @param WP_REST_Request $request The request object.
-     * @return array The JSON parameters.
+     * @param  callable         $callback
+     * @param  \WP_REST_Request $request
+     * @return \WP_REST_Response|\WP_Error|void
      */
-    protected function get_json_params( WP_REST_Request $request ): array {
-        return (array) $request->get_json_params();
-    }
+    public function exec_write( $callback, $request ) {
+        global $wpdb;
 
-    /**
-     * Get the form data from the request.
-     *
-     * @param WP_REST_Request $request The request object.
-     * @return array The form data.
-     */
-    protected function get_form_data( WP_REST_Request $request ): array {
-        return (array) $request->get_body_params();
+        try {
+            $wpdb->query( 'START TRANSACTION' ); // phpcs:ignore WordPress.DB
+            if ( is_callable( $callback ) ) {
+                $response = $callback( $request );
+            }
+            $wpdb->query( 'COMMIT' ); // phpcs:ignore WordPress.DB
+
+            return rest_ensure_response( $response );
+
+        } catch ( \Throwable $ex ) {
+            $wpdb->query( 'ROLLBACK' ); // phpcs:ignore WordPress.DB
+
+            return new \WP_Error( 'internal_error', $ex->getMessage(), [ 'status' => 500 ] );
+        }
     }
 }

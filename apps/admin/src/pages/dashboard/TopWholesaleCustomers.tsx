@@ -1,7 +1,5 @@
-import { useMemo } from 'react';
-import dayjs from 'dayjs';
+import { format } from 'date-fns';
 import { Crown } from 'lucide-react';
-import { DateRange } from 'react-day-picker';
 import { Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
@@ -12,14 +10,14 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
-export default function TopWholesaleCustomers(props: {
+type Props = {
   reportQuery: ReturnType<typeof useReportsQuery>;
-  dateRange: DateRange | undefined;
-}) {
-  const { data: reportData, isFetching, isLoading } = props.reportQuery;
+  startDate: Date;
+  endDate: Date;
+};
 
-  const startDate = useMemo(() => dayjs(props.dateRange?.from).format('YYYY-MM-DD'), [props.dateRange]);
-  const endDate = useMemo(() => dayjs(props.dateRange?.to).format('YYYY-MM-DD'), [props.dateRange]);
+export default function TopWholesaleCustomers({ reportQuery, startDate, endDate }: Props) {
+  const { data: reportData, isFetching, isLoading } = reportQuery;
 
   return (
     <Card className="mt-0 flex h-full flex-col rounded-lg shadow-none">
@@ -104,9 +102,9 @@ export default function TopWholesaleCustomers(props: {
                                 '&_customer_user=' +
                                 data.id +
                                 '&_ywhs_order_from=' +
-                                startDate +
+                                format(startDate, 'yyyy-MM-dd') +
                                 '&_ywhs_order_to=' +
-                                endDate +
+                                format(endDate, 'yyyy-MM-dd') +
                                 '&_ywhs_from_dashboard=true',
                               '_blank',
                             );

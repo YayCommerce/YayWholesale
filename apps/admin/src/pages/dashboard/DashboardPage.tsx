@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import dayjs from 'dayjs';
+import { subDays } from 'date-fns';
 import { DateRange } from 'react-day-picker';
 import { __ } from '@wordpress/i18n';
 
@@ -10,26 +10,20 @@ import TopProducts from './TopProducts';
 import TopWholesaleCustomers from './TopWholesaleCustomers';
 
 export default function DashboardPage() {
-  const [dateRange, setDateRange] = useState<DateRange | undefined>({
-    from: dayjs().subtract(30, 'day').toDate(),
-    to: dayjs().toDate(),
+  const [dateRange, setDateRange] = useState<DateRange | undefined>(() => {
+    const today = new Date();
+    return { from: subDays(today, 30), to: today };
   });
 
-  const compareDateRange = useMemo((): DateRange => {
-    const to = dateRange?.to?.getTime() ?? 1;
-    const from = dateRange?.from?.getTime() ?? 1;
-    const gap = (to - from) / (1000 * 60 * 60 * 24);
-    return {
-      from: dayjs(dateRange?.from)
-        .subtract(gap + 1, 'day')
-        .toDate(),
-      to: dayjs(dateRange?.to)
-        .subtract(gap + 1, 'day')
-        .toDate(),
-    };
+  const { startDate, endDate } = useMemo(() => {
+    if (dateRange && dateRange.from && dateRange.to) {
+      return { startDate: dateRange.from, endDate: dateRange.to };
+    }
+    const today = new Date();
+    return { startDate: subDays(today, 30), endDate: today };
   }, [dateRange]);
 
-  const reportQuery = useReportsQuery(dateRange, compareDateRange);
+  const reportQuery = useReportsQuery(startDate, endDate);
 
   return (
     <div className="mx-auto flex max-w-7xl flex-col gap-6 px-6">
@@ -41,7 +35,7 @@ export default function DashboardPage() {
       <DashboardSummary reportQuery={reportQuery} />
 
       <div className="grid items-stretch gap-6 md:grid-cols-2">
-        <TopWholesaleCustomers reportQuery={reportQuery} dateRange={dateRange} />
+        <TopWholesaleCustomers reportQuery={reportQuery} startDate={startDate} endDate={endDate} />
         <TopProducts reportQuery={reportQuery} />
       </div>
     </div>

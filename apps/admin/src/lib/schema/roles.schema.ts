@@ -26,4 +26,5 @@ export type Role = RoleFormValues & {
   status: boolean;
 };
 
-export type RoleUserCount = Record<string, number>;
+/** key is roleId, value is userCount */
+export type UserCountByRole = Record<string, number>;
