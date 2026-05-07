@@ -15,7 +15,7 @@ export default function RegistrationTab() {
       {/* Moderate new registrations */}
       <Controller
         control={control}
-        name={`registration.moderate`}
+        name="registration.moderate"
         render={({ field }) => (
           <div className="flex items-center justify-between rounded-md border p-4">
             <div>
@@ -36,7 +36,7 @@ export default function RegistrationTab() {
         // Wholesale registration page 
         <Controller
           control={control}
-          name={`registration.wholesale_registration_page`}
+          name="registration.wholesale_registration_page"
           render={({ field }) => (
             <Field className="w-full flex flex-col gap-2.5">
               <FieldLabel className="text-foreground-400 text-xs font-medium">
@@ -64,7 +64,7 @@ export default function RegistrationTab() {
       <div className="flex flex-col gap-5">
         <Controller
           control={control}
-          name={`registration.successful_registration_message`}
+          name="registration.successful_registration_message"
           render={({ field }) => (
             <Field className="flex w-full flex-col gap-2.5">
               <FieldLabel className="text-foreground-400 text-xs font-medium">
@@ -90,7 +90,7 @@ export default function RegistrationTab() {
         {/* Submit button label */}
         <Controller
           control={control}
-          name={`registration.submit_button_label`}
+          name="registration.submit_button_label"
           render={({ field }) => (
             <Field className="flex w-62.5 flex-col gap-2.5">
               <FieldLabel className="text-foreground-400 text-xs font-medium">

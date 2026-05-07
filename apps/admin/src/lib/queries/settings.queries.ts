@@ -32,7 +32,7 @@ export function useSettingsEmailsQuery() {
 
 /** Mutations */
 
-export function useSaveMainSettingsMutation() {
+export function useSaveSettingsMutation() {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -54,9 +54,10 @@ export function useUpdateEmailStatusMutation() {
     mutationFn: async ({ emailId, status }: { emailId: string; status: boolean }) => updateEmailStatus(emailId, status),
 
     onMutate: async ({ emailId, status }) => {
-      const previous = window.yayWholesaleB2BAdmin.wholesale_emails;
-      const next = previous!.map((e) => (e.id === emailId ? { ...e, status } : e));
+      const previous = queryClient.getQueryData(SETTINGS_QUERIES.emails.queryKey);
+      if (!previous) return;
 
+      const next = previous.map((e) => (e.id === emailId ? { ...e, status } : e));
       window.yayWholesaleB2BAdmin.wholesale_emails = next;
       queryClient.setQueryData(SETTINGS_QUERIES.emails.queryKey, next); // Optimistic
 
@@ -74,10 +75,6 @@ export function useUpdateEmailStatusMutation() {
 
 /** Utils */
 
-export function useIsMutatingMainSettings() {
+export function useIsMutatingSettings() {
   return useIsMutating({ mutationKey: ['settings', 'main'] });
-}
-
-export function useIsMutatingEmailsSettings() {
-  return useIsMutating({ mutationKey: ['settings', 'emails'] });
 }

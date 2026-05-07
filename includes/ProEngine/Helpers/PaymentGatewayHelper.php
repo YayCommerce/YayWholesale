@@ -86,6 +86,10 @@ class PaymentGatewayHelper {
         return $payment_settings;
     }
 
+    public static function save_payment_method_settings( array $payment_method_settings ) {
+        update_option( 'yaywholesaleb2b_payment_roles', $payment_method_settings );
+    }
+
     /**
      * Get the currently allow-in-checkout payment methods by current user's role
      *

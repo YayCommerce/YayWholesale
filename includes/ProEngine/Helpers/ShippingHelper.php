@@ -98,6 +98,10 @@ class ShippingHelper {
         return $shipping_settings;
     }
 
+    public static function save_shipping_method_settings( array $shipping_method_settings ) {
+        update_option( 'yaywholesaleb2b_shipping_roles', $shipping_method_settings );
+    }
+
     /**
      * Get the currently allow-in-checkout payment methods by current user's role
      *

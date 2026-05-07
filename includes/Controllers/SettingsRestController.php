@@ -63,12 +63,18 @@ class SettingsRestController extends BaseRestController {
     public function update_settings( WP_REST_Request $request ) {
         $payload = $request->get_json_params();
 
-        if ( empty( $payload ) || ! isset( $payload['settings'] ) ) {
+        if ( empty( $payload ) ) {
             return $this->error_invalid_arguments();
         }
 
-        SettingsHelper::update_settings( $payload['settings'] );
-        // TODO: do_action for Pro
+        $settings = [
+            'general'             => $payload['general'],
+            'display'             => $payload['display'],
+            'registration'        => $payload['registration'],
+            'registration_fields' => $payload['registration_fields'],
+        ];
+        SettingsHelper::update_settings( $settings );
+        do_action( 'ywhs_settings_updated', $payload );
 
         return SettingsHelper::get_settings();
     }

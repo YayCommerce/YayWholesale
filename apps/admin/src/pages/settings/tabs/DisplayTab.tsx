@@ -23,7 +23,7 @@ export default function DisplayTab() {
         {/* Wholesale registration page */}
         <Controller
           control={control}
-          name={`display.price_format`}
+          name="display.price_format"
           render={({ field }) => (
             <Field className="flex w-full flex-col gap-2.5">
               <FieldLabel className="text-foreground-400 text-xs font-medium">
@@ -53,7 +53,7 @@ export default function DisplayTab() {
 
         <Controller
           control={control}
-          name={`display.wholesale_price_label`}
+          name="display.wholesale_price_label"
           render={({ field }) => (
             <Field className="flex w-full flex-col gap-2.5">
               <FieldLabel className="text-foreground-400 text-xs font-medium">
@@ -76,7 +76,7 @@ export default function DisplayTab() {
 
         <Controller
           control={control}
-          name={`display.wholesale_price_color`}
+          name="display.wholesale_price_color"
           render={({ field }) => (
             <Field className="flex w-full flex-col gap-2.5">
               <FieldLabel className="text-foreground-400 text-xs font-medium">

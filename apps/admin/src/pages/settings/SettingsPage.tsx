@@ -6,7 +6,7 @@ import { toast } from 'sonner';
 import { __ } from '@wordpress/i18n';
 
 import { getErrorMsg } from '@/lib/helpers/response.helper';
-import { useIsMutatingSettings, useSaveSettingsMutation, useSettings } from '@/lib/queries/settings.queries';
+import { useIsMutatingSettings, useSaveSettingsMutation, useSettingsQuery } from '@/lib/queries/settings.queries';
 import { Settings, settingsFormSchema } from '@/lib/schema/settings.schema';
 import { cn } from '@/lib/utils';
 import { useRouteLeaveGuard } from '@/hooks/useRouteLeaveGuard';
@@ -50,7 +50,7 @@ const tabs = [
 export default function SettingsPage() {
   const { subMenu } = useParams();
 
-  const { data: settings } = useSettings();
+  const { data: settings } = useSettingsQuery();
   const saveMutation = useSaveSettingsMutation();
   const isMutating = useIsMutatingSettings();
 

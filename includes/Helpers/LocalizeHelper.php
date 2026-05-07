@@ -14,7 +14,7 @@ class LocalizeHelper {
     public const VAR_META  = 'yayWholesaleB2BMeta';
 
     public static function get_admin_data() {
-        $settings = SettingsHelper::get_settings( true );
+        $settings = SettingsHelper::get_settings();
         $roles    = get_option( 'yaywholesaleb2b_roles', [] );
         $pages    = SupportHelper::get_valid_pages_for_wholesale_store();
 
@@ -25,9 +25,7 @@ class LocalizeHelper {
             'valid_wholesale_store_pages' => $pages,
         ];
 
-        // TODO: Filter for Pro
-
-        return $admin_data;
+        return apply_filters( 'ywhs_localize_admin_data', $admin_data );
     }
 
     public static function get_meta() {

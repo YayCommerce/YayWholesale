@@ -5,7 +5,7 @@ import { InfoIcon, Truck } from 'lucide-react';
 import { useFieldArray, useFormContext } from 'react-hook-form';
 import { __ } from '@wordpress/i18n';
 
-import { useAllRolesQuery } from '@/lib/queries/roles.queries';
+import { useActiveRolesQuery } from '@/lib/queries/roles.queries';
 import { RoleRelatedSetting, Settings } from '@/lib/schema/settings.schema';
 import { cn } from '@/lib/utils';
 import { useUncontrolled } from '@/hooks/useUncontrolled';
@@ -32,7 +32,7 @@ export default function ShippingRolesTab() {
     name: 'shipping_roles',
   });
 
-  const { data: roles } = useAllRolesQuery();
+  const { data: roles } = useActiveRolesQuery();
 
   const rolesSelect = useMemo(() => {
     const handleRoles = roles?.map((role) => ({ slug: role.slug, name: role.name })) ?? [];
