@@ -26,11 +26,16 @@ class Pricing {
 
         add_action( 'woocommerce_before_calculate_totals', [ $this, 'before_calculate_totals' ], 103 );
 
-        add_filter( 'woocommerce_cart_item_price', [ $this, 'cart_item_price' ], 999, 3 );
+        add_filter( 'woocommerce_cart_item_price', [ $this, 'cart_item_price' ], 999, 2 );
 
         add_action( 'woocommerce_checkout_order_processed', [ $this, 'ywhs_checkout_wholesale_order_handling' ], 999, 3 );
     }
 
+    /**
+     * Update the wholesale price in cart / checkout
+     *
+     * @param \WC_Cart $cart The hash array.
+     */
     public function before_calculate_totals( $cart ) {
         if ( did_action( 'woocommerce_before_calculate_totals' ) > 1 ) {
             return;
@@ -56,7 +61,14 @@ class Pricing {
         do_action( 'ywhs_after_cart_calculate_totals', $cart );
     }
 
-    public function cart_item_price( $price_html, $cart_item, $cart_item_key ) {
+    /**
+     * Update price display in mini-cart
+     *
+     * @param string $price_html The hash array.
+     * @param array  $cart_item the cart item.
+     * @return string
+     */
+    public function cart_item_price( $price_html, $cart_item ) {
         if ( empty( $cart_item['data'] ) ) {
             return $price_html;
         }
@@ -68,7 +80,7 @@ class Pricing {
 
         $discounted = PricingHelper::apply_wholesale_discount( $sale > 0 ? $sale : $regular, $product, true );
 
-        $tax_display_shop = get_option( 'woocommerce_tax_display_shop', 'excl' );
+        $tax_display_shop = get_option( 'woocommerce_tax_display_cart', 'excl' );
 
         if ( 'incl' === $tax_display_shop ) {
             $regular    = wc_get_price_including_tax( $product, [ 'price' => $regular ] );
