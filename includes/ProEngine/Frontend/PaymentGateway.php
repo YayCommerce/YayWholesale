@@ -1,10 +1,10 @@
 <?php
-namespace YayWholesaleB2B\Engine\Frontend;
+namespace YayWholesaleB2B\ProEngine\Frontend;
 
-use YayWholesaleB2B\Helpers\PaymentGatewayHelper;
+use YayWholesaleB2B\Helpers\CustomerHelper;
 use YayWholesaleB2B\Utils\SingletonTrait;
-use YayWholesaleB2B\Helpers\RolesHelper;
 use YayWholesaleB2B\Helpers\SettingsHelper;
+use YayWholesaleB2B\ProEngine\Helpers\PaymentGatewayHelper;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -29,10 +29,10 @@ class PaymentGateway {
             return $available_gateways;
         }
 
-        $is_wholesale = RolesHelper::is_wholesale_user();
+        $wholesale_role = CustomerHelper::get_current_user_wholesale_role();
 
         $all_role_slugs = PaymentGatewayHelper::get_allowed_payment_by_role_slugs(
-            $is_wholesale ? $is_wholesale['slug'] : SettingsHelper::B2C_ROLE_SLUG
+            isset( $wholesale_role ) ? $wholesale_role['slug'] : SettingsHelper::B2C_ROLE_SLUG
         );
 
         $allow_role_slugs   = $all_role_slugs['allowed'];

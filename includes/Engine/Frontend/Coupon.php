@@ -1,8 +1,8 @@
 <?php
 namespace YayWholesaleB2B\Engine\Frontend;
 
+use YayWholesaleB2B\Helpers\CustomerHelper;
 use YayWholesaleB2B\Utils\SingletonTrait;
-use YayWholesaleB2B\Helpers\RolesHelper;
 use YayWholesaleB2B\Helpers\SettingsHelper;
 defined( 'ABSPATH' ) || exit;
 /**
@@ -35,7 +35,7 @@ class Coupon {
             return $enabled;
         }
 
-        if ( ! is_admin() && RolesHelper::is_wholesale_user() ) {
+        if ( ! is_admin() && CustomerHelper::is_current_wholesale_customer() ) {
             return false;
         }
 

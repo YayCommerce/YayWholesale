@@ -1,8 +1,8 @@
 <?php
 
-namespace YayWholesaleB2B\Helpers;
+namespace YayWholesaleB2B\ProEngine\Helpers;
 
-use Exception;
+use YayWholesaleB2B\Helpers\SettingsHelper;
 
 /**
  * Payment Gateway Helper

@@ -28,8 +28,6 @@ class Initialize {
         \YayWholesaleB2B\Engine\Frontend\Tax::get_instance();
         \YayWholesaleB2B\Engine\Frontend\RequestForm::get_instance();
         \YayWholesaleB2B\Engine\Frontend\Requirement::get_instance();
-        \YayWholesaleB2B\Engine\Frontend\PaymentGateway::get_instance();
-        \YayWholesaleB2B\Engine\Frontend\ShippingMethod::get_instance();
         \YayWholesaleB2B\Engine\Support\Support::get_instance();
     }
 }

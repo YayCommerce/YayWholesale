@@ -1,8 +1,7 @@
 <?php
 namespace YayWholesaleB2B\Engine\Admin;
 
-use YayWholesaleB2B\Helpers\HooksHelper;
-use YayWholesaleB2B\Helpers\RolesHelper;
+use YayWholesaleB2B\Helpers\CustomerHelper;
 use YayWholesaleB2B\Helpers\SettingsHelper;
 use YayWholesaleB2B\Helpers\PricingHelper;
 use YayWholesaleB2B\Utils\SingletonTrait;
@@ -16,7 +15,12 @@ defined( 'ABSPATH' ) || exit;
 class Orders {
     use SingletonTrait;
 
+    protected $is_processing_order_calc;
+
     protected function __construct() {
+
+        $this->is_processing_order_calc = false;
+
         add_action( 'woocommerce_order_before_calculate_totals', [ $this, 'ywhs_before_calculate_order' ], 999, 2 );
 
         add_filter( 'woocommerce_order_is_vat_exempt', [ $this, 'ywhs_tax_enabled_handler' ], 999, 2 );
@@ -39,9 +43,15 @@ class Orders {
      * @param WC_Order|WC_Order_Refund $order The order object.
      */
     public function ywhs_before_calculate_order( $and_taxes, $order ) {
+        if ( $this->is_processing_order_calc ) {
+            return;
+        }
+
+        $this->is_processing_order_calc = true;
+
         if ( $order instanceof \WC_Order ) {
-            $customer_id        = $order->get_customer_id();
-            $wholesale_role     = RolesHelper::is_wholesale_user( $customer_id );
+            $customer           = get_user_by( 'ID', $order->get_customer_id() );
+            $wholesale_role     = CustomerHelper::get_wholesale_role( $customer );
             $setting            = SettingsHelper::get_settings();
             $is_disabled_coupon = $setting['general']['disable_coupon'] ?? false;
             $items              = [];
@@ -69,6 +79,8 @@ class Orders {
         if ( isset( $_SERVER['REQUEST_METHOD'] ) && 'POST' === $_SERVER['REQUEST_METHOD'] ) {
             PricingHelper::handle_order( $order, $wholesale_role, $is_discounted );
         }
+
+        $this->is_processing_order_calc = false;
     }//end ywhs_before_calculate_order()
 
     /**
@@ -82,8 +94,8 @@ class Orders {
             return $is_exempt;
         }
 
-        $customer_id     = $order->get_customer_id();
-        $wholesale_role  = RolesHelper::is_wholesale_user( $customer_id );
+        $customer        = get_user_by( 'ID', $order->get_customer_id() );
+        $wholesale_role  = CustomerHelper::get_wholesale_role( $customer );
         $setting         = SettingsHelper::get_settings();
         $is_disabled_tax = $setting['general']['disable_tax'] ?? false;
 
@@ -133,15 +145,16 @@ class Orders {
             if ( is_admin() ) {
                 $extra = $extra_price_map[ $item->get_id() ] ?? 0;
 
-                $init_price = $product->get_price( 'edit' );
+                $init_price = $product->get_price();
                 $price      = apply_filters( 'ywhs_convert_price_from_order', $init_price, $order, false );
 
-                $price     = wc_get_price_excluding_tax( $product, [ 'price' => $price ] );
                 $new_price = $price + $extra;
 
                 if ( $is_discounted ) {
                     $new_price = PricingHelper::calc_discounted_price( $new_price, $wholesale_role, $product, $extra, $order );
                 }
+
+                $new_price = wc_get_price_excluding_tax( $product, [ 'price' => $new_price ] );
 
                 $item->set_subtotal( $new_price * $quantity );
                 $item->set_total( $new_price * $quantity );
@@ -157,7 +170,6 @@ class Orders {
 
         $order->remove_order_items( 'coupon' );
         if ( ! $is_discounted || ! $is_disabled_coupon ) {
-            remove_action( 'woocommerce_order_before_calculate_totals', [ $this, 'ywhs_before_calculate_order' ] );
             foreach ( $coupons as $coupon_item ) {
                 /** @var WC_Order_Item_Coupon $coupon_item */
 
@@ -165,7 +177,6 @@ class Orders {
                 $order->apply_coupon( $code );
 
             }
-            add_action( 'woocommerce_order_before_calculate_totals', [ $this, 'ywhs_before_calculate_order' ], 999, 2 );
         }
     }//end calculate_price_of_items()
 

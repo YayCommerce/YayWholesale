@@ -1,8 +1,9 @@
 <?php
 
-namespace YayWholesaleB2B\Helpers;
+namespace YayWholesaleB2B\ProEngine\Helpers;
 
 use WC_Shipping_Zones;
+use YayWholesaleB2B\Helpers\SettingsHelper;
 
 /**
  * Shipping Helper

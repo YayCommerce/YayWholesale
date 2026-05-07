@@ -68,39 +68,6 @@ class RolesHelper {
     }
 
     /**
-     * Check if the user is a wholesale user.
-     *
-     * @param int $user_id The user ID.
-     * @return array|null The user role or null if not found.
-     */
-    public static function is_wholesale_user( int $user_id = 0 ) {
-        if ( ! is_user_logged_in() ) {
-            return null;
-        }
-
-        $roles          = get_option( 'yaywholesaleb2b_roles', [] );
-        $user           = $user_id > 0 ? get_user_by( 'ID', $user_id ) : wp_get_current_user();
-        $user_role_slug = self::get_user_wholesale_role( $user, $roles );
-        if ( ! $user_role_slug ) {
-            return null;
-        }
-
-        $role = self::get_role_by_slug( $roles, $user_role_slug );
-        if ( ! $role || ! isset( $role['status'] ) || ! $role['status'] ) {
-            return null;
-        }
-
-        // Handle price (Compatible to other price-related plugins)
-        $role['minOrderAmount'] = apply_filters( 'ywhs_price_handle_processed', $role['minOrderAmount'] );
-
-        if ( ! Utils::is_pro() ) {
-            $role['minOrderQuantity'] = 0;
-        }
-
-        return $role;
-    }
-
-    /**
      * Generate a unique role slug.
      *
      * @param string  $name The role name.
@@ -142,30 +109,6 @@ class RolesHelper {
      */
     public static function get_role_by_slug( array $roles, string $slug ): ?array {
         return array_values( array_filter( $roles, fn( $role ) => isset( $role['slug'] ) && $role['slug'] === $slug ) )[0] ?? null;
-    }
-
-    /**
-     * Get the wholesale role slug for the current user.
-     *
-     * @param \WP_User $user The user object.
-     * @param array[]  $roles The roles array.
-     * @return string|null The wholesale role slug or null if not found.
-     */
-    public static function get_user_wholesale_role( \WP_User $user, array $roles ): ?string {
-        $meta_slug = get_user_meta( $user->ID, '_yaywholesaleb2b_role', true );
-        if ( $meta_slug ) {
-            return sanitize_title( $meta_slug );
-        }
-
-        // Fallback to WP role if slug matches
-        foreach ( $user->roles as $wp_role ) {
-            $role = self::get_role_by_slug( $roles, $wp_role );
-            if ( $role ) {
-                return $role['slug'];
-            }
-        }
-
-        return null;
     }
 
     /**

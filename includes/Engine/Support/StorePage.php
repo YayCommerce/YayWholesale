@@ -1,6 +1,7 @@
 <?php
 namespace YayWholesaleB2B\Engine\Support;
 
+use YayWholesaleB2B\Helpers\CustomerHelper;
 use YayWholesaleB2B\Helpers\RolesHelper;
 use YayWholesaleB2B\Helpers\SettingsHelper;
 use YayWholesaleB2B\Helpers\SupportHelper;
@@ -58,7 +59,7 @@ class StorePage {
             return $template;
         }
 
-        $wholesale_role = RolesHelper::is_wholesale_user();
+        $wholesale_role = CustomerHelper::get_current_user_wholesale_role();
         if ( ! isset( $wholesale_role ) ) {
             return $template;
         }
@@ -184,7 +185,7 @@ class StorePage {
             return;
         }
 
-        $wholesale_role = RolesHelper::is_wholesale_user();
+        $wholesale_role = CustomerHelper::get_current_user_wholesale_role();
         if ( ! isset( $wholesale_role ) ) {
             return;
         }
@@ -796,7 +797,7 @@ class StorePage {
      * Handle page redirects.
      */
     public function handle_redirects() {
-        $role = RolesHelper::is_wholesale_user();
+        $role = CustomerHelper::get_current_user_wholesale_role();
 
         if ( SupportHelper::is_using_wc_shop_page( $this->settings ) ) {
             return;
@@ -907,7 +908,7 @@ class StorePage {
         $ywhs_excludes  = [];
         $logged_in      = false;
         $is_wholesaler  = false;
-        $wholesale_role = RolesHelper::is_wholesale_user();
+        $wholesale_role = CustomerHelper::get_current_user_wholesale_role();
 
         if ( is_user_logged_in() ) {
             $logged_in     = true;
@@ -950,11 +951,11 @@ class StorePage {
 
         $current_user        = wp_get_current_user();
         $administrator_roles = $current_user ? array_values( array_intersect( [ 'administrator', 'shop_manager' ], $current_user->roles ) ) : [];
-        $wholesale_role      = RolesHelper::is_wholesale_user();
+        $is_wholesale        = CustomerHelper::is_current_wholesale_customer();
 
         if ( is_user_logged_in() ) {
             $logged_in     = true;
-            $is_wholesaler = isset( $wholesale_role );
+            $is_wholesaler = $is_wholesale;
             $is_shop_admin = ! empty( $administrator_roles );
         }
 

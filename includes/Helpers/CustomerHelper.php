@@ -2,6 +2,7 @@
 namespace YayWholesaleB2B\Helpers;
 
 use YayWholesaleB2B\Helpers\RolesHelper;
+use YayWholesaleB2B\Utils\Utils;
 
 /**
  * Roles Helper Class
@@ -36,10 +37,38 @@ class CustomerHelper {
             $found_role = RolesHelper::get_role_by_slug( $wholesale_roles, $wp_role );
 
             if ( $found_role !== null ) {
+
+                // Handle price (Compatible to other price-related plugins)
+                $found_role['minOrderAmount'] = apply_filters( 'ywhs_price_handle_processed', $found_role['minOrderAmount'], null );
+
+                if ( ! Utils::is_pro() ) {
+                    $found_role['minOrderQuantity'] = 0;
+                }
+
                 return $found_role;
             }
         }
 
         return null;
+    }
+
+    /**
+     * Check if the current user is a wholesale customer.
+     *
+     * @return boolean The user object.
+     */
+    public static function is_current_wholesale_customer() {
+        $current_user = wp_get_current_user();
+        return self::is_wholesale_customer( $current_user );
+    }
+
+    /**
+     * Get current user's wholesale role config.
+     *
+     * @return array|null
+     */
+    public static function get_current_user_wholesale_role() {
+        $current_user = wp_get_current_user();
+        return self::get_wholesale_role( $current_user );
     }
 }

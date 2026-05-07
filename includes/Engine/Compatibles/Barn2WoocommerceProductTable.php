@@ -9,6 +9,7 @@ use Barn2\Plugin\WC_Product_Table\Template_Handler as WPT_Template_Handler;
 use Barn2\Plugin\WC_Product_Table\Dependencies\Barn2\Table_Generator\Database\Query;
 use Barn2\Plugin\WC_Product_Table\Util\Settings;
 use Barn2\Plugin\WC_Product_Table\Admin\Table_Generator\Table_Generator;
+use YayWholesaleB2B\Helpers\CustomerHelper;
 use YayWholesaleB2B\Helpers\RolesHelper;
 use YayWholesaleB2B\Helpers\SettingsHelper;
 use YayWholesaleB2B\Helpers\SupportHelper;
@@ -138,7 +139,7 @@ class Barn2WoocommerceProductTable {
 
         // check if we are viewing as wholesale type user
 
-        if ( ! RolesHelper::is_wholesale_user() ) {
+        if ( ! CustomerHelper::is_current_wholesale_customer() ) {
             return;
         }
 
@@ -209,7 +210,7 @@ class Barn2WoocommerceProductTable {
             return $purchasable_from_table;
         }
 
-        $wholesale_role = RolesHelper::is_wholesale_user();
+        $wholesale_role = CustomerHelper::get_current_user_wholesale_role();
 
         if ( ! $wholesale_role ) {
             return false;

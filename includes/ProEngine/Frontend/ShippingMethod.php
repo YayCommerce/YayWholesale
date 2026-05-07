@@ -1,10 +1,10 @@
 <?php
-namespace YayWholesaleB2B\Engine\Frontend;
+namespace YayWholesaleB2B\ProEngine\Frontend;
 
+use YayWholesaleB2B\Helpers\CustomerHelper;
 use YayWholesaleB2B\Utils\SingletonTrait;
-use YayWholesaleB2B\Helpers\RolesHelper;
 use YayWholesaleB2B\Helpers\SettingsHelper;
-use YayWholesaleB2B\Helpers\ShippingHelper;
+use YayWholesaleB2B\ProEngine\Helpers\ShippingHelper;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -30,13 +30,13 @@ class ShippingMethod {
             return $rates;
         }
 
-        $is_wholesale = RolesHelper::is_wholesale_user();
+        $wholesale_role = CustomerHelper::get_current_user_wholesale_role();
 
         $zone    = wc_get_shipping_zone( $package );
         $zone_id = $zone->get_id();
 
         $shipping_role_slugs = ShippingHelper::get_shipping_by_role_slug(
-            $is_wholesale ? $is_wholesale['slug'] : SettingsHelper::B2C_ROLE_SLUG,
+            isset( $wholesale_role ) ? $wholesale_role['slug'] : SettingsHelper::B2C_ROLE_SLUG,
             $zone_id
         );
 

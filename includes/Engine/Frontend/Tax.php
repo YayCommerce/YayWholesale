@@ -1,8 +1,8 @@
 <?php
 namespace YayWholesaleB2B\Engine\Frontend;
 
+use YayWholesaleB2B\Helpers\CustomerHelper;
 use YayWholesaleB2B\Utils\SingletonTrait;
-use YayWholesaleB2B\Helpers\RolesHelper;
 use YayWholesaleB2B\Helpers\SettingsHelper;
 use YayWholesaleB2B\Helpers\PricingHelper;
 
@@ -37,16 +37,16 @@ class Tax {
             return;
         }
 
-        $is_wholesale = RolesHelper::is_wholesale_user();
+        $wholesale_role = CustomerHelper::get_current_user_wholesale_role();
 
         // If not wholesale user, always set exempt to false.
-        if ( ! $is_wholesale ) {
+        if ( ! $wholesale_role ) {
             WC()->customer->set_is_vat_exempt( false );
             return;
         }
 
         // If wholesale user + setting disable_tax = true => exempt tax.
-        if ( $this->disable_tax && PricingHelper::meets_discount_conditions( $is_wholesale ) ) {
+        if ( $this->disable_tax && PricingHelper::meets_discount_conditions( $wholesale_role ) ) {
             WC()->customer->set_is_vat_exempt( true );
         } else {
             WC()->customer->set_is_vat_exempt( false );
@@ -69,13 +69,13 @@ class Tax {
             return $pre_option;
         }
 
-        $is_wholesale = RolesHelper::is_wholesale_user();
+        $wholesale_role = CustomerHelper::get_current_user_wholesale_role();
 
-        if ( isset( $is_wholesale ) && $this->disable_tax && PricingHelper::meets_discount_conditions( $is_wholesale ) ) {
+        if ( isset( $wholesale_role ) && $this->disable_tax && PricingHelper::meets_discount_conditions( $wholesale_role ) ) {
             return 'excl';
         }
 
-        if ( isset( $is_wholesale ) && 'inherit' !== $this->tax_display_mode ) {
+        if ( isset( $wholesale_role ) && 'inherit' !== $this->tax_display_mode ) {
             return $this->tax_display_mode;
         }
 
@@ -94,9 +94,9 @@ class Tax {
             return $taxes;
         }
 
-        $is_wholesale = RolesHelper::is_wholesale_user();
+        $wholesale_role = CustomerHelper::get_current_user_wholesale_role();
 
-        if ( $is_wholesale && $this->disable_tax && PricingHelper::meets_discount_conditions( $is_wholesale ) ) {
+        if ( $wholesale_role && $this->disable_tax && PricingHelper::meets_discount_conditions( $wholesale_role ) ) {
             return [];
         }
 
