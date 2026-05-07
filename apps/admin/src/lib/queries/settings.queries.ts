@@ -8,7 +8,11 @@ import type { Settings } from '@/lib/schema/settings.schema';
 const SETTINGS_QUERIES = {
   main: queryOptions({
     queryKey: ['settings', 'main'],
-    queryFn: () => getSettings(),
+    queryFn: async () => {
+      const settings = await getSettings();
+      window.yayWholesaleB2BAdmin.settings = settings;
+      return settings;
+    },
     initialData: window.yayWholesaleB2BAdmin.settings,
     staleTime: Infinity,
   }),

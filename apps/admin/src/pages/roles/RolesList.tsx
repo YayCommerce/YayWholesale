@@ -12,11 +12,14 @@ import { useNavigate } from 'react-router-dom';
 import { Spinner } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 
+import { getErrorMsg } from '@/lib/helpers/response.helper';
 import {
   useAllRolesQuery,
+  useBulkDeleteRolesMutation,
   useBulkUpdateRoleStatusMutation,
-  useDeleteManyRolesMutation,
+  useIsMutatingRoles,
 } from '@/lib/queries/roles.queries';
+import { Role } from '@/lib/schema/roles.schema';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { BulkActionBox } from '@/components/ui/bulk-actions';
@@ -41,66 +44,75 @@ import {
 import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group';
 import { Pagination } from '@/components/ui/pagination';
 import { Separator } from '@/components/ui/separator';
+import { toast } from '@/components/ui/sonner';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import DeleteIcon from '@/components/icons/DeleteIcon';
-import { RolesColumn } from './roles-table/RolesColumn';
+import { isDefaultRole } from './roles.helper';
+import { roleColumns } from './RolesList/RolesColumns';
 
 export default function RolesList() {
   const navigate = useNavigate();
   const { data, isLoading: isLoadingRoles, isFetching: isFetchingRoles } = useAllRolesQuery();
   const queryClient = useQueryClient();
 
-  const { mutate: deleteManyRolesByIds, isPending: isDeletingManyRolesPending } = useDeleteManyRolesMutation();
-  const { mutate: bulkUpdateRoleStatus, isPending: isBulkUpdatingRoleStatusPending } =
-    useBulkUpdateRoleStatusMutation();
+  const bulkDeleteRolesMutation = useBulkDeleteRolesMutation();
+  const bulkUpdateRoleStatusMutation = useBulkUpdateRoleStatusMutation();
+  const isMutating = useIsMutatingRoles();
 
   const roles = useMemo(() => (data ? [...data].reverse() : []), [data]);
   const [search, setSearch] = useState('');
   const [openBulkDeleteDialog, setOpenDeleteDialog] = useState(false);
   const filteredData = useMemo(
     () =>
-      roles
-        .filter(
-          (role) =>
-            role.name.toLowerCase().includes(search.toLowerCase()) ||
-            (role.description?.toLowerCase().includes(search.toLowerCase()) ?? false),
-        )
-        .map((role) => ({ ...role, count: role.count ?? 0 })),
+      roles.filter(
+        (role) =>
+          role.name.toLowerCase().includes(search.toLowerCase()) ||
+          (role.description?.toLowerCase().includes(search.toLowerCase()) ?? false),
+      ),
     [roles, search],
   );
 
   const totalCount = useMemo(() => filteredData.length, [filteredData]);
 
-  const columns = RolesColumn;
-
-  const table = useReactTable({
+  const table = useReactTable<Role>({
     data: filteredData,
-    columns,
+    columns: roleColumns,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
-    enableRowSelection: (row) => !row.original.isDefault,
+    enableRowSelection: (row) => !isDefaultRole(row.original),
   });
 
-  const selectedCount = table.getFilteredSelectedRowModel().rows.length;
-  const selectedRowsIds = useMemo(
-    () => table.getSelectedRowModel().rows.map((row) => row.original.id),
-    [selectedCount],
-  );
+  async function handleBulkDelete() {
+    const roleIds = table.getSelectedRowModel().rows.map((row) => row.original.id);
+    if (roleIds.length === 0 || isMutating > 0) return;
 
-  const clearSelection = () => {
-    table.resetRowSelection();
-  };
+    try {
+      await bulkDeleteRolesMutation.mutateAsync(roleIds);
+      table.resetRowSelection();
+    } catch (error) {
+      toast.error(await getErrorMsg(error));
+    } finally {
+      setOpenDeleteDialog(false);
+    }
+  }
 
-  const handleBulkDelete = () => {
-    if (isDeletingManyRolesPending || isBulkUpdatingRoleStatusPending || isFetchingRoles) return;
-    deleteManyRolesByIds(selectedRowsIds, {
-      onSuccess: () => {
-        clearSelection();
-      },
-    });
-    setOpenDeleteDialog(false);
-  };
+  async function handleBulkUpdateStatus(status: boolean) {
+    const roleIds = table.getSelectedRowModel().rows.map((row) => row.original.id);
+    if (roleIds.length === 0 || isMutating > 0) return;
+
+    try {
+      await bulkUpdateRoleStatusMutation.mutateAsync({
+        ids: roleIds,
+        status,
+      });
+      table.resetRowSelection();
+    } catch (error) {
+      toast.error(await getErrorMsg(error));
+    }
+  }
+
+  const selectedCount = table.getSelectedRowModel().rows.length;
 
   return (
     <Card className="gap-4 shadow-sm">
@@ -126,7 +138,7 @@ export default function RolesList() {
             />
           )}
         </div>
-        <div className="flex flex-1 flex-col-reverse flex-nowrap items-end gap-4 sm:flex-row sm:items-center">
+        <div className="flex flex-1 flex-col-reverse flex-nowrap items-end justify-end gap-4 sm:flex-row sm:items-center">
           {roles.length > 10 && (
             <InputGroup className="w-full sm:w-80">
               <InputGroupInput
@@ -154,11 +166,11 @@ export default function RolesList() {
       <div
         className={cn(
           'relative overflow-x-auto rounded-lg border',
-          (isDeletingManyRolesPending || isBulkUpdatingRoleStatusPending) && 'relative opacity-50',
+          (bulkDeleteRolesMutation.isPending || bulkUpdateRoleStatusMutation.isPending) && 'relative opacity-50',
         )}
       >
         {/* Overlay Spinner */}
-        {(isDeletingManyRolesPending || isBulkUpdatingRoleStatusPending) && (
+        {(bulkDeleteRolesMutation.isPending || bulkUpdateRoleStatusMutation.isPending) && (
           <div className="absolute inset-0 z-50 flex items-center justify-center">
             <Spinner className="text-muted-foreground size-6 animate-spin" />
           </div>
@@ -245,35 +257,10 @@ export default function RolesList() {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="start" sideOffset={9} className="w-fit min-w-[20px] p-1">
-                <DropdownMenuItem
-                  onClick={() => {
-                    if (isDeletingManyRolesPending || isBulkUpdatingRoleStatusPending || isFetchingRoles) return;
-                    bulkUpdateRoleStatus(
-                      { ids: selectedRowsIds, status: true },
-                      {
-                        onSuccess: () => {
-                          clearSelection();
-                        },
-                      },
-                    );
-                  }}
-                >
+                <DropdownMenuItem onClick={() => handleBulkUpdateStatus(true)}>
                   {__('Active', 'yay-wholesale-b2b')}
                 </DropdownMenuItem>
-
-                <DropdownMenuItem
-                  onClick={() => {
-                    if (isDeletingManyRolesPending || isBulkUpdatingRoleStatusPending || isFetchingRoles) return;
-                    bulkUpdateRoleStatus(
-                      { ids: selectedRowsIds, status: false },
-                      {
-                        onSuccess: () => {
-                          clearSelection();
-                        },
-                      },
-                    );
-                  }}
-                >
+                <DropdownMenuItem onClick={() => handleBulkUpdateStatus(false)}>
                   {__('Inactive', 'yay-wholesale-b2b')}
                 </DropdownMenuItem>
               </DropdownMenuContent>

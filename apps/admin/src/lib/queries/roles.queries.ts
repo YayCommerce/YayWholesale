@@ -52,10 +52,10 @@ export function useRoleQuery(roleId: number) {
   });
 }
 
-export function useUserCountByRoleQuery(roleId: number) {
+export function useUserCountByRoleQuery(roleSlug: string) {
   return useQuery({
     ...ROLES_QUERIES.userCountByRole,
-    select: (data) => data[roleId] ?? 0,
+    select: (data) => data[roleSlug] ?? 0,
   });
 }
 
@@ -88,9 +88,10 @@ export function useUpdateRoleStatusMutation(roleId: number) {
     mutationFn: (status: boolean) => updateRoleStatus(roleId, status),
 
     onMutate: (status) => {
-      const previous = window.yayWholesaleB2BAdmin.roles;
-      const next = previous.map((role) => (role.id === roleId ? { ...role, status } : role));
+      const previous = queryClient.getQueryData(ROLES_QUERIES.all.queryKey);
+      if (!previous) return;
 
+      const next = previous.map((role) => (role.id === roleId ? { ...role, status } : role));
       window.yayWholesaleB2BAdmin.roles = next;
       queryClient.setQueryData(ROLES_QUERIES.all.queryKey, next); // Optimistic
 
@@ -142,8 +143,4 @@ export function useBulkUpdateRoleStatusMutation() {
 
 export function useIsMutatingRoles() {
   return useIsMutating({ mutationKey: ['roles'] });
-}
-
-export function useIsMutatingRole(roleId: number) {
-  return useIsMutating({ mutationKey: ['roles', roleId] });
 }
