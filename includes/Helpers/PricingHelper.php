@@ -92,24 +92,27 @@ class PricingHelper {
 
         $apply_to_sale = $role['applyToSalePrice'] ?? false;
         $regular       = (float) $product->get_regular_price();
-        $sale          = (float) $product->get_sale_price( 'edit' );
+        $sale          = (float) $product->get_sale_price();
 
         if ( isset( $order ) ) {
+            $regular = (float) $product->get_regular_price( 'edit' );
+            $sale    = (float) $product->get_sale_price( 'edit' );
+
             $regular = apply_filters( 'ywhs_convert_price_from_order', $regular, $order, false );
             $sale    = apply_filters( 'ywhs_convert_price_from_order', $sale, $order, false );
         }
 
-        if ( $sale > 0 ) {
-            $sale = floatval( $price );
-        } else {
-            $regular = floatval( $price );
-        }
+        // if ( $sale > 0 ) {
+        // $sale = floatval( $price );
+        // } else {
+        // $regular = floatval( $price );
+        // }
 
         $base = ( $apply_to_sale && $sale > 0 ) ? $sale : $regular;
 
         $new = max( 0, ( $base + $extra ) * ( 1 - $discount ) );
 
-        return wc_format_decimal( $new, wc_get_price_decimals() );
+        return (float) wc_format_decimal( $new, wc_get_price_decimals() );
     }
 
     /**
