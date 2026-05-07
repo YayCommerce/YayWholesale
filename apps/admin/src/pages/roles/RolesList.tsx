@@ -13,9 +13,9 @@ import { Spinner } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 
 import {
+  useAllRolesQuery,
   useBulkUpdateRoleStatusMutation,
   useDeleteManyRolesMutation,
-  useRolesQuery,
 } from '@/lib/queries/roles.queries';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
@@ -47,7 +47,7 @@ import { RolesColumn } from './roles-table/RolesColumn';
 
 export default function RolesList() {
   const navigate = useNavigate();
-  const { data, isLoading: isLoadingRoles, isFetching: isFetchingRoles } = useRolesQuery();
+  const { data, isLoading: isLoadingRoles, isFetching: isFetchingRoles } = useAllRolesQuery();
   const queryClient = useQueryClient();
 
   const { mutate: deleteManyRolesByIds, isPending: isDeletingManyRolesPending } = useDeleteManyRolesMutation();

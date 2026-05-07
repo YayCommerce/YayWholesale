@@ -8,6 +8,8 @@ use YayWholesaleB2B\ProEngine\Helpers\PaymentGatewayHelper;
 
 defined( 'ABSPATH' ) || exit;
 
+// TODO: move file to YayWholesaleB2B\Pro\Engine\Frontend
+
 /**
  * Payment Method Engine — Role-based Restrict Payment .
  */

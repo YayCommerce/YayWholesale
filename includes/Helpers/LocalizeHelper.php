@@ -25,6 +25,8 @@ class LocalizeHelper {
             'valid_wholesale_store_pages' => $pages,
         ];
 
+        // TODO: Filter for Pro
+
         return $admin_data;
     }
 

@@ -15,7 +15,7 @@ class SettingsHelper {
      *
      * @return array The settings.
      */
-    public static function get_settings( $is_fetch_all = false ): array {
+    public static function get_settings(): array {
 
         $data = [
             'general'             => [
@@ -106,11 +106,6 @@ class SettingsHelper {
                 $setting['general']['wholesale_store_page'] = 'inherit';
                 update_option( 'yaywholesaleb2b_settings', $setting );
             }
-        }
-
-        if ( $is_fetch_all ) {
-            $setting['payment_roles']  = PaymentGatewayHelper::get_payment_roles_setting();
-            $setting['shipping_roles'] = ShippingHelper::get_shipping_roles_setting();
         }
 
         return $setting;

@@ -20,6 +20,13 @@ const fieldSchema = z.object({
   isHidden: z.boolean(),
 });
 
+/** TODO: new schema */
+const enableByRoleSchema = z.object({
+  enableForRetail: z.boolean(),
+  enableForWholesale: z.boolean(),
+  enableForWholesaleRoles: z.array(z.string()), // array of slug
+});
+
 const roleRelatedSettingSchema = z.object({
   slug: z.string(),
   name: z.string(),

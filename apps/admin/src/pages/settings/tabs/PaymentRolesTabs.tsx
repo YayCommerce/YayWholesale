@@ -5,7 +5,7 @@ import { InfoIcon, WalletCards } from 'lucide-react';
 import { useFieldArray, useFormContext } from 'react-hook-form';
 import { __ } from '@wordpress/i18n';
 
-import { useRolesQuery } from '@/lib/queries/roles.queries';
+import { useAllRolesQuery } from '@/lib/queries/roles.queries';
 import { RoleRelatedSetting, Settings } from '@/lib/schema/settings.schema';
 import { cn } from '@/lib/utils';
 import { useUncontrolled } from '@/hooks/useUncontrolled';
