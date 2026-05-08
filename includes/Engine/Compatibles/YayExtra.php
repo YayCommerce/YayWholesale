@@ -3,7 +3,6 @@ namespace YayWholesaleB2B\Engine\Compatibles;
 
 use WC_Tax;
 use YayWholesaleB2B\Helpers\CustomerHelper;
-use YayWholesaleB2B\Helpers\PricingHelper;
 use YayWholesaleB2B\Utils\SingletonTrait;
 
 defined( 'ABSPATH' ) || exit;

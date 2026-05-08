@@ -6,7 +6,9 @@ use YayWholesaleB2B\Utils\SingletonTrait;
 use Yay_Currency\Helpers\YayCurrencyHelper;
 use Yay_Currency\Helpers\SupportHelper;
 use YayWholesaleB2B\Helpers\CustomerHelper;
-use YayWholesaleB2B\Helpers\PricingHelper;
+use YayWholesaleB2B\Helpers\PricingHelpers\ShopPricingHelper;
+use YayWholesaleB2B\Helpers\RequirementHelper;
+use YayWholesaleB2B\Utils\Utils;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -25,7 +27,7 @@ class YayCurrency {
         }
 
         // LITE
-        add_filter( 'ywhs_price_handle_processed', [ $this, 'convert_currency_price' ], 10, 1 );
+        add_filter( 'ywhs_price_handle_processed', [ $this, 'convert_currency_price' ], 10, 2 );
         add_filter( 'ywhs_product_price_ajax_handled', [ $this, 'product_price_ajax_handle' ], 10, 3 );
         add_filter( 'ywhs_ajax_using_default_currency', [ $this, 'is_using_default_price' ], 10, 1 );
         add_filter( 'ywhs_get_currency_by_third_party', [ $this, 'get_currency' ], 10, 1 );
@@ -67,12 +69,12 @@ class YayCurrency {
     }
 
     /* Convert the final price with YayCurrency */
-    public function convert_currency_price( $price ) {
+    public function convert_currency_price( $price, $product ) {
         if ( ! defined( 'YAY_CURRENCY_VERSION' ) ) {
             return $price;
         }
 
-        if ( is_checkout() || self::is_checkout_blocks() ) {
+        if ( is_checkout() || Utils::is_checkout_blocks() ) {
             $current_currency = YayCurrencyHelper::detect_current_currency();
 
             if ( YayCurrencyHelper::is_dis_checkout_diff_currency( $current_currency ) ) {
@@ -207,8 +209,8 @@ class YayCurrency {
 
         $calculate_product_price = $product->get_price( 'edit' );
 
-        if ( PricingHelper::meets_discount_conditions( $wholesale_role ) ) {
-            $calculate_product_price = PricingHelper::calc_discounted_price( $calculate_product_price, $wholesale_role, $product );
+        if ( RequirementHelper::is_cart_meet_requirement( $wholesale_role ) ) {
+            $calculate_product_price = ShopPricingHelper::calculate_wholesale_price( $calculate_product_price, $product, $wholesale_role );
         }
 
         $regular_price = wc_get_price_to_display(
@@ -242,49 +244,5 @@ class YayCurrency {
 
         $formatted_regular_price = SupportHelper::get_formatted_price( $regular_price, $params );
         return wc_format_sale_price( $formatted_regular_price, $formatted_final_price );
-    }
-
-    /*Woocommerce Checkout Block support */
-    protected static function is_checkout_blocks() {
-
-        // Return false if not rest api request
-        if ( ! self::detect_wc_store_rest_api_doing() ) {
-            return false;
-        }
-
-        // Return true if force country by checkout blocks page
-        if ( 'checkout' === self::get_wc_blocks_page_context() ) {
-            return true;
-        }
-
-        return apply_filters( 'YayCurrency/WooBlocks/IsCheckout', false );
-    }
-
-    protected static function detect_wc_store_rest_api_doing() {
-        if ( ! WC()->is_rest_api_request() ) {
-            return false;
-        }
-
-        if ( ! isset( $GLOBALS['wp']->query_vars['rest_route'] ) || empty( $GLOBALS['wp']->query_vars['rest_route'] ) ) {
-            $rest_route = false;
-        } else {
-            $rest_route = $GLOBALS['wp']->query_vars['rest_route'];
-        }
-
-        return $rest_route && strpos( $rest_route, '/wc/store/' ) === 0;
-    }
-
-    protected static function get_wc_blocks_page_context() {
-        $page_context = '';
-
-        if ( ! self::detect_wc_store_rest_api_doing() ) {
-            return $page_context;
-        }
-
-        if ( isset( $_SERVER['HTTP_YAYCURRENCY_WC_BLOCKS_CONTEXT'] ) ) {
-            $page_context = sanitize_text_field( wp_unslash( $_SERVER['HTTP_YAYCURRENCY_WC_BLOCKS_CONTEXT'] ) );
-        }
-
-        return $page_context;
     }
 }

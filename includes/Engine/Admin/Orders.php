@@ -2,8 +2,9 @@
 namespace YayWholesaleB2B\Engine\Admin;
 
 use YayWholesaleB2B\Helpers\CustomerHelper;
+use YayWholesaleB2B\Helpers\PricingHelpers\OrderPricingHelper;
+use YayWholesaleB2B\Helpers\RequirementHelper;
 use YayWholesaleB2B\Helpers\SettingsHelper;
-use YayWholesaleB2B\Helpers\PricingHelper;
 use YayWholesaleB2B\Utils\SingletonTrait;
 use YayWholesaleB2B\Utils\Utils;
 
@@ -61,10 +62,14 @@ class Orders {
             }
 
             if ( is_admin() ) {
+                // If admin is recalculating, then convert with order
                 $wholesale_role['minOrderAmount'] = apply_filters( 'ywhs_convert_price_from_order', $wholesale_role['minOrderAmount'], $order, false );
+            } else {
+                $wholesale_role['minOrderAmount'] = RequirementHelper::get_min_order_amount( $wholesale_role );
             }
+            $wholesale_role['minOrderQuantity'] = RequirementHelper::get_min_order_quantity( $wholesale_role );
 
-            $is_discounted = PricingHelper::check_is_discounted( $order, $wholesale_role );
+            $is_discounted = RequirementHelper::is_order_meet_requirement( $order, $wholesale_role );
 
             $this->calculate_price_of_items(
                 $order,
@@ -73,13 +78,12 @@ class Orders {
                 $wholesale_role,
                 $items
             );
+
+            // Update meta data for filter
+            if ( isset( $_SERVER['REQUEST_METHOD'] ) && 'POST' === $_SERVER['REQUEST_METHOD'] ) {
+                OrderPricingHelper::handle_order( $order, $wholesale_role, $is_discounted );
+            }
         }//end if
-
-        // Update meta data for filter
-        if ( isset( $_SERVER['REQUEST_METHOD'] ) && 'POST' === $_SERVER['REQUEST_METHOD'] ) {
-            PricingHelper::handle_order( $order, $wholesale_role, $is_discounted );
-        }
-
         $this->is_processing_order_calc = false;
     }//end ywhs_before_calculate_order()
 
@@ -103,7 +107,7 @@ class Orders {
             return $is_exempt;
         }
 
-        $is_discounted = PricingHelper::check_is_discounted( $order, $wholesale_role );
+        $is_discounted = RequirementHelper::is_order_meet_requirement( $order, $wholesale_role );
         if ( $is_discounted && $is_disabled_tax ) {
             return true;
         }
@@ -143,21 +147,27 @@ class Orders {
             $quantity = $item->get_quantity();
             $product  = $item->get_product();
             if ( is_admin() ) {
-                $extra = $extra_price_map[ $item->get_id() ] ?? 0;
+                $extra    = $extra_price_map[ $item->get_id() ] ?? 0;
+                $quantity = $item->get_quantity();
 
-                $init_price = $product->get_price();
-                $price      = apply_filters( 'ywhs_convert_price_from_order', $init_price, $order, false );
+                $apply_to_sale = $wholesale_role['applyToSalePrice'] ?? false;
+                $sale          = (float) $product->get_price( 'edit' );
+                $regular       = (float) $product->get_regular_price( 'edit' );
 
-                $new_price = $price + $extra;
+                $price = ( $apply_to_sale && $sale < $regular ) ? $sale : $regular;
+
+                $price = apply_filters( 'ywhs_convert_price_from_order', $price, $order, false );
 
                 if ( $is_discounted ) {
-                    $new_price = PricingHelper::calc_discounted_price( $new_price, $wholesale_role, $product, $extra, $order );
+                    $price = OrderPricingHelper::calculate_wholesale_price( $price, $extra, $product, $wholesale_role, $quantity );
+                } else {
+                    $price = $price + $extra;
                 }
 
-                $new_price = wc_get_price_excluding_tax( $product, [ 'price' => $new_price ] );
+                $new_price = wc_get_price_excluding_tax( $product, [ 'price' => $price ] );
 
                 $item->set_subtotal( $new_price * $quantity );
-                $item->set_total( $new_price * $quantity );
+                    $item->set_total( $new_price * $quantity );
             }//end if
 
             $items[] = $item->get_name() . ' x ' . $quantity;
@@ -168,14 +178,20 @@ class Orders {
             $shipping->update_meta_data( 'Items', implode( ', ', $items ) );
         }
 
-        $order->remove_order_items( 'coupon' );
-        if ( ! $is_discounted || ! $is_disabled_coupon ) {
-            foreach ( $coupons as $coupon_item ) {
-                /** @var WC_Order_Item_Coupon $coupon_item */
+        if ( is_admin() ) {
+            // Recalculate the tax
+            $order->calculate_taxes();
 
-                $code = $coupon_item->get_code();
-                $order->apply_coupon( $code );
+            // Re-apply coupon
+            $order->remove_order_items( 'coupon' );
+            if ( ! $is_discounted || ! $is_disabled_coupon ) {
+                foreach ( $coupons as $coupon_item ) {
+                    /** @var WC_Order_Item_Coupon $coupon_item */
 
+                    $code = $coupon_item->get_code();
+                    $order->apply_coupon( $code );
+
+                }
             }
         }
     }//end calculate_price_of_items()

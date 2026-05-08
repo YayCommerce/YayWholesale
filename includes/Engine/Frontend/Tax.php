@@ -2,9 +2,10 @@
 namespace YayWholesaleB2B\Engine\Frontend;
 
 use YayWholesaleB2B\Helpers\CustomerHelper;
+use YayWholesaleB2B\Helpers\PricingHelpers\ShopPricingHelper;
+use YayWholesaleB2B\Helpers\RequirementHelper;
 use YayWholesaleB2B\Utils\SingletonTrait;
 use YayWholesaleB2B\Helpers\SettingsHelper;
-use YayWholesaleB2B\Helpers\PricingHelper;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -46,7 +47,7 @@ class Tax {
         }
 
         // If wholesale user + setting disable_tax = true => exempt tax.
-        if ( $this->disable_tax && PricingHelper::meets_discount_conditions( $wholesale_role ) ) {
+        if ( $this->disable_tax && RequirementHelper::is_cart_meet_requirement( $wholesale_role ) ) {
             WC()->customer->set_is_vat_exempt( true );
         } else {
             WC()->customer->set_is_vat_exempt( false );
@@ -71,7 +72,7 @@ class Tax {
 
         $wholesale_role = CustomerHelper::get_current_user_wholesale_role();
 
-        if ( isset( $wholesale_role ) && $this->disable_tax && PricingHelper::meets_discount_conditions( $wholesale_role ) ) {
+        if ( isset( $wholesale_role ) && $this->disable_tax && RequirementHelper::is_cart_meet_requirement( $wholesale_role ) ) {
             return 'excl';
         }
 
@@ -96,7 +97,7 @@ class Tax {
 
         $wholesale_role = CustomerHelper::get_current_user_wholesale_role();
 
-        if ( $wholesale_role && $this->disable_tax && PricingHelper::meets_discount_conditions( $wholesale_role ) ) {
+        if ( $wholesale_role && $this->disable_tax && RequirementHelper::is_cart_meet_requirement( $wholesale_role ) ) {
             return [];
         }
 

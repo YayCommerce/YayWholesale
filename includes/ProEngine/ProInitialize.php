@@ -2,6 +2,7 @@
 namespace YayWholesaleB2B\ProEngine;
 
 use YayWholesaleB2B\ProEngine\Frontend\PaymentGateway;
+use YayWholesaleB2B\ProEngine\Frontend\Requirement;
 use YayWholesaleB2B\ProEngine\Frontend\ShippingMethod;
 use YayWholesaleB2B\Utils\SingletonTrait;
 
@@ -18,5 +19,6 @@ class ProInitialize {
     protected function __construct() {
         PaymentGateway::get_instance();
         ShippingMethod::get_instance();
+        Requirement::get_instance();
     }
 }

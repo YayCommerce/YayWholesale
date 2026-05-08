@@ -13,17 +13,19 @@
 if ( ! defined( 'ABSPATH' ) ) exit;
 
 use YayWholesaleB2B\Helpers\CustomerHelper;
+use YayWholesaleB2B\Helpers\RequirementHelper;
 
 $ywhs_wholesale = CustomerHelper::get_current_user_wholesale_role();
 
-if ($ywhs_wholesale) {
-	$is_hidden_quantity = 0 == $ywhs_wholesale['minOrderQuantity'];
-    $is_hidden_amount   = 0 == $ywhs_wholesale['minOrderAmount'];
-}
+$ywhs_wholesale['minOrderQuantity'] = RequirementHelper::get_min_order_quantity($ywhs_wholesale);
+$ywhs_wholesale['minOrderAmount'] = RequirementHelper::get_min_order_amount($ywhs_wholesale);
 
- wp_interactivity_config(
-    'ywhs_wholesale_requirement',
-    [
+$is_hidden_quantity = 0 === $ywhs_wholesale['minOrderQuantity'];
+$is_hidden_amount   = 0.0 == $ywhs_wholesale['minOrderAmount'];
+
+wp_interactivity_config(
+  'ywhs_wholesale_requirement',
+	[
 		'wholesale'     => $ywhs_wholesale,
 		'admin_url' => admin_url('admin-ajax.php'),
 		'rest_nonce' => wp_create_nonce( 'wp_rest' ),
@@ -31,8 +33,8 @@ if ($ywhs_wholesale) {
 		'is_using_defaut_currency' => apply_filters("ywhs_ajax_using_default_currency", false),
 		'currency' => get_woocommerce_currency(),
 		'nonce' => wp_create_nonce("get_original_price_in_cart"),
-    ]
-    );
+  ]
+);
 
 ?>
 <?php if ($ywhs_wholesale
