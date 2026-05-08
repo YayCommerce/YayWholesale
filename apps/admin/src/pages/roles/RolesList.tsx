@@ -1,5 +1,4 @@
 import { useMemo, useState } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
 import {
   flexRender,
   getCoreRowModel,
@@ -7,9 +6,8 @@ import {
   getPaginationRowModel,
   useReactTable,
 } from '@tanstack/react-table';
-import { ChevronsUpDown, Plus, Search } from 'lucide-react';
+import { ChevronsUpDown, Loader2, Plus, Search } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { Spinner } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 
 import { getErrorMsg } from '@/lib/helpers/response.helper';
@@ -52,31 +50,30 @@ import { roleColumns } from './RolesList/RolesColumns';
 
 export default function RolesList() {
   const navigate = useNavigate();
-  const { data, isLoading: isLoadingRoles, isFetching: isFetchingRoles } = useAllRolesQuery();
-  const queryClient = useQueryClient();
-
+  const { data: allRoles } = useAllRolesQuery();
   const bulkDeleteRolesMutation = useBulkDeleteRolesMutation();
   const bulkUpdateRoleStatusMutation = useBulkUpdateRoleStatusMutation();
   const isMutating = useIsMutatingRoles();
 
-  const roles = useMemo(() => (data ? [...data].reverse() : []), [data]);
   const [search, setSearch] = useState('');
   const [openBulkDeleteDialog, setOpenDeleteDialog] = useState(false);
-  const filteredData = useMemo(
-    () =>
-      roles.filter(
-        (role) =>
-          role.name.toLowerCase().includes(search.toLowerCase()) ||
-          (role.description?.toLowerCase().includes(search.toLowerCase()) ?? false),
-      ),
-    [roles, search],
-  );
 
-  const totalCount = useMemo(() => filteredData.length, [filteredData]);
+  const roles = useMemo(() => {
+    // move default role to the top
+    if (!allRoles) return [];
+    const defaultRole = allRoles.find((role) => isDefaultRole(role));
+    const otherRoles = allRoles.filter((role) => !isDefaultRole(role));
+
+    return defaultRole ? [defaultRole, ...otherRoles] : otherRoles;
+  }, [allRoles]);
 
   const table = useReactTable<Role>({
-    data: filteredData,
+    data: roles,
     columns: roleColumns,
+    initialState: {
+      pagination: { pageSize: 2 },
+    },
+    state: { globalFilter: search },
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
@@ -112,6 +109,8 @@ export default function RolesList() {
     }
   }
 
+  const totalCount = roles.length;
+  const filteredCount = table.getFilteredRowModel().rows.length;
   const selectedCount = table.getSelectedRowModel().rows.length;
 
   return (
@@ -120,7 +119,7 @@ export default function RolesList() {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-2">
           <h1 className="text-2xl font-bold">{__('Roles', 'yay-wholesale-b2b')}</h1>
-          {filteredData && totalCount > 0 && (
+          {totalCount > 0 && (
             <WholeSaleToolTip
               trigger={
                 <div>
@@ -139,18 +138,16 @@ export default function RolesList() {
           )}
         </div>
         <div className="flex flex-1 flex-col-reverse flex-nowrap items-end justify-end gap-4 sm:flex-row sm:items-center">
-          {roles.length > 10 && (
-            <InputGroup className="w-full sm:w-80">
-              <InputGroupInput
-                placeholder={__('Search', 'yay-wholesale-b2b')}
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-              />
-              <InputGroupAddon align="inline-end">
-                <Search className="size-4.5 text-[#A0A0A7]" />
-              </InputGroupAddon>
-            </InputGroup>
-          )}
+          <InputGroup className="w-full sm:w-80">
+            <InputGroupInput
+              placeholder={__('Search', 'yay-wholesale-b2b')}
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+            <InputGroupAddon align="inline-end">
+              <Search className="size-4.5 text-[#A0A0A7]" />
+            </InputGroupAddon>
+          </InputGroup>
           <Button
             variant="primary-outline"
             className="hover:bg-primary hover:text-primary-foreground gap-0.25 rounded-sm px-4 leading-0 shadow-xs"
@@ -162,20 +159,12 @@ export default function RolesList() {
         </div>
       </div>
 
-      {/* Table */}
       <div
         className={cn(
           'relative overflow-x-auto rounded-lg border',
           (bulkDeleteRolesMutation.isPending || bulkUpdateRoleStatusMutation.isPending) && 'relative opacity-50',
         )}
       >
-        {/* Overlay Spinner */}
-        {(bulkDeleteRolesMutation.isPending || bulkUpdateRoleStatusMutation.isPending) && (
-          <div className="absolute inset-0 z-50 flex items-center justify-center">
-            <Spinner className="text-muted-foreground size-6 animate-spin" />
-          </div>
-        )}
-
         <Table className="min-w-full">
           <TableHeader className="text-foreground">
             {table.getHeaderGroups().map((headerGroup) => (
@@ -196,45 +185,48 @@ export default function RolesList() {
           </TableHeader>
 
           <TableBody>
-            {isLoadingRoles ? (
+            {totalCount === 0 && (
               <TableRow>
                 <TableCell colSpan={table.getAllColumns().length} className="h-32 text-center align-middle">
                   <div className="flex items-center justify-center gap-2">
-                    <Spinner className="text-muted-foreground size-6 animate-spin" />
+                    {__('Add your first wholesale role to get started.', 'yay-wholesale-b2b')}
                   </div>
                 </TableCell>
               </TableRow>
-            ) : table.getRowModel().rows.length > 0 ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow key={row.id} className="group not-last:border-divider not-last:border-b">
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell
-                      key={cell.id}
-                      className={cn(
-                        cell.column.columnDef.meta?.align === 'center' ? 'text-center' : 'text-left',
-                        cell.column.columnDef.meta?.isCheckbox ? 'w-9' : 'px-3',
-                        cell.column.id === 'actions' && 'm-0 flex w-25 justify-end lg:w-full',
-                        ['select', 'actions', 'status'].indexOf(cell.column.id) < 0 && 'cursor-pointer',
-                      )}
-                      onClick={() => {
-                        if (['select', 'actions', 'status'].indexOf(cell.column.id) < 0) {
-                          queryClient.setQueryData(['role', row.original.id], row.original);
-                          navigate(`/roles/edit/${row.original.id}`);
-                        }
-                      }}
-                    >
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))
-            ) : (
+            )}
+
+            {totalCount > 0 && filteredCount === 0 && (
               <TableRow>
                 <TableCell colSpan={table.getAllColumns().length} className="h-32 text-center align-middle">
-                  {__('No roles found.', 'yay-wholesale-b2b')}
+                  <div className="flex items-center justify-center gap-2">
+                    {__('No roles found matching your search', 'yay-wholesale-b2b')}
+                  </div>
                 </TableCell>
               </TableRow>
             )}
+
+            {table.getRowModel().rows.map((row) => (
+              <TableRow key={row.id} className="group not-last:border-divider not-last:border-b">
+                {row.getVisibleCells().map((cell) => (
+                  <TableCell
+                    key={cell.id}
+                    className={cn(
+                      cell.column.columnDef.meta?.align === 'center' ? 'text-center' : 'text-left',
+                      cell.column.columnDef.meta?.isCheckbox ? 'w-9' : 'px-3',
+                      cell.column.id === 'actions' && 'm-0 flex w-25 justify-end lg:w-full',
+                      ['select', 'actions', 'status'].indexOf(cell.column.id) < 0 && 'cursor-pointer',
+                    )}
+                    onClick={() => {
+                      if (['select', 'actions', 'status'].indexOf(cell.column.id) < 0) {
+                        navigate(`/roles/edit/${row.original.id}`);
+                      }
+                    }}
+                  >
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  </TableCell>
+                ))}
+              </TableRow>
+            ))}
           </TableBody>
         </Table>
       </div>
@@ -252,7 +244,8 @@ export default function RolesList() {
                 <Button variant="ghost" className="hover:text-primary hover:bg-primary/6 group flex gap-1.5 px-2.5">
                   <span className="text-sm font-normal">{__('Status', 'yay-wholesale-b2b')}</span>
                   <span className="group-hover:text-primary text-muted-foreground flex items-center">
-                    <ChevronsUpDown className="size-3.5 stroke-[2.5px]" />
+                    {!bulkUpdateRoleStatusMutation.isPending && <ChevronsUpDown className="size-3.5 stroke-[2.5px]" />}
+                    {bulkUpdateRoleStatusMutation.isPending && <Loader2 className="size-3.5 animate-spin" />}
                   </span>
                 </Button>
               </DropdownMenuTrigger>
@@ -287,10 +280,7 @@ export default function RolesList() {
                     {sprintf(__(`Are you sure you want to delete %d roles ?`, 'yay-wholesale-b2b'), selectedCount)}
                   </DialogTitle>
                   <DialogDescription>
-                    {__(
-                      'This action cannot be undone. This will permanently delete these request and remove data from servers',
-                      'yay-wholesale-b2b',
-                    )}
+                    {__('This action cannot be undone. This will permanently delete these roles', 'yay-wholesale-b2b')}
                   </DialogDescription>
                 </DialogHeader>
                 <DialogFooter>
@@ -298,7 +288,8 @@ export default function RolesList() {
                     <Button variant="outline">{__('Cancel', 'yay-wholesale-b2b')}</Button>
                   </DialogClose>
                   <Button variant="destructive" onClick={() => handleBulkDelete()}>
-                    {__('Continue', 'yay-wholesale-b2b')}
+                    {bulkDeleteRolesMutation.isPending && <Loader2 className="size-4 animate-spin" />}
+                    {__('Delete', 'yay-wholesale-b2b')}
                   </Button>
                 </DialogFooter>
               </DialogContent>
