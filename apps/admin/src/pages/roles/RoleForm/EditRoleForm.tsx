@@ -9,14 +9,7 @@ import { getErrorMsg } from '@/lib/helpers/response.helper';
 import { useIsMutatingRoles, useUpdateRoleMutation } from '@/lib/queries/roles.queries';
 import { Role, RoleFormValues, roleSchema } from '@/lib/schema/roles.schema';
 import { Button } from '@/components/ui/button';
-import {
-  SheetClose,
-  SheetContent,
-  SheetDescription,
-  SheetFooter,
-  SheetHeader,
-  SheetTitle,
-} from '@/components/ui/sheet';
+import { SheetClose, SheetDescription, SheetFooter, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { toast } from '@/components/ui/sonner';
 import RoleFormContent from './RoleFormContent';
 
@@ -67,38 +60,33 @@ export default function EditRoleForm({ role }: { role: Role }) {
         onSubmit={form.handleSubmit(onSubmit, (err) => console.log(err))}
         className="flex h-full flex-col"
       >
-        <SheetContent
-          side="right"
-          className="overflow-x-auto md:m-2.5 md:h-[calc(100%-52px)] md:min-w-[490px] md:rounded-md"
-        >
-          <SheetHeader>
-            <div className="flex items-start justify-between">
-              <div>
-                <SheetTitle className="text-foreground text-[18px] font-semibold">
-                  {__('Edit Role', 'yay-wholesale-b2b')}
-                </SheetTitle>
-                <SheetDescription className="text-muted-foreground mt-[4px] text-sm leading-[20px] font-normal">
-                  {__('Enter the information below to edit wholesale user role', 'yay-wholesale-b2b')}
-                </SheetDescription>
-              </div>
+        <SheetHeader>
+          <div className="flex items-start justify-between">
+            <div>
+              <SheetTitle className="text-foreground text-[18px] font-semibold">
+                {__('Edit Role', 'yay-wholesale-b2b')}
+              </SheetTitle>
+              <SheetDescription className="text-muted-foreground mt-[4px] text-sm leading-[20px] font-normal">
+                {__('Enter the information below to edit wholesale user role', 'yay-wholesale-b2b')}
+              </SheetDescription>
             </div>
-          </SheetHeader>
+          </div>
+        </SheetHeader>
 
-          <RoleFormContent />
+        <RoleFormContent />
 
-          <SheetFooter className="p-0">
-            <div className="border-divider flex justify-end gap-4 border-t bg-white p-5">
-              <SheetClose asChild>
-                <Button variant="outline" className="text-foreground-400 px-4.5">
-                  {__('Cancel', 'yay-wholesale-b2b')}
-                </Button>
-              </SheetClose>
-              <Button type="submit" form="role-form" variant="primary" className="px-5">
-                {__('Save Changes', 'yay-wholesale-b2b')}
+        <SheetFooter className="p-0">
+          <div className="border-divider flex justify-end gap-4 border-t bg-white p-5">
+            <SheetClose asChild>
+              <Button variant="outline" className="text-foreground-400 px-4.5">
+                {__('Cancel', 'yay-wholesale-b2b')}
               </Button>
-            </div>
-          </SheetFooter>
-        </SheetContent>
+            </SheetClose>
+            <Button type="submit" form="role-form" variant="primary" className="px-5">
+              {__('Save Changes', 'yay-wholesale-b2b')}
+            </Button>
+          </div>
+        </SheetFooter>
       </form>
     </FormProvider>
   );

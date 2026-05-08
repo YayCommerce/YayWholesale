@@ -1,7 +1,7 @@
 import { useMatch, useNavigate, useParams } from 'react-router-dom';
 
 import { useRoleQuery } from '@/lib/queries/roles.queries';
-import { Sheet } from '@/components/ui/sheet';
+import { Sheet, SheetContent } from '@/components/ui/sheet';
 import AddRoleForm from './RoleForm/AddRoleForm';
 import EditRoleForm from './RoleForm/EditRoleForm';
 
@@ -23,8 +23,13 @@ export default function RoleForm() {
         if (!open) navigate('/roles');
       }}
     >
-      {isAdding && <AddRoleForm />}
-      {isEditing && editingRole !== null && <EditRoleForm role={editingRole} />}
+      <SheetContent
+        side="right"
+        className="overflow-x-auto md:m-2.5 md:h-[calc(100%-52px)] md:min-w-[490px] md:rounded-md"
+      >
+        {isAdding && <AddRoleForm />}
+        {isEditing && editingRole !== null && <EditRoleForm role={editingRole} />}
+      </SheetContent>
     </Sheet>
   );
 }

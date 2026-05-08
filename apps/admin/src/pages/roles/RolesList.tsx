@@ -6,6 +6,7 @@ import {
   getPaginationRowModel,
   useReactTable,
 } from '@tanstack/react-table';
+import clsx from 'clsx';
 import { ChevronsUpDown, Loader2, Plus, Search } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { __, sprintf } from '@wordpress/i18n';
@@ -67,13 +68,16 @@ export default function RolesList() {
     return defaultRole ? [defaultRole, ...otherRoles] : otherRoles;
   }, [allRoles]);
 
+  const totalCount = roles.length;
+  const enableFilter = totalCount > 10;
+
   const table = useReactTable<Role>({
     data: roles,
     columns: roleColumns,
     initialState: {
-      pagination: { pageSize: 2 },
+      pagination: { pageSize: 10 },
     },
-    state: { globalFilter: search },
+    state: { globalFilter: enableFilter ? search : undefined },
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
@@ -103,13 +107,11 @@ export default function RolesList() {
         ids: roleIds,
         status,
       });
-      table.resetRowSelection();
     } catch (error) {
       toast.error(await getErrorMsg(error));
     }
   }
 
-  const totalCount = roles.length;
   const filteredCount = table.getFilteredRowModel().rows.length;
   const selectedCount = table.getSelectedRowModel().rows.length;
 
@@ -119,35 +121,35 @@ export default function RolesList() {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-2">
           <h1 className="text-2xl font-bold">{__('Roles', 'yay-wholesale-b2b')}</h1>
-          {totalCount > 0 && (
-            <WholeSaleToolTip
-              trigger={
-                <div>
-                  <Badge variant="secondary" className="h-5 min-w-5 px-1 tabular-nums">
-                    {totalCount}
-                  </Badge>
-                </div>
-              }
-              content={
-                totalCount > 1
-                  ? sprintf(__('%d roles in total', 'yay-wholesale-b2b'), totalCount)
-                  : __('1 role in total', 'yay-wholesale-b2b')
-              }
-              side="bottom"
-            />
-          )}
+          <WholeSaleToolTip
+            trigger={
+              <div>
+                <Badge variant="secondary" className="h-5 min-w-5 px-1 tabular-nums">
+                  {totalCount}
+                </Badge>
+              </div>
+            }
+            content={
+              totalCount > 1
+                ? sprintf(__('%d roles in total', 'yay-wholesale-b2b'), totalCount)
+                : sprintf(__('%d role in total', 'yay-wholesale-b2b'), totalCount)
+            }
+            side="bottom"
+          />
         </div>
         <div className="flex flex-1 flex-col-reverse flex-nowrap items-end justify-end gap-4 sm:flex-row sm:items-center">
-          <InputGroup className="w-full sm:w-80">
-            <InputGroupInput
-              placeholder={__('Search', 'yay-wholesale-b2b')}
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-            />
-            <InputGroupAddon align="inline-end">
-              <Search className="size-4.5 text-[#A0A0A7]" />
-            </InputGroupAddon>
-          </InputGroup>
+          {enableFilter && (
+            <InputGroup className="w-full sm:w-80">
+              <InputGroupInput
+                placeholder={__('Search', 'yay-wholesale-b2b')}
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+              />
+              <InputGroupAddon align="inline-end">
+                <Search className="size-4.5 text-[#A0A0A7]" />
+              </InputGroupAddon>
+            </InputGroup>
+          )}
           <Button
             variant="primary-outline"
             className="hover:bg-primary hover:text-primary-foreground gap-0.25 rounded-sm px-4 leading-0 shadow-xs"
@@ -159,12 +161,7 @@ export default function RolesList() {
         </div>
       </div>
 
-      <div
-        className={cn(
-          'relative overflow-x-auto rounded-lg border',
-          (bulkDeleteRolesMutation.isPending || bulkUpdateRoleStatusMutation.isPending) && 'relative opacity-50',
-        )}
-      >
+      <div className="relative overflow-x-auto rounded-lg border">
         <Table className="min-w-full">
           <TableHeader className="text-foreground">
             {table.getHeaderGroups().map((headerGroup) => (
@@ -233,84 +230,78 @@ export default function RolesList() {
 
       {/* Footer */}
 
-      {/* Pagination Footer */}
-      {(table.getPageCount() > 1 || selectedCount > 1) && (
-        <div className="relative flex flex-col items-center gap-3 sm:flex-row">
-          <BulkActionBox selected={selectedCount} onClose={() => table.resetRowSelection()}>
-            <span>{sprintf(__('%d selected', 'yay-wholesale-b2b'), selectedCount)}</span>
-            <Separator orientation="vertical" className="ml-2 h-5!" />
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="hover:text-primary hover:bg-primary/6 group flex gap-1.5 px-2.5">
-                  <span className="text-sm font-normal">{__('Status', 'yay-wholesale-b2b')}</span>
-                  <span className="group-hover:text-primary text-muted-foreground flex items-center">
-                    {!bulkUpdateRoleStatusMutation.isPending && <ChevronsUpDown className="size-3.5 stroke-[2.5px]" />}
-                    {bulkUpdateRoleStatusMutation.isPending && <Loader2 className="size-3.5 animate-spin" />}
-                  </span>
+      <div className="relative flex flex-col items-center gap-3 sm:flex-row">
+        <BulkActionBox selected={selectedCount} onClose={() => table.resetRowSelection()}>
+          <span>{sprintf(__('%d selected', 'yay-wholesale-b2b'), selectedCount)}</span>
+          <Separator orientation="vertical" className="ml-2 h-5!" />
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="hover:text-primary hover:bg-primary/6 group flex gap-1.5 px-2.5">
+                <span className="text-sm font-normal">{__('Status', 'yay-wholesale-b2b')}</span>
+                <span className="group-hover:text-primary text-muted-foreground flex items-center">
+                  {!bulkUpdateRoleStatusMutation.isPending && <ChevronsUpDown className="size-3.5 stroke-[2.5px]" />}
+                  {bulkUpdateRoleStatusMutation.isPending && <Loader2 className="size-3.5 animate-spin" />}
+                </span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" sideOffset={9} className="w-fit min-w-[20px] p-1">
+              <DropdownMenuItem onClick={() => handleBulkUpdateStatus(true)}>
+                {__('Active', 'yay-wholesale-b2b')}
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleBulkUpdateStatus(false)}>
+                {__('Inactive', 'yay-wholesale-b2b')}
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          <span className="border-divider h-5 w-px border-r border-solid" aria-hidden />
+          <Dialog open={openBulkDeleteDialog} onOpenChange={setOpenDeleteDialog}>
+            <WholeSaleToolTip
+              trigger={
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="hover:text-destructive text-muted-foreground h-8 w-8 shrink-0 hover:bg-transparent hover:shadow-sm"
+                  onClick={() => setOpenDeleteDialog(true)}
+                  aria-label="Delete selected"
+                >
+                  <DeleteIcon className="size-4" />
                 </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" sideOffset={9} className="w-fit min-w-[20px] p-1">
-                <DropdownMenuItem onClick={() => handleBulkUpdateStatus(true)}>
-                  {__('Active', 'yay-wholesale-b2b')}
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => handleBulkUpdateStatus(false)}>
-                  {__('Inactive', 'yay-wholesale-b2b')}
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-            <span className="border-divider h-5 w-px border-r border-solid" aria-hidden />
-            <Dialog open={openBulkDeleteDialog} onOpenChange={setOpenDeleteDialog}>
-              <WholeSaleToolTip
-                trigger={
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="hover:text-destructive text-muted-foreground h-8 w-8 shrink-0 hover:bg-transparent hover:shadow-sm"
-                    onClick={() => setOpenDeleteDialog(true)}
-                    aria-label="Delete selected"
-                  >
-                    <DeleteIcon className="size-4" />
-                  </Button>
-                }
-                content={<span>{__('Delete', 'yay-wholesale-b2b')}</span>}
-              />
-              <DialogContent className="bw:max-w-md">
-                <DialogHeader className="bw:border-b-0">
-                  <DialogTitle>
-                    {sprintf(__(`Are you sure you want to delete %d roles ?`, 'yay-wholesale-b2b'), selectedCount)}
-                  </DialogTitle>
-                  <DialogDescription>
-                    {__('This action cannot be undone. This will permanently delete these roles', 'yay-wholesale-b2b')}
-                  </DialogDescription>
-                </DialogHeader>
-                <DialogFooter>
-                  <DialogClose asChild>
-                    <Button variant="outline">{__('Cancel', 'yay-wholesale-b2b')}</Button>
-                  </DialogClose>
-                  <Button variant="destructive" onClick={() => handleBulkDelete()}>
-                    {bulkDeleteRolesMutation.isPending && <Loader2 className="size-4 animate-spin" />}
-                    {__('Delete', 'yay-wholesale-b2b')}
-                  </Button>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
-          </BulkActionBox>
-
-          {/* Right side - Pagination controls */}
-          {table.getPageCount() > 1 && (
-            <Pagination
-              pageIndex={table.getState().pagination.pageIndex}
-              pageCount={table.getPageCount()}
-              onPreviousPage={() => table.previousPage()}
-              onNextPage={() => table.nextPage()}
-              onPageChange={(page) => table.setPageIndex(page)}
-              canPreviousPage={table.getCanPreviousPage()}
-              canNextPage={table.getCanNextPage()}
-              className="sm:ms-auto"
+              }
+              content={<span>{__('Delete', 'yay-wholesale-b2b')}</span>}
             />
-          )}
-        </div>
-      )}
+            <DialogContent className="bw:max-w-md">
+              <DialogHeader className="bw:border-b-0">
+                <DialogTitle>
+                  {sprintf(__(`Are you sure you want to delete %d roles ?`, 'yay-wholesale-b2b'), selectedCount)}
+                </DialogTitle>
+                <DialogDescription>
+                  {__('This action cannot be undone. This will permanently delete these roles', 'yay-wholesale-b2b')}
+                </DialogDescription>
+              </DialogHeader>
+              <DialogFooter>
+                <DialogClose asChild>
+                  <Button variant="outline">{__('Cancel', 'yay-wholesale-b2b')}</Button>
+                </DialogClose>
+                <Button variant="destructive" onClick={() => handleBulkDelete()}>
+                  {bulkDeleteRolesMutation.isPending && <Loader2 className="size-4 animate-spin" />}
+                  {__('Delete', 'yay-wholesale-b2b')}
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        </BulkActionBox>
+
+        <Pagination
+          pageIndex={table.getState().pagination.pageIndex}
+          pageCount={table.getPageCount()}
+          onPreviousPage={() => table.previousPage()}
+          onNextPage={() => table.nextPage()}
+          onPageChange={(page) => table.setPageIndex(page)}
+          canPreviousPage={table.getCanPreviousPage()}
+          canNextPage={table.getCanNextPage()}
+          className={clsx('sm:ms-auto', table.getPageCount() === 0 && 'hidden')}
+        />
+      </div>
     </Card>
   );
 }
