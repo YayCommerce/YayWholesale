@@ -15,12 +15,10 @@ class RequestsHelper {
     public const REQUEST_META_EMAIL        = 'ywhs_request_email';
     public const REQUEST_META_STATUS       = 'ywhs_request_status';
     public const REQUEST_META_MESSAGE      = 'ywhs_request_message';
-    public const REJECTED                  = 'rejected';
-    public const PENDING                   = 'pending';
-    public const APPROVED                  = 'approved';
-    public const ALL                       = 'all';
 
-    protected function __construct() {}
+    public const STATUS_PENDING  = 'pending';
+    public const STATUS_APPROVED = 'approved';
+    public const STATUS_REJECTED = 'rejected';
 
     /**
      * Insert new Wholesale request.
@@ -95,15 +93,17 @@ class RequestsHelper {
     /**
      * Get a list of Wholesale requests.
      *
-     * @param string $filter_key The search keyword .
-     * @param string $status The filtered status .
+     * @param string $search The search keyword .
      * @param int    $page The pagination page.
      * @param int    $per_page The number of items per page.
+     * @param string $status The filtered status .
      * @return array A paginated list of Wholesale requests.
      */
-    public static function get_paginated_request_post( string $filter_key, string $status, int $page, int $per_page ): array {
+    public static function get_paginated_request_post( string $search, int $page, int $per_page, string $status = 'all' ): array {
         $args = [
             'post_type'              => self::REQUEST_POST_TYPE,
+            'posts_per_page'         => $per_page,
+            'paged'                  => $page,
             'update_post_meta_cache' => true,
             'meta_query'             => [
                 'relation'      => 'AND',
@@ -118,32 +118,32 @@ class RequestsHelper {
             ],
         ];
 
-        if ( ! isset( $page ) || ! isset( $per_page ) ) {
-            $args['posts_per_page'] = '-1';
-        } else {
-            $args['posts_per_page'] = $per_page;
-            $args['paged']          = $page;
-        }
-
-        if ( isset( $filter_key ) ) {
+        if ( ! empty( $search ) ) {
             $args['meta_query'][] = [
                 'relation' => 'OR',
                 [
                     'key'     => self::REQUEST_META_DISPLAY_NAME,
-                    'value'   => $filter_key,
+                    'value'   => $search,
                     'compare' => 'LIKE',
                     'type'    => 'CHAR',
                 ],
                 [
                     'key'     => self::REQUEST_META_EMAIL,
-                    'value'   => $filter_key,
+                    'value'   => $search,
                     'compare' => 'LIKE',
                     'type'    => 'CHAR',
                 ],
             ];
         }
 
-        if ( isset( $status ) && ! in_array( $status, [ self::ALL, self::APPROVED ], true ) ) {
+        if ( $status === 'all' || empty( $status ) ) {
+            $args['meta_query'][] = [
+                'key'     => self::REQUEST_META_STATUS,
+                'value'   => self::STATUS_APPROVED,
+                'compare' => '!=',
+                'type'    => 'CHAR',
+            ];
+        } else {
             $args['meta_query'][] = [
                 'key'     => self::REQUEST_META_STATUS,
                 'value'   => $status,
@@ -152,28 +152,20 @@ class RequestsHelper {
             ];
         }
 
-        $args['meta_query'][] = [
-            'key'     => self::REQUEST_META_STATUS,
-            'value'   => self::APPROVED,
-            'compare' => '!=',
-            'type'    => 'CHAR',
-        ];
-
         $query     = new WP_Query( $args );
         $data_list = $query->posts;
 
-        $cleaned = [];
+        $response = [];
         foreach ( $data_list as $data ) {
-            array_push( $cleaned, self::clean_request_data( $data, true ) );
+            array_push( $response, self::make_request_response( $data, true ) );
         }
 
-        $response = [
+        return [
             'currentPage' => $page,
             'totalPage'   => $query->max_num_pages,
             'totalItems'  => $query->found_posts,
-            'data'        => $cleaned,
+            'data'        => $response,
         ];
-        return $response;
     }
 
     /**
@@ -183,7 +175,7 @@ class RequestsHelper {
      * @param bool     $is_extra_fields The Flag to determine to get extra fields .
      * @return array A  Wholesale requests cleaned.
      */
-    public static function clean_request_data( \WP_Post $data, bool $is_extra_fields ): array {
+    public static function make_request_response( \WP_Post $data, bool $is_extra_fields ): array {
         $display_name = get_post_meta( $data->ID, self::REQUEST_META_DISPLAY_NAME, true );
         $post_meta    = get_post_meta( $data->ID, self::REQUEST_META_DATA, true );
         $email        = get_post_meta( $data->ID, self::REQUEST_META_EMAIL, true );
@@ -263,7 +255,7 @@ class RequestsHelper {
         if ( ! isset( $request ) || self::REQUEST_POST_TYPE !== $request->post_type ) {
             return [];
         }
-        $cleaned = self::clean_request_data( $request, true );
+        $cleaned = self::make_request_response( $request, true );
 
         return $cleaned;
     }
@@ -489,21 +481,34 @@ class RequestsHelper {
         }
     }
 
-    /**
-     * Count the pending requests
-     *
-     * @return int count of the pending requests.
-     */
+    public static function count_requests_by_status( bool $force_recalc = false ): array {
+        if ( ! $force_recalc ) {
+            $cached = get_transient( 'yaywholesaleb2b_count_requests_by_status' );
+            if ( $cached ) {
+                return $cached;
+            }
+        }
+
+        $count_pending  = self::count_pending_requests();
+        $count_rejected = self::count_rejected_requests();
+        $count          = [
+            'pending'  => $count_pending,
+            'rejected' => $count_rejected,
+            'total'    => $count_pending + $count_rejected,
+        ];
+
+        set_transient( 'yaywholesaleb2b_count_requests_by_status', $count, 2 * HOUR_IN_SECONDS );
+        return $count;
+    }
+
     public static function count_pending_requests(): int {
         $args  = [
             'post_type'              => self::REQUEST_POST_TYPE,
             'update_post_meta_cache' => true,
-            'posts_per_page'         => -1,
             'meta_query'             => [
-                'relation' => 'AND',
                 [
                     'key'     => self::REQUEST_META_STATUS,
-                    'value'   => self::PENDING,
+                    'value'   => self::STATUS_PENDING,
                     'compare' => '==',
                     'type'    => 'CHAR',
                 ],
@@ -514,21 +519,15 @@ class RequestsHelper {
         return $query->post_count;
     }
 
-    /**
-     * Count the pending/rejected requests
-     *
-     * @return int count of the pending requests.
-     */
-    public static function count_total_requests(): int {
+    public static function count_rejected_requests(): int {
         $args  = [
             'post_type'              => self::REQUEST_POST_TYPE,
             'update_post_meta_cache' => true,
-            'posts_per_page'         => -1,
             'meta_query'             => [
                 [
                     'key'     => self::REQUEST_META_STATUS,
-                    'value'   => self::APPROVED,
-                    'compare' => '!=',
+                    'value'   => self::STATUS_REJECTED,
+                    'compare' => '==',
                     'type'    => 'CHAR',
                 ],
             ],

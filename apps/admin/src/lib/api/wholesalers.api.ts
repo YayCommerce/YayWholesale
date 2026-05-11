@@ -1,27 +1,21 @@
-import { PaginatedWholesalerListValues, TotalWholesalersValues } from '../schema/wholesalers.type';
+import { Wholesaler, WholesalerFilter } from '../schema/wholesalers.type';
 import { api } from './api';
-import type { ApiResponse } from './api.type';
+import { PaginatedResponse } from './api.type';
 
-export async function fetchWholesalersList(search: string, page: number, perPage: number, role: string) {
+export function getWholesalers(filter: WholesalerFilter) {
   const searchParams = new URLSearchParams({
-    search: search,
-    page: String(page),
-    per_page: String(perPage),
-    role: role,
+    search: filter.search,
+    page: String(filter.page),
+    per_page: String(filter.perPage),
+    ...(filter.roleSlug ? { role_slug: filter.roleSlug } : {}),
   });
-  return await api.get('wholesalers', { searchParams }).json<ApiResponse<PaginatedWholesalerListValues>>();
+  return api.get('wholesalers', { searchParams }).json<PaginatedResponse<Wholesaler>>();
 }
 
-export async function updateWholesalerRole(userId: number, roleSlug: string) {
-  return await api.put(`wholesalers/${userId}`, { json: { role_slug: roleSlug } }).json<ApiResponse<boolean>>();
+export function updateWholesalerRole(userId: number, roleSlug: string) {
+  return api.put(`wholesalers/${userId}/update-role`, { json: { roleSlug } }).json<boolean>();
 }
 
-export async function bulkUpdateWholesalerRole(userIds: number[], roleSlug: string) {
-  return await api
-    .put('wholesalers/bulk-role', { json: { ids: userIds, role_slug: roleSlug } })
-    .json<ApiResponse<boolean>>();
-}
-
-export async function getTotalCountWholesalers() {
-  return await api.get('wholesalers/total').json<ApiResponse<TotalWholesalersValues>>();
+export function bulkUpdateWholesalerRole(userIds: number[], roleSlug: string) {
+  return api.put('wholesalers/bulk-update-role', { json: { userIds, roleSlug } }).json<number>();
 }

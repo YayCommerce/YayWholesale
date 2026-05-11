@@ -217,18 +217,18 @@ class RolesRestController extends BaseRestController {
     }
 
     public function can_manage_roles() {
-        if ( ! current_user_can( 'manage_options' ) || ! current_user_can( 'manage_woocommerce' ) ) {
-            return $this->error_forbidden();
+        if ( current_user_can( 'manage_options' ) && current_user_can( 'manage_woocommerce' ) ) {
+            return true;
         }
 
-        return true;
+        return $this->error_forbidden();
     }
 
     public function can_get_roles() {
-        if ( ! current_user_can( 'edit_posts' ) || ! current_user_can( 'manage_woocommerce' ) ) {
-            return $this->error_forbidden();
+        if ( current_user_can( 'edit_posts' ) && current_user_can( 'manage_woocommerce' ) ) {
+            return true;
         }
 
-        return true;
+        return $this->error_forbidden();
     }
 }

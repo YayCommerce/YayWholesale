@@ -1,65 +1,77 @@
-import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-
-import { toast } from '@/components/ui/sonner';
 import {
-  bulkUpdateWholesalerRole,
-  fetchWholesalersList,
-  getTotalCountWholesalers,
-  updateWholesalerRole,
-} from '../api/wholesalers.api';
-import { handleErrorMessage } from '../utils';
+  keepPreviousData,
+  queryOptions,
+  useIsMutating,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from '@tanstack/react-query';
 
-export function useWholesalersQuery(
-  search: string,
-  pagination: {
-    pageIndex: number;
-    pageSize: number;
-  },
-  role: string,
-) {
-  return useQuery({
-    queryKey: ['wholesalers', { search, pagination, role }],
-    queryFn: async () => {
-      return fetchWholesalersList(search, pagination.pageIndex + 1, pagination.pageSize, role);
-    },
-    placeholderData: keepPreviousData,
-  });
+import { bulkUpdateWholesalerRole, getWholesalers, updateWholesalerRole } from '@/lib/api/wholesalers.api';
+import { Wholesaler, WholesalerFilter } from '@/lib/schema/wholesalers.type';
+import { ROLES_QUERIES } from './roles.queries';
+
+/** Options */
+
+const WHOLESALERS_QUERIES = {
+  all: ['wholesalers'],
+  list: (filter: WholesalerFilter) =>
+    queryOptions({
+      queryKey: ['wholesalers', filter],
+      queryFn: () => getWholesalers(filter),
+      placeholderData: keepPreviousData,
+    }),
+};
+
+/** Queries */
+
+export function useWholesalersQuery(filter: WholesalerFilter) {
+  return useQuery(WHOLESALERS_QUERIES.list(filter));
 }
+
+/** Mutations */
 
 export function useUpdateWholesalersRoleMutation(userId: number) {
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: ['wholesalers', userId, 'update-role'],
-    mutationFn: ({ roleSlug }: { roleSlug: string }) => updateWholesalerRole(userId, roleSlug),
-    onSuccess: (response) => {
-      toast.success(response.message);
-      queryClient.invalidateQueries({ queryKey: ['wholesalers', userId] });
-      if (!queryClient.isFetching({ queryKey: ['wholesalers'] })) {
-        queryClient.invalidateQueries({ queryKey: ['wholesalers'] });
-      }
+    mutationFn: (roleSlug: string) => updateWholesalerRole(userId, roleSlug),
+    onMutate: (roleSlug) => {
+      queryClient
+        .getQueryCache()
+        .findAll({ queryKey: WHOLESALERS_QUERIES.all })
+        .forEach((query) => {
+          const previous = query.state.data as Wholesaler[];
+          query.setData(previous.map((item) => (item.id === userId ? { ...item, roleSlug } : item))); // Optimistic
+        });
     },
-    onError: handleErrorMessage,
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ROLES_QUERIES.userCountByRole.queryKey }),
+    onError: () => queryClient.invalidateQueries({ queryKey: WHOLESALERS_QUERIES.all }),
   });
 }
 
-export function useBulkUpdateWholesalersRoleMutation(userIds: number[]) {
+export function useBulkUpdateWholesalersRoleMutation() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationKey: ['wholesalers', 'bulk-update-roles'],
-    mutationFn: ({ roleSlug }: { roleSlug: string }) => bulkUpdateWholesalerRole(userIds, roleSlug),
-    onSuccess: (response) => {
-      toast.success(response.message);
-      if (!queryClient.isFetching({ queryKey: ['wholesalers'] })) {
-        queryClient.invalidateQueries({ queryKey: ['wholesalers'] });
-      }
+    mutationFn: ({ userIds, roleSlug }: { userIds: number[]; roleSlug: string }) =>
+      bulkUpdateWholesalerRole(userIds, roleSlug),
+    onMutate: ({ userIds, roleSlug }) => {
+      queryClient
+        .getQueryCache()
+        .findAll({ queryKey: WHOLESALERS_QUERIES.all })
+        .forEach((query) => {
+          const previous = query.state.data as Wholesaler[];
+          query.setData(previous.map((item) => (userIds.includes(item.id) ? { ...item, roleSlug } : item))); // Optimistic
+        });
     },
-    onError: handleErrorMessage,
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ROLES_QUERIES.userCountByRole.queryKey }),
+    onError: () => queryClient.invalidateQueries({ queryKey: WHOLESALERS_QUERIES.all }),
   });
 }
 
-export function useTotalCountQuery() {
-  return useQuery({
-    queryKey: ['wholesalers', 'total-count'],
-    queryFn: () => getTotalCountWholesalers(),
-  });
+/** Utils */
+
+export function useIsMutatingWholesalers() {
+  return useIsMutating({ mutationKey: ['wholesalers'] });
 }
