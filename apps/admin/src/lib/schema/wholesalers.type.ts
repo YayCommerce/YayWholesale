@@ -1,31 +1,20 @@
-import z from 'zod';
+export type Wholesaler = {
+  id: number;
+  userName: string;
+  firstName: string;
+  lastName: string;
+  displayName: string;
+  avatar: string;
+  email: string;
 
-export const wholesalerSchema = z.object({
-  id: z.number(),
-  userName: z.string(),
-  firstName: z.string(),
-  lastName: z.string(),
-  displayName: z.string(),
-  avatar: z.string(),
-  email: z.string().email(),
-  role: z.string(),
-  completedOrdersCount: z.number().optional(),
-  wholesaleRevenue: z.number().optional(),
-});
+  wholesaleRoleSlug: string;
+  completedOrdersCount: number;
+  wholesaleRevenue: number;
+};
 
-const paginatedWholesalerSchema = z.object({
-  currentPage: z.number(),
-  totalPage: z.number(),
-  totalItems: z.number(),
-  data: z.array(wholesalerSchema),
-});
-
-const totalWholesalersSchema = z.object({
-  count: z.number(),
-});
-
-export type WholesalerFormValues = z.infer<typeof wholesalerSchema>;
-
-export type PaginatedWholesalerListValues = z.infer<typeof paginatedWholesalerSchema>;
-
-export type TotalWholesalersValues = z.infer<typeof totalWholesalersSchema>;
+export type WholesalerFilter = {
+  roleSlug?: string;
+  search: string;
+  page: number;
+  perPage: number;
+};

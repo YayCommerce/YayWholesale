@@ -12,7 +12,7 @@ use YayWholesaleB2B\Helpers\SettingsHelper;
 defined( 'ABSPATH' ) || exit;
 
 /**
- * Handles Wholesale Requests API endpoints.
+ * Handles Wholesale Registration Requests Endpoints.
  */
 class RequestRestController extends BaseRestController {
     use SingletonTrait;
@@ -49,11 +49,6 @@ class RequestRestController extends BaseRestController {
                     'permission_callback' => [ $this,'can_manage_request' ],
                 ],
                 [
-                    'methods'             => 'PUT',
-                    'callback'            => [ $this, 'update_request_by_id' ],
-                    'permission_callback' => [ $this,'can_manage_request' ],
-                ],
-                [
                     'methods'             => 'DELETE',
                     'callback'            => [ $this, 'delete_request_by_id' ],
                     'permission_callback' => [ $this,'can_manage_request' ],
@@ -72,7 +67,6 @@ class RequestRestController extends BaseRestController {
                 ],
             ]
         );
-
         register_rest_route(
             self::REST_NAMESPACE,
             '/requests/(?P<request_id>\d+)/reject',
@@ -80,7 +74,7 @@ class RequestRestController extends BaseRestController {
                 [
                     'methods'             => 'PUT',
                     'callback'            => [ $this, 'reject_request_status_by_id' ],
-                    'permission_callback' => [ $this,'can_manage_request' ],
+                    'permission_callback' => [ $this,'can_manage_request_and_user_role' ],
                 ],
             ]
         );
@@ -91,36 +85,22 @@ class RequestRestController extends BaseRestController {
             [
                 [
                     'methods'             => 'PUT',
-                    'callback'            => [ $this, 'bulk_approve_request_status' ],
+                    'callback'            => [ $this, 'bulk_approve_request' ],
                     'permission_callback' => [ $this,'can_manage_request_and_user_role' ],
                 ],
             ]
         );
-
         register_rest_route(
             self::REST_NAMESPACE,
             '/requests/bulk-reject',
             [
                 [
                     'methods'             => 'PUT',
-                    'callback'            => [ $this, 'bulk_reject_request_status' ],
-                    'permission_callback' => [ $this,'can_manage_request' ],
+                    'callback'            => [ $this, 'bulk_reject_request' ],
+                    'permission_callback' => [ $this,'can_manage_request_and_user_role' ],
                 ],
             ]
         );
-
-        register_rest_route(
-            self::REST_NAMESPACE,
-            '/requests/bulk-status',
-            [
-                [
-                    'methods'             => 'PUT',
-                    'callback'            => [ $this, 'bulk_update_request_status' ],
-                    'permission_callback' => [ $this,'can_manage_request' ],
-                ],
-            ]
-        );
-
         register_rest_route(
             self::REST_NAMESPACE,
             '/requests/bulk-delete',
@@ -135,23 +115,11 @@ class RequestRestController extends BaseRestController {
 
         register_rest_route(
             self::REST_NAMESPACE,
-            '/requests/pending',
+            '/requests/count-by-status',
             [
                 [
                     'methods'             => 'GET',
-                    'callback'            => [ $this, 'get_pending_count' ],
-                    'permission_callback' => [ $this,'can_manage_request' ],
-                ],
-            ]
-        );
-
-        register_rest_route(
-            self::REST_NAMESPACE,
-            '/requests/total',
-            [
-                [
-                    'methods'             => 'GET',
-                    'callback'            => [ $this, 'get_total_count' ],
+                    'callback'            => [ $this, 'count_requests_by_status' ],
                     'permission_callback' => [ $this,'can_manage_request' ],
                 ],
             ]
@@ -214,37 +182,14 @@ class RequestRestController extends BaseRestController {
         return $this->success( true, __( 'Request Saved', 'yay-wholesale-b2b' ) );
     }
 
-    /**
-     * Get the list of wholesale requests.
-     *
-     * @param WP_REST_Request $request The request object.
-     * @return WP_REST_Response The response object.
-     */
-    public function get_request_list( WP_REST_Request $request ): WP_REST_Response {
-        $page     = $request['page'];
-        $per_page = $request['per_page'];
-        $keyword  = $request['kw'];
-        $status   = $request['status'];
+    public function get_request_list( WP_REST_Request $request ) {
+        $page     = intval( $request->get_param( 'page' ) || 1 );
+        $per_page = intval( $request->get_param( 'per_page' ) || 10 );
+        $search   = sanitize_text_field( $request->get_param( 'search' ) || '' );
+        $status   = sanitize_text_field( $request->get_param( 'status' ) || 'all' );
 
-        if ( ! isset( $page ) ) {
-            $page = 1;
-        }
-
-        if ( ! isset( $per_page ) ) {
-            $per_page = 10;
-        }
-
-        if ( ! isset( $keyword ) ) {
-            $keyword = '';
-        }
-
-        if ( ! isset( $status ) ) {
-            $status = RequestsHelper::ALL;
-        }
-
-        $response = RequestsHelper::get_paginated_request_post( $keyword, $status, $page, $per_page );
-
-        return $this->success( $response, __( 'Fetched successfully', 'yay-wholesale-b2b' ) );
+        $response = RequestsHelper::get_paginated_request_post( $search, $page, $per_page, $status );
+        return $response;
     }
 
     /**
@@ -508,28 +453,9 @@ class RequestRestController extends BaseRestController {
         return $this->success( true, $message );
     }
 
-    /**
-     * Get the count of pending requests.
-     *
-     * @param WP_REST_Request $request The request object.
-     * @return WP_REST_Response The response object.
-     */
-    public function get_pending_count( WP_REST_Request $request ): WP_REST_Response {
-        $count = RequestsHelper::count_pending_requests();
-
-        return $this->success( [ 'count' => $count ], __( 'Pending Requests are successfully counted', 'yay-wholesale-b2b' ) );
-    }
-
-    /**
-     * Get the count of requests.
-     *
-     * @param WP_REST_Request $request The request object.
-     * @return WP_REST_Response The response object.
-     */
-    public function get_total_count( WP_REST_Request $request ): WP_REST_Response {
-        $count = RequestsHelper::count_total_requests();
-
-        return $this->success( [ 'count' => $count ], __( 'Requests are successfully counted', 'yay-wholesale-b2b' ) );
+    public function count_requests_by_status( WP_REST_Request $request ) {
+        $count = RequestsHelper::count_requests_by_status( true );
+        return $count;
     }
 
     /**
@@ -548,49 +474,29 @@ class RequestRestController extends BaseRestController {
         return $count <= $limit_rate;
     }
 
-    /**
-     * Check if the user has the necessary permissions to access the requests endpoints (actions: get, search, delete).
-     *
-     * @return bool|WP_Error True if the user has the necessary permissions, otherwise a WP_Error object.
-     */
     public function can_manage_request() {
-        if ( ! current_user_can( 'edit_posts' ) || ! current_user_can( 'manage_woocommerce' ) ) {
-            return new WP_Error( 'rest_forbidden', esc_html__( 'Forbidden.', 'yay-wholesale-b2b' ), [ 'status' => 401 ] );
+        if ( current_user_can( 'edit_posts' ) && current_user_can( 'manage_woocommerce' ) ) {
+            return true;
         }
 
-        return true;
+        return $this->error_forbidden();
     }
 
-    /**
-     * Check if the user has the necessary permissions to access the requests endpoints (actions: update status, bulk update).
-     *
-     * @return bool|WP_Error True if the user has the necessary permissions, otherwise a WP_Error object.
-     */
     public function can_manage_request_and_user_role() {
-        if ( ! ( current_user_can( 'edit_posts' ) &&
-            current_user_can( 'create_users' ) &&
-            current_user_can( 'promote_users' ) &&
-            current_user_can( 'manage_woocommerce' ) ) ) {
-
-            return new WP_Error( 'rest_forbidden', esc_html__( 'Forbidden.', 'yay-wholesale-b2b' ), [ 'status' => 401 ] );
+        if ( current_user_can( 'edit_posts' ) && current_user_can( 'create_users' ) && current_user_can( 'manage_woocommerce' ) && current_user_can( 'promote_users' ) ) {
+            return true;
         }
 
-        return true;
+        return $this->error_forbidden();
     }
 
-    /**
-     * Check if the user can submit a wholesale request
-     *
-     * @param \WP_REST_Request $request the request receivced.
-     * @return bool|WP_Error True if the user has the necessary permissions, otherwise a WP_Error object.
-     */
     public function can_submit_request( WP_REST_Request $request ) {
         if ( is_user_logged_in() ) {
-            $params = $this->get_form_data( $request );
+            $body_params = $request->get_body_params();
             global $current_user;
 
-            if ( in_array( 'email_address', $params, true ) ) {
-                if ( $params['email_address'] !== $current_user->user_email ) {
+            if ( in_array( 'email_address', $body_params, true ) ) {
+                if ( $body_params['email_address'] !== $current_user->user_email ) {
                     return new WP_Error( 'rest_forbidden', esc_html__( 'Forbidden.', 'yay-wholesale-b2b' ), [ 'status' => 401 ] );
                 }
             }

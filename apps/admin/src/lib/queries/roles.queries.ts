@@ -14,7 +14,7 @@ import { RoleFormValues } from '@/lib/schema/roles.schema';
 
 /** Options */
 
-const ROLES_QUERIES = {
+export const ROLES_QUERIES = {
   all: queryOptions({
     queryKey: ['roles'],
     queryFn: async () => {

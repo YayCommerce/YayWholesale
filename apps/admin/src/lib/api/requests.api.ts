@@ -1,61 +1,45 @@
-import { PaginatedRequestListValues, RequestFormValues, RequestsCountValues } from '../schema/requests.type';
+import { CountRequestByStatus, Request, RequestFilter } from '../schema/requests.type';
 import { api } from './api';
-import type { ApiResponse } from './api.type';
+import type { PaginatedResponse } from './api.type';
 
-export async function fetchRequests(keyword: string, page: number, perPage: number, status: string) {
+export function getRequests(filter: RequestFilter) {
   const searchParams = new URLSearchParams({
-    kw: keyword,
-    page: String(page),
-    per_page: String(perPage),
-    status: status,
+    search: filter.search,
+    page: String(filter.page),
+    per_page: String(filter.perPage),
+    status: filter.status,
   });
-  return await api.get('requests', { searchParams }).json<ApiResponse<PaginatedRequestListValues>>();
+  return api.get('requests', { searchParams }).json<PaginatedResponse<Request>>();
 }
 
-export async function fetchRequestById(requestId: number) {
-  return await api.get(`requests/${requestId}`).json<ApiResponse<RequestFormValues>>();
+export function getRequestById(requestId: number) {
+  return api.get(`requests/${requestId}`).json<Request>();
 }
 
-export async function updateRequestById(data: RequestFormValues, requestId: number) {
-  return await api.put(`requests/${requestId}`, { json: data }).json<ApiResponse<boolean>>();
+export function approveRequest(requestId: number, roleSlug: string) {
+  return api.put(`requests/${requestId}/approve`, { json: { roleSlug } }).json<Request>();
 }
 
-export async function deleteRequestById(requestId: number) {
-  return await api.delete(`requests/${requestId}`).json<ApiResponse<boolean>>();
+export function bulkApproveRequest(requestIds: number[], roleSlug: string) {
+  return api.put('requests/bulk-approve', { json: { ids: requestIds, roleSlug } }).json<number>();
 }
 
-export async function updateRequestStatusById(requestId: number, status: RequestFormValues['status'], roleId: number) {
-  const data = { role_id: roleId };
-
-  if (status === 'approved') {
-    return await api.put(`requests/${requestId}/approve`, { json: data }).json<ApiResponse<boolean>>();
-  } else {
-    return await api.put(`requests/${requestId}/reject`, { json: data }).json<ApiResponse<boolean>>();
-  }
+export function rejectRequest(requestId: number) {
+  return api.put(`requests/${requestId}/reject`).json<Request>();
 }
 
-export async function bulkUpdateRequestStatus(
-  requestIds: number[],
-  status: RequestFormValues['status'],
-  roleId: number,
-) {
-  const data = { ids: requestIds, role_id: roleId };
-
-  if (status === 'approved') {
-    return await api.put('requests/bulk-approve', { json: data }).json<ApiResponse<boolean>>();
-  } else {
-    return await api.put('requests/bulk-reject', { json: data }).json<ApiResponse<boolean>>();
-  }
+export function bulkRejectRequest(requestIds: number[]) {
+  return api.put('requests/bulk-reject', { json: { ids: requestIds } }).json<number>();
 }
 
-export async function bulkDeleteRequest(requestIds: number[]) {
-  return await api.delete('requests/bulk-delete', { json: { ids: requestIds } }).json<ApiResponse<boolean>>();
+export function deleteRequest(requestId: number) {
+  return api.delete(`requests/${requestId}`).json<boolean>();
 }
 
-export async function getPendingCount() {
-  return await api.get('requests/pending').json<ApiResponse<RequestsCountValues>>();
+export function bulkDeleteRequest(requestIds: number[]) {
+  return api.delete(`requests/bulk-delete`, { json: { ids: requestIds } }).json<number>();
 }
 
-export async function getTotalCount() {
-  return await api.get('requests/total').json<ApiResponse<RequestsCountValues>>();
+export function countRequestByStatus() {
+  return api.get('requests/count-by-status').json<CountRequestByStatus>();
 }
