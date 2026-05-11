@@ -6,9 +6,8 @@ import { useNavigate } from 'react-router-dom';
 import { __ } from '@wordpress/i18n';
 
 import { parseWPDate, parseWPTime } from '@/lib/helpers/format.helper';
-import { useDeleteRequestMutation } from '@/lib/queries/requests.queries';
-import { RequestFormValues } from '@/lib/schema/requests.type';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { cacheRequest, useDeleteRequestMutation } from '@/lib/queries/requests.queries';
+import { Request } from '@/lib/schema/requests.type';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { WholeSaleToolTip } from '@/components/ui/custom/WholeSaleToolTip';
@@ -22,35 +21,10 @@ import {
 } from '@/components/ui/dialog';
 import DeleteIcon from '@/components/icons/DeleteIcon';
 import SettingsIcon from '@/components/icons/SettingsIcon';
-import RequestsStatusColumn from './RequestsStatusColumn';
+import { RequestAvatarCell } from './RequestAvatarCell';
+import { RequestStatusCell } from './RequestStatusCell';
 
-function AvatarCell({ rowData }: { rowData: RequestFormValues }) {
-  const navigate = useNavigate();
-  const queryClient = useQueryClient();
-  const { avatar, name, id, email } = rowData;
-  return (
-    <div className="flex items-center gap-3">
-      <Avatar className="h-9.5 w-9.5">
-        <AvatarImage src={avatar} alt={name} />
-        <AvatarFallback>{name.charAt(0)}</AvatarFallback>
-      </Avatar>
-      <div>
-        <p
-          className="cursor-pointer leading-none font-medium hover:underline"
-          onClick={() => {
-            queryClient.setQueryData(['request', id], rowData);
-            navigate(`/request/edit/${id}`);
-          }}
-        >
-          {name}
-        </p>
-        <p className="text-muted-foreground mt-1 text-xs">{email}</p>
-      </div>
-    </div>
-  );
-}
-
-export const RequestsColumn: ColumnDef<RequestFormValues>[] = [
+export const requestColumns: ColumnDef<Request>[] = [
   {
     id: 'select',
     header: ({ table }) => (
@@ -82,7 +56,7 @@ export const RequestsColumn: ColumnDef<RequestFormValues>[] = [
     accessorKey: 'name',
     header: __('Name', 'yay-wholesale-b2b'),
     cell: ({ row }) => {
-      return <AvatarCell rowData={row.original} />;
+      return <RequestAvatarCell request={row.original} />;
     },
   },
   {
@@ -96,7 +70,7 @@ export const RequestsColumn: ColumnDef<RequestFormValues>[] = [
   {
     accessorKey: 'status',
     header: __('Status', 'yay-wholesale-b2b'),
-    cell: ({ row }) => <RequestsStatusColumn requestId={row.original.id} defaultValue={row.original.status} />,
+    cell: ({ row }) => <RequestStatusCell request={row.original} />,
   },
   {
     id: 'actions',
@@ -105,7 +79,6 @@ export const RequestsColumn: ColumnDef<RequestFormValues>[] = [
       const { mutate: deleteRequest, isPending: isDeletingRequestPending } = useDeleteRequestMutation(row.original.id);
       const navigate = useNavigate();
       const queryClient = useQueryClient();
-
       const [openDialog, setOpenDialog] = useState(false);
 
       return (
@@ -119,7 +92,7 @@ export const RequestsColumn: ColumnDef<RequestFormValues>[] = [
                     variant="ghost"
                     className="hover:text-primary text-muted-foreground h-8 w-8 hover:bg-white hover:shadow-xs"
                     onClick={() => {
-                      queryClient.setQueryData(['request', row.original.id], row.original);
+                      cacheRequest(queryClient, row.original);
                       navigate(`/request/edit/${row.original.id}`);
                     }}
                   >

@@ -38,7 +38,7 @@ class NewAccountRegistered extends WholesaleEmailBase {
             '{account_registration_time}' => wp_date(
                 get_option( 'date_format' ) . ' ' . get_option( 'time_format' )
             ),
-            '{admin_url}'                 => admin_url( 'admin.php?page=yay_wholesale#/request/' ),
+            '{admin_url}'                 => admin_url( 'admin.php?page=yay_wholesale#/requests/' ),
         ];
 
         // Trigger the email when a new wholesale account registration is submitted.
@@ -173,7 +173,7 @@ class NewAccountRegistered extends WholesaleEmailBase {
             $this->placeholders['{account_name}']              = $this->object['name'];
             $this->placeholders['{account_email}']             = $this->object['email'];
             $this->placeholders['{account_registration_time}'] = $date_string;
-            $this->placeholders['{admin_url}']                 = admin_url( 'admin.php?page=yay_wholesale#/request/edit/' . $this->object['id'] . '/' );
+            $this->placeholders['{admin_url}']                 = admin_url( 'admin.php?page=yay_wholesale#/requests/edit/' . $this->object['id'] . '/' );
         }
 
         if ( $this->is_enabled() && $this->get_recipient() ) {

@@ -1,9 +1,9 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { CircleNotchIcon } from '@phosphor-icons/react';
 import { useMatch, useNavigate } from 'react-router-dom';
 import { __, sprintf } from '@wordpress/i18n';
 
-import { usePendingCountQuery } from '@/lib/queries/requests.queries';
+import { useCountByStatusQuery } from '@/lib/queries/requests.queries';
 import { useIsMutatingSettings } from '@/lib/queries/settings.queries';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -25,27 +25,27 @@ const NAV_ITEMS = [
     side: () => <></>,
   },
   {
-    path: '/request/*',
-    to: '/request',
+    path: '/requests/*',
+    to: '/requests',
     icon: RequestIcon,
     label: 'Request',
     side: (props: { classname?: string }) => {
-      const { data } = usePendingCountQuery();
+      const { data } = useCountByStatusQuery();
+      const pendingCount = useMemo(() => data?.pending ?? 0, [data]);
 
       return (
-        data &&
-        data.count > 0 && (
+        pendingCount > 0 && (
           <WholeSaleToolTip
             trigger={
               <div>
                 <Badge variant="destructive" className={cn('h-5 min-w-5 px-1 leading-0 tabular-nums', props.classname)}>
-                  {data.count}
+                  {pendingCount}
                 </Badge>
               </div>
             }
             content={
-              data.count > 1
-                ? sprintf(__('%d requests are pending', 'yay-wholesale-b2b'), data.count)
+              pendingCount > 1
+                ? sprintf(__('%d requests are pending', 'yay-wholesale-b2b'), pendingCount)
                 : __('1 request is pending', 'yay-wholesale-b2b')
             }
             side="bottom"

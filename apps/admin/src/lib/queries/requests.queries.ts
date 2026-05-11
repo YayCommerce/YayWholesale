@@ -36,6 +36,7 @@ const REQUESTS_QUERIES = {
     queryOptions({
       queryKey: ['requests', requestId],
       queryFn: () => getRequestById(requestId),
+      enabled: requestId > 0,
     }),
   countByStatus: queryOptions({
     queryKey: ['requests', 'count-by-status'],
@@ -77,7 +78,7 @@ export function useApproveRequestMutation(requestId: number) {
 export function useBulkApproveRequestMutation() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationKey: ['requests', 'bulk-approve'],
+    mutationKey: ['requests', 'bulk', 'approve'],
     mutationFn: ({ requestIds, roleSlug }: { requestIds: number[]; roleSlug: string }) =>
       bulkApproveRequest(requestIds, roleSlug),
     onSuccess: () => {
@@ -104,7 +105,7 @@ export function useRejectRequestMutation(requestId: number) {
 export function useBulkRejectRequestMutation() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationKey: ['requests', 'bulk-reject'],
+    mutationKey: ['requests', 'bulk', 'reject'],
     mutationFn: bulkRejectRequest,
     onSuccess: () => queryClient.invalidateQueries({ queryKey: REQUESTS_QUERIES.all }),
     onError: () => queryClient.invalidateQueries({ queryKey: REQUESTS_QUERIES.all }),
@@ -124,7 +125,7 @@ export function useDeleteRequestMutation(requestId: number) {
 export function useBulkDeleteRequestMutation() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationKey: ['requests', 'bulk-delete'],
+    mutationKey: ['requests', 'bulk', 'delete'],
     mutationFn: bulkDeleteRequest,
     onSuccess: () => queryClient.invalidateQueries({ queryKey: REQUESTS_QUERIES.all }),
     onError: () => queryClient.invalidateQueries({ queryKey: REQUESTS_QUERIES.all }),
@@ -138,7 +139,9 @@ export function useIsMutatingRequests() {
 }
 
 export function useIsMutatingRequest(requestId: number) {
-  return useIsMutating({ mutationKey: ['requests', requestId] });
+  const isMutating = useIsMutating({ mutationKey: ['requests', 'bulk'] });
+  const isMutatingSingle = useIsMutating({ mutationKey: ['requests', requestId] });
+  return isMutating + isMutatingSingle;
 }
 
 export function cacheRequest(queryClient: QueryClient, request: Request) {

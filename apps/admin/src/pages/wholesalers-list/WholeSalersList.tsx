@@ -1,15 +1,18 @@
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { flexRender, getCoreRowModel, PaginationState, useReactTable } from '@tanstack/react-table';
-import { ChevronsUpDown, Plus, Search } from 'lucide-react';
-import { Spinner } from '@wordpress/components';
+import clsx from 'clsx';
+import { ChevronsUpDown, Loader2, Plus, Search } from 'lucide-react';
+import { useDebounce } from 'rooks';
 import { __, sprintf } from '@wordpress/i18n';
 
-import { useActiveRolesQuery } from '@/lib/queries/roles.queries';
+import { getErrorMsg } from '@/lib/helpers/response.helper';
+import { useActiveRolesQuery, useUserCountByRolesQuery } from '@/lib/queries/roles.queries';
 import {
   useBulkUpdateWholesalersRoleMutation,
-  useTotalCountQuery,
+  useIsMutatingWholesalers,
   useWholesalersQuery,
 } from '@/lib/queries/wholesalers.queries';
+import { WholesalerFilter } from '@/lib/schema/wholesalers.type';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { BulkActionBox } from '@/components/ui/bulk-actions';
@@ -34,77 +37,74 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
+import { toast } from '@/components/ui/sonner';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import RolesIcon from '@/components/icons/RolesIcon';
-import { WholesalersColumn } from './wholesalers-table/WholesalersColumn';
+import { wholesalerColumns } from './WholeSalersList/WholesalerColumns';
 
 export default function WholeSalersList() {
-  const [keyword, setKeyword] = useState('');
   const [search, setSearch] = useState('');
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
     pageSize: 10,
   });
   const [roleFilter, setRoleFilter] = useState('all');
+  const setSearchDebounced = useDebounce(setSearch, 500);
 
-  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const filter = useMemo(
+    () =>
+      ({
+        search,
+        ...(roleFilter === 'all' ? {} : { roleSlug: roleFilter }),
+        page: pagination.pageIndex + 1,
+        perPage: pagination.pageSize,
+      }) satisfies WholesalerFilter,
+    [search, pagination, roleFilter],
+  );
 
-  const debouncedSearch = useCallback((value: string) => {
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-    }
-
-    timeoutRef.current = setTimeout(() => {
-      setKeyword(value);
-    }, 500);
-  }, []);
-
-  const {
-    data: wholesalersData,
-    isLoading: isLoadingWholesalers,
-    isFetching: isFetchingWholesalers,
-  } = useWholesalersQuery(keyword, pagination, roleFilter);
+  const wholesalersQuery = useWholesalersQuery(filter);
 
   const { data: activeRoles } = useActiveRolesQuery();
-  const { data: totalCount } = useTotalCountQuery();
+  const { data: userCount } = useUserCountByRolesQuery();
+  const totalCount = useMemo(() => {
+    if (!userCount) return undefined;
+    return Object.values(userCount).reduce((acc, count) => acc + count, 0);
+  }, [userCount]);
 
+  const defaultData = useMemo(() => [], []);
   const table = useReactTable({
-    data: wholesalersData?.data ?? [],
-    columns: WholesalersColumn,
+    data: wholesalersQuery.data?.data ?? defaultData,
+    columns: wholesalerColumns,
     state: {
       pagination,
     },
     getCoreRowModel: getCoreRowModel(),
     onPaginationChange: setPagination,
     manualPagination: true,
-    rowCount: wholesalersData?.totalItems ?? 0,
-    pageCount: wholesalersData?.totalPage ?? -1,
+    rowCount: wholesalersQuery.data?.totalItems ?? 0,
+    pageCount: wholesalersQuery.data?.totalPage ?? -1,
   });
 
-  const selectedCount = table.getFilteredSelectedRowModel().rows.length;
-  const selectedRowsIds = useMemo(
-    () => Array.from(table.getSelectedRowModel().rows, (row) => row.original.id),
-    [selectedCount],
-  );
+  const bulkUpdateWholesalersRoleMutation = useBulkUpdateWholesalersRoleMutation();
+  const isMutating = useIsMutatingWholesalers();
 
-  const handleChangeSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearch(e.target.value);
-    table.setPageIndex(0);
-    debouncedSearch(e.target.value);
-  };
+  async function handleBulkUpdateWholesalersRole(roleSlug: string) {
+    const userIds = table.getSelectedRowModel().rows.map((row) => row.original.id);
+    if (userIds.length === 0 || isMutating > 0) return;
 
-  const handleChangePerPage = async (value: string) => {
-    table.setPageSize(parseInt(value));
-    table.setPageIndex(0);
-  };
+    try {
+      await bulkUpdateWholesalersRoleMutation.mutateAsync({
+        userIds,
+        roleSlug,
+      });
+    } catch (error) {
+      toast.error(await getErrorMsg(error));
+    }
+  }
 
-  const { mutate: bulkUpdateWholesalersRole, isPending: isBulkUpdateWholesalersPending } =
-    useBulkUpdateWholesalersRoleMutation(selectedRowsIds);
-
-  const onFilterChanged = (value: string) => {
-    setRoleFilter(value);
-    setPagination({ ...pagination, pageIndex: 0 });
-  };
+  const selectedCount = table.getSelectedRowModel().rows.length;
+  const noWholesaler = totalCount === 0;
+  const noFilterData = !wholesalersQuery.isLoading && wholesalersQuery.data?.data?.length === 0;
 
   return (
     <Card className="gap-4 shadow-sm">
@@ -112,38 +112,46 @@ export default function WholeSalersList() {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-2">
           <h1 className="text-2xl font-bold">{__('Wholesalers List', 'yay-wholesale-b2b')}</h1>
-          {totalCount && totalCount.count > 0 && (
+          {totalCount !== undefined && (
             <WholeSaleToolTip
               trigger={
                 <div>
                   <Badge variant="secondary" className="h-5 min-w-5 px-1 tabular-nums">
-                    {totalCount.count}
+                    {totalCount}
                   </Badge>
                 </div>
               }
               content={
-                totalCount.count > 1
-                  ? sprintf(__('%d wholesalers in total', 'yay-wholesale-b2b'), totalCount.count)
-                  : __('1 wholesaler in total', 'yay-wholesale-b2b')
+                totalCount > 1
+                  ? sprintf(__('%d wholesalers in total', 'yay-wholesale-b2b'), totalCount)
+                  : sprintf(__('%d wholesaler in total', 'yay-wholesale-b2b'), totalCount)
               }
               side="bottom"
             />
           )}
         </div>
+
         <div className="flex flex-1 flex-col-reverse items-end gap-4 lg:flex-0 lg:flex-row">
-          {(table.getPageCount() > 1 || keyword !== '') && (
-            <InputGroup className="w-full sm:w-80">
-              <InputGroupInput
-                placeholder="Search by ID, Email, Display Name"
-                value={search}
-                onChange={handleChangeSearch}
-              />
-              <InputGroupAddon align="inline-end">
-                <Search className="size-4.5 text-[#A0A0A7]" />
-              </InputGroupAddon>
-            </InputGroup>
-          )}
-          <Select value={roleFilter} onValueChange={(value) => onFilterChanged(value)}>
+          <InputGroup className="w-full sm:w-80">
+            <InputGroupInput
+              placeholder="Search by ID, Email, Display Name"
+              defaultValue={search}
+              onChange={(e) => {
+                table.setPageIndex(0);
+                setSearchDebounced(e.target.value);
+              }}
+            />
+            <InputGroupAddon align="inline-end">
+              <Search className="size-4.5 text-[#A0A0A7]" />
+            </InputGroupAddon>
+          </InputGroup>
+          <Select
+            value={roleFilter}
+            onValueChange={(roleSlug) => {
+              table.setPageIndex(0);
+              setRoleFilter(roleSlug);
+            }}
+          >
             <SelectTrigger className="w-full sm:w-45.5">
               <SelectValue />
             </SelectTrigger>
@@ -176,13 +184,7 @@ export default function WholeSalersList() {
       </div>
 
       {/* Table */}
-      <div className={cn('overflow-x-auto rounded-lg border', isBulkUpdateWholesalersPending && 'relative opacity-50')}>
-        {/* Overlay Spinner */}
-        {isBulkUpdateWholesalersPending && (
-          <div className="absolute inset-0 z-50 flex items-center justify-center">
-            <Spinner className="text-muted-foreground size-6 animate-spin" />
-          </div>
-        )}
+      <div className="overflow-x-auto rounded-lg border">
         <Table className="min-w-full">
           <TableHeader className="text-foreground">
             {table.getHeaderGroups().map((headerGroup) => (
@@ -202,98 +204,97 @@ export default function WholeSalersList() {
               </TableRow>
             ))}
           </TableHeader>
+
           <TableBody>
-            {isLoadingWholesalers ? (
+            {noWholesaler && (
               <TableRow>
-                <TableCell colSpan={WholesalersColumn.length} className="h-32 text-center align-middle">
+                <TableCell colSpan={table.getAllColumns().length} className="h-32 text-center align-middle">
                   <div className="flex items-center justify-center gap-2">
-                    <Spinner className="text-muted-foreground size-6 animate-spin" />
+                    {__('Add your first wholesaler to get started.', 'yay-wholesale-b2b')}
                   </div>
                 </TableCell>
               </TableRow>
-            ) : table.getRowModel().rows.length > 0 ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() && 'selected'}
-                  className="not-last:border-divider not-last:border-b"
-                >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell
-                      key={cell.id}
-                      className={cn(
-                        'h-14',
-                        cell.column.columnDef.meta?.align === 'center' ? 'text-center' : 'text-left',
-                        cell.column.columnDef.meta?.isCheckbox ? 'w-9' : 'px-3',
-                      )}
-                    >
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))
-            ) : (
+            )}
+
+            {noFilterData && (
               <TableRow>
-                <TableCell colSpan={WholesalersColumn.length} className="h-24 text-center">
+                <TableCell colSpan={table.getAllColumns().length} className="h-24 text-center">
                   {__('No Wholesalers found.', 'yay-wholesale-b2b')}
                 </TableCell>
               </TableRow>
             )}
+
+            {table.getRowModel().rows.map((row) => (
+              <TableRow
+                key={row.id}
+                data-state={row.getIsSelected() && 'selected'}
+                className="not-last:border-divider not-last:border-b"
+              >
+                {row.getVisibleCells().map((cell) => (
+                  <TableCell
+                    key={cell.id}
+                    className={cn(
+                      'h-14',
+                      cell.column.columnDef.meta?.align === 'center' ? 'text-center' : 'text-left',
+                      cell.column.columnDef.meta?.isCheckbox ? 'w-9' : 'px-3',
+                    )}
+                  >
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  </TableCell>
+                ))}
+              </TableRow>
+            ))}
           </TableBody>
         </Table>
       </div>
+
       {/* Footer */}
-      {(table.getPageCount() > 1 || selectedCount > 1) && (
-        <div className="relative flex flex-col items-center gap-3 sm:flex-row">
-          <BulkActionBox selected={selectedCount} onClose={() => table.resetRowSelection()}>
-            <span>{sprintf(__('%d selected', 'yay-wholesale-b2b'), selectedCount)}</span>
-            <Separator orientation="vertical" className="ml-2 h-5!" />
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="hover:text-primary hover:bg-primary/6 group flex gap-1.5 px-2.5">
-                  <span className="text-sm font-normal">{__('Wholesaler Role', 'yay-wholesale-b2b')}</span>
-                  <span className="group-hover:text-primary text-muted-foreground flex items-center">
-                    <ChevronsUpDown className="size-3.5 stroke-[2.5px]" />
-                  </span>
-                </Button>
-              </DropdownMenuTrigger>
+      <div className="relative flex flex-col items-center gap-3 sm:flex-row">
+        <BulkActionBox selected={selectedCount} onClose={() => table.resetRowSelection()}>
+          <span>{sprintf(__('%d selected', 'yay-wholesale-b2b'), selectedCount)}</span>
+          <Separator orientation="vertical" className="ml-2 h-5!" />
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="hover:text-primary hover:bg-primary/6 group flex gap-1.5 px-2.5">
+                <span className="text-sm font-normal">{__('Wholesaler Role', 'yay-wholesale-b2b')}</span>
+                <span className="group-hover:text-primary text-muted-foreground flex items-center">
+                  <ChevronsUpDown className="size-3.5 stroke-[2.5px]" />
+                </span>
+              </Button>
+            </DropdownMenuTrigger>
 
-              <DropdownMenuContent align="start" sideOffset={9} className="w-fit min-w-[20px] p-1">
-                {activeRoles?.map((role) => (
+            <DropdownMenuContent align="start" sideOffset={9} className="w-fit min-w-[20px] p-1">
+              {activeRoles?.map((role) => {
+                const isUpdating =
+                  bulkUpdateWholesalersRoleMutation.isPending &&
+                  bulkUpdateWholesalersRoleMutation.variables?.roleSlug === role.slug;
+                return (
                   <DropdownMenuItem
-                    onClick={() => {
-                      if (isBulkUpdateWholesalersPending || isFetchingWholesalers) return;
-                      bulkUpdateWholesalersRole(
-                        { roleSlug: role.slug },
-                        {
-                          onSuccess: () => {
-                            table.resetRowSelection();
-                          },
-                        },
-                      );
-                    }}
+                    key={role.slug}
+                    onClick={() => handleBulkUpdateWholesalersRole(role.slug)}
+                    disabled={isUpdating}
                   >
-                    <RolesIcon role={role?.slug} className="mt-0.5 min-h-4 min-w-4" /> {role.name}
+                    {isUpdating && <Loader2 className="size-3.5 animate-spin" />}
+                    {!isUpdating && <RolesIcon role={role?.slug} className="size-4" />}
+                    {role.name}
                   </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </BulkActionBox>
+                );
+              })}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </BulkActionBox>
 
-          {table.getPageCount() > 1 && (
-            <Pagination
-              pageIndex={table.getState().pagination.pageIndex}
-              pageCount={table.getPageCount()}
-              onPreviousPage={() => table.previousPage()}
-              onNextPage={() => table.nextPage()}
-              onPageChange={(page) => table.setPageIndex(page)}
-              canPreviousPage={table.getCanPreviousPage()}
-              canNextPage={table.getCanNextPage()}
-              className="sm:ms-auto"
-            />
-          )}
-        </div>
-      )}
+        <Pagination
+          pageIndex={table.getState().pagination.pageIndex}
+          pageCount={table.getPageCount()}
+          onPreviousPage={() => table.previousPage()}
+          onNextPage={() => table.nextPage()}
+          onPageChange={(page) => table.setPageIndex(page)}
+          canPreviousPage={table.getCanPreviousPage()}
+          canNextPage={table.getCanNextPage()}
+          className={clsx('sm:ms-auto', table.getPageCount() === 0 && 'hidden')}
+        />
+      </div>
     </Card>
   );
 }

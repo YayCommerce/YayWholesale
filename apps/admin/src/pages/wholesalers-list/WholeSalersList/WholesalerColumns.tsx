@@ -2,40 +2,13 @@ import { ColumnDef } from '@tanstack/react-table';
 import { __ } from '@wordpress/i18n';
 
 import { parseWPCurrency } from '@/lib/helpers/format.helper';
-import { WholesalerFormValues } from '@/lib/schema/wholesalers.type';
+import { Wholesaler } from '@/lib/schema/wholesalers.type';
 import { cn } from '@/lib/utils';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Checkbox } from '@/components/ui/checkbox';
-import WholesalersRoleColumn from './WholesalersRole';
+import { WholesalerAvatarCell } from './WholesalerAvatarCell';
+import { WholesalerRoleCell } from './WholesalerRoleCell';
 
-function AvatarCell({ rowData }: { rowData: WholesalerFormValues }) {
-  const { avatar, firstName, lastName, id, email, displayName } = rowData;
-  const name = displayName ?? `${firstName} ${lastName}`;
-  const userLink = window.yayWholesaleB2BMeta.wpMeta.usersUrl.edit.replace('%USER_ID%', id.toString());
-  return (
-    <div className="flex items-center gap-3">
-      <Avatar className="h-9.5 w-9.5">
-        <a href={userLink} target="_blank" rel="noopener noreferrer">
-          <AvatarImage src={avatar} alt={name} />
-          <AvatarFallback>{name.charAt(0)}</AvatarFallback>
-        </a>
-      </Avatar>
-      <div>
-        <a
-          className="cursor-pointer leading-none font-medium hover:underline"
-          href={userLink}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          {name}
-        </a>
-        <p className="text-muted-foreground text-xs">{email}</p>
-      </div>
-    </div>
-  );
-}
-
-export const WholesalersColumn: ColumnDef<WholesalerFormValues>[] = [
+export const wholesalerColumns: ColumnDef<Wholesaler>[] = [
   {
     id: 'select',
     header: ({ table }) => (
@@ -67,7 +40,7 @@ export const WholesalersColumn: ColumnDef<WholesalerFormValues>[] = [
     accessorKey: 'name',
     header: __('Name', 'yay-wholesale-b2b'),
     cell: ({ row }) => {
-      return <AvatarCell rowData={row.original} />;
+      return <WholesalerAvatarCell wholesaler={row.original} />;
     },
   },
 
@@ -75,7 +48,7 @@ export const WholesalersColumn: ColumnDef<WholesalerFormValues>[] = [
     accessorKey: 'role',
     header: __('Role', 'yay-wholesale-b2b'),
     cell: ({ row }) => {
-      return <WholesalersRoleColumn role={row.original.role} userId={row.original.id} />;
+      return <WholesalerRoleCell wholesaler={row.original} />;
     },
   },
   {

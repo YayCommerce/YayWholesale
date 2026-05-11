@@ -112,7 +112,7 @@ class RequestShortcode extends \YayMail\Abstracts\BaseShortcode {
             /**
              * Is sample order
              */
-            return admin_url( 'admin.php?page=yay_wholesale#/request/' );
+            return admin_url( 'admin.php?page=yay_wholesale#/requests/' );
         }
         return isset( $data['render_data']['placeholders']['{admin_url}'] ) ? $data['render_data']['placeholders']['{admin_url}'] : '';
     }

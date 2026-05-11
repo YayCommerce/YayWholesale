@@ -6,7 +6,7 @@ import WholesalersListPage from '@/pages/wholesalers-list/WholeSalersListPage';
 import AppLayout from './AppLayout';
 import NotFoundPage from './pages/404';
 import ErrorPage from './pages/500';
-import RequestsPage from './pages/request/RequestsPage';
+import RequestsPage from './pages/requests/RequestsPage';
 import SettingsPage from './pages/settings/SettingsPage';
 
 export function getManagerRouter() {
@@ -25,7 +25,7 @@ export function getManagerRouter() {
           element: <DashboardPage />,
         },
         {
-          path: 'request',
+          path: 'requests',
           children: [
             {
               index: true,

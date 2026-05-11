@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { queryOptions, useIsMutating, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import {
@@ -11,6 +12,7 @@ import {
   updateRoleStatus,
 } from '@/lib/api/roles.api';
 import { RoleFormValues } from '@/lib/schema/roles.schema';
+import { useSettingsQuery } from './settings.queries';
 
 /** Options */
 
@@ -50,6 +52,10 @@ export function useRoleQuery(roleId: number) {
     ...ROLES_QUERIES.all,
     select: (data) => data.find((role) => role.id === roleId) ?? null,
   });
+}
+
+export function useUserCountByRolesQuery() {
+  return useQuery(ROLES_QUERIES.userCountByRole);
 }
 
 export function useUserCountByRoleQuery(roleSlug: string) {
@@ -143,4 +149,19 @@ export function useBulkUpdateRoleStatusMutation() {
 
 export function useIsMutatingRoles() {
   return useIsMutating({ mutationKey: ['roles'] });
+}
+
+export function useDefaultRole() {
+  const { data: activeRoles } = useActiveRolesQuery();
+  const { data: settings } = useSettingsQuery();
+
+  return useMemo(() => {
+    if (activeRoles.length === 0) return null;
+
+    const defaultRoleSlug = settings.general.default_role;
+    const defaultRole = activeRoles.find((role) => role.slug === defaultRoleSlug);
+    if (!defaultRole) return activeRoles[0];
+
+    return defaultRole;
+  }, [settings, activeRoles]);
 }

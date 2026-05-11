@@ -1,17 +1,13 @@
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { flexRender, getCoreRowModel, PaginationState, useReactTable } from '@tanstack/react-table';
 import { ChevronsUpDown, Search } from 'lucide-react';
+import { useDebounce } from 'rooks';
 import { Spinner } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 
-import {
-  useBulkDeleteRequestMutation,
-  useBulkUpdateRequestStatusMutation,
-  useRequestsQuery,
-  useTotalCountQuery,
-} from '@/lib/queries/requests.queries';
+import { useBulkDeleteRequestMutation, useRequestsQuery } from '@/lib/queries/requests.queries';
 import { useActiveRolesQuery } from '@/lib/queries/roles.queries';
-import { RequestFormValues } from '@/lib/schema/requests.type';
+import { Request, RequestFilter } from '@/lib/schema/requests.type';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { BulkActionBox } from '@/components/ui/bulk-actions';
@@ -52,53 +48,45 @@ import { Separator } from '@/components/ui/separator';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import DeleteIcon from '@/components/icons/DeleteIcon';
 import RequestsStatusIcon from '@/components/icons/RequestStatusIcon';
-import { RequestsColumn } from './requests-table/RequestsColumn';
-import requestsStatusMap from './requests-table/RequestsStatusMap';
+import { requestColumns } from './RequestsList/RequestColumns';
 
 export default function RequestsList() {
-  const [keyword, setKeyword] = useState('');
+  const [search, setSearch] = useState('');
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
     pageSize: 10,
   });
-  const [search, setSearch] = useState('');
-  const [statusFilter, setStatusFilter] = useState('all');
+  const setSearchDebounced = useDebounce(setSearch, 500);
+
+  const [statusFilter, setStatusFilter] = useState<RequestFilter['status']>('all');
   const [openBulkDeleteDialog, setOpenDeleteDialog] = useState(false);
-  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const debouncedSearch = useCallback((value: string) => {
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-    }
+  const filter = useMemo(
+    () =>
+      ({
+        search,
+        status: statusFilter,
+        page: pagination.pageIndex + 1,
+        perPage: pagination.pageSize,
+      }) satisfies RequestFilter,
+    [search, pagination, statusFilter],
+  );
 
-    timeoutRef.current = setTimeout(() => {
-      setKeyword(value);
-    }, 500);
-  }, []);
-
-  const {
-    data: requests,
-    isLoading: isLoadingRequests,
-    isFetching: isFetchingRequests,
-  } = useRequestsQuery(keyword, pagination, statusFilter);
-
+  const { data: requestRes, isLoading } = useRequestsQuery(filter);
   const { data: activeRoles } = useActiveRolesQuery();
-  const { data: totalCount } = useTotalCountQuery();
 
-  const columns = RequestsColumn;
   const defaultData = useMemo(() => [], []);
-
   const table = useReactTable({
-    data: requests?.data ?? defaultData,
-    columns,
+    data: requestRes?.data ?? defaultData,
+    columns: requestColumns,
     state: {
       pagination,
     },
     getCoreRowModel: getCoreRowModel(),
     onPaginationChange: setPagination,
     manualPagination: true,
-    pageCount: requests?.totalPage ?? 0,
-    rowCount: requests?.data.length ?? 0,
+    rowCount: requestRes?.totalItems ?? 0,
+    pageCount: requestRes?.totalPage ?? -1,
   });
 
   const selectedCount = table.getFilteredSelectedRowModel().rows.length;

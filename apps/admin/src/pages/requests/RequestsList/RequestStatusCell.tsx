@@ -1,0 +1,106 @@
+import { ChevronDown } from 'lucide-react';
+import { __, sprintf } from '@wordpress/i18n';
+
+import { getErrorMsg } from '@/lib/helpers/response.helper';
+import {
+  useApproveRequestMutation,
+  useIsMutatingRequests,
+  useRejectRequestMutation,
+} from '@/lib/queries/requests.queries';
+import { useActiveRolesQuery, useDefaultRole } from '@/lib/queries/roles.queries';
+import { Request } from '@/lib/schema/requests.type';
+import { Button } from '@/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuPortal,
+  DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { toast } from '@/components/ui/sonner';
+import RequestsStatusIcon from '@/components/icons/RequestStatusIcon';
+
+export function RequestStatusCell({ request }: { request: Request }) {
+  const { data: activeRoles } = useActiveRolesQuery();
+  const defaultRole = useDefaultRole();
+
+  const approveRequestMutation = useApproveRequestMutation(request.id);
+  const rejectRequestMutation = useRejectRequestMutation(request.id);
+  const isMutating = useIsMutatingRequests();
+
+  async function handleApproveRequest(roleSlug: string) {
+    if (isMutating > 0) return;
+    try {
+      await approveRequestMutation.mutateAsync(roleSlug);
+    } catch (error) {
+      toast.error(await getErrorMsg(error));
+    }
+  }
+
+  async function handleRejectRequest() {
+    if (isMutating > 0) return;
+    try {
+      await rejectRequestMutation.mutateAsync();
+    } catch (error) {
+      toast.error(await getErrorMsg(error));
+    }
+  }
+
+  return (
+    <div className="pointer-events-none">
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button
+            variant="outline"
+            className="pointer-events-auto flex w-40 items-center justify-between pr-1.5! font-normal capitalize"
+          >
+            <span className="flex items-center gap-2">
+              <RequestsStatusIcon status={request.status} />
+              {request.status}
+            </span>
+            <ChevronDown className="text-muted-foreground/70 mt-0.5 h-6 w-6 cursor-pointer" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent className="w-40">
+          <DropdownMenuGroup>
+            <DropdownMenuSub>
+              <DropdownMenuSubTrigger>
+                <DropdownMenuItem className="p-0">
+                  <RequestsStatusIcon status="approved" /> {__('Approved', 'yay-wholesale-b2b')}
+                </DropdownMenuItem>
+              </DropdownMenuSubTrigger>
+              <DropdownMenuPortal>
+                <DropdownMenuSubContent>
+                  <DropdownMenuItem
+                    onClick={() => {
+                      if (!defaultRole) return;
+                      handleApproveRequest(defaultRole?.slug);
+                    }}
+                  >
+                    <RequestsStatusIcon status="approved" /> {__('Approved (Default)', 'yay-wholesale-b2b')}
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  {activeRoles.map((role) => (
+                    <DropdownMenuItem onClick={() => handleApproveRequest(role.slug)}>
+                      <RequestsStatusIcon status="approved" />{' '}
+                      {sprintf(__('Approved to %s', 'yay-wholesale-b2b'), role.name)}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuSubContent>
+              </DropdownMenuPortal>
+            </DropdownMenuSub>
+
+            <DropdownMenuItem onClick={() => handleRejectRequest()}>
+              <RequestsStatusIcon status="rejected" /> {__('Rejected', 'yay-wholesale-b2b')}
+            </DropdownMenuItem>
+          </DropdownMenuGroup>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </div>
+  );
+}
