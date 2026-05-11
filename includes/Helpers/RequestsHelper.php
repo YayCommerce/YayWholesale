@@ -4,6 +4,7 @@ namespace YayWholesaleB2B\Helpers;
 use Exception;
 use WP_Query;
 use WP_User;
+use WP_Error;
 
 /**
  * Settings Helper Class
@@ -23,17 +24,18 @@ class RequestsHelper {
     /**
      * Insert new Wholesale request.
      *
-     * @param int   $user_id The sender account ID .
-     * @param array $form_data The form data in request.
-     * @return int A new wholesale ID registered.
+     * @param int    $user_id The sender account ID .
+     * @param array  $body_params The form data in request.
+     * @param string $request_status The status of the request.
+     * @return int|WP_Error A new wholesale ID registered.
      */
-    public static function insert_whs_request( int $user_id, array $form_data ): int {
+    public static function insert_whs_request( int $user_id, array $body_params, string $request_status = self::STATUS_PENDING ) {
         $name         = '';
         $display_name = '';
 
-        if ( array_key_exists( 'first_name', $form_data ) && array_key_exists( 'last_name', $form_data ) ) {
-            $name         = $form_data['first_name'] . ' ' . $form_data['last_name'];
-            $display_name = $form_data['first_name'] . ' ' . $form_data['last_name'];
+        if ( array_key_exists( 'first_name', $body_params ) && array_key_exists( 'last_name', $body_params ) ) {
+            $name         = $body_params['first_name'] . ' ' . $body_params['last_name'];
+            $display_name = $body_params['first_name'] . ' ' . $body_params['last_name'];
         }
 
         if ( empty( $name ) ) {
@@ -55,37 +57,35 @@ class RequestsHelper {
         );
 
         if ( is_wp_error( $new_request_id ) ) {
-            return -1;
+            return $new_request_id;
         }
 
         $general_setting = SettingsHelper::get_settings();
+        $request_data    = [];
 
         foreach ( $general_setting['registration_fields']['fields'] as $gsetting ) {
             $key = $gsetting['inputName'];
-            if ( array_key_exists( $key, $form_data ) ) {
-                $data[ $gsetting['label'] ] = [
+            if ( array_key_exists( $key, $body_params ) ) {
+                $request_data[ $gsetting['label'] ] = [
                     'type'       => $gsetting['type'],
                     'is_default' => $gsetting['isDefault'],
                     'key'        => $key,
                 ];
 
                 if ( 'email_address' === $key ) {
-                    update_post_meta( $new_request_id, self::REQUEST_META_EMAIL, $form_data[ $key ] );
+                    update_post_meta( $new_request_id, self::REQUEST_META_EMAIL, $body_params[ $key ] );
                 } elseif ( 'message' === $key ) {
-                    update_post_meta( $new_request_id, self::REQUEST_META_MESSAGE, $form_data[ $key ] );
+                    update_post_meta( $new_request_id, self::REQUEST_META_MESSAGE, $body_params[ $key ] );
                 } else {
-                    $data[ $gsetting['label'] ]['value'] = $form_data[ $key ];
+                    $request_data[ $gsetting['label'] ]['value'] = $body_params[ $key ];
                 }
             }
         }
-        update_post_meta( $new_request_id, self::REQUEST_META_DATA, $data );
+        update_post_meta( $new_request_id, self::REQUEST_META_DATA, $request_data );
 
         update_post_meta( $new_request_id, self::REQUEST_META_DISPLAY_NAME, $display_name );
 
-        update_post_meta( $new_request_id, self::REQUEST_META_STATUS, self::PENDING );
-
-        // Trigger the email when a new wholesale account is registered.
-        do_action( 'ywhs_new_account_registered', $new_request_id );
+        update_post_meta( $new_request_id, self::REQUEST_META_STATUS, $request_status );
 
         return $new_request_id;
     }
@@ -348,46 +348,22 @@ class RequestsHelper {
      * Delete a wholesaler request by ID
      *
      * @param int $request_id The target request ID .
-     * @return bool A wholesale request deleted status.
+     * @return bool|WP_Error A wholesale request deleted status.
      */
-    public static function delete_whs_request( int $request_id ): bool {
+    public static function delete_whs_request( int $request_id ) {
         $request = get_post( $request_id );
 
         if ( ! isset( $request ) || self::REQUEST_POST_TYPE !== $request->post_type ) {
-            return false;
-        }
-        $meta        = get_post_meta( $request_id );
-        $backup      = [];
-        $is_rollback = false;
-
-        foreach ( $meta as $key => $val ) {
-            $backup[ $key ] = get_post_meta( $request_id, $key, true );
-            $result         = delete_post_meta( $request_id, $key );
-            if ( ! $result ) {
-                $is_rollback = true;
-                break;
-            }
+            return new WP_Error( 'not_found', 'Request not found', [ 'status' => 404 ] );
         }
 
-        if ( $is_rollback ) {
-            foreach ( $backup as $key => $val ) {
-                update_post_meta( $request_id, $key, $val );
-            }
+        $result = wp_delete_post( $request_id, true );
+
+        if ( $result === false || $result === null ) {
             return false;
         }
 
-        wp_cache_delete( $request_id, 'post-meta' );
-
-        $result = wp_delete_post( $request_id );
-
-        if ( ! $result ) {
-            foreach ( $backup as $key => $val ) {
-                update_post_meta( $request_id, $key, $val );
-            }
-            return false;
-        }
-
-            return true;
+        return true;
     }
 
     /**
@@ -418,9 +394,9 @@ class RequestsHelper {
      *
      * @param int    $request_id The target request ID .
      * @param string $role_slug The target role slug .
-     * @return void
+     * @return void|WP_Error
      */
-    public static function handle_ywhs_request_author( int $request_id, string $role_slug ): void {
+    public static function approve_request( int $request_id, string $role_slug ) {
         $request = get_post( $request_id );
 
         if ( $request->post_author < 1 ) {
@@ -442,7 +418,7 @@ class RequestsHelper {
             );
 
             if ( is_wp_error( $request_user ) ) {
-                throw new Exception( esc_html( $request_user->get_error_message() ) );
+                return $request_user;
             }
 
             $result = wp_update_post(
@@ -453,32 +429,26 @@ class RequestsHelper {
             );
 
             if ( is_wp_error( $result ) ) {
-                throw new Exception( esc_html( $result->get_error_message() ) );
+                return $result;
             }
         } else {
-            $current_user = new WP_User( $request->post_author );
 
-            RolesHelper::remove_ywhs_role_from_user( $current_user );
+            $user = get_user_by( 'ID', $request->post_author );
+            if ( $user === false ) {
+                return new WP_Error( 'not_found', 'User not found', [ 'status' => 404 ] );
+            }
 
-            $current_user->add_role( $role_slug );
-
+            RolesHelper::remove_ywhs_role_from_user( $user );
+            $user->add_role( $role_slug );
         }//end if
+
+        update_post_meta( $request_id, self::REQUEST_META_STATUS, self::STATUS_APPROVED );
+        do_action( 'ywhs_account_registration_approved', $request_id );
     }
 
-
-    /**
-     * Remove role from the the author of request
-     *
-     * @param int $request_id The target request ID.
-     * @return void
-     */
-    public static function remove_role_from_ywhs_request_author( int $request_id ): void {
-        $request = get_post( $request_id );
-
-        if ( $request->post_author > 0 ) {
-            $current_user = new WP_User( $request->post_author );
-            RolesHelper::remove_ywhs_role_from_user( $current_user );
-        }
+    public static function reject_request( int $request_id ) {
+        update_post_meta( $request_id, self::REQUEST_META_STATUS, self::STATUS_REJECTED );
+        do_action( 'ywhs_account_registration_rejected', $request_id );
     }
 
     public static function count_requests_by_status( bool $force_recalc = false ): array {

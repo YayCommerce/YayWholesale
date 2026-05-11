@@ -161,7 +161,7 @@ class RolesRestController extends BaseRestController {
 
     public function bulk_delete_roles( WP_REST_Request $request ) {
         $payload = $request->get_json_params();
-        $ids     = $payload['ids'] ?? [];
+        $ids     = $payload['roleIds'] ?? [];
 
         if ( empty( $ids ) ) {
             return $this->error_invalid_arguments();
@@ -184,7 +184,7 @@ class RolesRestController extends BaseRestController {
 
     public function bulk_update_role_status( WP_REST_Request $request ) {
         $payload = $request->get_json_params();
-        $ids     = $payload['ids'] ?? [];
+        $ids     = $payload['roleIds'] ?? [];
         $status  = $payload['status'] ?? null;
 
         if ( empty( $ids ) || ! is_bool( $status ) ) {

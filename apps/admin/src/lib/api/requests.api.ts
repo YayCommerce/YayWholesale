@@ -21,7 +21,7 @@ export function approveRequest(requestId: number, roleSlug: string) {
 }
 
 export function bulkApproveRequest(requestIds: number[], roleSlug: string) {
-  return api.put('requests/bulk-approve', { json: { ids: requestIds, roleSlug } }).json<number>();
+  return api.put('requests/bulk-approve', { json: { requestIds, roleSlug } }).json<number>();
 }
 
 export function rejectRequest(requestId: number) {
@@ -29,7 +29,7 @@ export function rejectRequest(requestId: number) {
 }
 
 export function bulkRejectRequest(requestIds: number[]) {
-  return api.put('requests/bulk-reject', { json: { ids: requestIds } }).json<number>();
+  return api.put('requests/bulk-reject', { json: { requestIds } }).json<number>();
 }
 
 export function deleteRequest(requestId: number) {
@@ -37,7 +37,7 @@ export function deleteRequest(requestId: number) {
 }
 
 export function bulkDeleteRequest(requestIds: number[]) {
-  return api.delete(`requests/bulk-delete`, { json: { ids: requestIds } }).json<number>();
+  return api.delete(`requests/bulk-delete`, { json: { requestIds } }).json<number>();
 }
 
 export function countRequestByStatus() {

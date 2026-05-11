@@ -64,7 +64,7 @@ class WholeSalersController extends BaseRestController {
         $payload   = $request->get_json_params();
         $role_slug = $payload['roleSlug'];
 
-        if ( empty( $role_slug ) || ! is_string( $role_slug ) ) {
+        if ( empty( $role_slug ) ) {
             return $this->error_invalid_arguments();
         }
 
@@ -75,7 +75,7 @@ class WholeSalersController extends BaseRestController {
         }
 
         $user = get_user_by( 'ID', $user_id );
-        if ( ! $user ) {
+        if ( $user === false ) {
             return $this->error_not_found();
         }
 
@@ -93,7 +93,7 @@ class WholeSalersController extends BaseRestController {
         if ( empty( $user_ids ) || ! is_array( $user_ids ) ) {
             return $this->error_invalid_arguments();
         }
-        if ( empty( $role_slug ) || ! is_string( $role_slug ) ) {
+        if ( empty( $role_slug ) ) {
             return $this->error_invalid_arguments();
         }
 

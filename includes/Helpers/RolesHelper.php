@@ -118,7 +118,8 @@ class RolesHelper {
      * @return void
      */
     public static function remove_ywhs_role_from_user( \WP_User $user ): void {
-        $role_slugs = array_column( get_option( 'yaywholesaleb2b_roles', [] ), 'slug' );
+        $all_role_configs = self::get_wholesale_roles();
+        $role_slugs       = array_column( $all_role_configs, 'slug' );
 
         foreach ( $role_slugs as $ywhs_role ) {
             if ( in_array( $ywhs_role, $user->roles, true ) ) {

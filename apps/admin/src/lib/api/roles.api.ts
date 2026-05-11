@@ -21,12 +21,12 @@ export function deleteRole(roleId: number) {
   return api.delete(`roles/${roleId}`).json<Role[]>();
 }
 
-export function bulkDeleteRoles(ids: number[]) {
-  return api.delete('roles/bulk-delete', { json: { ids } }).json<Role[]>();
+export function bulkDeleteRoles(roleIds: number[]) {
+  return api.delete('roles/bulk-delete', { json: { roleIds } }).json<Role[]>();
 }
 
-export function bulkUpdateRoleStatus(ids: number[], status: boolean) {
-  return api.put('roles/bulk-status', { json: { ids, status } }).json<Role[]>();
+export function bulkUpdateRoleStatus(roleIds: number[], status: boolean) {
+  return api.put('roles/bulk-status', { json: { roleIds, status } }).json<Role[]>();
 }
 
 export function countRolesUser() {
