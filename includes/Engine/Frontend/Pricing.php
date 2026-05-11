@@ -31,7 +31,7 @@ class Pricing {
 
         add_action( 'woocommerce_before_calculate_totals', [ $this, 'before_calculate_totals' ], 103 );
 
-        add_filter( 'woocommerce_cart_item_price', [ $this, 'cart_item_price' ], 999, 2 );
+        add_filter( 'woocommerce_cart_item_price', [ $this, 'cart_item_price' ], 999, 3 );
 
         add_action( 'woocommerce_checkout_order_processed', [ $this, 'ywhs_checkout_wholesale_order_handling' ], 999, 3 );
     }
@@ -47,24 +47,34 @@ class Pricing {
             return;
         }
 
-        do_action( 'ywhs_before_cart_calculate_totals', $cart );
-        foreach ( $cart->get_cart_contents() as $cart_item_key => $cart_item ) {
-            if ( ! empty( $cart_item['data'] ) ) {
-                do_action( 'ywhs_before_cart_item_calculate_totals', $cart );
+        $is_checking_mov = apply_filters( 'ywhs_is_force_checking_requirement', is_checkout() || Utils::is_checkout_blocks() );
+        $role_config     = CustomerHelper::get_current_user_wholesale_role();
 
-                $product         = $cart_item['data'];
-                $quantity        = $cart_item['quantity'];
-                $is_checking_mov = is_checkout() || Utils::is_checkout_blocks();
+        $is_discounted = true;
+        if ( $is_checking_mov ) {
+            $is_discounted = RequirementHelper::is_cart_meet_requirement( $role_config );
+        }
 
-                $maybe_discounted_price = ShopPricingHelper::get_wholesale_price( $product, $quantity, $is_checking_mov );
+        if ( $is_discounted ) {
+            do_action( 'ywhs_before_cart_calculate_totals', $cart );
+            foreach ( $cart->get_cart_contents() as $cart_item_key => $cart_item ) {
+                if ( ! empty( $cart_item['data'] ) ) {
+                    do_action( 'ywhs_before_cart_item_calculate_totals', $cart );
 
-                $product->set_price( $maybe_discounted_price );
+                    $cart_item_data = $cart_item['data'];
+                    $quantity       = $cart_item['quantity'];
+                    // var_dump( $cart_item_data->get_price() );
 
-                do_action( 'ywhs_after_cart_item_calculate_totals', $cart );
-            }//end if
-        }//end foreach
+                    $discounted_price = ShopPricingHelper::get_cart_item_wholesale_price( $cart_item_data, $role_config, $quantity );
+                    // var_dump( $discounted_price );
 
-        do_action( 'ywhs_after_cart_calculate_totals', $cart );
+                    $cart_item_data->set_price( $discounted_price );
+
+                    do_action( 'ywhs_after_cart_item_calculate_totals', $cart );
+                }//end if
+            }//end foreach
+            do_action( 'ywhs_after_cart_calculate_totals', $cart );
+        }//end if
     }
 
     /**
@@ -74,27 +84,28 @@ class Pricing {
      * @param array  $cart_item the cart item.
      * @return string
      */
-    public function cart_item_price( $price_html, $cart_item ) {
+    public function cart_item_price( $price_html, $cart_item, $cart_item_key ) {
         if ( empty( $cart_item['data'] ) ) {
             return $price_html;
         }
 
-        $product = $cart_item['data'];
+        $cart_item_data = $cart_item['data'];
+        $role_config    = CustomerHelper::get_current_user_wholesale_role();
 
-        $regular  = (float) $product->get_regular_price();
-        $sale     = (float) $product->get_sale_price();
+        $regular  = (float) $cart_item_data->get_regular_price();
+        $sale     = (float) $cart_item_data->get_sale_price();
         $quantity = $cart_item['quantity'];
 
-        $discounted = ShopPricingHelper::get_wholesale_price( $product, $quantity );
+        $discounted = ShopPricingHelper::get_cart_item_wholesale_price( $cart_item_data, $role_config, $quantity );
 
         $tax_display_cart = get_option( 'woocommerce_tax_display_cart', 'excl' );
 
         if ( 'incl' === $tax_display_cart ) {
-            $regular    = wc_get_price_including_tax( $product, [ 'price' => $regular ] );
-            $discounted = wc_get_price_including_tax( $product, [ 'price' => $discounted ] );
+            $regular    = wc_get_price_including_tax( $cart_item_data, [ 'price' => $regular ] );
+            $discounted = wc_get_price_including_tax( $cart_item_data, [ 'price' => $discounted ] );
         } else {
-            $regular    = wc_get_price_excluding_tax( $product, [ 'price' => $regular ] );
-            $discounted = wc_get_price_excluding_tax( $product, [ 'price' => $discounted ] );
+            $regular    = wc_get_price_excluding_tax( $cart_item_data, [ 'price' => $regular ] );
+            $discounted = wc_get_price_excluding_tax( $cart_item_data, [ 'price' => $discounted ] );
         }
 
         if ( $discounted < $regular ) {

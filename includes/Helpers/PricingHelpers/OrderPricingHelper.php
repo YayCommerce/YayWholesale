@@ -6,7 +6,7 @@ use YayWholesaleB2B\Helpers\ReportsHelper;
 use YayWholesaleB2B\Utils\Utils;
 
 /**
- * Common Helper
+ * Order Pricing Helper
  */
 class OrderPricingHelper {
     /**
@@ -20,12 +20,8 @@ class OrderPricingHelper {
      * @return float The discounted price.
      */
     public static function calculate_wholesale_price( $price, $extra, $product, array $role, $quantity = 1 ) {
-        $discount = isset( $role['discount'] ) ? ( (float) $role['discount'] / 100 ) : 0;
-        if ( $discount < 0 ) {
-            return $price;
-        }
 
-        $discounted_extra = max( 0, ( $extra ) * ( 1 - $discount ) );
+        $discounted_extra = ShopPricingHelper::calculate_wholesale_discount_for_extra( $extra, $role );
 
         $discounted_extra = apply_filters( 'ywhs_extra_calculated_before_add_to_price', $discounted_extra );
         $final_price      = 0;
@@ -36,16 +32,18 @@ class OrderPricingHelper {
             if ( isset( $handled_price ) ) {
                 $final_price = $handled_price;
             }
-        } else {
-            // Lite handle (Role based percentage discount)
+        }
+
+        // Lite handle (Role based percentage discount)
+        if ( (float) $final_price === 0.0 ) {
+            $discount = isset( $role['discount'] ) ? ( (float) $role['discount'] / 100 ) : 0;
+            if ( $discount < 0 ) {
+                return $price;
+            }
             $final_price = max( 0, ( $price ) * ( 1 - $discount ) );
         }
 
-        if ( $extra < 0 ) {
-            $final_price = $final_price - abs( $extra );
-        } else {
-            $final_price = $final_price + $discounted_extra;
-        }
+        $final_price = $final_price + $discounted_extra;
 
         return (float) wc_format_decimal( $final_price, wc_get_price_decimals() );
     }

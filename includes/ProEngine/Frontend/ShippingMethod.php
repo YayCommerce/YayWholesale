@@ -16,6 +16,8 @@ class ShippingMethod {
 
     protected function __construct() {
         add_filter( 'woocommerce_package_rates', [ $this, 'restrict_shipping_methods_by_role_checkout' ], 999, 2 );
+
+        add_filter( 'ywhs_shipping_method_roles', [ $this, 'get_shipping_method_roles_setting' ], 999, 1 );
     }
 
     /**
@@ -55,5 +57,15 @@ class ShippingMethod {
             }
         }
         return $rates;
+    }
+
+    /**
+     * Get setting of payment methods for admin page
+     *
+     * @param array $setting The setting.
+     * @return array
+     */
+    public function get_shipping_method_roles_setting( $setting ) {
+        return array_merge( $setting, ShippingHelper::get_shipping_roles_setting() );
     }
 }

@@ -2,42 +2,34 @@
 
 namespace YayWholesaleB2B\Helpers\PricingHelpers;
 
-use YayWholesaleB2B\Helpers\CustomerHelper;
-use YayWholesaleB2B\Helpers\RequirementHelper;
-use YayWholesaleB2B\Utils\Utils;
-
 /**
- * Common Helper
+ * Shop Pricing Helper
  */
 class ShopPricingHelper {
 
     /**
      * Get the wholesale price for calculating in cart / checkout
      *
-     * @param \WC_Product $product The current handling product.
+     * @param \WC_Product $cart_item The current handling product.
+     * @param array       $role_config The wholesale role configuration.
      * @param int         $quantity The current quantity in cart.
-     * @param bool        $is_checking_mov If it need to be checked with requirements (MOV).
      * @return float The discounted price
      */
-    public static function get_wholesale_price( $product, $quantity, $is_checking_mov = false ) {
+    public static function get_cart_item_wholesale_price( $cart_item, $role_config, $quantity ) {
 
-        $role = CustomerHelper::get_current_user_wholesale_role();
-        if ( ! $role ) {
-            return $product->get_price();
-        }
+        $product = wc_get_product( $cart_item->get_id() );
 
-        if ( $is_checking_mov ) {
-            if ( ! RequirementHelper::is_cart_meet_requirement( $role ) ) {
-                return $product->get_price();
-            }
-        }
+        $prices          = self::get_price_and_extra( $cart_item, $role_config );
+        $wholesale_price = ProductPricingHelper::get_wholesale_price( $product, $role_config, $quantity );
 
-        $prices = self::get_price_and_extra( $product, $role );
-        if ( ! isset( $prices ) || empty( $prices ) ) {
-            return $product->get_price();
-        }
+        $extra_price     = $prices['extra_price'];
+        $wholesale_extra = self::calculate_wholesale_discount_for_extra( $extra_price, $role_config );
 
-        return self::calculate_wholesale_price( $prices['price'], $prices['extra'], $product, $role, $quantity );
+        $final_price = max( 0, $wholesale_price + $wholesale_extra );
+
+        $final_price = (float) wc_format_decimal( $final_price, wc_get_price_decimals() );
+
+        return apply_filters( 'ywhs_calculated_wholesale_price', $final_price );
     }
 
     /**
@@ -57,12 +49,7 @@ class ShopPricingHelper {
             // return $price;
             // }
 
-        $apply_to_sale = $role['applyToSalePrice'] ?? false;
-        $regular_price = (float) $product->get_regular_price();
-        $sale_price    = (float) $product->get_price();
-        $price         = ( $apply_to_sale && $sale_price < $regular_price ) ? $sale_price : $regular_price;
-
-        return self::calculate_wholesale_price( $price, 0, $product, $role, 1 );
+        return ProductPricingHelper::get_wholesale_price( $product, $role, 1 );
     }
 
     /**
@@ -118,73 +105,51 @@ class ShopPricingHelper {
     }
 
     /**
-     * Calculate the price after applying the wholesale discount
-     *
-     * @param float       $price The original price before adding the extra.
-     * @param float       $extra The extra price (can be 0, negative, positive).
-     * @param \WC_Product $product The current handling product.
-     * @param array       $role The wholesale role.
-     * @param int         $quantity The quantity of product in cart.
-     * @return float The discounted price
-     */
-    public static function calculate_wholesale_price( $price, $extra, $product, $role, $quantity = 1 ) {
-        $discount = isset( $role['discount'] ) ? ( (float) $role['discount'] / 100 ) : 0;
-        if ( $discount < 0 ) {
-            return $price;
-        }
-
-        $discounted_extra = max( 0, ( $extra ) * ( 1 - $discount ) );
-
-        $discounted_extra = apply_filters( 'ywhs_extra_calculated_before_add_to_price', $discounted_extra );
-        $final_price      = 0;
-
-        if ( Utils::is_pro() ) {
-            // Pro handle for product based, category based, price tier (INCOMING)
-            $handled_price = null;
-            if ( isset( $handled_price ) ) {
-                $final_price = $handled_price;
-            }
-        } else {
-            // Lite handle (Role based percentage discount)
-            $final_price = max( 0, ( $price ) * ( 1 - $discount ) );
-        }
-
-        if ( $extra < 0 ) {
-            $final_price = $final_price - abs( $extra );
-        } else {
-            $final_price = $final_price + $discounted_extra;
-        }
-
-        return (float) wc_format_decimal( $final_price, wc_get_price_decimals() );
-    }
-
-    /**
      * Split the price to original price and extra price
      *
-     * @param \WC_Product $product The current handling product.
+     * @param \WC_Product $cart_item The current handling product.
      * @param array       $role The wholesale role.
      * @return array The prices
      */
-    protected static function get_price_and_extra( \WC_Product $product, array $role ) {
+    protected static function get_price_and_extra( \WC_Product $cart_item, array $role ) {
         $apply_to_sale = $role['applyToSalePrice'] ?? false;
 
-        $regular_price = $product->get_regular_price();
-        $sale_price    = $product->get_price();
+        $regular_price = (float) $cart_item->get_regular_price();
+        $sale_price    = (float) $cart_item->get_price();
 
         $is_sale_price = ( $apply_to_sale && $sale_price < $regular_price );
         $price         = $is_sale_price ? $sale_price : $regular_price;
+        // var_dump( $price );
 
-        $product = wc_get_product( $product->get_id() );
+        $product = wc_get_product( $cart_item->get_id() );
 
         if ( $is_sale_price ) {
-            $original = $product->get_sale_price();
+            $original = (float) $product->get_sale_price();
         } else {
-            $original = $product->get_regular_price();
+            $original = (float) $product->get_regular_price();
         }
 
         return [
-            'price' => $original,
-            'extra' => $price - $original,
+            'original_price' => $original,
+            'extra_price'    => $price - $original,
         ];
+    }
+
+    /**
+     * Handling calculate the extra price
+     *
+     * @param float $extra_price The extra price.
+     * @param array $role_config The wholesale role.
+     * @return float The discounted extra price
+     */
+    public static function calculate_wholesale_discount_for_extra( $extra_price, $role_config ) {
+        $discount = isset( $role_config['discount'] ) ? ( (float) $role_config['discount'] / 100 ) : 0;
+        if ( $discount < 0 ) {
+            return $extra_price;
+        }
+
+        $discounted_extra = max( 0, ( $extra_price ) * ( 1 - $discount ) );
+
+        return apply_filters( 'ywhs_extra_calculated_before_add_to_price', $discounted_extra );
     }
 }

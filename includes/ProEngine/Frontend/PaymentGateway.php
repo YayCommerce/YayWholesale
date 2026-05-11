@@ -16,6 +16,8 @@ class PaymentGateway {
 
     protected function __construct() {
         add_filter( 'woocommerce_available_payment_gateways', [ $this, 'restrict_payment_methods_by_role' ], 999, 1 );
+
+        add_filter( 'ywhs_paymemt_method_roles', [ $this, 'get_payment_method_roles_setting' ], 999, 1 );
     }
 
     /**
@@ -47,5 +49,15 @@ class PaymentGateway {
         }
 
         return $available_gateways;
+    }
+
+    /**
+     * Get setting of payment methods for admin page
+     *
+     * @param array $setting The setting.
+     * @return array
+     */
+    public function get_payment_method_roles_setting( $setting ) {
+        return array_merge( $setting, PaymentGatewayHelper::get_payment_roles_setting() );
     }
 }

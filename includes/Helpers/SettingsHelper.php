@@ -109,8 +109,8 @@ class SettingsHelper {
         }
 
         if ( $is_fetch_all ) {
-            $setting['payment_roles']  = PaymentGatewayHelper::get_payment_roles_setting();
-            $setting['shipping_roles'] = ShippingHelper::get_shipping_roles_setting();
+            $setting['payment_roles']  = apply_filters( 'ywhs_paymemt_method_roles', [] );
+            $setting['shipping_roles'] = apply_filters( 'ywhs_shipping_method_roles', [] );
         }
 
         return $setting;
