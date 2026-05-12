@@ -26,7 +26,7 @@ export default function DashboardSummary(props: { reportQuery: ReturnType<typeof
             variant="outline"
             size="sm"
             className="text-foreground h-9 w-fit leading-0"
-            onClick={() => navigate('/wholesalers-list')}
+            onClick={() => navigate('/wholesalers')}
           >
             {__('View all wholesalers', 'yay-wholesale-b2b')}
           </Button>

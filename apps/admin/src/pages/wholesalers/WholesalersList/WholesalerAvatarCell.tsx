@@ -5,6 +5,7 @@ export function WholesalerAvatarCell({ wholesaler }: { wholesaler: Wholesaler })
   const { avatar, firstName, lastName, id, email, displayName } = wholesaler;
   const name = displayName ?? `${firstName} ${lastName}`;
   const userLink = window.yayWholesaleB2BMeta.wpMeta.usersUrl.edit.replace('%USER_ID%', id.toString());
+
   return (
     <div className="flex items-center gap-3">
       <Avatar className="h-9.5 w-9.5">

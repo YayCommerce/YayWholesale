@@ -1,106 +1,25 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { CircleNotchIcon } from '@phosphor-icons/react';
-import { useMatch, useNavigate } from 'react-router-dom';
-import { __, sprintf } from '@wordpress/i18n';
+import { useMatch } from 'react-router-dom';
+import { __ } from '@wordpress/i18n';
 
-import { useCountByStatusQuery } from '@/lib/queries/requests.queries';
 import { useIsMutatingSettings } from '@/lib/queries/settings.queries';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import { WholeSaleToolTip } from '@/components/ui/custom/WholeSaleToolTip';
-import DashboardIcon from '@/components/icons/DashboardIcon';
-import RequestIcon from '@/components/icons/RequestIcon';
-import RolesIcon from '@/components/icons/RolesIcon';
-import SettingsIcon from '@/components/icons/SettingsIcon';
-import WholesalersIcon from '../icons/WholesalersIcon';
-import { Badge } from '../ui/badge';
-import { HeaderNavMenuItem, HeaderNavMenuList } from '../ui/navmenu-header';
-
-const NAV_ITEMS = [
-  {
-    path: '/dashboard/*',
-    to: '/dashboard',
-    icon: DashboardIcon,
-    label: 'Dashboard',
-    side: () => <></>,
-  },
-  {
-    path: '/requests/*',
-    to: '/requests',
-    icon: RequestIcon,
-    label: 'Request',
-    side: (props: { classname?: string }) => {
-      const { data } = useCountByStatusQuery();
-      const pendingCount = useMemo(() => data?.pending ?? 0, [data]);
-
-      return (
-        pendingCount > 0 && (
-          <WholeSaleToolTip
-            trigger={
-              <div>
-                <Badge variant="destructive" className={cn('h-5 min-w-5 px-1 leading-0 tabular-nums', props.classname)}>
-                  {pendingCount}
-                </Badge>
-              </div>
-            }
-            content={
-              pendingCount > 1
-                ? sprintf(__('%d requests are pending', 'yay-wholesale-b2b'), pendingCount)
-                : __('1 request is pending', 'yay-wholesale-b2b')
-            }
-            side="bottom"
-          />
-        )
-      );
-    },
-  },
-  {
-    path: '/wholesalers-list/*',
-    to: '/wholesalers-list',
-    icon: WholesalersIcon,
-    label: 'Wholesalers',
-    side: () => <></>,
-  },
-  { path: '/roles/*', to: '/roles', icon: RolesIcon, label: 'Roles', side: () => <></> },
-  {
-    path: '/settings/*',
-    to: '/settings',
-    icon: SettingsIcon,
-    label: 'Settings',
-    side: () => <></>,
-  },
-];
-
-function useScrolled(threshold = 0) {
-  const [scrolled, setScrolled] = useState(false);
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > threshold);
-    window.addEventListener('scroll', onScroll);
-    return () => window.removeEventListener('scroll', onScroll);
-  }, [threshold]);
-  return scrolled;
-}
+import { HeaderMenu } from './HeaderMenu';
 
 export default function Header() {
-  const navigate = useNavigate();
   const scrolled = useScrolled();
   const isSettingRoute = useMatch({ path: '/settings/*' });
   const isSavingSettings = useIsMutatingSettings() > 0;
 
-  const handleNavClick = useCallback((to: string) => navigate(to), [navigate]);
-
-  const baseItemClass =
-    'flex cursor-pointer flex-row items-center gap-0 sm:gap-1.5 sm:flex-col sm:pt-1.5 md:flex-col md:pt-1.5 lg:flex-row px-1 ';
-  const activeItemClass =
-    'text-primary border-primary hover:text-primary-accent hover:border-primary-accent focus-visible:text-primary-accent focus-visible:border-primary-accent';
-
   return (
     <header
       className={cn(
-        'bg-background z-50 flex h-[56px] w-full items-center justify-between gap-[5px] pt-0 transition-shadow duration-300',
+        'bg-background relative flex h-13.5 items-center justify-between gap-0 py-0 pr-3 lg:pr-6',
         scrolled ? 'top-0 shadow-[0_8px_8px_0_rgba(85,93,102,0.3)]' : 'top-11.5 shadow-none',
         'sm:top-11.5 md:top-8',
-        'md:gap-5 md:pr-3',
+        'md:pr-3',
       )}
     >
       {/* Logo */}
@@ -112,42 +31,34 @@ export default function Header() {
         />
       </div>
 
-      {/* Navigation */}
-      <HeaderNavMenuList className="h-[56px] justify-start gap-7.5">
-        {NAV_ITEMS.map(({ path, to, icon: Icon, label, side: Side }) => {
-          const isActive = !!useMatch({ path });
-          return (
-            <HeaderNavMenuItem
-              key={to}
-              onClick={() => handleNavClick(to)}
-              className={cn(baseItemClass, isActive && activeItemClass)}
-            >
-              <span className="relative">
-                <Icon />
-                <Side classname="absolute flex lg:hidden right-0.5 top-0.5 w-fit text-[7px] h-3 min-w-3 translate-x-1/2 -translate-y-1/2" />
-              </span>
-              <span className="hidden sm:inline">{__(label)}</span>
-              <span>
-                <Side classname="hidden lg:flex" />
-              </span>
-            </HeaderNavMenuItem>
-          );
-        })}
-      </HeaderNavMenuList>
+      <HeaderMenu />
 
-      {/* Save button (Settings only) */}
-      {isSettingRoute && (
-        <Button type="submit" form="settings-form" disabled={isSavingSettings} className="relative">
-          <span className={isSavingSettings ? 'opacity-0' : 'opacity-100'}>
-            {__('Save Changes', 'yay-wholesale-b2b')}
-          </span>
-          {isSavingSettings && (
-            <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-              <CircleNotchIcon className="animate-spin" />
+      <div className="flex items-center">
+        {/* Save button (Settings only) */}
+        {isSettingRoute && (
+          <Button type="submit" form="settings-form" disabled={isSavingSettings} className="relative ms-4">
+            <span className={isSavingSettings ? 'opacity-0' : 'opacity-100'}>
+              <span className="max-sm:hidden">{__('Save Changes', 'yay-wholesale-b2b')}</span>
+              <span className="sm:hidden">{__('Save', 'yay-wholesale-b2b')}</span>
             </span>
-          )}
-        </Button>
-      )}
+            {isSavingSettings && (
+              <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+                <CircleNotchIcon className="animate-spin" />
+              </span>
+            )}
+          </Button>
+        )}
+      </div>
     </header>
   );
+}
+
+function useScrolled(threshold = 0) {
+  const [scrolled, setScrolled] = useState(false);
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > threshold);
+    window.addEventListener('scroll', onScroll);
+    return () => window.removeEventListener('scroll', onScroll);
+  }, [threshold]);
+  return scrolled;
 }

@@ -2,7 +2,7 @@ import { createHashRouter, redirect } from 'react-router-dom';
 
 import DashboardPage from '@/pages/dashboard/DashboardPage';
 import RolesPage from '@/pages/roles/RolesPage';
-import WholesalersListPage from '@/pages/wholesalers-list/WholeSalersListPage';
+import WholesalersPage from '@/pages/wholesalers/WholesalersPage';
 import AppLayout from './AppLayout';
 import NotFoundPage from './pages/404';
 import ErrorPage from './pages/500';
@@ -38,13 +38,8 @@ export function getManagerRouter() {
           ],
         },
         {
-          path: 'wholesalers-list',
-          children: [
-            {
-              index: true,
-              element: <WholesalersListPage />,
-            },
-          ],
+          path: 'wholesalers',
+          element: <WholesalersPage />,
         },
         {
           path: 'roles',

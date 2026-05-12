@@ -40,9 +40,9 @@ import { Separator } from '@/components/ui/separator';
 import { toast } from '@/components/ui/sonner';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import RolesIcon from '@/components/icons/RolesIcon';
-import { wholesalerColumns } from './WholeSalersList/WholesalerColumns';
+import { wholesalerColumns } from './WholesalersList/WholesalerColumns';
 
-export default function WholeSalersList() {
+export function WholesalersList() {
   const [search, setSearch] = useState('');
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
