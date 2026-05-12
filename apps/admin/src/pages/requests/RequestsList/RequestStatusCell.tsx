@@ -23,7 +23,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { toast } from '@/components/ui/sonner';
-import RequestsStatusIcon from '@/components/icons/RequestStatusIcon';
+import RequestsStatusIcon from '@/components/icons/RequestsStatusIcon';
 
 export function RequestStatusCell({ request }: { request: Request }) {
   const { data: activeRoles } = useActiveRolesQuery();

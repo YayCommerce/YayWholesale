@@ -28,7 +28,7 @@ import { Label } from '@/components/ui/label';
 import { SheetDescription, SheetFooter, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { toast } from '@/components/ui/sonner';
 import { Textarea } from '@/components/ui/textarea';
-import RequestsStatusIcon from '@/components/icons/RequestStatusIcon';
+import RequestsStatusIcon from '@/components/icons/RequestsStatusIcon';
 
 export function EditRequestForm({ request }: { request: Request }) {
   const navigate = useNavigate();

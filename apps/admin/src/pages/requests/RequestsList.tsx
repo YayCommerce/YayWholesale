@@ -1,13 +1,21 @@
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { flexRender, getCoreRowModel, PaginationState, useReactTable } from '@tanstack/react-table';
-import { ChevronsUpDown, Search } from 'lucide-react';
+import clsx from 'clsx';
+import { ChevronsUpDown, Loader2, Search } from 'lucide-react';
 import { useDebounce } from 'rooks';
-import { Spinner } from '@wordpress/components';
-import { __, sprintf } from '@wordpress/i18n';
+import { __, _n, sprintf } from '@wordpress/i18n';
 
-import { useBulkDeleteRequestMutation, useRequestsQuery } from '@/lib/queries/requests.queries';
-import { useActiveRolesQuery } from '@/lib/queries/roles.queries';
-import { Request, RequestFilter } from '@/lib/schema/requests.type';
+import { getErrorMsg } from '@/lib/helpers/response.helper';
+import {
+  useBulkApproveRequestMutation,
+  useBulkDeleteRequestMutation,
+  useBulkRejectRequestMutation,
+  useCountByStatusQuery,
+  useIsMutatingRequests,
+  useRequestsQuery,
+} from '@/lib/queries/requests.queries';
+import { useActiveRolesQuery, useDefaultRole } from '@/lib/queries/roles.queries';
+import { RequestFilter } from '@/lib/schema/requests.type';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { BulkActionBox } from '@/components/ui/bulk-actions';
@@ -27,7 +35,6 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuSub,
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
@@ -45,9 +52,10 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
+import { toast } from '@/components/ui/sonner';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import DeleteIcon from '@/components/icons/DeleteIcon';
-import RequestsStatusIcon from '@/components/icons/RequestStatusIcon';
+import RequestsStatusIcon from '@/components/icons/RequestsStatusIcon';
 import { requestColumns } from './RequestsList/RequestColumns';
 
 export default function RequestsList() {
@@ -56,10 +64,12 @@ export default function RequestsList() {
     pageIndex: 0,
     pageSize: 10,
   });
+  const [statusFilter, setStatusFilter] = useState<RequestFilter['status']>('all');
   const setSearchDebounced = useDebounce(setSearch, 500);
 
-  const [statusFilter, setStatusFilter] = useState<RequestFilter['status']>('all');
   const [openBulkDeleteDialog, setOpenDeleteDialog] = useState(false);
+  const { data: countByStatusRes } = useCountByStatusQuery();
+  const totalCount = countByStatusRes?.total;
 
   const filter = useMemo(
     () =>
@@ -72,12 +82,13 @@ export default function RequestsList() {
     [search, pagination, statusFilter],
   );
 
-  const { data: requestRes, isLoading } = useRequestsQuery(filter);
+  const { data: requestsPage, isLoading } = useRequestsQuery(filter);
   const { data: activeRoles } = useActiveRolesQuery();
+  const defaultRole = useDefaultRole();
 
   const defaultData = useMemo(() => [], []);
   const table = useReactTable({
-    data: requestRes?.data ?? defaultData,
+    data: requestsPage?.data ?? defaultData,
     columns: requestColumns,
     state: {
       pagination,
@@ -85,53 +96,61 @@ export default function RequestsList() {
     getCoreRowModel: getCoreRowModel(),
     onPaginationChange: setPagination,
     manualPagination: true,
-    rowCount: requestRes?.totalItems ?? 0,
-    pageCount: requestRes?.totalPage ?? -1,
+    rowCount: requestsPage?.totalItems ?? 0,
+    pageCount: requestsPage?.totalPage ?? -1,
   });
 
-  const selectedCount = table.getFilteredSelectedRowModel().rows.length;
-  const selectedRowsIds = useMemo(
-    () => Array.from(table.getSelectedRowModel().rows, (row) => row.original.id),
-    [selectedCount],
-  );
-  const bulkUpdateMutation = useBulkUpdateRequestStatusMutation(selectedRowsIds);
-  const bulkDeleteMutation = useBulkDeleteRequestMutation(selectedRowsIds);
+  const bulkApproveMutation = useBulkApproveRequestMutation();
+  const bulkRejectMutation = useBulkRejectRequestMutation();
+  const bulkDeleteMutation = useBulkDeleteRequestMutation();
+  const isMutating = useIsMutatingRequests();
 
-  const handleChangeSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearch(e.target.value);
-    table.setPageIndex(0);
-    debouncedSearch(e.target.value);
-  };
+  async function handleBulkApprove(roleSlug: string) {
+    const requestIds = table.getSelectedRowModel().rows.map((row) => row.original.id);
+    if (requestIds.length === 0 || isMutating > 0) return;
 
-  const handleChangePerPage = async (value: string) => {
-    table.setPageSize(parseInt(value));
-    table.setPageIndex(0);
-  };
-
-  const handleBulkStatusChange = async (status: RequestFormValues['status'], roleId?: number) => {
-    if (bulkUpdateMutation.isPending || bulkDeleteMutation.isPending || isFetchingRequests) {
-      return;
+    try {
+      await bulkApproveMutation.mutateAsync({
+        roleSlug,
+        requestIds,
+      });
+      table.resetRowSelection();
+      toast.success(sprintf(__('Approved %d requests successfully', 'yay-wholesale-b2b'), requestIds.length));
+    } catch (error) {
+      toast.error(await getErrorMsg(error));
     }
-    if (!roleId) {
-      roleId = -1;
-    }
-    await bulkUpdateMutation.mutateAsync({ status, roleId });
-    table.resetRowSelection();
-  };
+  }
 
-  const handleBulkDelete = async () => {
-    if (bulkUpdateMutation.isPending || bulkDeleteMutation.isPending || isFetchingRequests) {
-      return;
-    }
-    await bulkDeleteMutation.mutateAsync();
-    setOpenDeleteDialog(false);
-    table.resetRowSelection();
-  };
+  async function handleBulkReject() {
+    const requestIds = table.getSelectedRowModel().rows.map((row) => row.original.id);
+    if (requestIds.length === 0 || isMutating > 0) return;
 
-  const onFilterChanged = (value: string) => {
-    setStatusFilter(value);
-    setPagination({ ...pagination, pageIndex: 0 });
-  };
+    try {
+      await bulkRejectMutation.mutateAsync(requestIds);
+      table.resetRowSelection();
+      toast.success(sprintf(__('Rejected %d requests successfully', 'yay-wholesale-b2b'), requestIds.length));
+    } catch (error) {
+      toast.error(await getErrorMsg(error));
+    }
+  }
+
+  async function handleBulkDelete() {
+    const requestIds = table.getSelectedRowModel().rows.map((row) => row.original.id);
+    if (requestIds.length === 0 || isMutating > 0) return;
+
+    try {
+      await bulkDeleteMutation.mutateAsync(requestIds);
+      setOpenDeleteDialog(false);
+      table.resetRowSelection();
+      toast.success(sprintf(__('Deleted %d requests successfully', 'yay-wholesale-b2b'), requestIds.length));
+    } catch (error) {
+      toast.error(await getErrorMsg(error));
+    }
+  }
+
+  const selectedCount = table.getSelectedRowModel().rows.length;
+  const noRequest = totalCount === 0;
+  const noFilteredRequest = !isLoading && requestsPage?.data.length === 0;
 
   return (
     <Card className="gap-4 shadow-sm">
@@ -139,26 +158,32 @@ export default function RequestsList() {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-2">
           <h1 className="text-2xl font-bold">{__('Wholesaler Requests', 'yay-wholesale-b2b')}</h1>
-          {totalCount && totalCount.count > 0 && (
+          {totalCount !== undefined && (
             <WholeSaleToolTip
               trigger={
                 <div>
                   <Badge variant="secondary" className="h-5 min-w-5 px-1 tabular-nums">
-                    {totalCount.count}
+                    {totalCount}
                   </Badge>
                 </div>
               }
-              content={
-                totalCount.count > 1
-                  ? sprintf(__('%d requests in total', 'yay-wholesale-b2b'), totalCount.count)
-                  : __('1 request in total', 'yay-wholesale-b2b')
-              }
+              content={sprintf(
+                _n('%d request in total', '%d requests in total', totalCount, 'yay-wholesale-b2b'),
+                totalCount,
+              )}
               side="bottom"
             />
           )}
         </div>
+
         <div className="flex flex-1 flex-col items-end gap-4 lg:flex-0 lg:flex-row">
-          <Select value={statusFilter} onValueChange={(value) => onFilterChanged(value)}>
+          <Select
+            value={statusFilter}
+            onValueChange={(status: RequestFilter['status']) => {
+              table.setPageIndex(0);
+              setStatusFilter(status);
+            }}
+          >
             <SelectTrigger className="w-full sm:w-40">
               <SelectValue />
             </SelectTrigger>
@@ -166,43 +191,35 @@ export default function RequestsList() {
               <SelectGroup>
                 <SelectLabel>{__('Status Filter', 'yay-wholesale-b2b')}</SelectLabel>
                 <SelectItem value="all">{__('All status', 'yay-wholesale-b2b')}</SelectItem>
-                {Object.entries(requestsStatusMap).map((status) => {
-                  const { icon, text } = status[1];
-                  return (
-                    status[0] !== 'approved' && (
-                      <SelectItem value={status[0]}>
-                        {icon} {text}
-                      </SelectItem>
-                    )
-                  );
-                })}
+                <SelectItem value="pending">
+                  <RequestsStatusIcon status="pending" />
+                  {__('Pending', 'yay-wholesale-b2b')}
+                </SelectItem>
+                <SelectItem value="rejected">
+                  <RequestsStatusIcon status="rejected" />
+                  {__('Rejected', 'yay-wholesale-b2b')}
+                </SelectItem>
               </SelectGroup>
             </SelectContent>
           </Select>
-          {(table.getPageCount() > 1 || keyword !== '') && (
-            <InputGroup className="w-full md:w-76">
-              <InputGroupInput placeholder="Search" value={search} onChange={handleChangeSearch} />
-              <InputGroupAddon align="inline-end">
-                <Search className="size-4.5 text-[#A0A0A7]" />
-              </InputGroupAddon>
-            </InputGroup>
-          )}
+          <InputGroup className="w-full md:w-76">
+            <InputGroupInput
+              placeholder="Search"
+              defaultValue={search}
+              onChange={(e) => {
+                table.setPageIndex(0);
+                setSearchDebounced(e.target.value);
+              }}
+            />
+            <InputGroupAddon align="inline-end">
+              <Search className="size-4.5 text-[#A0A0A7]" />
+            </InputGroupAddon>
+          </InputGroup>
         </div>
       </div>
 
       {/* Table */}
-      <div
-        className={cn(
-          'relative overflow-x-auto rounded-lg border',
-          (bulkUpdateMutation.isPending || bulkDeleteMutation.isPending) && 'relative opacity-50',
-        )}
-      >
-        {/* Overlay Spinner */}
-        {(bulkUpdateMutation.isPending || bulkDeleteMutation.isPending) && (
-          <div className="absolute inset-0 z-50 flex items-center justify-center">
-            <Spinner className="text-muted-foreground size-6 animate-spin" />
-          </div>
-        )}
+      <div className="relative overflow-x-auto rounded-lg border">
         <Table className="min-w-full">
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -222,141 +239,133 @@ export default function RequestsList() {
             ))}
           </TableHeader>
           <TableBody>
-            {isLoadingRequests ? (
+            {(noRequest || noFilteredRequest) && (
               <TableRow>
-                <TableCell colSpan={columns.length} className="h-32 text-center align-middle">
-                  <div className="flex items-center justify-center gap-2">
-                    <Spinner className="text-muted-foreground size-6 animate-spin" />
-                  </div>
-                </TableCell>
-              </TableRow>
-            ) : table.getRowModel().rows.length > 0 ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() && 'selected'}
-                  className="group not-last:border-divider not-last:border-b"
-                >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell
-                      key={cell.id}
-                      className={cn('h-14', cell.column.id === 'actions' ? 'flex w-25 justify-end lg:w-full' : '')}
-                    >
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell colSpan={columns.length} className="h-24 text-center">
-                  {__('No requests found.', 'yay-wholesale-b2b')}
+                <TableCell colSpan={table.getAllColumns().length} className="h-32 text-center">
+                  {__('No Requests found.', 'yay-wholesale-b2b')}
                 </TableCell>
               </TableRow>
             )}
+
+            {table.getRowModel().rows.map((row) => (
+              <TableRow
+                key={row.id}
+                data-state={row.getIsSelected() && 'selected'}
+                className="group not-last:border-divider not-last:border-b"
+              >
+                {row.getVisibleCells().map((cell) => (
+                  <TableCell
+                    key={cell.id}
+                    className={cn('h-14', cell.column.id === 'actions' ? 'flex w-25 justify-end lg:w-full' : '')}
+                  >
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  </TableCell>
+                ))}
+              </TableRow>
+            ))}
           </TableBody>
         </Table>
       </div>
+
       {/* Footer */}
-      {(table.getPageCount() > 1 || selectedCount > 1) && (
-        <div className="relative flex flex-col items-center gap-3 sm:flex-row">
-          <BulkActionBox selected={selectedCount} onClose={() => table.resetRowSelection()}>
-            <span>{sprintf(__('%d selected', 'yay-wholesale-b2b'), selectedCount)}</span>
-            <Separator orientation="vertical" className="ml-2 h-5!" />
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="hover:text-primary hover:bg-primary/6 group flex gap-1.5 px-2.5">
-                  <span className="text-sm font-normal">{__('Status', 'yay-wholesale-b2b')}</span>
-                  <span className="group-hover:text-primary text-muted-foreground flex items-center">
-                    <ChevronsUpDown className="size-3.5 stroke-[2.5px]" />
-                  </span>
+      <div className="relative flex flex-col items-center gap-3 sm:flex-row">
+        <BulkActionBox selected={selectedCount} onClose={() => table.resetRowSelection()}>
+          <span>{sprintf(__('%d selected', 'yay-wholesale-b2b'), selectedCount)}</span>
+          <Separator orientation="vertical" className="ml-2 h-5!" />
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="hover:text-primary hover:bg-primary/6 group flex gap-1.5 px-2.5">
+                <span className="text-sm font-normal">{__('Status', 'yay-wholesale-b2b')}</span>
+                <span className="group-hover:text-primary text-muted-foreground flex items-center">
+                  <ChevronsUpDown className="size-3.5 stroke-[2.5px]" />
+                </span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" sideOffset={9} className="w-fit min-w-[20px] p-1">
+              <DropdownMenuSub>
+                <DropdownMenuSubTrigger
+                  className="w-35"
+                  onClick={() => {
+                    if (!defaultRole) return;
+                    handleBulkApprove(defaultRole.slug);
+                  }}
+                >
+                  <RequestsStatusIcon status="approved" className="mt-0.5" />
+                  {__('Approve', 'yay-wholesale-b2b')}
+                </DropdownMenuSubTrigger>
+                <DropdownMenuSubContent>
+                  {activeRoles?.map((role) => (
+                    <DropdownMenuItem
+                      key={role.slug}
+                      onClick={() => {
+                        handleBulkApprove(role.slug);
+                      }}
+                      className="hover:bg-muted flex w-full cursor-pointer items-center justify-start gap-2 rounded-sm px-2.5 py-2 text-sm"
+                    >
+                      <RequestsStatusIcon status="approved" className="mt-0.5" />
+                      {sprintf(__('Approve to %s', 'yay-wholesale-b2b'), role.name)}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuSubContent>
+              </DropdownMenuSub>
+
+              <DropdownMenuItem className="w-35" onClick={() => handleBulkReject()}>
+                <RequestsStatusIcon status="rejected" />
+                {__('Reject', 'yay-wholesale-b2b')}
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          <Separator orientation="vertical" className="h-5!" />
+          <Dialog open={openBulkDeleteDialog} onOpenChange={setOpenDeleteDialog}>
+            <WholeSaleToolTip
+              trigger={
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  className="hover:text-destructive text-muted-foreground h-8 w-8 hover:bg-transparent hover:shadow-sm"
+                  onClick={() => setOpenDeleteDialog(true)}
+                >
+                  <DeleteIcon className="size-4" />
                 </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" sideOffset={9} className="w-fit min-w-[20px] p-1">
-                <DropdownMenuSub>
-                  <DropdownMenuSubTrigger
-                    className="w-35"
-                    onClick={() => {
-                      handleBulkStatusChange('approved');
-                    }}
-                  >
-                    <RequestsStatusIcon status="approved" className="mt-0.5" />
-                    {__('Approve', 'yay-wholesale-b2b')}
-                  </DropdownMenuSubTrigger>
-                  <DropdownMenuSubContent>
-                    {activeRoles?.map((role) => (
-                      <DropdownMenuItem
-                        onClick={() => {
-                          handleBulkStatusChange('approved', role.id);
-                        }}
-                        className="hover:bg-muted flex w-full cursor-pointer items-center justify-start gap-2 rounded-sm px-2.5 py-2 text-sm"
-                      >
-                        <RequestsStatusIcon status="approved" className="mt-0.5" />
-                        {sprintf(__('Approve to %s', 'yay-wholesale-b2b'), role.name)}
-                      </DropdownMenuItem>
-                    ))}
-                  </DropdownMenuSubContent>
-                </DropdownMenuSub>
-
-                <DropdownMenuItem className="w-35" onClick={() => handleBulkStatusChange('rejected')}>
-                  <RequestsStatusIcon status="rejected" />
-                  {__('Reject', 'yay-wholesale-b2b')}
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-            <Separator orientation="vertical" className="h-5!" />
-            <Dialog open={openBulkDeleteDialog} onOpenChange={setOpenDeleteDialog}>
-              <WholeSaleToolTip
-                trigger={
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    className="hover:text-destructive text-muted-foreground h-8 w-8 hover:bg-transparent hover:shadow-sm"
-                    onClick={() => setOpenDeleteDialog(true)}
-                  >
-                    <DeleteIcon className="size-4" />
-                  </Button>
-                }
-                content={<span>{__('Delete', 'yay-wholesale-b2b')}</span>}
-              />
-              <DialogContent className="bw:max-w-md">
-                <DialogHeader className="bw:border-b-0">
-                  <DialogTitle>
-                    {sprintf(__(`Are you sure you want to delete %d requests ?`, 'yay-wholesale-b2b'), selectedCount)}
-                  </DialogTitle>
-                  <DialogDescription>
-                    {__(
-                      'This action cannot be undone. This will permanently delete these requests and remove data from servers',
-                      'yay-wholesale-b2b',
-                    )}
-                  </DialogDescription>
-                </DialogHeader>
-                <DialogFooter>
-                  <DialogClose asChild>
-                    <Button variant="outline">{__('Cancel', 'yay-wholesale-b2b')}</Button>
-                  </DialogClose>
-                  <Button variant="destructive" onClick={() => handleBulkDelete()}>
-                    {__('Continue', 'yay-wholesale-b2b')}
-                  </Button>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
-          </BulkActionBox>
-
-          {table.getPageCount() > 1 && (
-            <Pagination
-              pageIndex={table.getState().pagination.pageIndex}
-              pageCount={table.getPageCount()}
-              onPreviousPage={() => table.previousPage()}
-              onNextPage={() => table.nextPage()}
-              onPageChange={(page) => table.setPageIndex(page)}
-              canPreviousPage={table.getCanPreviousPage()}
-              canNextPage={table.getCanNextPage()}
-              className="sm:ms-auto"
+              }
+              content={<span>{__('Delete', 'yay-wholesale-b2b')}</span>}
             />
-          )}
-        </div>
-      )}
+            <DialogContent className="bw:max-w-md">
+              <DialogHeader className="bw:border-b-0">
+                <DialogTitle>
+                  {sprintf(__(`Are you sure you want to delete %d requests ?`, 'yay-wholesale-b2b'), selectedCount)}
+                </DialogTitle>
+                <DialogDescription>
+                  {__(
+                    'This action cannot be undone. This will permanently delete these requests and remove data from servers',
+                    'yay-wholesale-b2b',
+                  )}
+                </DialogDescription>
+              </DialogHeader>
+              <DialogFooter>
+                <DialogClose asChild>
+                  <Button variant="outline">{__('Cancel', 'yay-wholesale-b2b')}</Button>
+                </DialogClose>
+                <Button variant="destructive" onClick={() => handleBulkDelete()}>
+                  {bulkDeleteMutation.isPending && <Loader2 className="size-3.5 animate-spin" />}
+                  {__('Delete', 'yay-wholesale-b2b')}
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        </BulkActionBox>
+
+        <Pagination
+          pageIndex={table.getState().pagination.pageIndex}
+          pageCount={table.getPageCount()}
+          onPreviousPage={() => table.previousPage()}
+          onNextPage={() => table.nextPage()}
+          onPageChange={(page) => table.setPageIndex(page)}
+          canPreviousPage={table.getCanPreviousPage()}
+          canNextPage={table.getCanNextPage()}
+          className={clsx('sm:ms-auto', table.getPageCount() === 0 && 'hidden')}
+        />
+      </div>
     </Card>
   );
 }

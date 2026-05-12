@@ -51,7 +51,7 @@ export function useRequestsQuery(filter: RequestFilter) {
   return useQuery(REQUESTS_QUERIES.list(filter));
 }
 
-export function useRequestQuery(requestId: number) {
+export function useSingleRequestQuery(requestId: number) {
   return useQuery(REQUESTS_QUERIES.single(requestId));
 }
 
@@ -139,9 +139,9 @@ export function useIsMutatingRequests() {
 }
 
 export function useIsMutatingRequest(requestId: number) {
-  const isMutating = useIsMutating({ mutationKey: ['requests', 'bulk'] });
+  const isMutatingBulk = useIsMutating({ mutationKey: ['requests', 'bulk'] });
   const isMutatingSingle = useIsMutating({ mutationKey: ['requests', requestId] });
-  return isMutating + isMutatingSingle;
+  return isMutatingBulk + isMutatingSingle;
 }
 
 export function cacheRequest(queryClient: QueryClient, request: Request) {

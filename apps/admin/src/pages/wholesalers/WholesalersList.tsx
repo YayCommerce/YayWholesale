@@ -3,7 +3,7 @@ import { flexRender, getCoreRowModel, PaginationState, useReactTable } from '@ta
 import clsx from 'clsx';
 import { ChevronsUpDown, Loader2, Plus, Search } from 'lucide-react';
 import { useDebounce } from 'rooks';
-import { __, sprintf } from '@wordpress/i18n';
+import { __, _n, sprintf } from '@wordpress/i18n';
 
 import { getErrorMsg } from '@/lib/helpers/response.helper';
 import { useActiveRolesQuery, useUserCountByRolesQuery } from '@/lib/queries/roles.queries';
@@ -51,6 +51,12 @@ export function WholesalersList() {
   const [roleFilter, setRoleFilter] = useState('all');
   const setSearchDebounced = useDebounce(setSearch, 500);
 
+  const { data: userCount } = useUserCountByRolesQuery();
+  const totalCount = useMemo(() => {
+    if (!userCount) return undefined;
+    return Object.values(userCount).reduce((acc, count) => acc + count, 0);
+  }, [userCount]);
+
   const filter = useMemo(
     () =>
       ({
@@ -62,18 +68,12 @@ export function WholesalersList() {
     [search, pagination, roleFilter],
   );
 
-  const wholesalersQuery = useWholesalersQuery(filter);
-
+  const { data: wholesalersPage, isLoading } = useWholesalersQuery(filter);
   const { data: activeRoles } = useActiveRolesQuery();
-  const { data: userCount } = useUserCountByRolesQuery();
-  const totalCount = useMemo(() => {
-    if (!userCount) return undefined;
-    return Object.values(userCount).reduce((acc, count) => acc + count, 0);
-  }, [userCount]);
 
   const defaultData = useMemo(() => [], []);
   const table = useReactTable({
-    data: wholesalersQuery.data?.data ?? defaultData,
+    data: wholesalersPage?.data ?? defaultData,
     columns: wholesalerColumns,
     state: {
       pagination,
@@ -81,8 +81,8 @@ export function WholesalersList() {
     getCoreRowModel: getCoreRowModel(),
     onPaginationChange: setPagination,
     manualPagination: true,
-    rowCount: wholesalersQuery.data?.totalItems ?? 0,
-    pageCount: wholesalersQuery.data?.totalPage ?? -1,
+    rowCount: wholesalersPage?.totalItems ?? 0,
+    pageCount: wholesalersPage?.totalPage ?? -1,
   });
 
   const bulkUpdateWholesalersRoleMutation = useBulkUpdateWholesalersRoleMutation();
@@ -104,7 +104,7 @@ export function WholesalersList() {
 
   const selectedCount = table.getSelectedRowModel().rows.length;
   const noWholesaler = totalCount === 0;
-  const noFilterData = !wholesalersQuery.isLoading && wholesalersQuery.data?.data?.length === 0;
+  const noFilterData = !isLoading && wholesalersPage?.data?.length === 0;
 
   return (
     <Card className="gap-4 shadow-sm">
@@ -121,11 +121,10 @@ export function WholesalersList() {
                   </Badge>
                 </div>
               }
-              content={
-                totalCount > 1
-                  ? sprintf(__('%d wholesalers in total', 'yay-wholesale-b2b'), totalCount)
-                  : sprintf(__('%d wholesaler in total', 'yay-wholesale-b2b'), totalCount)
-              }
+              content={sprintf(
+                _n('%d wholesaler in total', '%d wholesalers in total', totalCount, 'yay-wholesale-b2b'),
+                totalCount,
+              )}
               side="bottom"
             />
           )}
@@ -216,9 +215,9 @@ export function WholesalersList() {
               </TableRow>
             )}
 
-            {noFilterData && (
+            {!noWholesaler && noFilterData && (
               <TableRow>
-                <TableCell colSpan={table.getAllColumns().length} className="h-24 text-center">
+                <TableCell colSpan={table.getAllColumns().length} className="h-32 text-center">
                   {__('No Wholesalers found.', 'yay-wholesale-b2b')}
                 </TableCell>
               </TableRow>
@@ -269,11 +268,7 @@ export function WholesalersList() {
                   bulkUpdateWholesalersRoleMutation.isPending &&
                   bulkUpdateWholesalersRoleMutation.variables?.roleSlug === role.slug;
                 return (
-                  <DropdownMenuItem
-                    key={role.slug}
-                    onClick={() => handleBulkUpdateWholesalersRole(role.slug)}
-                    disabled={isUpdating}
-                  >
+                  <DropdownMenuItem key={role.slug} onClick={() => handleBulkUpdateWholesalersRole(role.slug)}>
                     {isUpdating && <Loader2 className="size-3.5 animate-spin" />}
                     {!isUpdating && <RolesIcon role={role?.slug} className="size-4" />}
                     {role.name}
