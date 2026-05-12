@@ -39,12 +39,18 @@ class ProductPricingHelper {
             return $product->get_price();
         }
 
-        $apply_to_sale = $role_config['applyToSalePrice'] ?? false;
+        $price = self::get_product_price_before_apply_wholesale_discount( $product, $role_config['applyToSalePrice'] );
+
+        $wholesale_price = max( 0, ( $price ) * ( 1 - $discount ) );
+
+        return wc_format_decimal( $wholesale_price, wc_get_price_decimals() );
+    }
+
+    public static function get_product_price_before_apply_wholesale_discount( \WC_Product $product, bool $apply_to_sale ) {
         $regular_price = (float) $product->get_regular_price();
         $sale_price    = (float) $product->get_price();
-        $price         = ( $apply_to_sale && $sale_price < $regular_price ) ? $sale_price : $regular_price;
-        // var_dump( $price );
+        $product_price = ( $apply_to_sale && $sale_price < $regular_price ) ? $sale_price : $regular_price;
 
-        return max( 0, ( $price ) * ( 1 - $discount ) );
+        return apply_filters( 'ywhs_product_price_before_apply_wholesale_discount', $product_price, $product, $apply_to_sale );
     }
 }
