@@ -14,6 +14,7 @@ yay-wholesale-lite.zip
 package-lock.json
 .DS_Store
 .vscode/launch.json
+.vscode/settings.json
 vendor-prefixed/
 
 .env.local
