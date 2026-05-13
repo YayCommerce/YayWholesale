@@ -29,7 +29,16 @@ class SettingsHelper {
             }
         }
 
-        return apply_filters( 'ywhs_settings', $settings );
+        return $settings;
+    }
+
+    /**
+     * Load multiple settings to localize on frontend.
+     */
+    public static function get_full_settings(): array {
+        $settings = self::get_settings();
+
+        return apply_filters( 'ywhs_full_settings', $settings );
     }
 
     public static function update_settings( array $settings ): bool {

@@ -32,7 +32,7 @@ class RolesHelper {
     /**
      * Save wholesale role config.
      *
-     * @return array|null
+     * @param array $roles The roles config array.
      */
     public static function save_wholesale_roles( array $roles ) {
         return update_option( 'yaywholesaleb2b_roles', $roles );

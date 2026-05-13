@@ -3,7 +3,6 @@
 namespace YayWholesaleB2B\Helpers;
 
 use DateTime;
-use WP_User_Query;
 
 /**
  * Common Helper

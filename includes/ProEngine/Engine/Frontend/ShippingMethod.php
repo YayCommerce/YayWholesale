@@ -1,5 +1,5 @@
 <?php
-namespace YayWholesaleB2B\ProEngine\Frontend;
+namespace YayWholesaleB2B\ProEngine\Engine\Frontend;
 
 use YayWholesaleB2B\Helpers\CustomerHelper;
 use YayWholesaleB2B\Utils\SingletonTrait;
@@ -17,7 +17,7 @@ class ShippingMethod {
     protected function __construct() {
         add_filter( 'woocommerce_package_rates', [ $this, 'restrict_shipping_methods_by_role_checkout' ], 999, 2 );
 
-        add_filter( 'ywhs_settings', [ $this, 'get_shipping_settings' ], 10, 1 );
+        add_filter( 'ywhs_full_settings', [ $this, 'get_shipping_settings' ], 10, 1 );
         add_action( 'ywhs_settings_updated', [ $this, 'update_shipping_settings' ], 10, 1 );
     }
 
