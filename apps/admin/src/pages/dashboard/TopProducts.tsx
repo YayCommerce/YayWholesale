@@ -1,5 +1,4 @@
-import { Crown } from 'lucide-react';
-import { Spinner } from '@wordpress/components';
+import { Crown, Loader2 } from 'lucide-react';
 import { __ } from '@wordpress/i18n';
 
 import { parseWPCurrency } from '@/lib/helpers/format.helper';
@@ -50,7 +49,7 @@ export default function TopProducts(props: { reportQuery: ReturnType<typeof useR
                 <TableRow className="border-divider border-b">
                   <TableCell colSpan={4} className="h-32 text-center align-middle">
                     <div className="flex items-center justify-center gap-2">
-                      <Spinner className="text-muted-foreground size-6 animate-spin" />
+                      <Loader2 className="text-muted-foreground size-6 animate-spin" />
                     </div>
                   </TableCell>
                 </TableRow>

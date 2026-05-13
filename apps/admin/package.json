@@ -42,7 +42,6 @@
     "@radix-ui/react-tooltip": "^1.2.4",
     "@tanstack/react-query": "^5.90.5",
     "@tanstack/react-table": "^8.21.3",
-    "@wordpress/components": "^30.6.0",
     "@wordpress/date": "^5.45.0",
     "@wordpress/element": "^6.38.0",
     "@wordpress/i18n": "^6.6.0",
