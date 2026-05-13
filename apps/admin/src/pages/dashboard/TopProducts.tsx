@@ -12,11 +12,11 @@ export default function TopProducts(props: { reportQuery: ReturnType<typeof useR
   const { data: reportData, isFetching, isLoading } = props.reportQuery;
 
   return (
-    <Card className="mt-0 flex h-full flex-col rounded-lg shadow-none">
-      <CardContent className="flex min-h-0 flex-1 flex-col gap-5">
+    <Card className="p-4 md:p-5 2xl:p-6">
+      <CardContent className="flex min-h-0 flex-1 flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between">
-          <h3 className="text-foreground text-[16px] font-semibold">{__('Top Products', 'yay-wholesale-b2b')}</h3>
+        <div className="mb-4 flex items-center justify-between">
+          <h3 className="text-base font-medium">{__('Top Products', 'yay-wholesale-b2b')}</h3>
         </div>
 
         {/* DataTable */}

@@ -53,7 +53,7 @@ export function getManagerRouter() {
               element: <RolesPage />,
             },
             {
-              path: 'edit/:roleId',
+              path: 'edit/:roleSlug',
               element: <RolesPage />,
             },
           ],

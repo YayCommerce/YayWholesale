@@ -16,7 +16,7 @@ import RoleFormContent from './RoleFormContent';
 export default function EditRoleForm({ role }: { role: Role }) {
   const navigate = useNavigate();
 
-  const updateRoleMutation = useUpdateRoleMutation(role.id);
+  const updateRoleMutation = useUpdateRoleMutation(role.slug);
   const isMutating = useIsMutatingRoles();
 
   const defaultValues = useMemo(() => {

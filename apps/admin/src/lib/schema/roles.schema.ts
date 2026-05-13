@@ -26,5 +26,5 @@ export type Role = RoleFormValues & {
   slug: string;
 };
 
-/** key is roleId, value is userCount */
+/** key is roleSlug, value is userCount */
 export type UserCountByRole = Record<string, number>;

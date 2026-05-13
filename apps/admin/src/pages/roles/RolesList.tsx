@@ -85,11 +85,11 @@ export default function RolesList() {
   });
 
   async function handleBulkDelete() {
-    const roleIds = table.getSelectedRowModel().rows.map((row) => row.original.id);
-    if (roleIds.length === 0 || isMutating > 0) return;
+    const roleSlugs = table.getSelectedRowModel().rows.map((row) => row.original.slug);
+    if (roleSlugs.length === 0 || isMutating > 0) return;
 
     try {
-      await bulkDeleteRolesMutation.mutateAsync(roleIds);
+      await bulkDeleteRolesMutation.mutateAsync(roleSlugs);
       table.resetRowSelection();
     } catch (error) {
       toast.error(await getErrorMsg(error));
@@ -99,12 +99,12 @@ export default function RolesList() {
   }
 
   async function handleBulkUpdateStatus(status: boolean) {
-    const roleIds = table.getSelectedRowModel().rows.map((row) => row.original.id);
-    if (roleIds.length === 0 || isMutating > 0) return;
+    const roleSlugs = table.getSelectedRowModel().rows.map((row) => row.original.slug);
+    if (roleSlugs.length === 0 || isMutating > 0) return;
 
     try {
       await bulkUpdateRoleStatusMutation.mutateAsync({
-        ids: roleIds,
+        roleSlugs,
         status,
       });
     } catch (error) {
@@ -211,7 +211,7 @@ export default function RolesList() {
                     )}
                     onClick={() => {
                       if (['select', 'actions', 'status'].indexOf(cell.column.id) < 0) {
-                        navigate(`/roles/edit/${row.original.id}`);
+                        navigate(`/roles/edit/${row.original.slug}`);
                       }
                     }}
                   >

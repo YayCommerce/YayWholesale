@@ -166,7 +166,7 @@ export const roleColumns: ColumnDef<Role>[] = [
     id: 'actions',
     header: '',
     cell: ({ row }) => {
-      const { mutate: deleteRoleById, isPending: isDeletingRolePending } = useDeleteRoleMutation(row.original.id);
+      const { mutate: deleteRole, isPending: isDeletingRolePending } = useDeleteRoleMutation(row.original.slug);
       const navigate = useNavigate();
       const [openDialog, setOpenDialog] = useState(false);
       const queryClient = useQueryClient();
@@ -182,7 +182,7 @@ export const roleColumns: ColumnDef<Role>[] = [
                     variant="ghost"
                     onClick={() => {
                       queryClient.setQueryData(['role', row.original.id], row.original);
-                      navigate(`/roles/edit/${row.original.id}`);
+                      navigate(`/roles/edit/${row.original.slug}`);
                     }}
                     className="hover:text-primary text-muted-foreground transition hover:bg-white hover:shadow-xs"
                   >
@@ -228,7 +228,7 @@ export const roleColumns: ColumnDef<Role>[] = [
               <Button
                 variant="destructive"
                 onClick={() => {
-                  deleteRoleById();
+                  deleteRole();
                   setOpenDialog(false);
                 }}
               >

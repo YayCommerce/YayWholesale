@@ -6,7 +6,7 @@ import { Switch } from '@/components/ui/switch';
 import { isDefaultRole } from '../roles.helper';
 
 export default function RoleStatusSwitch({ role }: { role: Role }) {
-  const updateRoleStatusMutation = useUpdateRoleStatusMutation(role.id);
+  const updateRoleStatusMutation = useUpdateRoleStatusMutation(role.slug);
 
   async function handleUpdateStatus(status: boolean) {
     if (updateRoleStatusMutation.isPending) return;
