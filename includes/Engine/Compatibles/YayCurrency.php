@@ -368,7 +368,6 @@ class YayCurrency {
 
     public function get_price_with_options( $price, $product ) {
         $wholesale_price = SupportHelper::get_cart_item_objects_property( $product, 'yay_currency_wholesale_price' );
-        var_dump( $wholesale_price );
         if ( $wholesale_price ) {
             return (float) $wholesale_price;
         }
