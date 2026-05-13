@@ -27,6 +27,9 @@ class ActDeact {
             return;
         }
 
+        // TODO: if activate network
+        // TODO: add_input_name_for_fields
+
         $setting         = SettingsHelper::get_settings();
         $wholesale_roles = RolesHelper::get_wholesale_roles();
         $role_slugs      = array_column( $wholesale_roles, 'slug' );

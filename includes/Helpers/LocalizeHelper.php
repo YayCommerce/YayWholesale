@@ -14,8 +14,8 @@ class LocalizeHelper {
     public const VAR_META  = 'yayWholesaleB2BMeta';
 
     public static function get_admin_data() {
-        $settings = SettingsHelper::get_settings( true );
-        $roles    = get_option( 'yaywholesaleb2b_roles', [] );
+        $settings = SettingsHelper::get_full_settings();
+        $roles    = RolesHelper::get_wholesale_roles();
         $pages    = SupportHelper::get_valid_pages_for_wholesale_store();
 
         $admin_data = [
@@ -25,7 +25,7 @@ class LocalizeHelper {
             'valid_wholesale_store_pages' => $pages,
         ];
 
-        return $admin_data;
+        return apply_filters( 'ywhs_localize_admin_data', $admin_data );
     }
 
     public static function get_meta() {
@@ -61,8 +61,6 @@ class LocalizeHelper {
                     ),
                 ],
 
-                'dayFormat'    => get_option( 'date_format' ),
-                'timeFormat'   => get_option( 'time_format' ),
             ],
             'wholesaleMeta' => [
                 'pluginUrl' => YAYWHOLESALEB2B_PLUGIN_URL,

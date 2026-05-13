@@ -32,7 +32,7 @@ export default function GeneralTab() {
       {/* Default role for new user */}
       <Controller
         control={control}
-        name={`general.default_role`}
+        name="general.default_role"
         render={({ field, fieldState }) => (
           <Field className="flex w-full flex-col gap-2.5">
             <FieldLabel className="text-xs font-medium">
@@ -59,7 +59,7 @@ export default function GeneralTab() {
 
       <Controller
         control={control}
-        name={`general.wholesale_store_page`}
+        name="general.wholesale_store_page"
         render={({ field }) => (
           <div className="flex items-center justify-between rounded-md border p-4">
             <div>
@@ -89,7 +89,7 @@ export default function GeneralTab() {
 
       <Controller
         control={control}
-        name={`general.show_wholesale_price`}
+        name="general.show_wholesale_price"
         render={({ field }) => (
           <div className="flex items-center justify-between rounded-md border p-4">
             <div>
@@ -111,7 +111,7 @@ export default function GeneralTab() {
 
       <Controller
         control={control}
-        name={`general.disable_coupon`}
+        name="general.disable_coupon"
         render={({ field }) => (
           <div className="flex items-center justify-between rounded-lg border p-4">
             <div>
@@ -131,7 +131,7 @@ export default function GeneralTab() {
 
       <Controller
         control={control}
-        name={`general.disable_tax`}
+        name="general.disable_tax"
         render={({ field }) => (
           <div className="flex items-center justify-between rounded-md border p-4">
             <div>
@@ -149,7 +149,7 @@ export default function GeneralTab() {
 
       <Controller
         control={control}
-        name={`general.tax_display_mode`}
+        name="general.tax_display_mode"
         render={({ field }) => (
           <div className="flex items-center justify-between gap-5 rounded-md border p-4">
             <div>

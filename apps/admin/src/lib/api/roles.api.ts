@@ -1,31 +1,34 @@
 import { api } from '@/lib/api/api';
-import type { Role, RoleFormValues } from '@/lib/schema/roles.schema';
-import type { ApiResponse } from './api.type';
+import type { Role, RoleFormValues, UserCountByRole } from '@/lib/schema/roles.schema';
 
-export async function getAllRoles() {
-  return await api.get('roles').json<ApiResponse<RolesListValues[]>>();
+export function getAllRoles() {
+  return api.get('roles').json<Role[]>();
 }
 
-export async function createRole(data: RoleFormValues) {
-  return await api.post('roles', { json: data }).json<ApiResponse<RoleFormValues>>();
+export function addRole(data: RoleFormValues) {
+  return api.post('roles', { json: data }).json<Role[]>();
 }
 
-export async function updateRole(roleId: number, data: RoleFormValues) {
-  return await api.put(`roles/${roleId}`, { json: data }).json<ApiResponse<RoleFormValues>>();
+export function updateRole(roleSlug: string, data: RoleFormValues) {
+  return api.put(`roles/${roleSlug}`, { json: data }).json<Role[]>();
 }
 
-export async function deleteRole(id: number) {
-  return await api.delete(`roles/${id}`).json<ApiResponse<boolean>>();
+export function updateRoleStatus(roleSlug: string, status: boolean) {
+  return api.put(`roles/${roleSlug}`, { json: { status } }).json<Role[]>();
 }
 
-export async function deleteManyRoles(ids: number[]) {
-  return await api.delete('roles/bulk', { json: { ids } }).json<ApiResponse<number>>();
+export function deleteRole(roleSlug: string) {
+  return api.delete(`roles/${roleSlug}`).json<Role[]>();
 }
 
-export async function updateRoleStatus(id: number, status: boolean) {
-  return await api.put(`roles/${id}`, { json: { status } }).json<ApiResponse<RolesListValues>>();
+export function bulkDeleteRoles(roleSlugs: string[]) {
+  return api.delete('roles/bulk-delete', { json: { roleSlugs } }).json<Role[]>();
 }
 
-export async function bulkUpdateRoleStatus(ids: number[], status: boolean) {
-  return await api.put('roles/bulk-status', { json: { ids, status } }).json<ApiResponse<number>>();
+export function bulkUpdateRoleStatus(roleSlugs: string[], status: boolean) {
+  return api.put('roles/bulk-status', { json: { roleSlugs, status } }).json<Role[]>();
+}
+
+export function countRolesUser() {
+  return api.get('roles/count-users').json<UserCountByRole>();
 }

@@ -4,127 +4,44 @@ namespace YayWholesaleB2B\Helpers;
 use WC_Email;
 
 /**
- * Settings Helper Class
+ * Wholesale Settings Helpers
  */
 class SettingsHelper {
 
     public const B2C_ROLE_SLUG = 'ywhs_retail';
 
-    /**
-     * Get the settings
-     *
-     * @return array The settings.
-     */
-    public static function get_settings( $is_fetch_all = false ): array {
+    public static function get_settings(): array {
 
-        $data = [
-            'general'             => [
-                'default_role'         => '',
-                'show_wholesale_price' => false,
-                'disable_coupon'       => false,
-                'disable_tax'          => false,
-                'tax_display_mode'     => 'inherit',
-                'wholesale_store_page' => 'inherit',
-            ],
-            'display'             => [
-                'price_format'          => 'retail-and-wholesale',
-                'wholesale_price_label' => 'Wholesale price',
-                'wholesale_price_color' => '#333333',
-            ],
-            'registration'        => [
-                'moderate'                        => true,
-                'wholesale_registration_page'     => '',
-                'submit_button_label'             => 'Register now',
-                'successful_registration_message' => 'Thank you for registering. Your account begin reviewing. Please wait to be approved.',
-            ],
-            'registration_fields' => [
-                'fields' => [
-                    [
-                        'id'          => uniqid( 'field_' ),
-                        'label'       => 'First Name',
-                        'inputName'   => 'first_name',
-                        'type'        => 'text',
-                        'placeholder' => 'Enter First Name',
-                        'columnWidth' => '50%',
-                        'deletable'   => false,
-                        'isDefault'   => true,
-                        'isRequired'  => true,
-                        'isHidden'    => false,
-                    ],
-                    [
-                        'id'          => uniqid( 'field_' ),
-                        'label'       => 'Last Name',
-                        'inputName'   => 'last_name',
-                        'type'        => 'text',
-                        'placeholder' => 'Enter Last Name',
-                        'columnWidth' => '50%',
-                        'deletable'   => false,
-                        'isDefault'   => true,
-                        'isRequired'  => true,
-                        'isHidden'    => false,
-                    ],
-                    [
-                        'id'          => uniqid( 'field_' ),
-                        'label'       => 'Email Address',
-                        'inputName'   => 'email_address',
-                        'type'        => 'email',
-                        'placeholder' => 'Enter Email Address',
-                        'columnWidth' => '100%',
-                        'deletable'   => false,
-                        'isDefault'   => true,
-                        'isRequired'  => true,
-                        'isHidden'    => false,
-                    ],
-                    [
-                        'id'          => uniqid( 'field_' ),
-                        'label'       => 'Message',
-                        'inputName'   => 'message',
-                        'type'        => 'textarea',
-                        'placeholder' => 'Enter Message',
-                        'columnWidth' => '100%',
-                        'deletable'   => false,
-                        'isDefault'   => true,
-                        'isRequired'  => true,
-                        'isHidden'    => false,
-                    ],
-                ],
-            ],
+        $settings = get_option( 'yaywholesaleb2b_settings', self::get_default_settings() );
 
-        ];
-
-        $setting = get_option( 'yaywholesaleb2b_settings', $data );
-
+        // TODO: move to ActDeact::migration
         if ( version_compare( YAYWHOLESALEB2B_VERSION, '1.0.6', '<=' ) ) {
-            $setting = self::add_input_name_for_fields( $setting );
+            $settings = self::add_input_name_for_fields( $settings );
 
-            if ( ! isset( $setting['general']['tax_display_mode'] ) ) {
-                $setting['general']['tax_display_mode'] = 'inherit';
-                update_option( 'yaywholesaleb2b_settings', $setting );
+            if ( ! isset( $settings['general']['tax_display_mode'] ) ) {
+                $settings['general']['tax_display_mode'] = 'inherit';
+                update_option( 'yaywholesaleb2b_settings', $settings );
             }
 
-            if ( ! isset( $setting['general']['wholesale_store_page'] ) ) {
-                $setting['general']['wholesale_store_page'] = 'inherit';
-                update_option( 'yaywholesaleb2b_settings', $setting );
+            if ( ! isset( $settings['general']['wholesale_store_page'] ) ) {
+                $settings['general']['wholesale_store_page'] = 'inherit';
+                update_option( 'yaywholesaleb2b_settings', $settings );
             }
         }
 
-        if ( $is_fetch_all ) {
-            $setting['payment_roles']  = apply_filters( 'ywhs_paymemt_method_roles', [] );
-            $setting['shipping_roles'] = apply_filters( 'ywhs_shipping_method_roles', [] );
-        }
+        return $settings;
+    }
 
-        return $setting;
+    /**
+     * Load multiple settings to localize on frontend.
+     */
+    public static function get_full_settings(): array {
+        $settings = self::get_settings();
+
+        return apply_filters( 'ywhs_full_settings', $settings );
     }
 
     public static function update_settings( array $settings ): bool {
-        $payment_roles = $settings['payment_roles'];
-        unset( $settings['payment_roles'] );
-
-        $shipping_roles = $settings['shipping_roles'];
-        unset( $settings['shipping_roles'] );
-
-        update_option( 'yaywholesaleb2b_payment_roles', $payment_roles );
-        update_option( 'yaywholesaleb2b_shipping_roles', $shipping_roles );
         return update_option( 'yaywholesaleb2b_settings', $settings );
     }
 
@@ -223,5 +140,81 @@ class SettingsHelper {
         update_option( 'yaywholesaleb2b_settings', $setting );
 
         return $setting;
+    }
+
+    private static function get_default_settings(): array {
+        return [
+            'general'             => [
+                'default_role'         => '',
+                'show_wholesale_price' => false,
+                'disable_coupon'       => false,
+                'disable_tax'          => false,
+                'tax_display_mode'     => 'inherit',
+                'wholesale_store_page' => 'inherit',
+            ],
+            'display'             => [
+                'price_format'          => 'retail-and-wholesale',
+                'wholesale_price_label' => 'Wholesale price',
+                'wholesale_price_color' => '#333333',
+            ],
+            'registration'        => [
+                'moderate'                        => true,
+                'wholesale_registration_page'     => '',
+                'submit_button_label'             => 'Register now',
+                'successful_registration_message' => 'Thank you for registering. Your account begin reviewing. Please wait to be approved.',
+            ],
+            'registration_fields' => [
+                'fields' => [
+                    [
+                        'id'          => uniqid( 'field_' ),
+                        'label'       => 'First Name',
+                        'inputName'   => 'first_name',
+                        'type'        => 'text',
+                        'placeholder' => 'Enter First Name',
+                        'columnWidth' => '50%',
+                        'deletable'   => false,
+                        'isDefault'   => true,
+                        'isRequired'  => true,
+                        'isHidden'    => false,
+                    ],
+                    [
+                        'id'          => uniqid( 'field_' ),
+                        'label'       => 'Last Name',
+                        'inputName'   => 'last_name',
+                        'type'        => 'text',
+                        'placeholder' => 'Enter Last Name',
+                        'columnWidth' => '50%',
+                        'deletable'   => false,
+                        'isDefault'   => true,
+                        'isRequired'  => true,
+                        'isHidden'    => false,
+                    ],
+                    [
+                        'id'          => uniqid( 'field_' ),
+                        'label'       => 'Email Address',
+                        'inputName'   => 'email_address',
+                        'type'        => 'email',
+                        'placeholder' => 'Enter Email Address',
+                        'columnWidth' => '100%',
+                        'deletable'   => false,
+                        'isDefault'   => true,
+                        'isRequired'  => true,
+                        'isHidden'    => false,
+                    ],
+                    [
+                        'id'          => uniqid( 'field_' ),
+                        'label'       => 'Message',
+                        'inputName'   => 'message',
+                        'type'        => 'textarea',
+                        'placeholder' => 'Enter Message',
+                        'columnWidth' => '100%',
+                        'deletable'   => false,
+                        'isDefault'   => true,
+                        'isRequired'  => true,
+                        'isHidden'    => false,
+                    ],
+                ],
+            ],
+        ];
     }
 }

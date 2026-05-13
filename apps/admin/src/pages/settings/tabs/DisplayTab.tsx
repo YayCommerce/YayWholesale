@@ -3,12 +3,20 @@ import { __ } from '@wordpress/i18n';
 
 import { parseWPCurrency } from '@/lib/helpers/format.helper';
 import type { Settings } from '@/lib/schema/settings.schema';
+import {
+  ColorPicker,
+  ColorPickerContent,
+  ColorPickerInput,
+  ColorPickerPanel,
+  ColorPickerProps,
+  ColorPickerSwatch,
+  ColorPickerTrigger,
+} from '@/components/ui/color-picker';
 import { AddToCartSkeleton, ProductImageSkeleton } from '@/components/ui/custom/shop-skeleton';
 import { Field, FieldContent, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
-import { ColorPicker } from '@/components/ui/wp-color-picker';
 
 export default function DisplayTab() {
   const { control, watch } = useFormContext<Settings>();
@@ -23,7 +31,7 @@ export default function DisplayTab() {
         {/* Wholesale registration page */}
         <Controller
           control={control}
-          name={`display.price_format`}
+          name="display.price_format"
           render={({ field }) => (
             <Field className="flex w-full flex-col gap-2.5">
               <FieldLabel className="text-foreground-400 text-xs font-medium">
@@ -53,7 +61,7 @@ export default function DisplayTab() {
 
         <Controller
           control={control}
-          name={`display.wholesale_price_label`}
+          name="display.wholesale_price_label"
           render={({ field }) => (
             <Field className="flex w-full flex-col gap-2.5">
               <FieldLabel className="text-foreground-400 text-xs font-medium">
@@ -76,18 +84,14 @@ export default function DisplayTab() {
 
         <Controller
           control={control}
-          name={`display.wholesale_price_color`}
+          name="display.wholesale_price_color"
           render={({ field }) => (
             <Field className="flex w-full flex-col gap-2.5">
               <FieldLabel className="text-foreground-400 text-xs font-medium">
                 {__('Wholesale price color', 'yay-wholesale-b2b')}
               </FieldLabel>
               <FieldContent>
-                <ColorPicker
-                  value={field.value}
-                  defaultColor={field.value}
-                  onChangeColor={(color: string) => field.onChange(color)}
-                />
+                <CustomColorPicker value={field.value} onValueChange={(color: string) => field.onChange(color)} />
               </FieldContent>
             </Field>
           )}
@@ -119,5 +123,27 @@ export default function DisplayTab() {
         </div>
       </div>
     </div>
+  );
+}
+
+function CustomColorPicker({ children, ...props }: ColorPickerProps) {
+  return (
+    <ColorPicker {...props}>
+      <ColorPickerTrigger />
+      <ColorPickerContent>
+        <ColorPickerPanel />
+        <ColorPickerInput />
+        <div className="mt-1 flex justify-between">
+          <ColorPickerSwatch swatchValue="#171717" title="Black" />
+          <ColorPickerSwatch swatchValue="#fafafa" title="White" />
+          <ColorPickerSwatch swatchValue="#d50719" title="Red" />
+          <ColorPickerSwatch swatchValue="#ea580c" title="Orange" />
+          <ColorPickerSwatch swatchValue="#f9bd09" title="Yellow" />
+          <ColorPickerSwatch swatchValue="#16a34a" title="Green" />
+          <ColorPickerSwatch swatchValue="#2271b1" title="Blue" />
+          <ColorPickerSwatch swatchValue="#6d28d9" title="Violet" />
+        </div>
+      </ColorPickerContent>
+    </ColorPicker>
   );
 }

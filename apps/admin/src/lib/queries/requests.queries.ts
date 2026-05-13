@@ -1,138 +1,149 @@
-import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-
-import { toast } from '@/components/ui/sonner';
 import {
+  keepPreviousData,
+  QueryClient,
+  queryOptions,
+  useIsMutating,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from '@tanstack/react-query';
+
+import {
+  approveRequest,
+  bulkApproveRequest,
   bulkDeleteRequest,
-  bulkUpdateRequestStatus,
-  deleteRequestById,
-  fetchRequestById,
-  fetchRequests,
-  getPendingCount,
-  getTotalCount,
-  updateRequestById,
-  updateRequestStatusById,
-} from '../api/requests.api';
-import { RequestFormValues } from '../schema/requests.type';
-import { handleErrorMessage } from '../utils';
+  bulkRejectRequest,
+  countRequestByStatus,
+  deleteRequest,
+  getRequestById,
+  getRequests,
+  rejectRequest,
+} from '@/lib/api/requests.api';
+import { Request, RequestFilter } from '@/lib/schema/requests.type';
+import { ROLES_QUERIES } from './roles.queries';
 
-export function useRequestsQuery(
-  keyword: string,
-  pagination: {
-    pageIndex: number;
-    pageSize: number;
-  },
-  status: string,
-) {
-  return useQuery({
-    queryKey: ['requests', { keyword, pagination, status }],
-    queryFn: async () => {
-      return fetchRequests(keyword, pagination.pageIndex + 1, pagination.pageSize, status);
-    },
-    placeholderData: keepPreviousData,
-  });
+/** Options */
+
+const REQUESTS_QUERIES = {
+  all: ['requests'],
+  list: (filter: RequestFilter) =>
+    queryOptions({
+      queryKey: ['requests', filter],
+      queryFn: () => getRequests(filter),
+      placeholderData: keepPreviousData,
+    }),
+  single: (requestId: number) =>
+    queryOptions({
+      queryKey: ['requests', requestId],
+      queryFn: () => getRequestById(requestId),
+      enabled: requestId > 0,
+    }),
+  countByStatus: queryOptions({
+    queryKey: ['requests', 'count-by-status'],
+    queryFn: () => countRequestByStatus(),
+    staleTime: Infinity,
+  }),
+};
+
+/** Queries */
+
+export function useRequestsQuery(filter: RequestFilter) {
+  return useQuery(REQUESTS_QUERIES.list(filter));
 }
 
-export function useRequestQuery(requestId: number | null) {
-  return useQuery({
-    queryKey: ['request', requestId],
-    queryFn: async () => {
-      if (!requestId) {
-        throw new Error('No Request ID provided');
-      }
-      const response = await fetchRequestById(requestId);
-      return response;
-    },
-    enabled: !!requestId,
-  });
+export function useSingleRequestQuery(requestId: number) {
+  return useQuery(REQUESTS_QUERIES.single(requestId));
 }
 
-export function useUpdateRequestMutation(requestId: number) {
+export function useCountByStatusQuery() {
+  return useQuery(REQUESTS_QUERIES.countByStatus);
+}
+
+/** Mutations */
+
+export function useApproveRequestMutation(requestId: number) {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationKey: ['request', requestId, 'update'],
-    mutationFn: (data: RequestFormValues) => updateRequestById(data, requestId),
-    onSuccess: (response) => {
-      toast.success(response.message);
-      queryClient.invalidateQueries({ queryKey: ['request', requestId] });
-      queryClient.invalidateQueries({ queryKey: ['requests'] });
-      queryClient.invalidateQueries({ queryKey: ['roles'] });
+    mutationKey: ['requests', requestId, 'approve'],
+    mutationFn: (roleSlug: string) => approveRequest(requestId, roleSlug),
+    onSuccess: (updatedRequest) => {
+      queryClient.invalidateQueries({ queryKey: REQUESTS_QUERIES.all });
+      queryClient.invalidateQueries({ queryKey: ROLES_QUERIES.userCountByRole.queryKey });
+      cacheRequest(queryClient, updatedRequest);
     },
-    onError: handleErrorMessage,
+    onError: () => queryClient.invalidateQueries({ queryKey: REQUESTS_QUERIES.all }),
+  });
+}
+
+export function useBulkApproveRequestMutation() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationKey: ['requests', 'bulk', 'approve'],
+    mutationFn: ({ requestIds, roleSlug }: { requestIds: number[]; roleSlug: string }) =>
+      bulkApproveRequest(requestIds, roleSlug),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: REQUESTS_QUERIES.all });
+      queryClient.invalidateQueries({ queryKey: ROLES_QUERIES.userCountByRole.queryKey });
+    },
+    onError: () => queryClient.invalidateQueries({ queryKey: REQUESTS_QUERIES.all }),
+  });
+}
+
+export function useRejectRequestMutation(requestId: number) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationKey: ['requests', requestId, 'reject'],
+    mutationFn: () => rejectRequest(requestId),
+    onSuccess: (updatedRequest) => {
+      queryClient.invalidateQueries({ queryKey: REQUESTS_QUERIES.all });
+      cacheRequest(queryClient, updatedRequest);
+    },
+    onError: () => queryClient.invalidateQueries({ queryKey: REQUESTS_QUERIES.all }),
+  });
+}
+
+export function useBulkRejectRequestMutation() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationKey: ['requests', 'bulk', 'reject'],
+    mutationFn: bulkRejectRequest,
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: REQUESTS_QUERIES.all }),
+    onError: () => queryClient.invalidateQueries({ queryKey: REQUESTS_QUERIES.all }),
   });
 }
 
 export function useDeleteRequestMutation(requestId: number) {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationKey: ['request', requestId, 'delete'],
-    mutationFn: () => deleteRequestById(requestId),
-    onSuccess: (response) => {
-      toast.success(response.message);
-      queryClient.invalidateQueries({ queryKey: ['request', requestId] });
-      queryClient.invalidateQueries({ queryKey: ['requests'] });
-      queryClient.invalidateQueries({ queryKey: ['roles'] });
-    },
-    onError: handleErrorMessage,
+    mutationKey: ['requests', requestId, 'delete'],
+    mutationFn: () => deleteRequest(requestId),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: REQUESTS_QUERIES.all }),
+    onError: () => queryClient.invalidateQueries({ queryKey: REQUESTS_QUERIES.all }),
   });
 }
 
-export function useUpdateRequestStatusMutation(requestId: number) {
+export function useBulkDeleteRequestMutation() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationKey: ['request', requestId, 'update-status'],
-    mutationFn: ({ status, roleId }: { status: RequestFormValues['status']; roleId: number }) =>
-      updateRequestStatusById(requestId, status, roleId),
-    onSuccess: (response) => {
-      toast.success(response.message);
-      queryClient.invalidateQueries({ queryKey: ['request', requestId] });
-      queryClient.invalidateQueries({ queryKey: ['requests'] });
-      queryClient.invalidateQueries({ queryKey: ['roles'] });
-      queryClient.invalidateQueries({ queryKey: ['wholesalers'] });
-    },
-    onError: handleErrorMessage,
+    mutationKey: ['requests', 'bulk', 'delete'],
+    mutationFn: bulkDeleteRequest,
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: REQUESTS_QUERIES.all }),
+    onError: () => queryClient.invalidateQueries({ queryKey: REQUESTS_QUERIES.all }),
   });
 }
 
-export function useBulkUpdateRequestStatusMutation(ids: number[]) {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationKey: ['requests', 'bulk-update-status'],
-    mutationFn: ({ status, roleId }: { status: RequestFormValues['status']; roleId: number }) =>
-      bulkUpdateRequestStatus(ids, status, roleId),
-    onSuccess: (response) => {
-      toast.success(response.message);
-      queryClient.invalidateQueries({ queryKey: ['requests'] });
-      queryClient.invalidateQueries({ queryKey: ['roles'] });
-      queryClient.invalidateQueries({ queryKey: ['wholesalers'] });
-    },
-    onError: handleErrorMessage,
-  });
+/** Utils */
+
+export function useIsMutatingRequests() {
+  return useIsMutating({ mutationKey: ['requests'] });
 }
 
-export function useBulkDeleteRequestMutation(ids: number[]) {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationKey: ['requests', 'bulk-delete'],
-    mutationFn: () => bulkDeleteRequest(ids),
-    onSuccess: (response) => {
-      toast.success(response.message);
-      queryClient.invalidateQueries({ queryKey: ['requests'] });
-      queryClient.invalidateQueries({ queryKey: ['roles'] });
-    },
-    onError: handleErrorMessage,
-  });
+export function useIsMutatingRequest(requestId: number) {
+  const isMutatingBulk = useIsMutating({ mutationKey: ['requests', 'bulk'] });
+  const isMutatingSingle = useIsMutating({ mutationKey: ['requests', requestId] });
+  return isMutatingBulk + isMutatingSingle;
 }
 
-export function usePendingCountQuery() {
-  return useQuery({
-    queryKey: ['requests', 'pending-count'],
-    queryFn: () => getPendingCount(),
-  });
-}
-
-export function useTotalCountQuery() {
-  return useQuery({
-    queryKey: ['requests', 'total-count'],
-    queryFn: () => getTotalCount(),
-  });
+export function cacheRequest(queryClient: QueryClient, request: Request) {
+  queryClient.setQueryData(REQUESTS_QUERIES.single(request.id).queryKey, request);
 }

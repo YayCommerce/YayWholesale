@@ -1,8 +1,5 @@
-import { useMemo } from 'react';
-import dayjs from 'dayjs';
-import { Crown } from 'lucide-react';
-import { DateRange } from 'react-day-picker';
-import { Spinner } from '@wordpress/components';
+import { format } from 'date-fns';
+import { Crown, Loader2 } from 'lucide-react';
 import { __ } from '@wordpress/i18n';
 
 import { useReportsQuery } from '@/lib/queries/reports.queries';
@@ -12,23 +9,21 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
-export default function TopWholesaleCustomers(props: {
+type Props = {
   reportQuery: ReturnType<typeof useReportsQuery>;
-  dateRange: DateRange | undefined;
-}) {
-  const { data: reportData, isFetching, isLoading } = props.reportQuery;
+  startDate: Date;
+  endDate: Date;
+};
 
-  const startDate = useMemo(() => dayjs(props.dateRange?.from).format('YYYY-MM-DD'), [props.dateRange]);
-  const endDate = useMemo(() => dayjs(props.dateRange?.to).format('YYYY-MM-DD'), [props.dateRange]);
+export default function TopWholesaleCustomers({ reportQuery, startDate, endDate }: Props) {
+  const { data: reportData, isFetching, isLoading } = reportQuery;
 
   return (
-    <Card className="mt-0 flex h-full flex-col rounded-lg shadow-none">
-      <CardContent className="flex min-h-0 flex-1 flex-col gap-5">
+    <Card className="p-4 md:p-5 2xl:p-6">
+      <CardContent className="flex min-h-0 flex-1 flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between">
-          <h3 className="text-foreground text-[16px] font-semibold">
-            {__('Top Wholesale Customers', 'yay-wholesale-b2b')}
-          </h3>
+        <div className="mb-4 flex items-center justify-between">
+          <h3 className="text-base font-medium">{__('Top Wholesale Customers', 'yay-wholesale-b2b')}</h3>
         </div>
 
         {/* DataTable */}
@@ -57,7 +52,7 @@ export default function TopWholesaleCustomers(props: {
                 <TableRow>
                   <TableCell colSpan={4} className="h-32 text-center align-middle">
                     <div className="flex items-center justify-center gap-2">
-                      <Spinner className="text-muted-foreground size-6 animate-spin" />
+                      <Loader2 className="text-muted-foreground size-6 animate-spin" />
                     </div>
                   </TableCell>
                 </TableRow>
@@ -104,9 +99,9 @@ export default function TopWholesaleCustomers(props: {
                                 '&_customer_user=' +
                                 data.id +
                                 '&_ywhs_order_from=' +
-                                startDate +
+                                format(startDate, 'yyyy-MM-dd') +
                                 '&_ywhs_order_to=' +
-                                endDate +
+                                format(endDate, 'yyyy-MM-dd') +
                                 '&_ywhs_from_dashboard=true',
                               '_blank',
                             );

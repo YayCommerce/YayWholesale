@@ -9,9 +9,9 @@ import {
   useContext,
   useState,
 } from 'react';
-import { useDebounceFn } from 'ahooks';
 import { Check } from 'lucide-react';
 import { HexAlphaColorPicker, HexColorInput, HexColorPicker } from 'react-colorful';
+import { useDebounceFn } from 'rooks';
 
 import { cn } from '@/lib/utils';
 import { useUncontrolled } from '@/hooks/useUncontrolled';
@@ -39,15 +39,16 @@ export function ColorPicker({
     defaultValue: defaultValue,
     onChange: onValueChange,
   });
-  const debouncedSetValue = useDebounceFn(setValue, { wait: 200, maxWait: 500 });
+  const [debouncedSetValue] = useDebounceFn(setValue, 200, { trailing: true, maxWait: 500 });
   const [open, setOpen] = useState(false);
+
   return (
     <ColorPickerContext.Provider
       value={{
         value,
         defaultValue,
         setValue,
-        debouncedSetValue: debouncedSetValue.run,
+        debouncedSetValue,
         open,
         setOpen,
       }}

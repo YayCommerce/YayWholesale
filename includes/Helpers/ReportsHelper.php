@@ -3,14 +3,13 @@
 namespace YayWholesaleB2B\Helpers;
 
 use DateTime;
-use WP_User_Query;
 
 /**
  * Common Helper
  */
 class ReportsHelper {
 
-    public static function get_statictis_data( string $compare_start_date, string $compare_end_date, string $start_date, string $end_date ) {
+    public static function get_wholesale_report( string $compare_start_date, string $compare_end_date, string $start_date, string $end_date ) {
         $default_date_range = self::get_default_report_date();
 
         if ( ! isset( $start_date ) ) {

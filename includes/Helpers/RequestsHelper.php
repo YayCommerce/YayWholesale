@@ -1,9 +1,9 @@
 <?php
 namespace YayWholesaleB2B\Helpers;
 
-use Exception;
 use WP_Query;
 use WP_User;
+use WP_Error;
 
 /**
  * Settings Helper Class
@@ -15,27 +15,26 @@ class RequestsHelper {
     public const REQUEST_META_EMAIL        = 'ywhs_request_email';
     public const REQUEST_META_STATUS       = 'ywhs_request_status';
     public const REQUEST_META_MESSAGE      = 'ywhs_request_message';
-    public const REJECTED                  = 'rejected';
-    public const PENDING                   = 'pending';
-    public const APPROVED                  = 'approved';
-    public const ALL                       = 'all';
 
-    protected function __construct() {}
+    public const STATUS_PENDING  = 'pending';
+    public const STATUS_APPROVED = 'approved';
+    public const STATUS_REJECTED = 'rejected';
 
     /**
      * Insert new Wholesale request.
      *
-     * @param int   $user_id The sender account ID .
-     * @param array $form_data The form data in request.
-     * @return int A new wholesale ID registered.
+     * @param int    $user_id The sender account ID .
+     * @param array  $body_params The form data in request.
+     * @param string $request_status The status of the request.
+     * @return int|WP_Error A new wholesale ID registered.
      */
-    public static function insert_whs_request( int $user_id, array $form_data ): int {
+    public static function insert_whs_request( int $user_id, array $body_params, string $request_status = self::STATUS_PENDING ) {
         $name         = '';
         $display_name = '';
 
-        if ( array_key_exists( 'first_name', $form_data ) && array_key_exists( 'last_name', $form_data ) ) {
-            $name         = $form_data['first_name'] . ' ' . $form_data['last_name'];
-            $display_name = $form_data['first_name'] . ' ' . $form_data['last_name'];
+        if ( array_key_exists( 'first_name', $body_params ) && array_key_exists( 'last_name', $body_params ) ) {
+            $name         = $body_params['first_name'] . ' ' . $body_params['last_name'];
+            $display_name = $body_params['first_name'] . ' ' . $body_params['last_name'];
         }
 
         if ( empty( $name ) ) {
@@ -57,37 +56,35 @@ class RequestsHelper {
         );
 
         if ( is_wp_error( $new_request_id ) ) {
-            return -1;
+            return $new_request_id;
         }
 
         $general_setting = SettingsHelper::get_settings();
+        $request_data    = [];
 
         foreach ( $general_setting['registration_fields']['fields'] as $gsetting ) {
             $key = $gsetting['inputName'];
-            if ( array_key_exists( $key, $form_data ) ) {
-                $data[ $gsetting['label'] ] = [
+            if ( array_key_exists( $key, $body_params ) ) {
+                $request_data[ $gsetting['label'] ] = [
                     'type'       => $gsetting['type'],
                     'is_default' => $gsetting['isDefault'],
                     'key'        => $key,
                 ];
 
                 if ( 'email_address' === $key ) {
-                    update_post_meta( $new_request_id, self::REQUEST_META_EMAIL, $form_data[ $key ] );
+                    update_post_meta( $new_request_id, self::REQUEST_META_EMAIL, $body_params[ $key ] );
                 } elseif ( 'message' === $key ) {
-                    update_post_meta( $new_request_id, self::REQUEST_META_MESSAGE, $form_data[ $key ] );
+                    update_post_meta( $new_request_id, self::REQUEST_META_MESSAGE, $body_params[ $key ] );
                 } else {
-                    $data[ $gsetting['label'] ]['value'] = $form_data[ $key ];
+                    $request_data[ $gsetting['label'] ]['value'] = $body_params[ $key ];
                 }
             }
         }
-        update_post_meta( $new_request_id, self::REQUEST_META_DATA, $data );
+        update_post_meta( $new_request_id, self::REQUEST_META_DATA, $request_data );
 
         update_post_meta( $new_request_id, self::REQUEST_META_DISPLAY_NAME, $display_name );
 
-        update_post_meta( $new_request_id, self::REQUEST_META_STATUS, self::PENDING );
-
-        // Trigger the email when a new wholesale account is registered.
-        do_action( 'ywhs_new_account_registered', $new_request_id );
+        update_post_meta( $new_request_id, self::REQUEST_META_STATUS, $request_status );
 
         return $new_request_id;
     }
@@ -95,15 +92,17 @@ class RequestsHelper {
     /**
      * Get a list of Wholesale requests.
      *
-     * @param string $filter_key The search keyword .
-     * @param string $status The filtered status .
+     * @param string $search The search keyword .
      * @param int    $page The pagination page.
      * @param int    $per_page The number of items per page.
+     * @param string $status The filtered status .
      * @return array A paginated list of Wholesale requests.
      */
-    public static function get_paginated_request_post( string $filter_key, string $status, int $page, int $per_page ): array {
+    public static function get_paginated_request_post( string $search, int $page, int $per_page, string $status = 'all' ): array {
         $args = [
             'post_type'              => self::REQUEST_POST_TYPE,
+            'posts_per_page'         => $per_page,
+            'paged'                  => $page,
             'update_post_meta_cache' => true,
             'meta_query'             => [
                 'relation'      => 'AND',
@@ -118,32 +117,32 @@ class RequestsHelper {
             ],
         ];
 
-        if ( ! isset( $page ) || ! isset( $per_page ) ) {
-            $args['posts_per_page'] = '-1';
-        } else {
-            $args['posts_per_page'] = $per_page;
-            $args['paged']          = $page;
-        }
-
-        if ( isset( $filter_key ) ) {
+        if ( ! empty( $search ) ) {
             $args['meta_query'][] = [
                 'relation' => 'OR',
                 [
                     'key'     => self::REQUEST_META_DISPLAY_NAME,
-                    'value'   => $filter_key,
+                    'value'   => $search,
                     'compare' => 'LIKE',
                     'type'    => 'CHAR',
                 ],
                 [
                     'key'     => self::REQUEST_META_EMAIL,
-                    'value'   => $filter_key,
+                    'value'   => $search,
                     'compare' => 'LIKE',
                     'type'    => 'CHAR',
                 ],
             ];
         }
 
-        if ( isset( $status ) && ! in_array( $status, [ self::ALL, self::APPROVED ], true ) ) {
+        if ( $status === 'all' || empty( $status ) ) {
+            $args['meta_query'][] = [
+                'key'     => self::REQUEST_META_STATUS,
+                'value'   => self::STATUS_APPROVED,
+                'compare' => '!=',
+                'type'    => 'CHAR',
+            ];
+        } else {
             $args['meta_query'][] = [
                 'key'     => self::REQUEST_META_STATUS,
                 'value'   => $status,
@@ -152,28 +151,20 @@ class RequestsHelper {
             ];
         }
 
-        $args['meta_query'][] = [
-            'key'     => self::REQUEST_META_STATUS,
-            'value'   => self::APPROVED,
-            'compare' => '!=',
-            'type'    => 'CHAR',
-        ];
-
         $query     = new WP_Query( $args );
         $data_list = $query->posts;
 
-        $cleaned = [];
+        $response = [];
         foreach ( $data_list as $data ) {
-            array_push( $cleaned, self::clean_request_data( $data, true ) );
+            array_push( $response, self::make_request_response( $data, true ) );
         }
 
-        $response = [
+        return [
             'currentPage' => $page,
             'totalPage'   => $query->max_num_pages,
             'totalItems'  => $query->found_posts,
-            'data'        => $cleaned,
+            'data'        => $response,
         ];
-        return $response;
     }
 
     /**
@@ -183,7 +174,7 @@ class RequestsHelper {
      * @param bool     $is_extra_fields The Flag to determine to get extra fields .
      * @return array A  Wholesale requests cleaned.
      */
-    public static function clean_request_data( \WP_Post $data, bool $is_extra_fields ): array {
+    public static function make_request_response( \WP_Post $data, bool $is_extra_fields ): array {
         $display_name = get_post_meta( $data->ID, self::REQUEST_META_DISPLAY_NAME, true );
         $post_meta    = get_post_meta( $data->ID, self::REQUEST_META_DATA, true );
         $email        = get_post_meta( $data->ID, self::REQUEST_META_EMAIL, true );
@@ -263,7 +254,7 @@ class RequestsHelper {
         if ( ! isset( $request ) || self::REQUEST_POST_TYPE !== $request->post_type ) {
             return [];
         }
-        $cleaned = self::clean_request_data( $request, true );
+        $cleaned = self::make_request_response( $request, true );
 
         return $cleaned;
     }
@@ -356,46 +347,22 @@ class RequestsHelper {
      * Delete a wholesaler request by ID
      *
      * @param int $request_id The target request ID .
-     * @return bool A wholesale request deleted status.
+     * @return bool|WP_Error A wholesale request deleted status.
      */
-    public static function delete_whs_request( int $request_id ): bool {
+    public static function delete_whs_request( int $request_id ) {
         $request = get_post( $request_id );
 
         if ( ! isset( $request ) || self::REQUEST_POST_TYPE !== $request->post_type ) {
-            return false;
-        }
-        $meta        = get_post_meta( $request_id );
-        $backup      = [];
-        $is_rollback = false;
-
-        foreach ( $meta as $key => $val ) {
-            $backup[ $key ] = get_post_meta( $request_id, $key, true );
-            $result         = delete_post_meta( $request_id, $key );
-            if ( ! $result ) {
-                $is_rollback = true;
-                break;
-            }
+            return new WP_Error( 'not_found', 'Request not found', [ 'status' => 404 ] );
         }
 
-        if ( $is_rollback ) {
-            foreach ( $backup as $key => $val ) {
-                update_post_meta( $request_id, $key, $val );
-            }
+        $result = wp_delete_post( $request_id, true );
+
+        if ( $result === false || $result === null ) {
             return false;
         }
 
-        wp_cache_delete( $request_id, 'post-meta' );
-
-        $result = wp_delete_post( $request_id );
-
-        if ( ! $result ) {
-            foreach ( $backup as $key => $val ) {
-                update_post_meta( $request_id, $key, $val );
-            }
-            return false;
-        }
-
-            return true;
+        return true;
     }
 
     /**
@@ -426,9 +393,9 @@ class RequestsHelper {
      *
      * @param int    $request_id The target request ID .
      * @param string $role_slug The target role slug .
-     * @return void
+     * @return void|WP_Error
      */
-    public static function handle_ywhs_request_author( int $request_id, string $role_slug ): void {
+    public static function approve_request( int $request_id, string $role_slug ) {
         $request = get_post( $request_id );
 
         if ( $request->post_author < 1 ) {
@@ -450,7 +417,7 @@ class RequestsHelper {
             );
 
             if ( is_wp_error( $request_user ) ) {
-                throw new Exception( esc_html( $request_user->get_error_message() ) );
+                return $request_user;
             }
 
             $result = wp_update_post(
@@ -461,49 +428,56 @@ class RequestsHelper {
             );
 
             if ( is_wp_error( $result ) ) {
-                throw new Exception( esc_html( $result->get_error_message() ) );
+                return $result;
             }
         } else {
-            $current_user = new WP_User( $request->post_author );
 
-            RolesHelper::remove_ywhs_role_from_user( $current_user );
+            $user = get_user_by( 'ID', $request->post_author );
+            if ( $user === false ) {
+                return new WP_Error( 'not_found', 'User not found', [ 'status' => 404 ] );
+            }
 
-            $current_user->add_role( $role_slug );
-
+            RolesHelper::remove_ywhs_role_from_user( $user );
+            $user->add_role( $role_slug );
         }//end if
+
+        update_post_meta( $request_id, self::REQUEST_META_STATUS, self::STATUS_APPROVED );
+        do_action( 'ywhs_account_registration_approved', $request_id );
     }
 
+    public static function reject_request( int $request_id ) {
+        update_post_meta( $request_id, self::REQUEST_META_STATUS, self::STATUS_REJECTED );
+        do_action( 'ywhs_account_registration_rejected', $request_id );
+    }
 
-    /**
-     * Remove role from the the author of request
-     *
-     * @param int $request_id The target request ID.
-     * @return void
-     */
-    public static function remove_role_from_ywhs_request_author( int $request_id ): void {
-        $request = get_post( $request_id );
-
-        if ( $request->post_author > 0 ) {
-            $current_user = new WP_User( $request->post_author );
-            RolesHelper::remove_ywhs_role_from_user( $current_user );
+    public static function count_requests_by_status( bool $force_recalc = false ): array {
+        if ( ! $force_recalc ) {
+            $cached = get_transient( 'yaywholesaleb2b_count_requests_by_status' );
+            if ( $cached ) {
+                return $cached;
+            }
         }
+
+        $count_pending  = self::count_pending_requests();
+        $count_rejected = self::count_rejected_requests();
+        $count          = [
+            'pending'  => $count_pending,
+            'rejected' => $count_rejected,
+            'total'    => $count_pending + $count_rejected,
+        ];
+
+        set_transient( 'yaywholesaleb2b_count_requests_by_status', $count, 2 * HOUR_IN_SECONDS );
+        return $count;
     }
 
-    /**
-     * Count the pending requests
-     *
-     * @return int count of the pending requests.
-     */
     public static function count_pending_requests(): int {
         $args  = [
             'post_type'              => self::REQUEST_POST_TYPE,
             'update_post_meta_cache' => true,
-            'posts_per_page'         => -1,
             'meta_query'             => [
-                'relation' => 'AND',
                 [
                     'key'     => self::REQUEST_META_STATUS,
-                    'value'   => self::PENDING,
+                    'value'   => self::STATUS_PENDING,
                     'compare' => '==',
                     'type'    => 'CHAR',
                 ],
@@ -514,21 +488,15 @@ class RequestsHelper {
         return $query->post_count;
     }
 
-    /**
-     * Count the pending/rejected requests
-     *
-     * @return int count of the pending requests.
-     */
-    public static function count_total_requests(): int {
+    public static function count_rejected_requests(): int {
         $args  = [
             'post_type'              => self::REQUEST_POST_TYPE,
             'update_post_meta_cache' => true,
-            'posts_per_page'         => -1,
             'meta_query'             => [
                 [
                     'key'     => self::REQUEST_META_STATUS,
-                    'value'   => self::APPROVED,
-                    'compare' => '!=',
+                    'value'   => self::STATUS_REJECTED,
+                    'compare' => '==',
                     'type'    => 'CHAR',
                 ],
             ],

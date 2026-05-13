@@ -53,7 +53,7 @@ export const settingsFormSchema = z.object({
     wholesale_store_page: z.string(),
   }),
   display: z.object({
-    price_format: z.string(),
+    price_format: z.enum(['retail-and-wholesale', 'wholesale-only', 'retail-only']),
     wholesale_price_label: z.string(),
     wholesale_price_color: z.string(),
   }),
@@ -85,3 +85,4 @@ export const settingsFormSchema = z.object({
 });
 
 export type Settings = z.infer<typeof settingsFormSchema>;
+export type RoleRelatedSetting = z.infer<typeof roleRelatedSettingSchema>;

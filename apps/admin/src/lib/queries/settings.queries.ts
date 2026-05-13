@@ -1,34 +1,84 @@
-import { useIsMutating, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { __ } from '@wordpress/i18n';
+import { queryOptions, useIsMutating, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
-import { postSettings } from '@/lib/api/settings.api';
+import { getSettings, postSettings, updateEmailStatus } from '@/lib/api/settings.api';
 import type { Settings } from '@/lib/schema/settings.schema';
 
-export function useSettings() {
-  return useQuery({
-    queryKey: ['settings'],
-    queryFn: () => window.yayWholesaleB2BAdmin.settings,
+/** Options */
+
+const SETTINGS_QUERIES = {
+  main: queryOptions({
+    queryKey: ['settings', 'main'],
+    queryFn: async () => {
+      const settings = await getSettings();
+      window.yayWholesaleB2BAdmin.settings = settings;
+      return settings;
+    },
     initialData: window.yayWholesaleB2BAdmin.settings,
-  });
+    staleTime: Infinity,
+  }),
+  emails: queryOptions({
+    queryKey: ['settings', 'emails'],
+    queryFn: () => window.yayWholesaleB2BAdmin.wholesale_emails,
+    initialData: window.yayWholesaleB2BAdmin.wholesale_emails,
+    staleTime: Infinity,
+  }),
+};
+
+/** Queries */
+
+export function useSettingsQuery() {
+  return useQuery(SETTINGS_QUERIES.main);
 }
+
+export function useSettingsEmailsQuery() {
+  return useQuery(SETTINGS_QUERIES.emails);
+}
+
+/** Mutations */
 
 export function useSaveSettingsMutation() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationKey: ['settings'],
+    mutationKey: ['settings', 'main'],
     mutationFn: async (data: Settings) => postSettings(data),
     onSuccess: (res) => {
-      window.yayWholesaleB2BAdmin.settings = res.data;
-      queryClient.invalidateQueries({ queryKey: ['settings'] });
+      window.yayWholesaleB2BAdmin.settings = res;
+      queryClient.setQueryData(SETTINGS_QUERIES.main.queryKey, res);
+    },
+    onError: () => queryClient.invalidateQueries({ queryKey: SETTINGS_QUERIES.main.queryKey }),
+  });
+}
 
-      if (!queryClient.isFetching({ queryKey: ['roles'] })) {
-        queryClient.invalidateQueries({ queryKey: ['roles'] });
+export function useUpdateEmailStatusMutation() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationKey: ['settings', 'emails', 'update-status'],
+    mutationFn: async ({ emailId, status }: { emailId: string; status: boolean }) => updateEmailStatus(emailId, status),
+
+    onMutate: async ({ emailId, status }) => {
+      const previous = queryClient.getQueryData(SETTINGS_QUERIES.emails.queryKey);
+      if (!previous) return;
+
+      const next = previous.map((e) => (e.id === emailId ? { ...e, status } : e));
+      window.yayWholesaleB2BAdmin.wholesale_emails = next;
+      queryClient.setQueryData(SETTINGS_QUERIES.emails.queryKey, next); // Optimistic
+
+      return { previous };
+    },
+
+    onError: (_err, _, context) => {
+      if (context?.previous) {
+        window.yayWholesaleB2BAdmin.wholesale_emails = context.previous;
+        queryClient.setQueryData(SETTINGS_QUERIES.emails.queryKey, context.previous); // Rollback
       }
     },
   });
 }
 
+/** Utils */
+
 export function useIsMutatingSettings() {
-  return useIsMutating({ mutationKey: ['settings'] });
+  return useIsMutating({ mutationKey: ['settings', 'main'] });
 }

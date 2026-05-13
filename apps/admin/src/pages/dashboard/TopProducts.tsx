@@ -1,5 +1,4 @@
-import { Crown } from 'lucide-react';
-import { Spinner } from '@wordpress/components';
+import { Crown, Loader2 } from 'lucide-react';
 import { __ } from '@wordpress/i18n';
 
 import { parseWPCurrency } from '@/lib/helpers/format.helper';
@@ -12,11 +11,11 @@ export default function TopProducts(props: { reportQuery: ReturnType<typeof useR
   const { data: reportData, isFetching, isLoading } = props.reportQuery;
 
   return (
-    <Card className="mt-0 flex h-full flex-col rounded-lg shadow-none">
-      <CardContent className="flex min-h-0 flex-1 flex-col gap-5">
+    <Card className="p-4 md:p-5 2xl:p-6">
+      <CardContent className="flex min-h-0 flex-1 flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between">
-          <h3 className="text-foreground text-[16px] font-semibold">{__('Top Products', 'yay-wholesale-b2b')}</h3>
+        <div className="mb-4 flex items-center justify-between">
+          <h3 className="text-base font-medium">{__('Top Products', 'yay-wholesale-b2b')}</h3>
         </div>
 
         {/* DataTable */}
@@ -50,7 +49,7 @@ export default function TopProducts(props: { reportQuery: ReturnType<typeof useR
                 <TableRow className="border-divider border-b">
                   <TableCell colSpan={4} className="h-32 text-center align-middle">
                     <div className="flex items-center justify-center gap-2">
-                      <Spinner className="text-muted-foreground size-6 animate-spin" />
+                      <Loader2 className="text-muted-foreground size-6 animate-spin" />
                     </div>
                   </TableCell>
                 </TableRow>

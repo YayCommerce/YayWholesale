@@ -31,16 +31,18 @@ class NewAccountRegistered extends WholesaleEmailBase {
         $admin_user  = get_user_by( 'email', $admin_email );
 
         $this->placeholders = [
+            '{request_status}'            => __( 'Pending for Approval', 'yay-wholesale-b2b' ),
             '{account_name}'              => '{account_name}',
             '{admin_name}'                => $admin_user && ! empty( $admin_user->display_name ) ? $admin_user->display_name : __( 'Admin', 'yay-wholesale-b2b' ),
             '{account_email}'             => 'johndoe@email.com',
             '{account_registration_time}' => wp_date(
                 get_option( 'date_format' ) . ' ' . get_option( 'time_format' )
             ),
-            '{admin_url}'                 => admin_url( 'admin.php?page=yay_wholesale#/request/' ),
+            '{admin_url}'                 => admin_url( 'admin.php?page=yay_wholesale#/requests/' ),
         ];
-        // Trigger the email when a new wholesale account is registered.
-        add_action( 'ywhs_new_account_registered', [ $this, 'trigger' ], 10, 1 );
+
+        // Trigger the email when a new wholesale account registration is submitted.
+        add_action( 'ywhs_account_registration_submitted', [ $this, 'trigger' ], 10, 1 );
 
         // Call parent constructor
         parent::__construct();
@@ -86,9 +88,11 @@ class NewAccountRegistered extends WholesaleEmailBase {
                 <li>%s</li>
                 <li>%s</li>
                 <li>%s</li>
+                <li>%s</li>
             </ul>',
             __( 'Customer name: {account_name}', 'yay-wholesale-b2b' ),
             __( 'Email address: {account_email}', 'yay-wholesale-b2b' ),
+            __( 'Registration status: {request_status}', 'yay-wholesale-b2b' ),
             __( 'Registration time: {account_registration_time}', 'yay-wholesale-b2b' )
         );
         $content .= "\n\n";
@@ -158,15 +162,18 @@ class NewAccountRegistered extends WholesaleEmailBase {
         $this->setup_locale();
 
         if ( $request_id ) {
-            $this->object                                      = RequestsHelper::get_request_by_id( $request_id );
-            $date_string                                       = get_the_date(
+            $this->object   = RequestsHelper::get_request_by_id( $request_id );
+            $date_string    = get_the_date(
                 get_option( 'date_format' ) . ' ' . get_option( 'time_format' ),
                 $this->object['id']
             );
+            $request_status = $this->object['status'] === RequestsHelper::STATUS_PENDING ? __( 'Pending for Approval', 'yay-wholesale-b2b' ) : __( 'Approved', 'yay-wholesale-b2b' );
+
+            $this->placeholders['{request_status}']            = $request_status;
             $this->placeholders['{account_name}']              = $this->object['name'];
             $this->placeholders['{account_email}']             = $this->object['email'];
             $this->placeholders['{account_registration_time}'] = $date_string;
-            $this->placeholders['{admin_url}']                 = admin_url( 'admin.php?page=yay_wholesale#/request/edit/' . $this->object['id'] . '/' );
+            $this->placeholders['{admin_url}']                 = admin_url( 'admin.php?page=yay_wholesale#/requests/edit/' . $this->object['id'] . '/' );
         }
 
         if ( $this->is_enabled() && $this->get_recipient() ) {

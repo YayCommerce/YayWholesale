@@ -16,14 +16,16 @@ export const roleSchema = z.object({
     .number({ required_error: __('Minimum order amount is required', 'yay-wholesale-b2b') })
     .min(0, { message: __('Minimum order amount must be greater than 0', 'yay-wholesale-b2b') }),
   applyToSalePrice: z.boolean(),
+  status: z.boolean(),
 });
 
 export type RoleFormValues = z.infer<typeof roleSchema>;
 
 export type Role = RoleFormValues & {
+  /** @deprecated use slug instead */
   id: number;
   slug: string;
-  status: boolean;
 };
 
-export type RoleUserCount = Record<string, number>;
+/** key is roleSlug, value is userCount */
+export type UserCountByRole = Record<string, number>;

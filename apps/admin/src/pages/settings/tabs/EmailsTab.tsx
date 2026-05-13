@@ -2,14 +2,14 @@ import { useState } from 'react';
 import { __ } from '@wordpress/i18n';
 
 import { getErrorMsg } from '@/lib/helpers/response.helper';
-import { useUpdateEmailStatusMutation, useWholesaleEmailsQuery } from '@/lib/queries/emails.queries';
+import { useSettingsEmailsQuery, useUpdateEmailStatusMutation } from '@/lib/queries/settings.queries';
 import { toast } from '@/components/ui/sonner';
 import { Switch } from '@/components/ui/switch';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
 export default function EmailsTab() {
   const [loadingId, setLoadingId] = useState<string | null>(null);
-  const { data: emails } = useWholesaleEmailsQuery();
+  const { data: emails } = useSettingsEmailsQuery();
   const updateEmailStatusMutation = useUpdateEmailStatusMutation();
 
   async function handleStatusChange(emailId: string, status: boolean) {

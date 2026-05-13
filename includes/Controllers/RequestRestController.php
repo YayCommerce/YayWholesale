@@ -3,16 +3,18 @@ namespace YayWholesaleB2B\Controllers;
 
 use Exception;
 use WP_Error;
-use YayWholesaleB2B\Utils\SingletonTrait;
 use WP_REST_Request;
 use WP_REST_Response;
+use YayWholesaleB2B\Utils\SingletonTrait;
+use YayWholesaleB2B\Helpers\CustomerHelper;
 use YayWholesaleB2B\Helpers\RequestsHelper;
+use YayWholesaleB2B\Helpers\RolesHelper;
 use YayWholesaleB2B\Helpers\SettingsHelper;
 
 defined( 'ABSPATH' ) || exit;
 
 /**
- * Handles Wholesale Requests API endpoints.
+ * Handles Wholesale Registration Requests Endpoints.
  */
 class RequestRestController extends BaseRestController {
     use SingletonTrait;
@@ -49,11 +51,6 @@ class RequestRestController extends BaseRestController {
                     'permission_callback' => [ $this,'can_manage_request' ],
                 ],
                 [
-                    'methods'             => 'PUT',
-                    'callback'            => [ $this, 'update_request_by_id' ],
-                    'permission_callback' => [ $this,'can_manage_request' ],
-                ],
-                [
                     'methods'             => 'DELETE',
                     'callback'            => [ $this, 'delete_request_by_id' ],
                     'permission_callback' => [ $this,'can_manage_request' ],
@@ -67,20 +64,19 @@ class RequestRestController extends BaseRestController {
             [
                 [
                     'methods'             => 'PUT',
-                    'callback'            => [ $this, 'approve_request_status_by_id' ],
+                    'callback'            => [ $this, 'approve_request_by_id' ],
                     'permission_callback' => [ $this,'can_manage_request_and_user_role' ],
                 ],
             ]
         );
-
         register_rest_route(
             self::REST_NAMESPACE,
             '/requests/(?P<request_id>\d+)/reject',
             [
                 [
                     'methods'             => 'PUT',
-                    'callback'            => [ $this, 'reject_request_status_by_id' ],
-                    'permission_callback' => [ $this,'can_manage_request' ],
+                    'callback'            => [ $this, 'reject_request_by_id' ],
+                    'permission_callback' => [ $this,'can_manage_request_and_user_role' ],
                 ],
             ]
         );
@@ -91,36 +87,22 @@ class RequestRestController extends BaseRestController {
             [
                 [
                     'methods'             => 'PUT',
-                    'callback'            => [ $this, 'bulk_approve_request_status' ],
+                    'callback'            => [ $this, 'bulk_approve_request' ],
                     'permission_callback' => [ $this,'can_manage_request_and_user_role' ],
                 ],
             ]
         );
-
         register_rest_route(
             self::REST_NAMESPACE,
             '/requests/bulk-reject',
             [
                 [
                     'methods'             => 'PUT',
-                    'callback'            => [ $this, 'bulk_reject_request_status' ],
-                    'permission_callback' => [ $this,'can_manage_request' ],
+                    'callback'            => [ $this, 'bulk_reject_request' ],
+                    'permission_callback' => [ $this,'can_manage_request_and_user_role' ],
                 ],
             ]
         );
-
-        register_rest_route(
-            self::REST_NAMESPACE,
-            '/requests/bulk-status',
-            [
-                [
-                    'methods'             => 'PUT',
-                    'callback'            => [ $this, 'bulk_update_request_status' ],
-                    'permission_callback' => [ $this,'can_manage_request' ],
-                ],
-            ]
-        );
-
         register_rest_route(
             self::REST_NAMESPACE,
             '/requests/bulk-delete',
@@ -135,23 +117,11 @@ class RequestRestController extends BaseRestController {
 
         register_rest_route(
             self::REST_NAMESPACE,
-            '/requests/pending',
+            '/requests/count-by-status',
             [
                 [
                     'methods'             => 'GET',
-                    'callback'            => [ $this, 'get_pending_count' ],
-                    'permission_callback' => [ $this,'can_manage_request' ],
-                ],
-            ]
-        );
-
-        register_rest_route(
-            self::REST_NAMESPACE,
-            '/requests/total',
-            [
-                [
-                    'methods'             => 'GET',
-                    'callback'            => [ $this, 'get_total_count' ],
+                    'callback'            => [ $this, 'count_requests_by_status' ],
                     'permission_callback' => [ $this,'can_manage_request' ],
                 ],
             ]
@@ -161,10 +131,10 @@ class RequestRestController extends BaseRestController {
     /**
      * Register a new wholesale request.
      *
-     * @param WP_REST_Request $request The request object.
-     * @return WP_REST_Response The response object.
+     * @param WP_REST_Request $request
+     * @return mixed|WP_Error
      */
-    public function register_request( WP_REST_Request $request ): WP_REST_Response {
+    public function register_request( WP_REST_Request $request ) {
 
         if ( isset( $_COOKIE['yaywholesaleb2b_cid'] ) && ! empty( $_COOKIE['yaywholesaleb2b_cid'] ) ) {
             $cookie_id = sanitize_text_field( wp_unslash( $_COOKIE['yaywholesaleb2b_cid'] ) );
@@ -172,364 +142,178 @@ class RequestRestController extends BaseRestController {
             set_transient( "yaywholesaleb2b_client_$cookie_id", $count, 15 * MINUTE_IN_SECONDS );
         }
 
-        $params       = $this->get_form_data( $request );
-        $current_user = get_current_user_id();
+        $body_params                   = $request->get_body_params();
+        $is_logged_in                  = is_user_logged_in();
+        $current_user_id               = get_current_user_id();
+        $is_current_wholesale_customer = CustomerHelper::is_current_wholesale_customer();
+        $default_role                  = RolesHelper::get_default_wholesale_role();
+        $settings                      = SettingsHelper::get_settings();
+        $need_moderate                 = $settings['registration']['moderate'];
 
-        $wholesale_id = RequestsHelper::insert_whs_request( $current_user, $params );
-
-        if ( $wholesale_id < 0 ) {
-            return $this->error( __( 'Failed to register this request', 'yay-wholesale-b2b' ) );
-        }
-
-        $settings = SettingsHelper::get_settings();
-        if ( ! $settings['registration']['moderate'] ) {
-            $roles        = get_option( 'yaywholesaleb2b_roles', [] );
-            $active_roles = array_values( array_filter( $roles, fn( $r ) => $r['status'] ) );
-            $role_slug    = $settings['general']['default_role'];
-            $role         = array_values( array_filter( $active_roles, fn( $r ) => $r['slug'] === $role_slug ) )[0] ?? null;
-            if ( ! isset( $role ) ) {
-                do_action( 'ywhs_account_registration_pending', $wholesale_id );
-                return $this->error( __( 'The default role is inactive, your request is changed to pending', 'yay-wholesale-b2b' ) );
+        if ( ! $is_logged_in || $need_moderate || empty( $default_role ) || $is_current_wholesale_customer ) {
+            // When cannot auto-approved, set request to pending
+            $new_request_id = RequestsHelper::insert_whs_request( $current_user_id, $body_params, RequestsHelper::STATUS_PENDING );
+            if ( is_wp_error( $new_request_id ) ) {
+                return $new_request_id;
             }
 
-            $result = RequestsHelper::add_role_to_ywhs_request_author( $wholesale_id, $role_slug );
+            do_action( 'ywhs_account_registration_submitted', $new_request_id );
+            do_action( 'ywhs_account_registration_pending', $new_request_id );
+            return [ 'message' => __( 'Your request has been submitted successfully.', 'yay-wholesale-b2b' ) ];
 
-            if ( $result ) {
-                if ( ! RequestsHelper::update_whs_request( $wholesale_id, [ 'status' => RequestsHelper::APPROVED ] ) ) {
-                    do_action( 'ywhs_account_registration_pending', $wholesale_id );
-                    return $this->error( __( 'Role has been applied, but your request is still pending', 'yay-wholesale-b2b' ) );
-                }
-
-                // Trigger the email when a new wholesale account is approved.
-                do_action( 'ywhs_account_registration_approved', $wholesale_id );
-            } else {
-                // Trigger the email when a new wholesale account is pending.
-                do_action( 'ywhs_account_registration_pending', $wholesale_id );
-            }
         } else {
-            // Trigger the email when a new wholesale account is pending.
-            do_action( 'ywhs_account_registration_pending', $wholesale_id );
+            $new_request_id = RequestsHelper::insert_whs_request( $current_user_id, $body_params, RequestsHelper::STATUS_APPROVED );
+            if ( is_wp_error( $new_request_id ) ) {
+                return $new_request_id;
+            }
+
+            $current_user = wp_get_current_user();
+            RolesHelper::remove_ywhs_role_from_user( $current_user );
+            $current_user->add_role( $default_role['slug'] );
+
+            do_action( 'ywhs_account_registration_submitted', $new_request_id );
+            do_action( 'ywhs_account_registration_approved', $new_request_id );
+            return [ 'message' => __( 'Your request has been submitted and approved. ', 'yay-wholesale-b2b' ) ];
         }//end if
-
-        return $this->success( true, __( 'Request Saved', 'yay-wholesale-b2b' ) );
     }
 
-    /**
-     * Get the list of wholesale requests.
-     *
-     * @param WP_REST_Request $request The request object.
-     * @return WP_REST_Response The response object.
-     */
-    public function get_request_list( WP_REST_Request $request ): WP_REST_Response {
-        $page     = $request['page'];
-        $per_page = $request['per_page'];
-        $keyword  = $request['kw'];
-        $status   = $request['status'];
+    public function get_request_list( WP_REST_Request $request ) {
+        $page     = intval( $request->get_param( 'page' ) || 1 );
+        $per_page = intval( $request->get_param( 'per_page' ) || 10 );
+        $search   = sanitize_text_field( $request->get_param( 'search' ) || '' );
+        $status   = sanitize_text_field( $request->get_param( 'status' ) || 'all' );
 
-        if ( ! isset( $page ) ) {
-            $page = 1;
-        }
-
-        if ( ! isset( $per_page ) ) {
-            $per_page = 10;
-        }
-
-        if ( ! isset( $keyword ) ) {
-            $keyword = '';
-        }
-
-        if ( ! isset( $status ) ) {
-            $status = RequestsHelper::ALL;
-        }
-
-        $response = RequestsHelper::get_paginated_request_post( $keyword, $status, $page, $per_page );
-
-        return $this->success( $response, __( 'Fetched successfully', 'yay-wholesale-b2b' ) );
+        $response = RequestsHelper::get_paginated_request_post( $search, $page, $per_page, $status );
+        return $response;
     }
 
-    /**
-     * Get a wholesale request by ID.
-     *
-     * @param WP_REST_Request $request The request object.
-     * @return WP_REST_Response The response object.
-     */
-    public function get_request_by_id( WP_REST_Request $request ): WP_REST_Response {
-        $id      = (int) $request->get_param( 'request_id' );
-        $request = RequestsHelper::get_request_by_id( $id );
+    public function get_request_by_id( WP_REST_Request $request ) {
+        $request_id = (int) $request->get_param( 'request_id' );
+        $request    = RequestsHelper::get_request_by_id( $request_id );
 
         if ( empty( $request ) ) {
-            return $this->error( __( 'Request not found', 'yay-wholesale-b2b' ), 404 );
+            return $this->error_not_found();
         }
 
-        return $this->success( $request );
+        return $request;
     }
 
-    /**
-     * Update a wholesale request by ID.
-     *
-     * @param WP_REST_Request $request The request object.
-     * @return WP_REST_Response The response object.
-     */
-    public function update_request_by_id( WP_REST_Request $request ): WP_REST_Response {
-        $id        = (int) $request->get_param( 'request_id' );
-        $form_data = $this->get_json_params( $request );
-
-        $result = RequestsHelper::update_whs_request( $id, $form_data );
-        if ( ! $result ) {
-            return $this->error( __( 'Cannot save the request', 'yay-wholesale-b2b' ) );
-        }
-        return $this->success( true, __( 'Request has been updated successfully', 'yay-wholesale-b2b' ) );
-    }
-
-    /**
-     * Delete a wholesale request by ID.
-     *
-     * @param WP_REST_Request $request The request object.
-     * @return WP_REST_Response The response object.
-     */
-    public function delete_request_by_id( WP_REST_Request $request ): WP_REST_Response {
+    public function delete_request_by_id( WP_REST_Request $request ) {
         $id     = (int) $request->get_param( 'request_id' );
         $result = RequestsHelper::delete_whs_request( $id );
 
-        if ( ! $result ) {
-            return $this->error( __( 'Cannot delete the request', 'yay-wholesale-b2b' ) );
-        }
-        return $this->success( true, __( 'Request has been deleted successfully', 'yay-wholesale-b2b' ) );
+        return $result;
     }
 
-    /**
-     * Approve a wholesale request by ID.
-     *
-     * @param WP_REST_Request $request The request object.
-     * @return WP_REST_Response The response object.
-     */
-    public function approve_request_status_by_id( WP_REST_Request $request ): WP_REST_Response {
-        $id        = (int) $request->get_param( 'request_id' );
-        $json_data = $this->get_json_params( $request );
+    public function approve_request_by_id( WP_REST_Request $request ) {
+        $request_id = (int) $request->get_param( 'request_id' );
+        $payload    = $request->get_json_params();
+        $role_slug  = $payload['roleSlug'];
 
-        $role_slug    = '';
-        $roles        = get_option( 'yaywholesaleb2b_roles', [] );
-        $active_roles = array_values( array_filter( $roles, fn( $r ) => $r['status'] ) );
-
-        if ( ! array_key_exists( 'role_id', $json_data ) || $json_data['role_id'] < 0 ) {
-            $settings  = SettingsHelper::get_settings();
-            $role_slug = $settings['general']['default_role'];
-            if ( empty( $role_slug ) ) {
-                return $this->error( __( 'Cannot find the default role', 'yay-wholesale-b2b' ) );
-            }
-
-            $role = array_values( array_filter( $active_roles, fn( $r ) => $r['slug'] === $role_slug ) )[0] ?? null;
-            if ( ! isset( $role ) ) {
-                return $this->error( __( 'The default role is inactive, please set the default active or change the default role to continue', 'yay-wholesale-b2b' ) );
-            }
-        } else {
-            $role = array_values( array_filter( $active_roles, fn( $r ) => (int) ( $r['id'] ?? 0 ) === $json_data['role_id'] ) )[0] ?? null;
-            if ( ! isset( $role ) ) {
-                return $this->error( __( 'Cannot find the specified role', 'yay-wholesale-b2b' ) );
-            }
-            $role_slug = $role['slug'];
+        if ( empty( $role_slug ) || ! is_string( $role_slug ) ) {
+            return $this->error_invalid_arguments();
         }
 
-        try {
-            RequestsHelper::handle_ywhs_request_author( $id, $role_slug );
-        } catch ( Exception $e ) {
-            return $this->error( $e->getMessage() );
+        $wholesale_request = RequestsHelper::get_request_by_id( $request_id );
+        if ( empty( $wholesale_request ) ) {
+            return $this->error_not_found();
         }
 
-        if ( ! RequestsHelper::update_whs_request( $id, [ 'status' => RequestsHelper::APPROVED ] ) ) {
-            return $this->error( __( 'Role has been added to the request author, but cannot change the status', 'yay-wholesale-b2b' ) );
+        $active_roles = RolesHelper::get_active_wholesale_roles();
+        $role_config  = RolesHelper::get_role_by_slug( $active_roles, $role_slug );
+        if ( empty( $role_config ) ) {
+            return $this->error_invalid_arguments();
         }
 
-        // Trigger the email when a wholesale account is approved.
-        do_action( 'ywhs_account_registration_approved', $id );
+        $success = RequestsHelper::approve_request( $request_id, $role_slug );
+        if ( is_wp_error( $success ) ) {
+            return $success;
+        }
 
-        return $this->success( true, __( 'Request status has been updated successfully', 'yay-wholesale-b2b' ) );
+        $updated_request = RequestsHelper::get_request_by_id( $request_id );
+        return $updated_request;
     }
 
-    /**
-     * Reject a wholesale request by ID.
-     *
-     * @param WP_REST_Request $request The request object.
-     * @return WP_REST_Response The response object.
-     */
-    public function reject_request_status_by_id( WP_REST_Request $request ): WP_REST_Response {
-        $id        = (int) $request->get_param( 'request_id' );
-        $json_data = $this->get_json_params( $request );
+    public function reject_request_by_id( WP_REST_Request $request ) {
+        $request_id = (int) $request->get_param( 'request_id' );
 
-        if ( ! RequestsHelper::update_whs_request( $id, [ 'status' => RequestsHelper::REJECTED ] ) ) {
-            return $this->error( __( 'Role has been removed from the request author, but cannot change the status', 'yay-wholesale-b2b' ) );
+        $wholesale_request = RequestsHelper::get_request_by_id( $request_id );
+        if ( empty( $wholesale_request ) ) {
+            return $this->error_not_found();
         }
 
-        // Trigger the email when a wholesale account is rejected.
-        do_action( 'ywhs_account_registration_rejected', $id );
-
-        return $this->success( true, __( 'Request status has been updated successfully', 'yay-wholesale-b2b' ) );
+        RequestsHelper::reject_request( $request_id );
+        $updated_request = RequestsHelper::get_request_by_id( $request_id );
+        return $updated_request;
     }
 
-    /**
-     * Bulk approve of multiple wholesale requests.
-     *
-     * @param WP_REST_Request $request The request object.
-     * @return WP_REST_Response The response object.
-     */
-    public function bulk_approve_request_status( WP_REST_Request $request ): WP_REST_Response {
-        $params           = $this->get_json_params( $request );
-        $ids              = $params['ids'] ?? [];
-        $status           = RequestsHelper::APPROVED;
-        $role_id          = $params['role_id'] ?? null;
-        $updated          = 0;
-        $failed_partially = 0;
-        $failed_totally   = 0;
+    public function bulk_approve_request( WP_REST_Request $request ) {
+        $payload     = $request->get_json_params();
+        $request_ids = $payload['requestIds'] ?? [];
+        $role_slug   = $payload['roleSlug'];
 
-        $role_slug    = '';
-        $roles        = get_option( 'yaywholesaleb2b_roles', [] );
-        $active_roles = array_values( array_filter( $roles, fn( $r ) => $r['status'] ) );
-
-        if ( ! isset( $role_id ) || $role_id < 0 ) {
-            $settings  = SettingsHelper::get_settings();
-            $role_slug = $settings['general']['default_role'];
-            if ( empty( $role_slug ) ) {
-                return $this->error( __( 'Cannot find the default role', 'yay-wholesale-b2b' ) );
-            }
-
-            $role = array_values( array_filter( $active_roles, fn( $r ) => $r['slug'] === $role_slug ) )[0] ?? null;
-            if ( ! isset( $role ) ) {
-                return $this->error( __( 'The default role is inactive, please set the default active or change the default role to continue', 'yay-wholesale-b2b' ) );
-            }
-        } else {
-            $role = array_values( array_filter( $active_roles, fn( $r ) => (int) ( $r['id'] ?? 0 ) === $role_id ) )[0] ?? null;
-            if ( ! isset( $role ) ) {
-                return $this->error( __( 'Cannot find the specified role', 'yay-wholesale-b2b' ) );
-            }
-            $role_slug = $role['slug'];
+        if ( empty( $request_ids ) || empty( $role_slug ) ) {
+            return $this->error_invalid_arguments();
         }
 
-        foreach ( $ids as $id ) {
-            try {
-                RequestsHelper::handle_ywhs_request_author( $id, $role_slug );
-            } catch ( Exception $e ) {
-                ++$failed_totally;
+        $active_roles = RolesHelper::get_active_wholesale_roles();
+        $role_config  = RolesHelper::get_role_by_slug( $active_roles, $role_slug );
+        if ( empty( $role_config ) ) {
+            return $this->error_invalid_arguments();
+        }
+
+        $approved_count = 0;
+        foreach ( $request_ids as $request_id ) {
+            $success = RequestsHelper::approve_request( $request_id, $role_slug );
+            if ( is_wp_error( $success ) ) {
                 continue;
             }
 
-            if ( ! RequestsHelper::update_whs_request( $id, [ 'status' => $status ] ) ) {
-                ++$failed_partially;
-            } else {
-                ++$updated;
-                do_action( 'ywhs_account_registration_approved', $id );
+            ++$approved_count;
+        }
+
+        return $approved_count;
+    }
+
+    public function bulk_reject_request( WP_REST_Request $request ) {
+        $payload     = $request->get_json_params();
+        $request_ids = $payload['requestIds'] ?? [];
+
+        if ( empty( $request_ids ) ) {
+            return $this->error_invalid_arguments();
+        }
+
+        $rejected_count = 0;
+        foreach ( $request_ids as $request_id ) {
+            RequestsHelper::reject_request( $request_id );
+            ++$rejected_count;
+        }
+
+        return $rejected_count;
+    }
+
+    public function bulk_delete_request( WP_REST_Request $request ) {
+        $payload     = $request->get_json_params();
+        $request_ids = $payload['requestIds'] ?? [];
+
+        if ( empty( $request_ids ) ) {
+            return $this->error_invalid_arguments();
+        }
+
+        $deleted_count = 0;
+        foreach ( $request_ids as $request_id ) {
+            $result = RequestsHelper::delete_whs_request( $request_id );
+            if ( $result === true ) {
+                ++$deleted_count;
             }
         }
 
-        if ( count( $ids ) === $failed_partially || count( $ids ) === $failed_totally ) {
-            return $this->error( __( 'Can not update these requests', 'yay-wholesale-b2b' ) );
-        }
-
-        if ( count( $ids ) === $updated ) {
-            return $this->success( true, __( 'Requests status have been updated successfully', 'yay-wholesale-b2b' ) );
-        }
-
-        // Translators: 1: number of requests successfully updated; 2: number of requests that have add/remove role; 3: number of requests that failed.
-        $message = __( '%1$d request(s) updated, %2$d request(s) changed role but failed updated status, %3$d request(s) failed', 'yay-wholesale-b2b' );
-        $message = sprintf( $message, $updated, $failed_partially, $failed_totally );
-
-        return $this->success( true, $message );
+        return $deleted_count;
     }
 
-    /**
-     * Bulk reject multiple wholesale requests.
-     *
-     * @param WP_REST_Request $request The request object.
-     * @return WP_REST_Response The response object.
-     */
-    public function bulk_reject_request_status( WP_REST_Request $request ): WP_REST_Response {
-        $params         = $this->get_json_params( $request );
-        $ids            = $params['ids'] ?? [];
-        $status         = RequestsHelper::REJECTED;
-        $updated        = 0;
-        $failed_totally = 0;
-
-        foreach ( $ids as $id ) {
-            if ( ! RequestsHelper::update_whs_request( $id, [ 'status' => $status ] ) ) {
-                ++$failed_totally;
-            } else {
-                ++$updated;
-                do_action( 'ywhs_account_registration_rejected', $id );
-            }
-        }
-
-        if ( count( $ids ) === $failed_totally ) {
-            return $this->error( __( 'Can not update these requests', 'yay-wholesale-b2b' ) );
-        }
-
-        if ( count( $ids ) === $updated ) {
-            return $this->success( true, __( 'Requests status have been updated successfully', 'yay-wholesale-b2b' ) );
-        }
-
-        // Translators: 1: number of requests successfully updated; 2: number of requests that have failed.
-        $message = __( '%1$d request(s) updated, %2$d request(s) failed', 'yay-wholesale-b2b' );
-        $message = sprintf( $message, $updated, $failed_totally );
-
-        return $this->success( true, $message );
-    }
-
-    /**
-     * Bulk delete multiple wholesale requests.
-     *
-     * @param WP_REST_Request $request The request object.
-     * @return WP_REST_Response The response object.
-     */
-    public function bulk_delete_request( WP_REST_Request $request ): WP_REST_Response {
-        $params  = $this->get_json_params( $request );
-        $ids     = $params['ids'] ?? [];
-        $deleted = 0;
-        $failed  = 0;
-
-        foreach ( $ids as $id ) {
-            $result = RequestsHelper::delete_whs_request( $id );
-            if ( $result ) {
-                ++$deleted;
-            } else {
-                ++$failed;
-            }
-        }
-
-        if ( count( $ids ) === $failed ) {
-            return $this->error( __( 'Can not delete these requests', 'yay-wholesale-b2b' ) );
-        }
-
-        if ( count( $ids ) === $deleted ) {
-            return $this->success( true, __( 'Requests have been deleted successfully', 'yay-wholesale-b2b' ) );
-        }
-
-        // Translators: 1: number of requests successfully deleted; 2: number of requests that failed.
-        $message = __( '%1$d request(s) deleted, %2$d request(s) failed', 'yay-wholesale-b2b' );
-        $message = sprintf( $message, $deleted, $failed );
-
-        return $this->success( true, $message );
-    }
-
-    /**
-     * Get the count of pending requests.
-     *
-     * @param WP_REST_Request $request The request object.
-     * @return WP_REST_Response The response object.
-     */
-    public function get_pending_count( WP_REST_Request $request ): WP_REST_Response {
-        $count = RequestsHelper::count_pending_requests();
-
-        return $this->success( [ 'count' => $count ], __( 'Pending Requests are successfully counted', 'yay-wholesale-b2b' ) );
-    }
-
-    /**
-     * Get the count of requests.
-     *
-     * @param WP_REST_Request $request The request object.
-     * @return WP_REST_Response The response object.
-     */
-    public function get_total_count( WP_REST_Request $request ): WP_REST_Response {
-        $count = RequestsHelper::count_total_requests();
-
-        return $this->success( [ 'count' => $count ], __( 'Requests are successfully counted', 'yay-wholesale-b2b' ) );
+    public function count_requests_by_status( WP_REST_Request $request ) {
+        $count = RequestsHelper::count_requests_by_status( true );
+        return $count;
     }
 
     /**
@@ -548,60 +332,40 @@ class RequestRestController extends BaseRestController {
         return $count <= $limit_rate;
     }
 
-    /**
-     * Check if the user has the necessary permissions to access the requests endpoints (actions: get, search, delete).
-     *
-     * @return bool|WP_Error True if the user has the necessary permissions, otherwise a WP_Error object.
-     */
     public function can_manage_request() {
-        if ( ! current_user_can( 'edit_posts' ) || ! current_user_can( 'manage_woocommerce' ) ) {
-            return new WP_Error( 'rest_forbidden', esc_html__( 'Forbidden.', 'yay-wholesale-b2b' ), [ 'status' => 401 ] );
+        if ( current_user_can( 'edit_posts' ) && current_user_can( 'manage_woocommerce' ) ) {
+            return true;
         }
 
-        return true;
+        return $this->error_forbidden();
     }
 
-    /**
-     * Check if the user has the necessary permissions to access the requests endpoints (actions: update status, bulk update).
-     *
-     * @return bool|WP_Error True if the user has the necessary permissions, otherwise a WP_Error object.
-     */
     public function can_manage_request_and_user_role() {
-        if ( ! ( current_user_can( 'edit_posts' ) &&
-            current_user_can( 'create_users' ) &&
-            current_user_can( 'promote_users' ) &&
-            current_user_can( 'manage_woocommerce' ) ) ) {
-
-            return new WP_Error( 'rest_forbidden', esc_html__( 'Forbidden.', 'yay-wholesale-b2b' ), [ 'status' => 401 ] );
+        if ( current_user_can( 'edit_posts' ) && current_user_can( 'create_users' ) && current_user_can( 'manage_woocommerce' ) && current_user_can( 'promote_users' ) ) {
+            return true;
         }
 
-        return true;
+        return $this->error_forbidden();
     }
 
-    /**
-     * Check if the user can submit a wholesale request
-     *
-     * @param \WP_REST_Request $request the request receivced.
-     * @return bool|WP_Error True if the user has the necessary permissions, otherwise a WP_Error object.
-     */
     public function can_submit_request( WP_REST_Request $request ) {
         if ( is_user_logged_in() ) {
-            $params = $this->get_form_data( $request );
+            $body_params = $request->get_body_params();
             global $current_user;
 
-            if ( in_array( 'email_address', $params, true ) ) {
-                if ( $params['email_address'] !== $current_user->user_email ) {
-                    return new WP_Error( 'rest_forbidden', esc_html__( 'Forbidden.', 'yay-wholesale-b2b' ), [ 'status' => 401 ] );
+            if ( in_array( 'email_address', $body_params, true ) ) {
+                if ( $body_params['email_address'] !== $current_user->user_email ) {
+                    return $this->error_forbidden();
                 }
             }
         }
 
         if ( ! isset( $_COOKIE['yaywholesaleb2b_cid'] ) || empty( $_COOKIE['yaywholesaleb2b_cid'] ) ) {
-            return new WP_Error( 'rest_forbidden', esc_html__( 'Cookie Error.', 'yay-wholesale-b2b' ), [ 'status' => 401 ] );
+            return $this->error_forbidden( esc_html__( 'Cookie Error.', 'yay-wholesale-b2b' ) );
         }
 
         if ( ! $this->check_submit_request_limit_rate() ) {
-            return new WP_Error( 'rest_forbidden', esc_html__( 'You reached the limit requests you can send. Please try again in few minutes.', 'yay-wholesale-b2b' ), [ 'status' => 401 ] );
+            return $this->error_forbidden( esc_html__( 'You reached the limit requests you can send. Please try again in few minutes.', 'yay-wholesale-b2b' ) );
         }
 
         return true;

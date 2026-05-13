@@ -32,7 +32,7 @@ class RolesHelper {
     /**
      * Save wholesale role config.
      *
-     * @return array|null
+     * @param array $roles The roles config array.
      */
     public static function save_wholesale_roles( array $roles ) {
         return update_option( 'yaywholesaleb2b_roles', $roles );
@@ -138,7 +138,8 @@ class RolesHelper {
      * @return void
      */
     public static function remove_ywhs_role_from_user( \WP_User $user ): void {
-        $role_slugs = array_column( get_option( 'yaywholesaleb2b_roles', [] ), 'slug' );
+        $all_role_configs = self::get_wholesale_roles();
+        $role_slugs       = array_column( $all_role_configs, 'slug' );
 
         foreach ( $role_slugs as $ywhs_role ) {
             if ( in_array( $ywhs_role, $user->roles, true ) ) {
@@ -186,5 +187,16 @@ class RolesHelper {
         }
 
         return $roles;
+    }
+
+    public static function count_users_by_role( string $role_slug ) {
+        $user_query = new WP_User_Query(
+            [
+                'role'   => $role_slug,
+                'fields' => 'ID',
+                'number' => -1,
+            ]
+        );
+        return $user_query->get_total();
     }
 }

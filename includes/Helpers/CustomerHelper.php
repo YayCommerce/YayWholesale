@@ -2,7 +2,6 @@
 namespace YayWholesaleB2B\Helpers;
 
 use YayWholesaleB2B\Helpers\RolesHelper;
-use YayWholesaleB2B\Utils\Utils;
 
 /**
  * Roles Helper Class

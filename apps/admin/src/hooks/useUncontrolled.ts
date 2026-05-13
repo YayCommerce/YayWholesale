@@ -4,7 +4,6 @@ import { useState } from 'react';
 /**
  * A hook that manages a state which can be either controlled or uncontrolled. Copy from mantine hooks.
  * Use this for Custom Input components follow Shadcn UI pattern.
- * Use this hooks to prepare for future migration from Antd Form, ahooks => react-hook-form, react-use
  */
 
 export interface UseUncontrolledOptions<T> {

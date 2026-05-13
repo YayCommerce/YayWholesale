@@ -2,11 +2,11 @@ import { createHashRouter, redirect } from 'react-router-dom';
 
 import DashboardPage from '@/pages/dashboard/DashboardPage';
 import RolesPage from '@/pages/roles/RolesPage';
-import WholesalersListPage from '@/pages/wholesalers-list/WholeSalersListPage';
+import WholesalersPage from '@/pages/wholesalers/WholesalersPage';
 import AppLayout from './AppLayout';
 import NotFoundPage from './pages/404';
 import ErrorPage from './pages/500';
-import RequestsPage from './pages/request/RequestsPage';
+import RequestsPage from './pages/requests/RequestsPage';
 import SettingsPage from './pages/settings/SettingsPage';
 
 export function getManagerRouter() {
@@ -25,7 +25,7 @@ export function getManagerRouter() {
           element: <DashboardPage />,
         },
         {
-          path: 'request',
+          path: 'requests',
           children: [
             {
               index: true,
@@ -38,13 +38,8 @@ export function getManagerRouter() {
           ],
         },
         {
-          path: 'wholesalers-list',
-          children: [
-            {
-              index: true,
-              element: <WholesalersListPage />,
-            },
-          ],
+          path: 'wholesalers',
+          element: <WholesalersPage />,
         },
         {
           path: 'roles',
@@ -58,7 +53,7 @@ export function getManagerRouter() {
               element: <RolesPage />,
             },
             {
-              path: 'edit/:roleId',
+              path: 'edit/:roleSlug',
               element: <RolesPage />,
             },
           ],

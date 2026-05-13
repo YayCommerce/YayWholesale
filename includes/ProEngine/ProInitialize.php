@@ -1,9 +1,9 @@
 <?php
 namespace YayWholesaleB2B\ProEngine;
 
-use YayWholesaleB2B\ProEngine\Frontend\PaymentGateway;
-use YayWholesaleB2B\ProEngine\Frontend\Requirement;
-use YayWholesaleB2B\ProEngine\Frontend\ShippingMethod;
+use YayWholesaleB2B\ProEngine\Engine\Frontend\PaymentGateway;
+use YayWholesaleB2B\ProEngine\Engine\Frontend\Requirement;
+use YayWholesaleB2B\ProEngine\Engine\Frontend\ShippingMethod;
 use YayWholesaleB2B\Utils\SingletonTrait;
 
 if ( ! defined( 'ABSPATH' ) ) {
