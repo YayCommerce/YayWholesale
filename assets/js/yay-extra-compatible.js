@@ -1,87 +1,132 @@
-function cloneCss(from, to) {
-  const styles = window.getComputedStyle(from);
-  const css = {};
+(function ($) {
+  function cloneCss(from, to) {
+    const styles = window.getComputedStyle(from);
+    const css = {};
 
-  for (let i = 0; i < styles.length; i++) {
-    const prop = styles[i];
-    css[prop] = styles.getPropertyValue(prop);
+    for (let i = 0; i < styles.length; i++) {
+      const prop = styles[i];
+      css[prop] = styles.getPropertyValue(prop);
+    }
+
+    $(to).css(css);
   }
 
-  jQuery(to).css(css);
-}
+  ("use strict");
+  $(document).ready(() => {
+    /**
+     * Integrate with YayExtra product total
+     */
+    if (!window.wp?.hooks?.addFilter) {
+      return;
+    }
 
-jQuery(document).ready(() => {
-  /**
-   * Integrate with YayExtra product total
-   */
-  if (!window.wp?.hooks?.addFilter) {
-    return;
-  }
+    const { __ } = window.wp.i18n;
+    const {
+      wholesale_role: wholesaleRole,
+      // is_discounted: isDiscounted,
+      product_type: productType,
+      currency_rate: currencyRate,
+      regular_prices: regularPrices,
+      sale_prices: salePrices,
+      tax_enabled: taxEnabled,
+      prices_include_tax: priceIncludeTax,
+      tax_display_shop: taxDisplayShop,
+      tax_rate: taxRate,
+    } = window.yayWholesaleExtra;
 
-  const { __ } = window.wp.i18n;
-  const {
-    wholesale_role: wholesaleRole,
-    // is_discounted: isDiscounted,
-    currency_rate: currencyRate,
-    regular_price: regularPrice,
-    sale_price: salePrice,
-    tax_enabled: taxEnabled,
-    prices_include_tax: priceIncludeTax,
-    tax_display_shop: taxDisplayShop,
-    tax_rate: taxRate,
-  } = window.yayWholesaleExtra;
+    if ($(".yayextra-total-price") && wholesaleRole) {
+      let defaultHtml = $(".yayextra-total-price").html();
+      let appendHtml = "<br/>";
+      appendHtml += `<span class="total-price-title">${__(
+        "Total wholesale price:"
+      )}</span>`;
+      appendHtml += `<span id="ywhs-extra-total-price"></span`;
+      $(".yayextra-total-price").html(defaultHtml + appendHtml);
+      cloneCss($(".total-price")[0], $("#ywhs-extra-total-price")[0]);
+    }
 
-  if (jQuery(".yayextra-total-price") && wholesaleRole) {
-    let defaultHtml = jQuery(".yayextra-total-price").html();
-    let appendHtml = "<br/>";
-    appendHtml += `<span class="total-price-title">${__(
-      "Total wholesale price:"
-    )}</span>`;
-    appendHtml += `<span id="ywhs-extra-total-price"></span`;
-    jQuery(".yayextra-total-price").html(defaultHtml + appendHtml);
-    cloneCss(jQuery(".total-price")[0], jQuery("#ywhs-extra-total-price")[0]);
-  }
+    window.wp.hooks.addFilter(
+      "yaye_total_price_hook",
+      "ywhs",
+      function (html, quantityProduct, totalPriceOriginalData) {
+        let productIds = [];
 
-  window.wp.hooks.addFilter(
-    "yaye_total_price_hook",
-    "ywhs",
-    function (html, quantityProduct, totalPriceOriginalData) {
-      let optionExtra =
-        parseFloat(totalPriceOriginalData.total_options_original) *
-        currencyRate;
-      let linkedProductExtra =
-        parseFloat(totalPriceOriginalData.total_linked_product_original ?? 0) *
-        currencyRate;
-
-      let base =
-        wholesaleRole && wholesaleRole["applyToSalePrice"] && salePrice > 0
-          ? parseFloat(salePrice)
-          : parseFloat(regularPrice);
-      let totalUnit = base + optionExtra + linkedProductExtra;
-      let total;
-      if (wholesaleRole) {
-        let discount = wholesaleRole["discount"]
-          ? wholesaleRole["discount"] / 100
-          : 0;
-        total =
-          Math.max(0, totalUnit * (1 - discount)) * parseInt(quantityProduct);
-
-        if (taxEnabled === "1" && parseFloat(taxRate) > 0) {
-          rate = parseFloat(taxRate) / 100;
-
-          if (priceIncludeTax === "1" && taxDisplayShop === "excl") {
-            total = total / (1 + rate);
+        if (productType !== "grouped") {
+          productIds[0] = 0;
+          if (
+            $('button[name="add-to-cart"').length &&
+            "" != $('button[name="add-to-cart"').val()
+          ) {
+            // regular product
+            productIds[0] = parseInt($('button[name="add-to-cart"').val());
+          } else if (
+            $('input[name="variation_id"').length &&
+            "" != $('input[name="variation_id"').val()
+          ) {
+            // variation product
+            productIds[0] = parseInt($('input[name="variation_id"').val());
           }
-
-          if (priceIncludeTax !== "1" && taxDisplayShop === "incl") {
-            total = total * (1 + rate);
-          }
+        } else {
+          productIds = Object.keys(regularPrices);
         }
 
-        jQuery("#ywhs-extra-total-price").text(parseWPCurrency(total));
-      }
+        let optionExtra =
+          parseFloat(totalPriceOriginalData.total_options_original) *
+          currencyRate;
+        let linkedProductExtra =
+          parseFloat(
+            totalPriceOriginalData.total_linked_product_original ?? 0
+          ) * currencyRate;
 
-      return html;
-    }
-  );
-});
+        // Pricing handle
+        let total = 0;
+        productIds.forEach((productId) => {
+          let quantity;
+          if (productType !== "grouped") {
+            quantity = parseInt(quantityProduct);
+          } else {
+            quantity =
+              $(`#product-${productId} input[type=number]`).val() ?? "0";
+            quantity = parseInt(quantity == "" ? "0" : quantity);
+          }
+
+          let productTotal =
+            wholesaleRole &&
+            wholesaleRole["applyToSalePrice"] &&
+            productId > 0 &&
+            salePrices[productId] > 0
+              ? parseFloat(productId > 0 ? salePrices[productId] : 0)
+              : parseFloat(productId > 0 ? regularPrices[productId] : 0);
+
+          if (productTotal != 0) {
+            let totalUnit = productTotal + optionExtra + linkedProductExtra;
+            if (wholesaleRole) {
+              let discount = wholesaleRole["discount"]
+                ? wholesaleRole["discount"] / 100
+                : 0;
+              let finalProductTotal =
+                Math.max(0, totalUnit * (1 - discount)) * quantity;
+              // Excluding / Including tax - shop display mode
+              if (taxEnabled === "1" && parseFloat(taxRate) > 0) {
+                rate = parseFloat(taxRate) / 100;
+
+                if (priceIncludeTax === "1" && taxDisplayShop === "excl") {
+                  finalProductTotal = finalProductTotal / (1 + rate);
+                }
+
+                if (priceIncludeTax !== "1" && taxDisplayShop === "incl") {
+                  finalProductTotal = finalProductTotal * (1 + rate);
+                }
+              }
+
+              total += finalProductTotal;
+            }
+          }
+        });
+        $("#ywhs-extra-total-price").text(parseWPCurrency(total));
+
+        return html;
+      }
+    );
+  });
+})(jQuery);

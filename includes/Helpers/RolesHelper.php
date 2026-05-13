@@ -10,15 +10,30 @@ use WP_User_Query;
  */
 class RolesHelper {
 
+    /**
+     * Get wholesale role configs.
+     *
+     * @return array
+     */
     public static function get_wholesale_roles(): array {
         return get_option( 'yaywholesaleb2b_roles', [] );
     }
 
+    /**
+     * Get active wholesale role configs.
+     *
+     * @return array
+     */
     public static function get_active_wholesale_roles() {
         $roles = self::get_wholesale_roles();
         return array_values( array_filter( $roles, fn( $role ) => $role['status'] === true ) );
     }
 
+    /**
+     * Save wholesale role config.
+     *
+     * @return array|null
+     */
     public static function save_wholesale_roles( array $roles ) {
         return update_option( 'yaywholesaleb2b_roles', $roles );
     }
@@ -47,6 +62,11 @@ class RolesHelper {
         return null;
     }
 
+    /**
+     * Generate default wholesale role config.
+     *
+     * @return array|null
+     */
     public static function generate_default_role() {
         $default_slug      = 'ywhs_default_role';
         $default_role_name = __( 'YayWholesale Role', 'yay-wholesale-b2b' );
@@ -107,7 +127,7 @@ class RolesHelper {
      * @param string  $slug The role slug.
      * @return array|null The role config or null if not found.
      */
-    public static function get_role_by_slug( array $roles, string $slug ): ?array {
+    public static function get_role_by_slug( array $roles, string $slug ) {
         return array_values( array_filter( $roles, fn( $role ) => isset( $role['slug'] ) && $role['slug'] === $slug ) )[0] ?? null;
     }
 
@@ -156,9 +176,7 @@ class RolesHelper {
                 $default_index = $key;
             }
 
-            if ( ! Utils::is_pro() ) {
-                $role['minOrderQuantity'] = 0;
-            }
+            $role['minOrderQuantity'] = RequirementHelper::get_min_order_quantity( $role );
         }//end foreach
 
         if ( isset( $default_index ) && $default_index < count( $roles ) - 1 ) {

@@ -25,7 +25,7 @@ class YayWholesaleB2bPluginAdapter implements \YayWholesaleB2BScoped\YayCommerce
         };
     } // Set your render callback here
     public function get_settings_page_position(): ?int {
-        return null; }
+        return YAYWHOLESALEB2B_MENU_ORDER; }
     public function get_capability(): string {
         return 'manage_woocommerce'; }
     public function get_plugin_basename(): string {

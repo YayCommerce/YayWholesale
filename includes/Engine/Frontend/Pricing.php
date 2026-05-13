@@ -2,9 +2,13 @@
 namespace YayWholesaleB2B\Engine\Frontend;
 
 use YayWholesaleB2B\Helpers\CustomerHelper;
+use YayWholesaleB2B\Helpers\PricingHelpers\OrderPricingHelper;
 use YayWholesaleB2B\Utils\SingletonTrait;
 use YayWholesaleB2B\Helpers\SettingsHelper;
-use YayWholesaleB2B\Helpers\PricingHelper;
+use YayWholesaleB2B\Helpers\PricingHelpers\ShopPricingHelper;
+use YayWholesaleB2B\Helpers\RequirementHelper;
+use YayWholesaleB2B\Helpers\RolesHelper;
+use YayWholesaleB2B\Utils\Utils;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -20,16 +24,28 @@ class Pricing {
         $this->settings = SettingsHelper::get_settings();
 
         // --- WooCommerce hooks ---
-        // add_filter( 'woocommerce_get_variation_prices_hash', [ $this, 'ywhs_variation_prices_hash' ], 99, 1 );
+
+        add_filter( 'woocommerce_get_variation_prices_hash', [ $this, 'ywhs_variation_prices_hash' ], 99, 1 );
 
         add_filter( 'woocommerce_get_price_html', [ $this, 'ywhs_display_wholesale_price_html' ], 999, 2 );
 
         add_action( 'woocommerce_before_calculate_totals', [ $this, 'before_calculate_totals' ], 103 );
 
-        add_filter( 'woocommerce_cart_item_price', [ $this, 'cart_item_price' ], 999, 2 );
+        add_filter( 'woocommerce_add_cart_item_data', [ $this, 'add_cart_item_wholesale_data' ], 999, 4 );
+
+        add_filter( 'woocommerce_cart_item_price', [ $this, 'cart_item_price' ], 999, 3 );
 
         add_action( 'woocommerce_checkout_order_processed', [ $this, 'ywhs_checkout_wholesale_order_handling' ], 999, 3 );
     }
+
+    public function add_cart_item_wholesale_data( $cart_item_data, $product_id, $variation_id = 0, $quantity = 0 ) {
+        $role_config            = CustomerHelper::get_current_user_wholesale_role();
+        $cart_item_data['data'] = wc_get_product( $product_id );
+        $discounted_price       = ShopPricingHelper::get_cart_item_wholesale_price( $cart_item_data, $role_config, $quantity );
+
+        return $cart_item_data;
+    }
+
 
     /**
      * Update the wholesale price in cart / checkout
@@ -41,24 +57,33 @@ class Pricing {
             return;
         }
 
-        do_action( 'ywhs_before_cart_calculate_totals', $cart );
-        foreach ( $cart->get_cart_contents() as $cart_item_key => $cart_item ) {
-            if ( ! empty( $cart_item['data'] ) ) {
-                do_action( 'ywhs_before_cart_item_calculate_totals', $cart );
+        $is_checking_mov = apply_filters( 'ywhs_is_force_checking_requirement', is_checkout() || Utils::is_checkout_blocks() );
+        $role_config     = CustomerHelper::get_current_user_wholesale_role();
 
-                $product = $cart_item['data'];
+        $is_discounted = true;
+        if ( $is_checking_mov ) {
+            $is_discounted = RequirementHelper::is_cart_meet_requirement( $role_config );
+        }
 
-                $price = $product->get_price();
+        if ( $is_discounted ) {
+            do_action( 'ywhs_before_cart_calculate_totals', $cart, $role_config );
+            foreach ( $cart->get_cart_contents() as $cart_item_key => $cart_item ) {
+                if ( ! empty( $cart_item['data'] ) ) {
+                    do_action( 'ywhs_before_cart_item_calculate_totals', $cart_item, $cart_item_key, $role_config );
 
-                $maybe_discounted_price = PricingHelper::apply_wholesale_discount( $price, $product, false );
+                    $quantity = $cart_item['quantity'];
+                    // var_dump( $cart_item_data->get_price() );
 
-                $product->set_price( $maybe_discounted_price );
+                    $discounted_price = ShopPricingHelper::get_cart_item_wholesale_price( $cart_item, $role_config, $quantity );
+                    // var_dump( $discounted_price );
 
-                do_action( 'ywhs_after_cart_item_calculate_totals', $cart );
-            }//end if
-        }//end foreach
+                    $cart_item['data']->set_price( $discounted_price );
 
-        do_action( 'ywhs_after_cart_calculate_totals', $cart );
+                    do_action( 'ywhs_after_cart_item_calculate_totals', $cart_item, $cart_item_key, $role_config );
+                }//end if
+            }//end foreach
+            do_action( 'ywhs_after_cart_calculate_totals', $cart, $role_config );
+        }//end if
     }
 
     /**
@@ -68,26 +93,30 @@ class Pricing {
      * @param array  $cart_item the cart item.
      * @return string
      */
-    public function cart_item_price( $price_html, $cart_item ) {
+    public function cart_item_price( $price_html, $cart_item, $cart_item_key ) {
         if ( empty( $cart_item['data'] ) ) {
             return $price_html;
         }
 
-        $product = $cart_item['data'];
+        $cart_item_data = $cart_item['data'];
+        $role_config    = CustomerHelper::get_current_user_wholesale_role();
 
-        $regular = (float) $product->get_regular_price();
-        $sale    = (float) $product->get_sale_price();
+        $regular  = (float) $cart_item_data->get_regular_price();
+        $quantity = $cart_item['quantity'];
 
-        $discounted = PricingHelper::apply_wholesale_discount( $sale > 0 ? $sale : $regular, $product, true );
+        $discounted = ShopPricingHelper::get_cart_item_wholesale_price( $cart_item, $role_config, $quantity );
+        // var_dump( $cart_item['ywhs_wholesale_extra_price'] );
 
-        $tax_display_shop = get_option( 'woocommerce_tax_display_cart', 'excl' );
+        $discounted = apply_filters( 'ywhs_price_handle_processed', $discounted, $cart_item_data );
 
-        if ( 'incl' === $tax_display_shop ) {
-            $regular    = wc_get_price_including_tax( $product, [ 'price' => $regular ] );
-            $discounted = wc_get_price_including_tax( $product, [ 'price' => $discounted ] );
+        $tax_display_cart = get_option( 'woocommerce_tax_display_cart', 'excl' );
+
+        if ( 'incl' === $tax_display_cart ) {
+            $regular    = wc_get_price_including_tax( $cart_item_data, [ 'price' => $regular ] );
+            $discounted = wc_get_price_including_tax( $cart_item_data, [ 'price' => $discounted ] );
         } else {
-            $regular    = wc_get_price_excluding_tax( $product, [ 'price' => $regular ] );
-            $discounted = wc_get_price_excluding_tax( $product, [ 'price' => $discounted ] );
+            $regular    = wc_get_price_excluding_tax( $cart_item_data, [ 'price' => $regular ] );
+            $discounted = wc_get_price_excluding_tax( $cart_item_data, [ 'price' => $discounted ] );
         }
 
         if ( $discounted < $regular ) {
@@ -108,7 +137,7 @@ class Pricing {
      * @param array $hash The hash array.
      * @return array The variation prices hash.
      */
-    public function ywhs_variation_prices_hash( array $hash ): array {
+    public function ywhs_variation_prices_hash( array $hash ) {
         $role = CustomerHelper::get_current_user_wholesale_role();
         if ( $role ) {
             $hash[] = $role['slug'];
@@ -124,33 +153,40 @@ class Pricing {
      * @param \WC_Product $product The product object.
      * @return string The displayed HTML.
      */
-    public function ywhs_display_wholesale_price_html( string $price_html, \WC_Product $product ): string {
+    public function ywhs_display_wholesale_price_html( string $price_html, \WC_Product $product ) {
+        $show_to_all                 = $this->settings['general']['show_wholesale_price'] ?? false;
+        $display_mode                = $this->settings['display']['price_format'] ?? 'retail-and-wholesale';
+        $current_user_wholesale_role = CustomerHelper::get_current_user_wholesale_role();
+        $is_wholesale                = ! empty( $current_user_wholesale_role );
 
-        $show_to_all  = $this->settings['general']['show_wholesale_price'] ?? false;
-        $display_mode = $this->settings['display']['price_format'] ?? 'retail-and-wholesale';
-        $is_logged_in = is_user_logged_in();
-        $role         = CustomerHelper::get_current_user_wholesale_role();
-        $is_wholesale = ! empty( $role );
-
-        // If not logged in and not showing to all, or logged in and not wholesale and not showing to all
-        if ( ( ! $is_logged_in && ! $show_to_all ) || ( $is_logged_in && ! $is_wholesale && ! $show_to_all ) ) {
+        if ( ! $is_wholesale && ! $show_to_all ) {
             return $price_html;
         }
 
+        if ( $is_wholesale ) {
+            $display_wholesale_role = $current_user_wholesale_role;
+        } else {
+            $display_wholesale_role = RolesHelper::get_default_wholesale_role();
+        }
+        $discounted_price = ShopPricingHelper::get_wholesale_price_for_display( $product, $display_wholesale_role );
+
         // If variable product
         if ( $product->is_type( 'variable' ) ) {
-            return $this->format_variable_wholesale_price_html( $product );
+            return $this->format_variable_wholesale_price_html( $product, $display_wholesale_role, $price_html );
         }
 
-        // If simple product
+        if ( $product->is_type( 'grouped' ) ) {
+            return $this->format_grouped_wholesale_price_html( $product, $display_wholesale_role, $price_html );
+        }
+
         switch ( $display_mode ) {
             case 'wholesale-only':
-                return $this->format_wholesale_only_price_html( $product );
+                return $this->format_wholesale_only_price_html( $product, $discounted_price );
             case 'retail-only':
-                return $this->format_retail_only_price_html( $product );
+                return $price_html;
             case 'retail-and-wholesale':
             default:
-                return $this->format_retail_and_wholesale_price_html( $product );
+                return $this->format_retail_and_wholesale_price_html( $product, $discounted_price, $price_html );
         }
     }
 
@@ -160,7 +196,7 @@ class Pricing {
      * @param \WC_Product $product The product object.
      * @return string The formatted HTML.
      */
-    protected function format_retail_only_price_html( \WC_Product $product ): string {
+    protected function format_retail_only_price_html( \WC_Product $product ) {
         $regular = (float) $product->get_regular_price();
         $sale    = (float) $product->get_sale_price();
 
@@ -184,16 +220,15 @@ class Pricing {
      * Format the wholesale only price HTML
      *
      * @param \WC_Product $product The product object.
+     * @param float       $discounted_price The discounted price of product.
      * @return string The formatted HTML.
      */
-    protected function format_wholesale_only_price_html( \WC_Product $product ): string {
-        $discount = PricingHelper::apply_wholesale_discount( $product->get_price(), $product, true );
-
+    protected function format_wholesale_only_price_html( \WC_Product $product, float $discounted_price ) {
         $tax_display_shop = get_option( 'woocommerce_tax_display_shop', 'excl' );
         if ( 'incl' === $tax_display_shop ) {
-            $discounted_to_show = wc_get_price_including_tax( $product, [ 'price' => $discount ] );
+            $discounted_to_show = wc_get_price_including_tax( $product, [ 'price' => $discounted_price ] );
         } else {
-            $discounted_to_show = wc_get_price_excluding_tax( $product, [ 'price' => $discount ] );
+            $discounted_to_show = wc_get_price_excluding_tax( $product, [ 'price' => $discounted_price ] );
         }
 
         return $this->get_wholesale_price_html( wc_price( $discounted_to_show ) );
@@ -203,31 +238,21 @@ class Pricing {
      * Format the retail and wholesale price HTML
      *
      * @param \WC_Product $product The product object.
+     * @param float       $discounted_price The discounted price.
+     * @param string      $price_html the default price html.
      * @return string The formatted HTML.
      */
-    protected function format_retail_and_wholesale_price_html( \WC_Product $product ): string {
-        $regular = (float) $product->get_regular_price();
-
-        $sale = (float) $product->get_sale_price();
-
-        $discounted = PricingHelper::apply_wholesale_discount( $sale > 0 ? $sale : $regular, $product, true );
-
+    protected function format_retail_and_wholesale_price_html( \WC_Product $product, float $discounted_price, string $price_html ) {
         $tax_display_shop = get_option( 'woocommerce_tax_display_shop', 'excl' );
 
         if ( 'incl' === $tax_display_shop ) {
-            $regular_to_show    = wc_get_price_including_tax( $product, [ 'price' => $regular ] );
-            $sale_to_show       = wc_get_price_including_tax( $product, [ 'price' => $sale ] );
-            $discounted_to_show = wc_get_price_including_tax( $product, [ 'price' => $discounted ] );
+            $discounted_to_show = wc_get_price_including_tax( $product, [ 'price' => $discounted_price ] );
         } else {
-            $regular_to_show    = wc_get_price_excluding_tax( $product, [ 'price' => $regular ] );
-            $sale_to_show       = wc_get_price_excluding_tax( $product, [ 'price' => $sale ] );
-            $discounted_to_show = wc_get_price_excluding_tax( $product, [ 'price' => $discounted ] );
+            $discounted_to_show = wc_get_price_excluding_tax( $product, [ 'price' => $discounted_price ] );
         }
 
         $html  = '<span class="yay-retail-price">Retail: ';
-        $html .= ( $sale > 0 && $sale < $regular )
-            ? '<del>' . wc_price( $regular_to_show ) . '</del> <ins>' . wc_price( $sale_to_show ) . '</ins>'
-            : wc_price( $regular_to_show );
+        $html .= $price_html;
         $html .= '</span><br>';
         $html .= '<span class="yay-wholesale-price">'
             . $this->get_wholesale_price_html( wc_price( $discounted_to_show ) )
@@ -237,100 +262,132 @@ class Pricing {
     }
 
     /**
-     * Get the discounted variation prices
-     *
-     * @param \WC_Product $product The product object.
-     * @return array The discounted variation prices.
-     */
-    protected function get_discounted_variation_prices( \WC_Product $product ): array {
-        $prices = $product->get_variation_prices( true );
-        if ( ! isset( $prices['price'] ) ) {
-            return [];
-        }
-
-        $discounted = [];
-        foreach ( $prices['price'] as $vid => $price ) {
-            $variation = wc_get_product( $vid );
-            if ( ! $variation ) {
-                continue;
-            }
-            $discounted[] = (float) PricingHelper::apply_wholesale_discount( (float) $price, $variation, true );
-        }
-        return $discounted;
-    }
-
-    /**
      * Format the variable wholesale price HTML
      *
      * @param \WC_Product $product The product object.
+     * @param array       $wholesale_role The wholesale role.
+     * @param string      $price_html The default price HTML.
      * @return string The formatted HTML.
      */
-    protected function format_variable_wholesale_price_html( \WC_Product $product ): string {
+    protected function format_variable_wholesale_price_html( \WC_Product $product, array $wholesale_role, string $price_html ) {
         $display_mode = $this->settings['display']['price_format'] ?? 'retail-and-wholesale';
-
-        // Remove the filter to avoid recursion
-        remove_filter( 'woocommerce_get_price_html', [ $this, 'ywhs_display_wholesale_price_html' ], 999 );
-
         // If format = retail-only => display retail price as WooCommerce standard
         if ( 'retail-only' === $display_mode ) {
-            $html = $product->get_price_html();
-            add_filter( 'woocommerce_get_price_html', [ $this, 'ywhs_display_wholesale_price_html' ], 999, 2 );
-            return $html;
+            return $price_html;
         }
 
-        $discounted = $this->get_discounted_variation_prices( $product );
+        $discounted = ShopPricingHelper::get_wholesale_prices_display_from_variants( $product, $wholesale_role );
         if ( empty( $discounted ) ) {
-            $html = $product->get_price_html();
-            add_filter( 'woocommerce_get_price_html', [ $this, 'ywhs_display_wholesale_price_html' ], 999, 2 );
-            return $html;
+            return $price_html;
         }
 
-        $min_ws = min( $discounted );
-        $max_ws = max( $discounted );
+        $tax_display_shop = get_option( 'woocommerce_tax_display_shop', 'excl' );
+        if ( 'incl' === $tax_display_shop ) {
+            $min_ws = wc_get_price_including_tax( $product, [ 'price' => min( $discounted ) ] );
+            $max_ws = wc_get_price_including_tax( $product, [ 'price' => max( $discounted ) ] );
+        } else {
+            $min_ws = wc_get_price_excluding_tax( $product, [ 'price' => min( $discounted ) ] );
+            $max_ws = wc_get_price_excluding_tax( $product, [ 'price' => max( $discounted ) ] );
+        }
 
-        $prices  = $product->get_variation_prices( true );
-        $regular = isset( $prices['regular_price'] ) ? array_filter( array_map( 'floatval', $prices['regular_price'] ) ) : [];
+        // $prices = $product->get_variation_prices( true );
+        // $regular = isset( $prices['regular_price'] ) ? array_filter( array_map( 'floatval', $prices['regular_price'] ) ) : [];
 
-        $is_wholesale_only = empty( $regular );
-        $wholesale_price   = ( $min_ws !== $max_ws )
+        // $is_wholesale_only = empty( $regular );
+        $wholesale_price = ( $min_ws !== $max_ws )
         ? wc_format_price_range( wc_price( $min_ws ), wc_price( $max_ws ) )
         : wc_price( $min_ws );
 
-        $label = $this->get_wholesale_price_html( $wholesale_price );
+        $wholesale_price_html = $this->get_wholesale_price_html( $wholesale_price . $product->get_price_suffix() );
 
         // Wholesale-only mode
-        if ( 'wholesale-only' === $display_mode || $is_wholesale_only ) {
-            $html = $label . $product->get_price_suffix();
-            add_filter( 'woocommerce_get_price_html', [ $this, 'ywhs_display_wholesale_price_html' ], 999, 2 );
-            return $html;
+        if ( 'wholesale-only' === $display_mode ) {
+            return $wholesale_price_html;
         }
 
         // Retail-and-wholesale mode
-        if ( count( $regular ) > 1 ) {
-            sort( $regular );
-            $min_r      = (float) current( $regular );
-            $max_r      = (float) end( $regular );
-            $price_html = wc_format_price_range( wc_price( $min_r ), wc_price( $max_r ) );
-        } else {
-            $price_html = wc_price( (float) current( $regular ) );
-        }
+        // if ( count( $regular ) > 1 ) {
+        // sort( $regular );
+        // $min_r = (float) current( $regular );
+        // $max_r = (float) end( $regular );
+        // if ( $min_r !== $max_r ) {
+        // $price_html = wc_format_price_range( wc_price( $min_r ), wc_price( $max_r ) );
+        // } else {
+        // $price_html = wc_price( $min_r );
+        // }
+        // } else {
+        // $price_html = wc_price( (float) current( $regular ) );
+        // }
 
         if ( $price_html === $wholesale_price ) {
-            add_filter( 'woocommerce_get_price_html', [ $this, 'ywhs_display_wholesale_price_html' ], 999, 2 );
-            return $price_html . $product->get_price_suffix();
+            return $wholesale_price_html;
         }
 
-        $sale_html = wc_format_sale_price( $price_html, $wholesale_price );
+        $sale_html = wc_format_sale_price( $price_html, '<br/>' . $wholesale_price );
 
         // Replace only the last found in the string
         $pos = strrpos( $sale_html, $wholesale_price );
         if ( false === $pos ) {
             $pos = 0;
         }
-        $html = substr_replace( $sale_html, $label, $pos, strlen( $wholesale_price ) );
+        $html = substr_replace( $sale_html, $wholesale_price_html, $pos, strlen( $wholesale_price ) );
 
-        // Add the filter again
-        add_filter( 'woocommerce_get_price_html', [ $this, 'ywhs_display_wholesale_price_html' ], 999, 2 );
+        return $html;
+    }
+
+    /**
+     * Format the grouped-product's wholesale price HTML
+     *
+     * @param \WC_Product $product The product object.
+     * @param array       $wholesale_role The wholesale role.
+     * @param string      $price_html The default price HTML.
+     * @return string The formatted HTML.
+     */
+    protected function format_grouped_wholesale_price_html( \WC_Product $product, array $wholesale_role, string $price_html ) {
+        $display_mode = $this->settings['display']['price_format'] ?? 'retail-and-wholesale';
+        // If format = retail-only => display retail price as WooCommerce standard
+        if ( 'retail-only' === $display_mode ) {
+            return $price_html;
+        }
+
+        $discounted = ShopPricingHelper::get_wholesale_prices_display_from_grouped( $product, $wholesale_role );
+        if ( empty( $discounted ) ) {
+            return $price_html;
+        }
+
+        $tax_display_shop = get_option( 'woocommerce_tax_display_shop', 'excl' );
+        if ( 'incl' === $tax_display_shop ) {
+            $min_ws = wc_get_price_including_tax( $product, [ 'price' => min( $discounted ) ] );
+            $max_ws = wc_get_price_including_tax( $product, [ 'price' => max( $discounted ) ] );
+        } else {
+            $min_ws = wc_get_price_excluding_tax( $product, [ 'price' => min( $discounted ) ] );
+            $max_ws = wc_get_price_excluding_tax( $product, [ 'price' => max( $discounted ) ] );
+        }
+
+        $wholesale_price = ( $min_ws !== $max_ws )
+        ? wc_format_price_range( wc_price( $min_ws ), wc_price( $max_ws ) )
+        : wc_price( $min_ws );
+
+        $wholesale_price_html = $this->get_wholesale_price_html( $wholesale_price . $product->get_price_suffix() );
+
+        // Wholesale-only mode
+        if ( 'wholesale-only' === $display_mode ) {
+            return $wholesale_price_html;
+        }
+
+        // Retail-and-wholesale mode
+        if ( $price_html === $wholesale_price ) {
+            return $wholesale_price_html;
+        }
+
+        $sale_html = wc_format_sale_price( $price_html, '<br/>' . $wholesale_price );
+
+        // Replace only the last found in the string
+        $pos = strrpos( $sale_html, $wholesale_price );
+        if ( false === $pos ) {
+            $pos = 0;
+        }
+        $html = substr_replace( $sale_html, $wholesale_price_html, $pos, strlen( $wholesale_price ) );
 
         return $html;
     }
@@ -341,7 +398,7 @@ class Pricing {
      * @param string $discounted_price_html the discounted price HTML.
      * @return string The wholesale price HTML.
      */
-    protected function get_wholesale_price_html( string $discounted_price_html ): string {
+    protected function get_wholesale_price_html( string $discounted_price_html ) {
         $label = $this->settings['display']['wholesale_price_label'] ?? __( 'Wholesale price', 'yay-wholesale-b2b' );
         $color = $this->settings['display']['wholesale_price_color'] ?? '#333333';
         return '<span class="yay-wholesale-label">' . esc_html( $label ) . ':</span> '
@@ -363,8 +420,8 @@ class Pricing {
             return;
         }
 
-        $is_discounted = PricingHelper::check_is_discounted( $order, $wholesale_role );
+        $is_discounted = RequirementHelper::is_order_meet_requirement( $order, $wholesale_role );
 
-        PricingHelper::handle_order( $order, $wholesale_role, $is_discounted );
+        OrderPricingHelper::handle_order( $order, $wholesale_role, $is_discounted );
     }
 }

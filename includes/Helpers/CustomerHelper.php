@@ -38,13 +38,6 @@ class CustomerHelper {
 
             if ( $found_role !== null ) {
 
-                // Handle price (Compatible to other price-related plugins)
-                $found_role['minOrderAmount'] = apply_filters( 'ywhs_price_handle_processed', $found_role['minOrderAmount'], null );
-
-                if ( ! Utils::is_pro() ) {
-                    $found_role['minOrderQuantity'] = 0;
-                }
-
                 return $found_role;
             }
         }
