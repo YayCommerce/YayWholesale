@@ -1,89 +1,13 @@
-import dayjs from 'dayjs';
+import { dateI18n, getSettings } from '@wordpress/date';
 
-export function parseWPDate(date: string | undefined) {
-  var format = '';
-
-  var arr = window.yayWholesaleB2BMeta.wpMeta.dayFormat.split('');
-  arr.forEach((ch) => {
-    switch (ch) {
-      case 'd':
-        format += 'DD';
-        break;
-      case 'j':
-        format += 'D';
-        break;
-      case 's':
-        format += '';
-        break;
-      case 'l':
-        format += 'dddd';
-        break;
-      case 'D':
-        format += 'ddd';
-        break;
-      case 'm':
-        format += 'MM';
-        break;
-      case 'n':
-        format += 'M';
-        break;
-      case 'F':
-        format += 'MMMM';
-        break;
-      case 'M':
-        format += 'MMM';
-        break;
-      case 'Y':
-        format += 'YYYY';
-        break;
-      case 'y':
-        format += 'YY';
-        break;
-      default:
-        format += ch;
-    }
-  });
-
-  return dayjs(date ?? null).format(format);
+export function parseWPDate(date: Date | string | undefined) {
+  const { formats } = getSettings();
+  return dateI18n(formats.date, date);
 }
 
-export function parseWPTime(date: string) {
-  var format = '';
-
-  var arr = window.yayWholesaleB2BMeta.wpMeta.timeFormat.split('');
-  arr.forEach((ch) => {
-    switch (ch) {
-      case 'g':
-        format += 'h';
-        break;
-      case 'h':
-        format += 'hh';
-        break;
-      case 'G':
-        format += 'H';
-        break;
-      case 'H':
-        format += 'HH';
-        break;
-      case 'i':
-        format += 'mm';
-        break;
-      case 's':
-        format += 'ss';
-        break;
-      case 'T':
-        format += '';
-        break;
-      default:
-        format += ch;
-    }
-  });
-
-  return dayjs(date).format(format);
-}
-
-export function parseWPTimeForInput(date: string) {
-  return dayjs(date).format('HH:mm:ss');
+export function parseWPTime(date: Date | string) {
+  const { formats } = getSettings();
+  return dateI18n(formats.time, date);
 }
 
 export function parseWPCurrency(price: string | number) {

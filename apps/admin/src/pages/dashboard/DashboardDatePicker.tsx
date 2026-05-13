@@ -20,7 +20,7 @@ const DashboardDatePicker: FC<DashboardDatePickerProps> = ({ dateRange, setDateR
   const [openPopover, setOpenPopover] = useState(false);
 
   const displayDateRange = useMemo(
-    () => parseWPDate(dateRange?.from?.toDateString()) + ' - ' + parseWPDate(dateRange?.to?.toDateString()),
+    () => parseWPDate(dateRange?.from) + ' - ' + parseWPDate(dateRange?.to),
     [dateRange],
   );
 

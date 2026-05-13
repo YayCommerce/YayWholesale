@@ -15,4 +15,19 @@ declare module '@tanstack/react-table' {
   }
 }
 
+declare module 'rooks' {
+  type AnyFunction = (...args: any[]) => any;
+  type DebounceOptions = {
+    leading?: boolean;
+    trailing?: boolean;
+    maxWait?: number;
+  };
+
+  declare function useDebounceFn<F extends AnyFunction>(
+    func: F,
+    delay: number,
+    options?: DebounceOptions,
+  ): [(...args: Parameters<F>) => void, boolean];
+}
+
 export {};
