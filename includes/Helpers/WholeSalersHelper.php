@@ -178,34 +178,4 @@ class WholeSalersHelper {
         );
         return array_values( $cleaned_users );
     }
-
-    /**
-     * Count the total of wholesalers
-     *
-     * @return int count of the pending requests.
-     */
-    public static function count_total_wholesalers() {
-        $roles = get_option( 'yaywholesaleb2b_roles', [] );
-
-        if ( empty( $roles ) ) {
-            return 0;
-        }
-
-        $wholesale_slugs = array_filter(
-            array_map( fn( $r ) => $r['status'] ? $r['slug'] : null, $roles )
-        );
-
-        if ( ! empty( $role ) && 'all' !== $role ) {
-            $wholesale_slugs = [ $role ];
-        }
-
-        $query_args = [
-            'role__in' => $wholesale_slugs,
-        ];
-
-        $query = new \WP_User_Query( $query_args );
-        $count = $query->get_total();
-
-        return $count;
-    }
 }

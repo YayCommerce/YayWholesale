@@ -37,7 +37,7 @@ class RolesRestController extends BaseRestController {
 
         register_rest_route(
             self::REST_NAMESPACE,
-            '/roles/(?P<roleId>\d+)',
+            '/roles/(?P<roleSlug>\w+)',
             [
                 [
                     'methods'             => 'PUT',
@@ -119,12 +119,12 @@ class RolesRestController extends BaseRestController {
 
     public function update_role( WP_REST_Request $request ) {
         $payload      = $request->get_json_params();
-        $role_id      = (int) $request->get_param( 'roleId' );
+        $role_slug    = $request->get_param( 'roleSlug' );
         $roles        = RolesHelper::get_wholesale_roles();
         $updated_role = false;
 
         foreach ( $roles as $key => $role ) {
-            if ( (int) ( $role['id'] ?? 0 ) === $role_id ) {
+            if ( $role['slug'] === $role_slug ) {
                 $updated_role  = array_merge( $role, $payload );
                 $roles[ $key ] = $updated_role;
             }
@@ -139,12 +139,12 @@ class RolesRestController extends BaseRestController {
     }
 
     public function delete_role( WP_REST_Request $request ) {
-        $role_id      = (int) $request->get_param( 'roleId' );
+        $role_slug    = $request->get_param( 'roleSlug' );
         $roles        = RolesHelper::get_wholesale_roles();
         $deleted_role = false;
 
         foreach ( $roles as $key => $role ) {
-            if ( (int) ( $role['id'] ?? 0 ) === $role_id ) {
+            if ( $role['slug'] === $role_slug ) {
                 $deleted_role = $role;
                 RolesHelper::remove_wp_role_by_slug( $role['slug'] );
                 unset( $roles[ $key ] );
@@ -160,10 +160,10 @@ class RolesRestController extends BaseRestController {
     }
 
     public function bulk_delete_roles( WP_REST_Request $request ) {
-        $payload = $request->get_json_params();
-        $ids     = $payload['roleIds'] ?? [];
+        $payload    = $request->get_json_params();
+        $role_slugs = $payload['roleSlugs'] ?? [];
 
-        if ( empty( $ids ) ) {
+        if ( empty( $role_slugs ) ) {
             return $this->error_invalid_arguments();
         }
 
@@ -171,7 +171,7 @@ class RolesRestController extends BaseRestController {
         $deleted_role_count = 0;
 
         foreach ( $roles as $key => $role ) {
-            if ( in_array( (int) ( $role['id'] ?? 0 ), $ids, true ) ) {
+            if ( in_array( $role['slug'], $role_slugs, true ) ) {
                 ++$deleted_role_count;
                 RolesHelper::remove_wp_role_by_slug( $role['slug'] );
                 unset( $roles[ $key ] );
@@ -183,11 +183,11 @@ class RolesRestController extends BaseRestController {
     }
 
     public function bulk_update_role_status( WP_REST_Request $request ) {
-        $payload = $request->get_json_params();
-        $ids     = $payload['roleIds'] ?? [];
-        $status  = $payload['status'] ?? null;
+        $payload    = $request->get_json_params();
+        $role_slugs = $payload['roleSlugs'] ?? [];
+        $status     = $payload['status'] ?? null;
 
-        if ( empty( $ids ) || ! is_bool( $status ) ) {
+        if ( empty( $role_slugs ) || ! is_bool( $status ) ) {
             return $this->error_invalid_arguments();
         }
 
@@ -195,7 +195,7 @@ class RolesRestController extends BaseRestController {
         $updated_count = 0;
 
         foreach ( $roles as &$role ) {
-            if ( in_array( (int) $role['id'], $ids, true ) ) {
+            if ( in_array( $role['slug'], $role_slugs, true ) ) {
                 $role['status'] = $status;
                 ++$updated_count;
             }

@@ -1,7 +1,6 @@
 <?php
 namespace YayWholesaleB2B\Helpers;
 
-use Exception;
 use WP_Query;
 use WP_User;
 use WP_Error;

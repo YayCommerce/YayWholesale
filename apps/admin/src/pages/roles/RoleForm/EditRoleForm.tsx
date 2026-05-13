@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { FormProvider, useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
-import { useUpdateEffect } from 'react-use';
+import { useDidUpdate } from 'rooks';
 import { __ } from '@wordpress/i18n';
 
 import { getErrorMsg } from '@/lib/helpers/response.helper';
@@ -16,7 +16,7 @@ import RoleFormContent from './RoleFormContent';
 export default function EditRoleForm({ role }: { role: Role }) {
   const navigate = useNavigate();
 
-  const updateRoleMutation = useUpdateRoleMutation(role.id);
+  const updateRoleMutation = useUpdateRoleMutation(role.slug);
   const isMutating = useIsMutatingRoles();
 
   const defaultValues = useMemo(() => {
@@ -49,9 +49,9 @@ export default function EditRoleForm({ role }: { role: Role }) {
     }
   }
 
-  useUpdateEffect(() => {
+  useDidUpdate(() => {
     form.reset(defaultValues);
-  }, [role, form]);
+  }, [defaultValues, form]);
 
   return (
     <FormProvider {...form}>

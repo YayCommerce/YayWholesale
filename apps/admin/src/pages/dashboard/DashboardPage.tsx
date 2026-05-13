@@ -26,15 +26,15 @@ export default function DashboardPage() {
   const reportQuery = useReportsQuery(startDate, endDate);
 
   return (
-    <div className="mx-auto flex max-w-7xl flex-col gap-6 px-6">
-      <div className="flex flex-col items-start gap-5 sm:flex-row sm:items-center sm:justify-between sm:gap-0">
+    <div className="mx-auto flex max-w-7xl flex-col gap-4 px-6 2xl:gap-6">
+      <div className="flex flex-col items-start gap-x-4 gap-y-2 sm:flex-row sm:items-center sm:justify-between">
         <h1 className="text-2xl font-bold">{__('Dashboard', 'yay-wholesale-b2b')}</h1>
         <DashboardDatePicker dateRange={dateRange} setDateRange={setDateRange} />
       </div>
 
       <DashboardSummary reportQuery={reportQuery} />
 
-      <div className="grid items-stretch gap-6 md:grid-cols-2">
+      <div className="grid gap-3 md:grid-cols-2 md:gap-4 2xl:gap-6">
         <TopWholesaleCustomers reportQuery={reportQuery} startDate={startDate} endDate={endDate} />
         <TopProducts reportQuery={reportQuery} />
       </div>

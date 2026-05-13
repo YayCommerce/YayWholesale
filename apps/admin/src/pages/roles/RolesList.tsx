@@ -85,11 +85,11 @@ export default function RolesList() {
   });
 
   async function handleBulkDelete() {
-    const roleIds = table.getSelectedRowModel().rows.map((row) => row.original.id);
-    if (roleIds.length === 0 || isMutating > 0) return;
+    const roleSlugs = table.getSelectedRowModel().rows.map((row) => row.original.slug);
+    if (roleSlugs.length === 0 || isMutating > 0) return;
 
     try {
-      await bulkDeleteRolesMutation.mutateAsync(roleIds);
+      await bulkDeleteRolesMutation.mutateAsync(roleSlugs);
       table.resetRowSelection();
     } catch (error) {
       toast.error(await getErrorMsg(error));
@@ -99,12 +99,12 @@ export default function RolesList() {
   }
 
   async function handleBulkUpdateStatus(status: boolean) {
-    const roleIds = table.getSelectedRowModel().rows.map((row) => row.original.id);
-    if (roleIds.length === 0 || isMutating > 0) return;
+    const roleSlugs = table.getSelectedRowModel().rows.map((row) => row.original.slug);
+    if (roleSlugs.length === 0 || isMutating > 0) return;
 
     try {
       await bulkUpdateRoleStatusMutation.mutateAsync({
-        ids: roleIds,
+        roleSlugs,
         status,
       });
     } catch (error) {
@@ -150,13 +150,9 @@ export default function RolesList() {
               </InputGroupAddon>
             </InputGroup>
           )}
-          <Button
-            variant="primary-outline"
-            className="hover:bg-primary hover:text-primary-foreground gap-0.25 rounded-sm px-4 leading-0 shadow-xs"
-            onClick={() => navigate('/roles/new')}
-          >
-            <Plus className="h-4 w-4" />
-            <span className="px-0.75">{__('Add New Role', 'yay-wholesale-b2b')}</span>
+          <Button variant="primary-outline-fill" onClick={() => navigate('/roles/new')}>
+            <Plus className="size-4" />
+            {__('Add New Role', 'yay-wholesale-b2b')}
           </Button>
         </div>
       </div>
@@ -215,7 +211,7 @@ export default function RolesList() {
                     )}
                     onClick={() => {
                       if (['select', 'actions', 'status'].indexOf(cell.column.id) < 0) {
-                        navigate(`/roles/edit/${row.original.id}`);
+                        navigate(`/roles/edit/${row.original.slug}`);
                       }
                     }}
                   >

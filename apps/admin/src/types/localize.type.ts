@@ -16,9 +16,6 @@ export type Meta = {
       new: string;
       edit: string;
     };
-
-    dayFormat: string;
-    timeFormat: string;
   };
   wholesaleMeta: {
     pluginUrl: string;

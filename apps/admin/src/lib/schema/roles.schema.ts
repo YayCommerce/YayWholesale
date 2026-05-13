@@ -22,9 +22,10 @@ export const roleSchema = z.object({
 export type RoleFormValues = z.infer<typeof roleSchema>;
 
 export type Role = RoleFormValues & {
+  /** @deprecated use slug instead */
   id: number;
   slug: string;
 };
 
-/** key is roleId, value is userCount */
+/** key is roleSlug, value is userCount */
 export type UserCountByRole = Record<string, number>;

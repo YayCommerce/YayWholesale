@@ -168,17 +168,12 @@ export function WholesalersList() {
               </SelectGroup>
             </SelectContent>
           </Select>
-          <a href={window.yayWholesaleB2BMeta.wpMeta.usersUrl.new} target="_blank" rel="noopener noreferrer">
-            <Button
-              variant="primary-outline"
-              className="hover:bg-primary hover:text-primary-foreground gap-0.25 rounded-sm px-4 shadow-xs"
-            >
-              <Plus className="h-4 w-4" />
-              <span className="px-0.75 text-[12px] text-nowrap sm:text-[14px]">
-                {__('Add New Wholesaler', 'yay-wholesale-b2b')}
-              </span>
-            </Button>
-          </a>
+          <Button variant="primary-outline-fill" asChild>
+            <a href={window.yayWholesaleB2BMeta.wpMeta.usersUrl.new} target="_blank" rel="noopener noreferrer">
+              <Plus className="size-4" />
+              {__('Add New Wholesaler', 'yay-wholesale-b2b')}
+            </a>
+          </Button>
         </div>
       </div>
 

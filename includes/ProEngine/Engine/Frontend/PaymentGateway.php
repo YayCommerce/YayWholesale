@@ -1,5 +1,5 @@
 <?php
-namespace YayWholesaleB2B\ProEngine\Frontend;
+namespace YayWholesaleB2B\ProEngine\Engine\Frontend;
 
 use YayWholesaleB2B\Helpers\CustomerHelper;
 use YayWholesaleB2B\Utils\SingletonTrait;
@@ -7,8 +7,6 @@ use YayWholesaleB2B\Helpers\SettingsHelper;
 use YayWholesaleB2B\ProEngine\Helpers\PaymentGatewayHelper;
 
 defined( 'ABSPATH' ) || exit;
-
-// TODO: move file to YayWholesaleB2B\Pro\Engine\Frontend
 
 /**
  * Payment Method Engine — Role-based Restrict Payment .
@@ -19,7 +17,7 @@ class PaymentGateway {
     protected function __construct() {
         add_filter( 'woocommerce_available_payment_gateways', [ $this, 'restrict_payment_methods_by_role' ], 999, 1 );
 
-        add_filter( 'ywhs_settings', [ $this, 'get_payment_settings' ], 10, 1 );
+        add_filter( 'ywhs_full_settings', [ $this, 'get_payment_settings' ], 10, 1 );
         add_action( 'ywhs_settings_updated', [ $this, 'update_payment_settings' ], 10, 1 );
     }
 

@@ -33,8 +33,11 @@ const externalOptions: Options = {
 
   production: {
     externals: {
+      '@wordpress/element': 'wp.element',
+      '@wordpress/components': 'wp.components',
       '@wordpress/hooks': 'wp.hooks',
       '@wordpress/i18n': 'wp.i18n',
+      '@wordpress/date': 'wp.date',
       react: 'React',
       'react-dom': 'ReactDOM',
       'react-dom/client': 'ReactDOM',
@@ -50,7 +53,7 @@ export default defineConfig({
     react({ jsxRuntime: 'classic' }),
     tailwindcss(),
     pluginExternal(externalOptions),
-    // visualizer({ template: 'network', emitFile: true, filename: 'stats.html' }),
+    // visualizer({ template: 'flamegraph', emitFile: true, filename: 'stats.html' }),
   ],
 
   resolve: {
@@ -59,9 +62,8 @@ export default defineConfig({
     },
   },
   build: {
-    // minify: 'terser',
-    // terserOptions: terserOptions,
-    minify: false,
+    minify: 'terser',
+    terserOptions: terserOptions,
     manifest: false,
     emptyOutDir: true,
     outDir: path.resolve('../assets', 'dist'),

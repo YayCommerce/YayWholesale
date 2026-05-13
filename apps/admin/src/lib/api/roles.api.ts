@@ -9,24 +9,24 @@ export function addRole(data: RoleFormValues) {
   return api.post('roles', { json: data }).json<Role[]>();
 }
 
-export function updateRole(roleId: number, data: RoleFormValues) {
-  return api.put(`roles/${roleId}`, { json: data }).json<Role[]>();
+export function updateRole(roleSlug: string, data: RoleFormValues) {
+  return api.put(`roles/${roleSlug}`, { json: data }).json<Role[]>();
 }
 
-export function updateRoleStatus(roleId: number, status: boolean) {
-  return api.put(`roles/${roleId}`, { json: { status } }).json<Role[]>();
+export function updateRoleStatus(roleSlug: string, status: boolean) {
+  return api.put(`roles/${roleSlug}`, { json: { status } }).json<Role[]>();
 }
 
-export function deleteRole(roleId: number) {
-  return api.delete(`roles/${roleId}`).json<Role[]>();
+export function deleteRole(roleSlug: string) {
+  return api.delete(`roles/${roleSlug}`).json<Role[]>();
 }
 
-export function bulkDeleteRoles(roleIds: number[]) {
-  return api.delete('roles/bulk-delete', { json: { roleIds } }).json<Role[]>();
+export function bulkDeleteRoles(roleSlugs: string[]) {
+  return api.delete('roles/bulk-delete', { json: { roleSlugs } }).json<Role[]>();
 }
 
-export function bulkUpdateRoleStatus(roleIds: number[], status: boolean) {
-  return api.put('roles/bulk-status', { json: { roleIds, status } }).json<Role[]>();
+export function bulkUpdateRoleStatus(roleSlugs: string[], status: boolean) {
+  return api.put('roles/bulk-status', { json: { roleSlugs, status } }).json<Role[]>();
 }
 
 export function countRolesUser() {

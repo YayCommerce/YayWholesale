@@ -57,7 +57,7 @@ class SettingsRestController extends BaseRestController {
     }
 
     public function get_settings() {
-        return SettingsHelper::get_settings();
+        return SettingsHelper::get_full_settings();
     }
 
     public function update_settings( WP_REST_Request $request ) {
@@ -76,7 +76,7 @@ class SettingsRestController extends BaseRestController {
         SettingsHelper::update_settings( $settings );
         do_action( 'ywhs_settings_updated', $payload );
 
-        return SettingsHelper::get_settings();
+        return SettingsHelper::get_full_settings();
     }
 
     public function mark_reviewed() {
