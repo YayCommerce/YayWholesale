@@ -16,7 +16,7 @@ class RequirementHelper {
      */
     public static function get_min_order_amount( array $wholesale_role ) {
         // Handle price (Compatible to other price-related plugins)
-        return floatval( isset( $wholesale_role['minOrderAmount'] ) ? apply_filters( 'ywhs_price_handle_processed', $wholesale_role['minOrderAmount'], null ) : 0 );
+        return floatval( isset( $wholesale_role['minOrderAmount'] ) ? apply_filters( 'ywhs_price_handle_processed', $wholesale_role['minOrderAmount'], null, null ) : 0 );
     }
 
     /**
@@ -84,8 +84,8 @@ class RequirementHelper {
         $quantity = $order->get_item_count();
         $subtotal = self::calc_actual_subtotal_of_order( $order );
 
-        $min_qty    = self::get_min_order_quantity( $role );
-        $min_amount = self::get_min_order_amount( $role );
+        $min_qty    = $role['minOrderQuantity'];
+        $min_amount = $role['minOrderAmount'];
 
         if ( ( $min_qty > 0 && $quantity < $min_qty ) || ( $min_amount > 0 && $subtotal < $min_amount ) ) {
             return false;
@@ -105,9 +105,13 @@ class RequirementHelper {
 
         // Calculate the subtotal (in this action, subtotal is not calculated)
         foreach ( $cart as $cart_item ) {
-            $product   = $cart_item['data'];
-            $price     = wc_get_price_excluding_tax( $product );
+            $product = wc_get_product( $cart_item['data']->get_id() );
+            $extra   = $cart_item['ywhs_wholesale_extra_price'];
+
+            $extra     = apply_filters( 'ywhs_price_handle_processed', $extra, null, null );
+            $price     = wc_get_price_excluding_tax( $product ) + $extra;
             $subtotal += $price * $cart_item['quantity'];
+
         }
 
         return $subtotal;
@@ -129,7 +133,7 @@ class RequirementHelper {
             }
             $extra     = $extra_price_map[ $item->get_id() ] ?? 0;
             $product   = $item->get_product();
-            $price     = apply_filters( 'ywhs_convert_price_from_order', $product->get_price(), $order, false );
+            $price     = apply_filters( 'ywhs_convert_price_from_order', $product->get_price(), $order, $product, false );
             $price    += $extra;
             $subtotal += $price * $item->get_quantity();
         }

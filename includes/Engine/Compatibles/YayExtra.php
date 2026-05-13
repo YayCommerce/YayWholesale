@@ -19,6 +19,12 @@ class YayExtra {
         }
 
         add_action( 'wp_enqueue_scripts', [ $this, 'enqueue_scripts' ] );
+
+        add_filter( 'ywhs_cart_item_extra_price_before_apply_discount', [ $this, 'get_extra_price_from_cart_item' ], 999, 2 );
+    }
+
+    public function get_extra_price_from_cart_item( $extra_price, $cart_item ) {
+        return ! empty( $cart_item['yaye_total_option_cost'] ) ? $cart_item['yaye_total_option_cost'] : $extra_price;
     }
 
     public function enqueue_scripts() {

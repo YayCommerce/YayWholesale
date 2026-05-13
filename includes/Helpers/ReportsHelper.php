@@ -124,7 +124,7 @@ class ReportsHelper {
                 continue;
             }
 
-            $revenue    += apply_filters( 'ywhs_convert_price_from_order', $order->get_total(), $order, true );
+            $revenue    += apply_filters( 'ywhs_convert_price_from_order', $order->get_total(), $order, null, true );
             $customer_id = $order->get_customer_id();
             $order_role  = $order->get_meta( '_ywhs_wholesale_role' );
             if ( isset( $top_wholesaler[ $customer_id ] ) ) {
@@ -145,7 +145,7 @@ class ReportsHelper {
                 }
 
                 $product_id                 = $item->get_product_id();
-                $line_item_revenue          = apply_filters( 'ywhs_convert_price_from_order', $item->get_total() + $item->get_total_tax(), $order, true );
+                $line_item_revenue          = apply_filters( 'ywhs_convert_price_from_order', $item->get_total() + $item->get_total_tax(), $order, null, true );
                 $top_product[ $product_id ] = [
                     'name'       => __( 'Unknown Product', 'yay-wholesale-b2b' ),
                     'image'      => '',
@@ -163,7 +163,7 @@ class ReportsHelper {
                 continue;
             }
 
-            $compare_revenue += floatval( apply_filters( 'ywhs_convert_price_from_order', $p_order->get_total(), $p_order, true ) );
+            $compare_revenue += floatval( apply_filters( 'ywhs_convert_price_from_order', $p_order->get_total(), $p_order, null, true ) );
             if ( ! in_array( $p_order->get_customer_id(), $compare_wholesalers, true ) ) {
                 $compare_wholesalers[] = $p_order->get_customer_id();
             }

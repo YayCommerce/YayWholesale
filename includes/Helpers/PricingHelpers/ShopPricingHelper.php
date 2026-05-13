@@ -9,6 +9,10 @@ class ShopPricingHelper {
 
     public const WHOLESALE_ORIGINAL_PRICE_KEY = 'ywhs_wholesale_original_price';
     public const WHOLESALE_EXTRA_PRICE_KEY    = 'ywhs_wholesale_extra_price';
+    public const WHOLESALE_DISCOUNT_TYPE      = 'ywhs_wholesale_discount_type';
+    public const WHOLESALE_DISCOUNT_VALUE     = 'ywhs_wholesale_discount_value';
+    public const APPLY_WHOLESALE_TO_SALE      = 'ywhs_apply_to_sale_price';
+
 
     public static function  get_cart_item_wholesale_price( &$cart_item, $role_config, $quantity ) {
         $product = wc_get_product( $cart_item['data']->get_id() );
@@ -24,7 +28,11 @@ class ShopPricingHelper {
         $cart_item[ self::WHOLESALE_ORIGINAL_PRICE_KEY ] = $wholesale_price;
         $cart_item[ self::WHOLESALE_EXTRA_PRICE_KEY ]    = $wholesale_extra;
 
-        return $final_price;
+        return [
+            'product_price' => $wholesale_price,
+            'extra_price'   => $extra_price,
+            'final_price'   => $final_price,
+        ];
     }
 
     /**
@@ -46,9 +54,11 @@ class ShopPricingHelper {
 
         $discounted = ProductPricingHelper::get_wholesale_price( $product, $role, 1 );
 
-        $discounted = (float) wc_format_decimal( $discounted, wc_get_price_decimals() );
+        $decimals = absint( get_option( 'woocommerce_price_num_decimals', 2 ) );
 
-        return apply_filters( 'ywhs_price_handle_processed', $discounted, $product );
+        $discounted = (float) wc_format_decimal( $discounted, $decimals );
+
+        return apply_filters( 'ywhs_price_handle_processed', $discounted, $product, $role );
     }
 
     /**
@@ -110,30 +120,18 @@ class ShopPricingHelper {
      * @param array $role The wholesale role.
      * @return array The prices
      */
-    protected static function get_price_and_extra( array $cart_item, array $role ) {
-        if ( isset( $cart_item[ self::WHOLESALE_ORIGINAL_PRICE_KEY ] ) && isset( $cart_item[ self::WHOLESALE_EXTRA_PRICE_KEY ] ) ) {
-            $original = (float) $cart_item[ self::WHOLESALE_ORIGINAL_PRICE_KEY ];
-            $extra    = (float) $cart_item[ self::WHOLESALE_EXTRA_PRICE_KEY ];
-        } else {
+    protected static function get_price_and_extra( array &$cart_item, array $role ) {
+        $apply_to_sale = $role['applyToSalePrice'] ?? false;
 
-            $apply_to_sale = $role['applyToSalePrice'] ?? false;
+        $product = wc_get_product( $cart_item['data']->get_id() );
 
-            $regular_price = (float) $cart_item['data']->get_regular_price();
-            $sale_price    = (float) $cart_item['data']->get_price();
+        $regular_price = (float) $product->get_regular_price( 'edit' );
+        $sale_price    = (float) $product->get_price( 'edit' );
 
-            $is_sale_price = ( $apply_to_sale && $sale_price < $regular_price );
-            $price         = $is_sale_price ? $sale_price : $regular_price;
-
-            $product = wc_get_product( $cart_item['data']->get_id() );
-
-            if ( $is_sale_price ) {
-                $original = (float) $product->get_price();
-            } else {
-                $original = (float) $product->get_regular_price();
-            }
-
-            $extra = $price - $original;
-        }//end if
+        $is_sale_price = ( $apply_to_sale && $sale_price < $regular_price );
+        $original      = $is_sale_price ? $sale_price : $regular_price;
+        $extra         = 0;
+        $extra         = apply_filters( 'ywhs_cart_item_extra_price_before_apply_discount', $extra, $cart_item );
 
         return [
             'original_price' => $original,
@@ -162,6 +160,8 @@ class ShopPricingHelper {
 
         $discounted_extra = max( 0, ( $extra_price ) * ( 1 - $discount ) );
 
-        return wc_format_decimal( $discounted_extra, wc_get_price_decimals() );
+        $decimals = absint( get_option( 'woocommerce_price_num_decimals', 2 ) );
+
+        return wc_format_decimal( $discounted_extra, $decimals );
     }
 }
