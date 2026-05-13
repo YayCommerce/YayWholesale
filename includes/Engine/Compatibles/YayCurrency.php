@@ -33,11 +33,13 @@ class YayCurrency {
         $this->apply_currency    = YayCurrencyHelper::detect_current_currency();
         $this->is_handling_price = false;
 
-        // LITE
+        // YayWholesale Hooks
         add_filter( 'ywhs_price_handle_processed', [ $this, 'convert_currency_price' ], 10, 3 );
         add_filter( 'ywhs_product_price_ajax_handled', [ $this, 'product_price_ajax_handle' ], 10, 3 );
         add_filter( 'ywhs_ajax_using_default_currency', [ $this, 'is_using_default_price' ], 10, 1 );
         add_filter( 'ywhs_get_currency_by_third_party', [ $this, 'get_currency' ], 10, 1 );
+
+        // YayCurrency Hooks
         add_filter( 'YayCurrency/StoreCurrency/GetCartSubtotal', [ $this, 'calculate_cart_subtotal_in_checkout' ], 20, 1 );
         add_filter( 'YayCurrency/Checkout/FallbackCurrency/GetProductPrice', [ $this, 'calculate_product_price_in_checkout' ], 20, 2 );
         add_filter( 'YayCurrency/ApplyCurrency/GetProductPrice', [ $this, 'calculate_approximate_product_price_in_checkout' ], 20, 2 );
@@ -45,46 +47,11 @@ class YayCurrency {
         // Pricing
         add_action( 'yay_currency_set_cart_contents', [ $this, 'product_addons_set_cart_contents' ], 10, 4 );
         add_filter( 'yay_currency_product_price_3rd_with_condition', [ $this, 'get_price_with_options' ], 30, 2 );
+        // Fallback Currency + Pricing
+        add_filter( 'YayCurrency/FallbackCurrency/GetPrice', [ $this, 'get_fallback_price_in_checkout_page' ], 30, 4 );
+        // No Checkout in difference currency + Pricing
+        add_filter( 'YayCurrency/StoreCurrency/GetPrice', [ $this, 'get_price_default_in_checkout_page' ], 30, 2 );
     }
-
-    public function product_addons_set_cart_contents( $cart_contents, $cart_item_key, $cart_item, $apply_currency ) {
-        if ( isset( $cart_item[ ShopPricingHelper::WHOLESALE_ORIGINAL_PRICE_KEY ] ) && isset( $cart_item[ ShopPricingHelper::WHOLESALE_EXTRA_PRICE_KEY ] ) ) {
-            $wholesale_price = (float) $cart_item[ ShopPricingHelper::WHOLESALE_ORIGINAL_PRICE_KEY ];
-            $wholesale_extra = (float) $cart_item[ ShopPricingHelper::WHOLESALE_EXTRA_PRICE_KEY ];
-
-            $wholesale_type  = $cart_item[ ShopPricingHelper::WHOLESALE_DISCOUNT_TYPE ];
-            $wholesale_value = $cart_item[ ShopPricingHelper::WHOLESALE_DISCOUNT_VALUE ];
-            $apply_to_sale   = (bool) $cart_item[ ShopPricingHelper::APPLY_WHOLESALE_TO_SALE ];
-            $discount_price  = -1;
-
-            if ( $this->is_has_yaycurrency_fixed_price( $wholesale_price, $cart_item['data'], $apply_currency, false ) && $wholesale_type === 'percentage' ) {
-                $custom_fixed_prices = \Yay_Currency\Helpers\FixedPriceHelper::get_custom_fixed_prices( $cart_item['data']->get_id(), $apply_currency['currency'] );
-                $regular_price       = (float) \Yay_Currency\Helpers\FixedPriceHelper::get_regular_price( $custom_fixed_prices, -1 );
-                $sale_price          = (float) \Yay_Currency\Helpers\FixedPriceHelper::get_sale_price( $custom_fixed_prices, -1 );
-
-                $discount_price = ( $apply_to_sale && $sale_price < $regular_price ) ? $sale_price : $regular_price;
-
-                $discount_price = max( 0, $discount_price * ( 1 - ( $wholesale_value / 100 ) ) );
-
-                $discount_extra = YayCurrencyHelper::calculate_price_by_currency( $wholesale_extra, false, $apply_currency );
-                $discount_price = wc_format_decimal( $discount_price + $discount_extra, wc_get_price_decimals() );
-            } else {
-                $discount_price = YayCurrencyHelper::calculate_price_by_currency( $wholesale_price + $wholesale_extra, false, $apply_currency );
-            }
-
-            SupportHelper::set_cart_item_objects_property( $cart_contents[ $cart_item_key ]['data'], 'yay_currency_wholesale_price', $discount_price );
-        }//end if
-    }
-
-    public function get_price_with_options( $price, $product ) {
-        $wholesale_price = SupportHelper::get_cart_item_objects_property( $product, 'yay_currency_wholesale_price' );
-        if ( $wholesale_price ) {
-            return (float) $wholesale_price;
-        }
-
-        return $price;
-    }
-
 
     protected function is_has_yaycurrency_fixed_price( $price, $product, $apply_currency, $is_strict ) {
         if ( class_exists( 'Yay_Currency\Helpers\FixedPriceHelper' ) ) {
@@ -336,5 +303,76 @@ class YayCurrency {
 
         $formatted_regular_price = SupportHelper::get_formatted_price( $regular_price, $params );
         return wc_format_sale_price( $formatted_regular_price, $formatted_final_price );
+    }
+
+    public function get_fallback_price_in_checkout_page( $fallback_price, $price, $product, $fallback_currency ) {
+        $wholesale_price = SupportHelper::get_cart_item_objects_property( $product, 'yay_currency_wholesale_price_fallback' );
+        if ( $wholesale_price ) {
+            return (float) $wholesale_price;
+        }
+
+        return $price;
+    }
+
+    public function get_price_default_in_checkout_page( $price, $product ) {
+        $wholesale_price = SupportHelper::get_cart_item_objects_property( $product, 'yay_currency_wholesale_price_default' );
+        if ( $wholesale_price ) {
+            return (float) $wholesale_price;
+        }
+
+        return $price;
+    }
+
+    protected function handle_wholesale_price_by_currency( $cart_item, $currency ) {
+        $wholesale_price = (float) $cart_item[ ShopPricingHelper::WHOLESALE_ORIGINAL_PRICE_KEY ];
+        $wholesale_extra = (float) $cart_item[ ShopPricingHelper::WHOLESALE_EXTRA_PRICE_KEY ];
+
+        $wholesale_type  = $cart_item[ ShopPricingHelper::WHOLESALE_DISCOUNT_TYPE ];
+        $wholesale_value = $cart_item[ ShopPricingHelper::WHOLESALE_DISCOUNT_VALUE ];
+        $apply_to_sale   = (bool) $cart_item[ ShopPricingHelper::APPLY_WHOLESALE_TO_SALE ];
+        $discount_price  = -1;
+        if ( $this->is_has_yaycurrency_fixed_price( $wholesale_price, $cart_item['data'], $currency, false ) && $wholesale_type === 'percentage' ) {
+            $custom_fixed_prices = \Yay_Currency\Helpers\FixedPriceHelper::get_custom_fixed_prices( $cart_item['data']->get_id(), $currency['currency'] );
+            $regular_price       = (float) \Yay_Currency\Helpers\FixedPriceHelper::get_regular_price( $custom_fixed_prices, -1 );
+            $sale_price          = (float) \Yay_Currency\Helpers\FixedPriceHelper::get_sale_price( $custom_fixed_prices, -1 );
+
+            $discount_price = ( $apply_to_sale && $sale_price < $regular_price ) ? $sale_price : $regular_price;
+
+            $discount_price = max( 0, $discount_price * ( 1 - ( $wholesale_value / 100 ) ) );
+
+            $discount_extra = YayCurrencyHelper::calculate_price_by_currency( $wholesale_extra, false, $currency );
+            $discount_price = wc_format_decimal( $discount_price + $discount_extra, wc_get_price_decimals() );
+        } else {
+            $discount_price = YayCurrencyHelper::calculate_price_by_currency( $wholesale_price + $wholesale_extra, false, $currency );
+        }
+
+        return $discount_price;
+    }
+
+    public function product_addons_set_cart_contents( $cart_contents, $cart_item_key, $cart_item, $apply_currency ) {
+        if ( isset( $cart_item[ ShopPricingHelper::WHOLESALE_ORIGINAL_PRICE_KEY ] ) && isset( $cart_item[ ShopPricingHelper::WHOLESALE_EXTRA_PRICE_KEY ] ) ) {
+            $wholesale_price = (float) $cart_item[ ShopPricingHelper::WHOLESALE_ORIGINAL_PRICE_KEY ];
+            $wholesale_extra = (float) $cart_item[ ShopPricingHelper::WHOLESALE_EXTRA_PRICE_KEY ];
+
+            $discount_price = $this->handle_wholesale_price_by_currency( $cart_item, $apply_currency );
+
+            $fallback_currency       = YayCurrencyHelper::get_fallback_currency();
+            $fallback_discount_price = $this->handle_wholesale_price_by_currency( $cart_item, $fallback_currency );
+
+            SupportHelper::set_cart_item_objects_property( $cart_contents[ $cart_item_key ]['data'], 'yay_currency_wholesale_price', $discount_price );
+            SupportHelper::set_cart_item_objects_property( $cart_contents[ $cart_item_key ]['data'], 'yay_currency_wholesale_price_default', $wholesale_price + $wholesale_extra );
+            SupportHelper::set_cart_item_objects_property( $cart_contents[ $cart_item_key ]['data'], 'yay_currency_wholesale_price_fallback', $fallback_discount_price );
+
+        }//end if
+    }
+
+    public function get_price_with_options( $price, $product ) {
+        $wholesale_price = SupportHelper::get_cart_item_objects_property( $product, 'yay_currency_wholesale_price' );
+        var_dump( $wholesale_price );
+        if ( $wholesale_price ) {
+            return (float) $wholesale_price;
+        }
+
+        return $price;
     }
 }

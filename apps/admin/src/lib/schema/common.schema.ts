@@ -16,8 +16,8 @@ type AccessRestriction = {
 };
 
 /**
- * TODO: remove role.applyToSalePrice
+ * TODO:
  */
 type Display = {
-  price_format: 'retail-and-wholesale' | 'wholesale-only' | 'apply-sale-price';
+  price_format: 'retail-and-wholesale' | 'wholesale-only' | 'retail-only';
 };
