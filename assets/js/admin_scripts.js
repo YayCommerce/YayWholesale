@@ -1,7 +1,20 @@
 (function ($) {
   ("use strict");
   $(document).ready(() => {
-    // Product-based behaviors
+    productBasedBehavioursSetting();
+
+    $(document).on(
+      "woocommerce_variations_loaded",
+      productBasedBehavioursSetting
+    );
+    $(document).on(
+      "woocommerce_variations_saved",
+      productBasedBehavioursSetting
+    );
+  });
+
+  // Product-based behaviors
+  function productBasedBehavioursSetting() {
     // Toggle the Inputs by Discount mode
     $(".ywhs_product_based_discount_mode").each((index, el) => {
       const input = $(el).find("input");
@@ -26,31 +39,33 @@
     //Toggle the value input by Discount rule
     $(".ywhs_product_based_rule_fixed, .ywhs_product_based_rule_rate").each(
       function () {
-        const $block = $(this);
-        const $radios = $block.find("input[type='radio']");
+        const block = $(this);
+        const radios = block.find("input[type='radio']");
 
-        const $inputsContainer = $block
+        const inputsContainer = block
           .parent()
           .parent()
           .siblings(".ywhs_product_based_discount_value_inputs")
           .first();
 
-        const $fixedInput = $inputsContainer.find(
+        const fixedInput = inputsContainer.find(
           ".ywhs_product_based_discount_fixed"
         );
-        const $rateInput = $inputsContainer.find(
+        const rateInput = inputsContainer.find(
           ".ywhs_product_based_discount_rate"
         );
 
         function toggleFields() {
-          const isFixedChecked = $radios.filter(":checked").val() === "fixed";
+          const checkedRadio = radios.filter(":checked").val();
 
-          if (isFixedChecked) {
-            $fixedInput.show();
-            $rateInput.hide();
-          } else {
-            $fixedInput.hide();
-            $rateInput.show();
+          if (checkedRadio === "fixed") {
+            fixedInput.show();
+            rateInput.hide();
+          }
+
+          if (checkedRadio === "rate") {
+            fixedInput.hide();
+            rateInput.show();
           }
         }
 
@@ -58,7 +73,7 @@
         toggleFields();
 
         // On Radio checked change
-        $radios.on("change", toggleFields);
+        radios.on("change", toggleFields);
       }
     );
 
@@ -73,5 +88,5 @@
         input.val(value.toFixed(2));
       }
     });
-  });
+  }
 })(jQuery);

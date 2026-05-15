@@ -81,3 +81,36 @@
   width: 150px;
   text-overflow: ellipsis;
 }
+
+/* Fixed discount in product page (Variable) */
+.ywhs_variable_product_based_discount_custom_container {
+  display: table;
+  width: 100%;
+
+
+  .ywhs_product_based_discount_title {
+    display: block;
+    margin: 0 0 12px 0;
+    font-size: 1.3em;
+    font-weight: 700;
+    color: #1d2327;
+  }
+
+  .ywhs_product_based_discount_role_header {
+    margin-left: 0;
+  }
+
+  .ywhs_product_based_discount_subtitle {
+    display: block;
+    margin: 0 0 12px 0;
+  }
+
+  .ywhs_product_based_discount_rule {
+    margin: 0 0 0 0;
+  }
+
+  .ywhs_product_based_discount_inputs {
+    margin-left: -26px !important;
+    padding-left: 26px;
+  }
+}
