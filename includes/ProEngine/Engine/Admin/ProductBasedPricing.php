@@ -67,7 +67,7 @@ class ProductBasedPricing {
 
         do_action( 'ywhs_before_saved_product_based_discount', $custom_discount_data, $post_id, $product_type );
 
-        update_post_meta( $post_id, 'yaywholesaleb2b_product_based_discount', $custom_discount_data );
+        ProductPricingHelper::save_product_based_discount( $post_id, $custom_discount_data );
 
         do_action( 'ywhs_after_saved_product_based_discount', $custom_discount_data, $post_id, $product_type );
     }
@@ -95,7 +95,7 @@ class ProductBasedPricing {
 
         do_action( 'ywhs_before_saved_variable_product_based_discount', $custom_discount_data, $variation_id );
 
-        update_post_meta( $variation_id, 'yaywholesaleb2b_product_based_discount', $custom_discount_data );
+        ProductPricingHelper::save_product_based_discount( $variation_id, $custom_discount_data );
 
         do_action( 'ywhs_after_saved_variable_product_based_discount', $custom_discount_data, $variation_id );
     }

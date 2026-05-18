@@ -32,32 +32,10 @@ class Pricing {
 
         add_action( 'woocommerce_before_calculate_totals', [ $this, 'before_calculate_totals' ], 103 );
 
-        add_filter( 'woocommerce_add_cart_item_data', [ $this, 'add_cart_item_wholesale_data' ], 9999, 4 );
-
         add_filter( 'woocommerce_cart_item_price', [ $this, 'cart_item_price' ], 999, 2 );
 
         add_action( 'woocommerce_checkout_order_processed', [ $this, 'ywhs_checkout_wholesale_order_handling' ], 999, 3 );
     }
-
-    public function add_cart_item_wholesale_data( $cart_item_data, $product_id, $variation_id = 0, $quantity = 0 ) {
-        $role_config            = CustomerHelper::get_current_user_wholesale_role();
-        $cart_item_data['data'] = wc_get_product( $product_id );
-
-        // Get Wholesale data
-        $wholesale_data = ProductPricingHelper::get_product_wholesale_discount_data( $cart_item_data['data'], $role_config, $quantity );
-
-        if ( ! empty( $wholesale_data ) ) {
-            $cart_item_data[ ShopPricingHelper::WHOLESALE_DISCOUNT_TYPE ]  = $wholesale_data['wholesale_dicount_type'];
-            $cart_item_data[ ShopPricingHelper::WHOLESALE_DISCOUNT_VALUE ] = $wholesale_data['wholesale_discount_value'];
-        }
-
-        $cart_item_data[ ShopPricingHelper::APPLY_WHOLESALE_TO_SALE ] = $role_config['applyToSalePrice'];
-
-        $discounted_prices = ShopPricingHelper::get_cart_item_wholesale_price( $cart_item_data, $role_config, $quantity );
-
-        return $cart_item_data;
-    }
-
 
     /**
      * Update the wholesale price in cart / checkout

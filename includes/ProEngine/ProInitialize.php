@@ -1,6 +1,7 @@
 <?php
 namespace YayWholesaleB2B\ProEngine;
 
+use YayWholesaleB2B\ProEngine\Engine\Admin\CategoryBasedPricing;
 use YayWholesaleB2B\ProEngine\Engine\Admin\ProductBasedPricing;
 use YayWholesaleB2B\ProEngine\Engine\Frontend\PaymentGateway;
 use YayWholesaleB2B\ProEngine\Engine\Frontend\Requirement;
@@ -25,5 +26,6 @@ class ProInitialize {
 
         // Admin
         ProductBasedPricing::get_instance();
+        CategoryBasedPricing::get_instance();
     }
 }

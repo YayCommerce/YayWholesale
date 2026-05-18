@@ -29,39 +29,43 @@
 
 
 /* Fixed discount in product page */
-.ywhs_product_based_discount_role_header,
 .ywhs_product_based_discount_title {
   display: block;
   margin: 0 0 0px 12px;
 }
 
+
 .ywhs_product_based_discount_rule {
   display: flex;
-  margin: 0 0 0px 12px;
+  margin: 0 0 15px 12px;
   align-items: center;
+}
+
+.ywhs_product_based_discount_mode {
+  display: flex;
+  margin: 0 0 30px 12px;
 }
 
 .ywhs_product_based_discount_subtitle {
   display: block;
-  margin: 0 0 32px 12px;
+  margin: 0 0 15px 12px;
 }
 
-.ywhs_product_based_discount_inputs {
-  display: none;
+.ywhs_product_based_discount_roles {
   box-shadow: inset 4px 0 #ffc106;
 }
 
-.ywhs_product_based_discount_input_title {
+.ywhs_product_based_discount_rule_title {
   width: 150px;
 }
 
-.ywhs_product_based_discount_input_values {
+.ywhs_product_based_discount_rule_radios {
   display: flex;
   gap: 40px;
 }
 
-.ywhs_product_based_discount_mode,
-.ywhs_product_based_discount_input_values label {
+.ywhs_product_based_discount_mode label,
+.ywhs_product_based_discount_rule_radios label {
   margin: 0 0 0 0 !important;
   width: fit-content !important;
   display: flex;
@@ -69,24 +73,14 @@
   gap: 5px;
 }
 
-.ywhs_product_based_discount_role_header {
-  display: flex;
-  margin-bottom: 10px;
-  margin-top: 25px;
-  align-items: center;
-}
-
-.ywhs_product_based_discount_role_header span {
-  font-weight: 600;
-  width: 150px;
-  text-overflow: ellipsis;
+.ywhs_product_based_discount_inputs {
+  display: none;
 }
 
 /* Fixed discount in product page (Variable) */
 .ywhs_variable_product_based_discount_custom_container {
   display: table;
   width: 100%;
-
 
   .ywhs_product_based_discount_title {
     display: block;
@@ -96,21 +90,58 @@
     color: #1d2327;
   }
 
-  .ywhs_product_based_discount_role_header {
-    margin-left: 0;
-  }
-
   .ywhs_product_based_discount_subtitle {
     display: block;
     margin: 0 0 12px 0;
   }
 
+  .ywhs_product_based_discount_mode,
   .ywhs_product_based_discount_rule {
-    margin: 0 0 0 0;
+    margin-left: 0;
   }
 
-  .ywhs_product_based_discount_inputs {
+  .ywhs_product_based_discount_roles {
     margin-left: -26px !important;
-    padding-left: 26px;
+    padding: 0 0 1px 26px;
+  }
+}
+
+/* Category-based discount */
+.ywhs_category_based_discount_rates {
+  display: none;
+}
+
+.ywhs_category_based_discount_rate_table {
+  border: 1px solid #c3c4c7;
+  border-collapse: collapse;
+  border-radius: 4px;
+
+  th {
+    background-color: #f6f7f7;
+    border: 1px solid #c3c4c7;
+    width: fit-content;
+    padding: 10px;
+  }
+
+
+  .ywhs_category_based_discount_rate_role {
+    font-weight: 500;
+    font-size: 13px;
+    max-width: 125px;
+    text-align: left;
+    text-wrap-mode: wrap;
+  }
+
+  .ywhs_category_based_discount_rate {
+    background-color: #ffffff;
+    gap: 5px;
+    font-weight: 500;
+    font-size: 13px;
+    flex: 1;
+  }
+
+  input {
+    width: 80px !important;
+    margin: 0 !important;
   }
 }

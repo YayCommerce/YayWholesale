@@ -1,7 +1,6 @@
 <?php
 namespace YayWholesaleB2B\ProEngine\Engine\Frontend;
 
-use YayWholesaleB2B\Engine\Frontend\Pricing;
 use YayWholesaleB2B\Helpers\CustomerHelper;
 use YayWholesaleB2B\Helpers\PricingHelpers\ShopPricingHelper;
 use YayWholesaleB2B\Helpers\RequirementHelper;
@@ -201,7 +200,7 @@ class Requirement {
 
             foreach ( $cart as $cart_item_key => $cart_item ) {
                 $product = wc_get_product( $cart_item['data']->get_id() );
-                $extra   = $cart_item[ ShopPricingHelper::WHOLESALE_EXTRA_PRICE_KEY ];
+                $extra   = apply_filters( 'ywhs_cart_item_extra_price_before_apply_discount', 0, $cart_item );
 
                 $extra                       = apply_filters( 'ywhs_price_handle_processed', $extra, null, $wholesale );
                 $price_map[ $cart_item_key ] = wc_get_price_excluding_tax( $product ) + $extra;
@@ -271,11 +270,11 @@ class Requirement {
         $price_map = [];
 
         foreach ( $cart as $cart_item_key => $cart_item ) {
-            $product                     = wc_get_product( $cart_item['data']->get_id() );
-            $extra                       = $cart_item[ ShopPricingHelper::WHOLESALE_EXTRA_PRICE_KEY ];
+            $product = wc_get_product( $cart_item['data']->get_id() );
+            $extra   = apply_filters( 'ywhs_cart_item_extra_price_before_apply_discount', 0, $cart_item );
+
             $extra                       = apply_filters( 'ywhs_price_handle_processed', $extra, null, null );
             $price_map[ $cart_item_key ] = wc_get_price_excluding_tax( $product ) + $extra;
-
         }
 
         wp_send_json_success( $price_map );

@@ -2,6 +2,7 @@
   ("use strict");
   $(document).ready(() => {
     productBasedBehavioursSetting();
+    categoryBasedBehavioursSetting();
 
     $(document).on(
       "woocommerce_variations_loaded",
@@ -18,9 +19,9 @@
     // Toggle the Inputs by Discount mode
     $(".ywhs_product_based_discount_mode").each((index, el) => {
       const input = $(el).find("input");
-      const inputs_container = $(el)
-        .parent()
-        .siblings(".ywhs_product_based_discount_inputs");
+      const inputs_container = $(el).siblings(
+        ".ywhs_product_based_discount_inputs"
+      );
       if (input.is(":checked")) {
         inputs_container.show();
       } else {
@@ -45,8 +46,7 @@
         const inputsContainer = block
           .parent()
           .parent()
-          .siblings(".ywhs_product_based_discount_value_inputs")
-          .first();
+          .siblings(".ywhs_product_based_discount_roles");
 
         const fixedInput = inputsContainer.find(
           ".ywhs_product_based_discount_fixed"
@@ -76,6 +76,45 @@
         radios.on("change", toggleFields);
       }
     );
+
+    $(".ywhs_product_based_discount_rate").on("change", function () {
+      const input = $(this).find("input");
+      const value = parseFloat(input.val());
+      if (value > 100) {
+        // if the rate is over 100 then make it 100 for maximum rate
+        input.val(100);
+      } else if (value % 1 !== 0) {
+        // if the value has decimals then fix it to 2 decimals
+        input.val(value.toFixed(2));
+      }
+    });
+  }
+
+  // Category-based behaviours
+  function categoryBasedBehavioursSetting() {
+    const discountMode = $("#ywhs_category_based_discount_mode");
+    const discountRate = discountMode
+      .closest(".ywhs_category_based_discount_mode_wrapper")
+      .siblings(".ywhs_category_based_discount_rates");
+    const modeValue = discountMode.val();
+    if (modeValue === "" || modeValue === "default") {
+      discountRate.hide();
+    }
+
+    if (modeValue === "custom") {
+      discountRate.show();
+    }
+
+    discountMode.on("change", function (e) {
+      const value = $(this).val();
+      if (value === "" || value === "default") {
+        discountRate.hide();
+      }
+
+      if (value === "custom") {
+        discountRate.show();
+      }
+    });
 
     $(".ywhs_product_based_discount_rate").on("change", function () {
       const input = $(this).find("input");

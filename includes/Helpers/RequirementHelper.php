@@ -106,7 +106,7 @@ class RequirementHelper {
         // Calculate the subtotal (in this action, subtotal is not calculated)
         foreach ( $cart as $cart_item ) {
             $product = wc_get_product( $cart_item['data']->get_id() );
-            $extra   = $cart_item['ywhs_wholesale_extra_price'];
+            $extra   = apply_filters( 'ywhs_cart_item_extra_price_before_apply_discount', 0, $cart_item );
 
             $extra     = apply_filters( 'ywhs_price_handle_processed', $extra, null, null );
             $price     = wc_get_price_excluding_tax( $product ) + $extra;

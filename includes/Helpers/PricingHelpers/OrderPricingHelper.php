@@ -27,9 +27,9 @@ class OrderPricingHelper {
         $final_price      = 0;
 
         if ( Utils::is_pro() ) {
-            // Pro handle for product based, category based, price tier (INCOMING)
-            $handled_price = null;
-            if ( isset( $handled_price ) ) {
+            // Pro handle for product based, category based, price tier
+            $handled_price = $handled_price = \YayWholesaleB2B\ProEngine\Helpers\PricingHelpers\AdvancedPricingHelper::get_final_advanced_price( $price, $product, $role, $quantity );
+            if ( ! empty( $handled_price ) ) {
                 $final_price = $handled_price;
             }
         }

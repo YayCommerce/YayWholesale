@@ -24,13 +24,14 @@ class ProductPricingHelper {
             return $product->get_price();
         }
 
+        $regular_price = (float) $product->get_regular_price( 'edit' );
+        $sale_price    = (float) $product->get_price( 'edit' );
+        $price         = ( $role_config['applyToSalePrice'] && $sale_price < $regular_price ) ? $sale_price : $regular_price;
+
         if ( Utils::is_pro() ) {
-            // Pro handle: (INCOMING)
-            // Quantity Tier
-            // Price for each Product
-            // Discount for each Category
-            $handled_price = null;
-            if ( isset( $handled_price ) ) {
+            // Pro handle: Quantity Tier, Product-based, Category-based
+            $handled_price = \YayWholesaleB2B\ProEngine\Helpers\PricingHelpers\AdvancedPricingHelper::get_final_advanced_price( $price, $product, $role_config, $quantity );
+            if ( ! empty( $handled_price ) ) {
                 return $handled_price;
             }
         }
@@ -39,10 +40,6 @@ class ProductPricingHelper {
         if ( $discount <= 0 ) {
             return $product->get_price();
         }
-
-        $regular_price = (float) $product->get_regular_price( 'edit' );
-        $sale_price    = (float) $product->get_price( 'edit' );
-        $price         = ( $role_config['applyToSalePrice'] && $sale_price < $regular_price ) ? $sale_price : $regular_price;
 
         $wholesale_price = max( 0, ( $price ) * ( 1 - $discount ) );
 
@@ -62,19 +59,16 @@ class ProductPricingHelper {
         }
 
         if ( Utils::is_pro() ) {
-            // Pro handle: (INCOMING)
-            // Quantity Tier
-            // Price for each Product
-            // Discount for each Category
+            // Pro handle: Quantity Tier, Product-based, Category-based
+            $data = \YayWholesaleB2B\ProEngine\Helpers\PricingHelpers\AdvancedPricingHelper::get_final_advanced_discount_data( $product, $role_config, $quantity );
 
-            $data = [];
             if ( ! empty( $data ) ) {
                 return $data;
             }
         }
 
         return [
-            'wholesale_dicount_type'   => 'percentage',
+            'wholesale_discount_type'  => 'rate',
             'wholesale_discount_value' => $role_config['discount'],
         ];
     }
