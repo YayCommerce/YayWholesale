@@ -133,7 +133,7 @@ class RequirementHelper {
             }
             $extra     = $extra_price_map[ $item->get_id() ] ?? 0;
             $product   = $item->get_product();
-            $price     = apply_filters( 'ywhs_convert_price_from_order', $product->get_price(), $order, $product, false );
+            $price     = apply_filters( 'ywhs_convert_price_from_order', $product->get_price(), $order, $product );
             $price    += $extra;
             $subtotal += $price * $item->get_quantity();
         }

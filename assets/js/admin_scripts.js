@@ -116,7 +116,7 @@
       }
     });
 
-    $(".ywhs_product_based_discount_rate").on("change", function () {
+    $(".ywhs_category_based_discount_rate").on("change", function () {
       const input = $(this).find("input");
       const value = parseFloat(input.val());
       if (value > 100) {

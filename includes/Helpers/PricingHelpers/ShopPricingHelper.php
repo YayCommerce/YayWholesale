@@ -132,8 +132,6 @@ class ShopPricingHelper {
             return $extra_price;
         }
 
-        $extra_price = apply_filters( 'ywhs_extra_price_before_apply_wholesale_discount', $extra_price, $role_config );
-
         if ( $extra_price < 0 ) {
             return $extra_price;
         }

@@ -63,7 +63,7 @@ class Orders {
 
             if ( is_admin() ) {
                 // If admin is recalculating, then convert with order
-                $wholesale_role['minOrderAmount'] = apply_filters( 'ywhs_convert_price_from_order', $wholesale_role['minOrderAmount'], $order, null, false );
+                $wholesale_role['minOrderAmount'] = apply_filters( 'ywhs_convert_price_from_order', $wholesale_role['minOrderAmount'], $order, null );
             } else {
                 $wholesale_role['minOrderAmount'] = RequirementHelper::get_min_order_amount( $wholesale_role );
             }
@@ -151,17 +151,10 @@ class Orders {
                 $extra    = $extra_price_map[ $item->get_id() ] ?? 0;
                 $quantity = $item->get_quantity();
 
-                $apply_to_sale = $wholesale_role['applyToSalePrice'] ?? false;
-                $sale          = (float) $product->get_price( 'edit' );
-                $regular       = (float) $product->get_regular_price( 'edit' );
-
-                $price = ( $apply_to_sale && $sale < $regular ) ? $sale : $regular;
-
-                $price = apply_filters( 'ywhs_convert_price_from_order', $price, $order, $product, false );
-
                 if ( $is_discounted ) {
-                    $price = OrderPricingHelper::calculate_wholesale_price( $price, $extra, $product, $wholesale_role, $quantity );
+                    $price = OrderPricingHelper::calculate_wholesale_price_from_order( $order, $extra, $product, $wholesale_role, $quantity );
                 } else {
+                    $price = apply_filters( 'ywhs_convert_price_from_order', $product->get_price( 'edit' ), $order, $product );
                     $price = $price + $extra;
                 }
 

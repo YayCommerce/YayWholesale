@@ -24,7 +24,9 @@ class YayCurrency {
 
     protected function __construct() {
 
-        add_filter( 'ywhs_convert_price_from_order', [ $this, 'convert_price_in_order' ], 10, 4 );
+        // Expected to work even if the YayCurrency not activated
+        add_filter( 'ywhs_convert_price_from_order', [ $this, 'convert_price_in_order' ], 10, 3 );
+        add_filter( 'ywhs_revert_price_from_order', [ $this, 'revert_price_in_order' ], 10, 2 );
 
         if ( ! defined( 'YAY_CURRENCY_VERSION' ) ) {
             return;
@@ -75,21 +77,14 @@ class YayCurrency {
     }
 
     // Order have Meta-data: yay_currency_order_rate to revert the original price of order
-    public function convert_price_in_order( $price, \WC_Order $order, $product, $is_reverting_to_original_currency ) {
+    public function convert_price_in_order( $price, \WC_Order $order, $product ) {
         if ( defined( 'YAY_CURRENCY_VERSION' ) && class_exists( 'Yay_Currency\Helpers\YayCurrencyHelper' ) ) {
             $apply_currency = YayCurrencyHelper::get_currency_by_currency_code( $order->get_currency() );
 
             if ( $apply_currency ) {
-                if ( $is_reverting_to_original_currency ) {
-                    if ( $product && $this->is_has_yaycurrency_fixed_price( $price, $product, $apply_currency, true ) ) {
-                        return $product->get_price( 'edit' );
-                    }
-                    return YayCurrencyHelper::reverse_calculate_price_by_currency( $price, $apply_currency );
-                } else {
-                    $price = YayCurrencyHelper::calculate_price_by_currency( $price, false, $apply_currency );
-                    if ( $product && class_exists( 'Yay_Currency\Helpers\FixedPriceHelper' ) ) {
-                        $price = \Yay_Currency\Helpers\FixedPriceHelper::get_price_fixed_by_apply_currency( $product, $price, $this->apply_currency );
-                    }
+                $price = YayCurrencyHelper::calculate_price_by_currency( $price, false, $apply_currency );
+                if ( $product && class_exists( 'Yay_Currency\Helpers\FixedPriceHelper' ) ) {
+                    $price = \Yay_Currency\Helpers\FixedPriceHelper::get_price_fixed_by_apply_currency( $product, $price, $this->apply_currency );
                 }
             }
 
@@ -101,11 +96,33 @@ class YayCurrency {
                 return $price;
             }
 
-            if ( $is_reverting_to_original_currency ) {
-                $price = floatval( $price ) / max( 1, floatval( $rate ) );
-            } else {
-                $price = floatval( $price ) * max( 1, floatval( $rate ) );
+            $price = floatval( $price ) * max( 1, floatval( $rate ) );
+
+            return $price;
+        }//end if
+    }
+
+    public function revert_price_in_order( $price, \WC_Order $order ) {
+        if ( defined( 'YAY_CURRENCY_VERSION' ) && class_exists( 'Yay_Currency\Helpers\YayCurrencyHelper' ) ) {
+            $apply_currency = YayCurrencyHelper::get_currency_by_currency_code( $order->get_currency() );
+
+            if ( $apply_currency ) {
+                // if ( $product && $this->is_has_yaycurrency_fixed_price( $price, $product, $apply_currency, true ) ) {
+                // return $product->get_price( 'edit' );
+                // }
+                    return YayCurrencyHelper::reverse_calculate_price_by_currency( $price, $apply_currency );
+
             }
+
+            return (float) $price;
+        } else {
+            $rate = $order->get_meta( 'yay_currency_order_rate' );
+
+            if ( ! isset( $rate ) ) {
+                return $price;
+            }
+
+            $price = floatval( $price ) / max( 1, floatval( $rate ) );
 
             return $price;
         }//end if
@@ -148,12 +165,10 @@ class YayCurrency {
             $discount_data = ProductPricingHelper::get_product_wholesale_discount_data( $product, $role_config, 0 );
 
             if ( ! empty( $discount_data ) ) {
-                if ( 'fixed' === $discount_data['wholesale_discount_type'] ) {
-                    return apply_filters( 'yay_currency_convert_price', (float) $discount_data['wholesale_discount_value'] );
-                }
-
                 if ( 'rate' === $discount_data['wholesale_discount_type'] ) {
                     $rate = (float) $discount_data['wholesale_discount_value'];
+                } else {
+                    return apply_filters( 'yay_currency_convert_price', (float) $discount_data['wholesale_discount_value'] );
                 }
             }
 
@@ -340,11 +355,12 @@ class YayCurrency {
 
     protected function handle_wholesale_price_by_currency( $cart_item, $currency ) {
         $role_config     = CustomerHelper::get_current_user_wholesale_role();
-        $wholesale_price = ProductPricingHelper::get_wholesale_price( $cart_item['data'], $role_config, $cart_item['quantity'] );
+        $wholesale_price = ProductPricingHelper::get_wholesale_price( wc_get_product( $cart_item['data']->get_id() ), $role_config, $cart_item['quantity'] );
         $wholesale_extra = ShopPricingHelper::get_wholesale_extra_price_from_cart_item( $cart_item, $role_config );
 
-        $wholesale_data = ProductPricingHelper::get_product_wholesale_discount_data( $cart_item['data'], $role_config, $cart_item['quantity'] );
-        $wholesale_type = $wholesale_data['wholesale_discount_type'];
+        $wholesale_data  = ProductPricingHelper::get_product_wholesale_discount_data( $cart_item['data'], $role_config, $cart_item['quantity'] );
+        $wholesale_type  = $wholesale_data['wholesale_discount_type'];
+        $wholesale_value = $wholesale_data['wholesale_discount_value'];
 
         $discount_price = -1;
         if ( $this->is_has_yaycurrency_fixed_price( $wholesale_price, $cart_item['data'], $currency, false ) && $wholesale_type === 'rate' ) {
