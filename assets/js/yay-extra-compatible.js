@@ -32,6 +32,7 @@
       prices_include_tax: priceIncludeTax,
       tax_display_shop: taxDisplayShop,
       tax_rate: taxRate,
+      discount_data: discountData,
     } = window.yayWholesaleExtra;
 
     if ($(".yayextra-total-price") && wholesaleRole) {
@@ -50,6 +51,8 @@
       "ywhs",
       function (html, quantityProduct, totalPriceOriginalData) {
         let productIds = [];
+
+        if (!wholesaleRole) return;
 
         if (productType !== "grouped") {
           productIds[0] = 0;
@@ -90,37 +93,53 @@
             quantity = parseInt(quantity == "" ? "0" : quantity);
           }
 
-          let productTotal =
-            wholesaleRole &&
-            wholesaleRole["applyToSalePrice"] &&
-            productId > 0 &&
-            salePrices[productId] > 0
-              ? parseFloat(productId > 0 ? salePrices[productId] : 0)
-              : parseFloat(productId > 0 ? regularPrices[productId] : 0);
+          // Handle Wholesale price
+          let productTotal = 0;
+          if (productId > 0) {
+            if (discountData[productId].wholesale_discount_type === "rate") {
+              productTotal =
+                wholesaleRole &&
+                wholesaleRole["applyToSalePrice"] &&
+                salePrices[productId] > 0
+                  ? parseFloat(productId > 0 ? salePrices[productId] : 0)
+                  : parseFloat(productId > 0 ? regularPrices[productId] : 0);
+              let discount =
+                parseFloat(discountData[productId].wholesale_discount_value) /
+                100;
+              productTotal = Math.max(0, productTotal * (1 - discount));
+            } else {
+              productTotal =
+                parseFloat(discountData[productId].wholesale_discount_value) *
+                currencyRate;
+            }
+          }
 
+          // Handle Extra Price
           if (productTotal != 0) {
-            let totalUnit = productTotal + optionExtra + linkedProductExtra;
-            if (wholesaleRole) {
-              let discount = wholesaleRole["discount"]
-                ? wholesaleRole["discount"] / 100
-                : 0;
-              let finalProductTotal =
-                Math.max(0, totalUnit * (1 - discount)) * quantity;
-              // Excluding / Including tax - shop display mode
-              if (taxEnabled === "1" && parseFloat(taxRate) > 0) {
-                rate = parseFloat(taxRate) / 100;
+            let extraTotal = optionExtra + linkedProductExtra;
+            let discount = wholesaleRole["discount"]
+              ? wholesaleRole["discount"] / 100
+              : 0;
+            extraTotal = Math.max(0, extraTotal * (1 - discount));
 
-                if (priceIncludeTax === "1" && taxDisplayShop === "excl") {
-                  finalProductTotal = finalProductTotal / (1 + rate);
-                }
+            //Handle total price
+            let unitTotal = productTotal + extraTotal;
+            let finalProductTotal = unitTotal * quantity;
 
-                if (priceIncludeTax !== "1" && taxDisplayShop === "incl") {
-                  finalProductTotal = finalProductTotal * (1 + rate);
-                }
+            // Excluding / Including tax - shop display mode
+            if (taxEnabled === "1" && parseFloat(taxRate) > 0) {
+              rate = parseFloat(taxRate) / 100;
+
+              if (priceIncludeTax === "1" && taxDisplayShop === "excl") {
+                finalProductTotal = finalProductTotal / (1 + rate);
               }
 
-              total += finalProductTotal;
+              if (priceIncludeTax !== "1" && taxDisplayShop === "incl") {
+                finalProductTotal = finalProductTotal * (1 + rate);
+              }
             }
+
+            total += finalProductTotal;
           }
         });
         $("#ywhs-extra-total-price").text(parseWPCurrency(total));
