@@ -19,8 +19,7 @@ defined( 'ABSPATH' ) || exit;
 class YayCurrency {
     use SingletonTrait;
 
-    private $apply_currency    = [];
-    private $is_handling_price = false;
+    private $apply_currency = [];
 
     protected function __construct() {
 
@@ -78,7 +77,15 @@ class YayCurrency {
 
     // Order have Meta-data: yay_currency_order_rate to revert the original price of order
     public function convert_price_in_order( $price, \WC_Order $order, $product ) {
+        $original_currency = get_woocommerce_currency();
+
+        // If the order's currency is same as store system then do nothing
+        if ( $order->get_currency() === $original_currency ) {
+            return $price;
+        }
+
         if ( defined( 'YAY_CURRENCY_VERSION' ) && class_exists( 'Yay_Currency\Helpers\YayCurrencyHelper' ) ) {
+
             $apply_currency = YayCurrencyHelper::get_currency_by_currency_code( $order->get_currency() );
 
             if ( $apply_currency ) {
@@ -103,6 +110,13 @@ class YayCurrency {
     }
 
     public function revert_price_in_order( $price, \WC_Order $order ) {
+        $original_currency = get_woocommerce_currency();
+
+        // If the order's currency is same as store system then do nothing
+        if ( $order->get_currency() === $original_currency ) {
+            return $price;
+        }
+
         if ( defined( 'YAY_CURRENCY_VERSION' ) && class_exists( 'Yay_Currency\Helpers\YayCurrencyHelper' ) ) {
             $apply_currency = YayCurrencyHelper::get_currency_by_currency_code( $order->get_currency() );
 
