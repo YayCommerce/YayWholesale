@@ -33,7 +33,7 @@ export default function DisplayTab() {
           control={control}
           name="display.price_format"
           render={({ field }) => (
-            <Field className="flex w-full flex-col gap-2.5">
+            <Field className="flex w-full flex-col gap-1.5">
               <FieldLabel className="text-foreground-400 text-xs font-medium">
                 {__('Display price format', 'yay-wholesale-b2b')}
               </FieldLabel>
@@ -63,7 +63,7 @@ export default function DisplayTab() {
           control={control}
           name="display.wholesale_price_label"
           render={({ field }) => (
-            <Field className="flex w-full flex-col gap-2.5">
+            <Field className="flex w-full flex-col gap-1.5">
               <FieldLabel className="text-foreground-400 text-xs font-medium">
                 {__('Wholesale price label', 'yay-wholesale-b2b')}
               </FieldLabel>
@@ -86,7 +86,7 @@ export default function DisplayTab() {
           control={control}
           name="display.wholesale_price_color"
           render={({ field }) => (
-            <Field className="flex w-full flex-col gap-2.5">
+            <Field className="flex w-full flex-col gap-1.5">
               <FieldLabel className="text-foreground-400 text-xs font-medium">
                 {__('Wholesale price color', 'yay-wholesale-b2b')}
               </FieldLabel>
@@ -104,21 +104,23 @@ export default function DisplayTab() {
             <Skeleton className="h-2 w-[65px] animate-none bg-[#F1F3F6]" />
             <Skeleton className="h-2 w-[130px] animate-none bg-[#F1F3F6]" />
           </div>
-          {['retail-and-wholesale', 'retail-only'].includes(displayFormat) && (
-            <p className="flex gap-1.5 text-[14px] leading-3.5 text-[#A0A0A7]">
-              {displayFormat === 'retail-and-wholesale' && <span>{__('Retail:', 'yay-wholesale-b2b')}</span>}
-              <del> {parseWPCurrency(20)} </del>
-              <span>{parseWPCurrency(18)}</span>
-            </p>
-          )}
-          {['retail-and-wholesale', 'wholesale-only'].includes(displayFormat) && (
-            <p className="flex gap-1.5 text-[14px] leading-3.5">
-              <span>{priceLabel}:</span>
-              <span className="font-bold" style={{ color: priceColor }}>
-                {parseWPCurrency(15)}
-              </span>
-            </p>
-          )}
+          <div className="flex flex-col gap-3">
+            {['retail-and-wholesale', 'retail-only'].includes(displayFormat) && (
+              <p className="flex gap-1.5 text-[14px] leading-3.5 text-[#A0A0A7]">
+                {displayFormat === 'retail-and-wholesale' && <span>{__('Retail:', 'yay-wholesale-b2b')}</span>}
+                <del> {parseWPCurrency(20)} </del>
+                <span>{parseWPCurrency(18)}</span>
+              </p>
+            )}
+            {['retail-and-wholesale', 'wholesale-only'].includes(displayFormat) && (
+              <p className="flex gap-1.5 text-[14px] leading-3.5">
+                <span>{priceLabel}:</span>
+                <span className="font-bold" style={{ color: priceColor }}>
+                  {parseWPCurrency(15)}
+                </span>
+              </p>
+            )}
+          </div>
           <AddToCartSkeleton />
         </div>
       </div>

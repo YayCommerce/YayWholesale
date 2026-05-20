@@ -11,7 +11,7 @@ function ProductImageSkeleton({
   return (
     <div className="relative">
       <div
-        className="absolute top-2.5 left-2.5 flex h-6 w-fit items-center rounded-xs px-[9px] py-[3px] text-[14px] leading-3.5 font-semibold text-[#B6BFCC]"
+        className="absolute top-2.5 left-2.5 flex h-6 w-fit items-center rounded-xs px-[9px] py-[3px] text-[14px] leading-3.5 text-[#B6BFCC]"
         style={{ backgroundColor: color }}
       >
         {__('Sale', 'yay-wholesale-b2b')}

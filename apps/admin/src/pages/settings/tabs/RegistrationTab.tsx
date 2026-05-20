@@ -33,7 +33,7 @@ export default function RegistrationTab() {
 
       {/* Two column layout */}
       {/* <div className="grid grid-cols-2 gap-6">
-        // Wholesale registration page 
+        // Wholesale registration page
         <Controller
           control={control}
           name="registration.wholesale_registration_page"
@@ -66,7 +66,7 @@ export default function RegistrationTab() {
           control={control}
           name="registration.successful_registration_message"
           render={({ field }) => (
-            <Field className="flex w-full flex-col gap-2.5">
+            <Field className="flex w-full flex-col gap-1.5">
               <FieldLabel className="text-foreground-400 text-xs font-medium">
                 {__('Successful registration message', 'yay-wholesale-b2b')}
               </FieldLabel>

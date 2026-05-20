@@ -34,7 +34,7 @@ export default function GeneralTab() {
         control={control}
         name="general.default_role"
         render={({ field, fieldState }) => (
-          <Field className="flex w-full flex-col gap-2.5">
+          <Field className="flex w-full flex-col gap-1.5">
             <FieldLabel className="text-xs font-medium">
               {__('Default role for new user', 'yay-wholesale-b2b')}
             </FieldLabel>
@@ -71,7 +71,7 @@ export default function GeneralTab() {
               </p>
             </div>
             <Select value={String(field.value) ?? 'inherit'} onValueChange={field.onChange}>
-              <SelectTrigger className="w-53 text-sm font-normal">
+              <SelectTrigger className="w-fit min-w-40 text-sm font-normal">
                 <SelectValue placeholder={__('Select your page', 'yay-wholesale-b2b')} />
               </SelectTrigger>
               <SelectContent align="end">

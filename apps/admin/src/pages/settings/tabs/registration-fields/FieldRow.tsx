@@ -100,7 +100,7 @@ export function FieldRow({
             control={control}
             name={`registration_fields.fields.${index}.label`}
             render={({ field, fieldState }) => (
-              <Field className="flex w-full flex-col gap-2.5">
+              <Field className="flex w-full flex-col gap-1.5">
                 <FieldLabel className="text-foreground-400 text-xs font-medium">
                   {__('Label', 'yay-wholesale-b2b')}
                   {isRequired && <div className="text-destructive">*</div>}
@@ -136,7 +136,7 @@ export function FieldRow({
             control={control}
             name={`registration_fields.fields.${index}.type`}
             render={({ field }) => (
-              <Field className="flex w-full flex-col gap-2.5">
+              <Field className="flex w-full flex-col gap-1.5">
                 <FieldLabel className="text-foreground-400 text-xs font-medium">
                   {__('Type', 'yay-wholesale-b2b')}
                 </FieldLabel>
@@ -167,7 +167,7 @@ export function FieldRow({
             control={control}
             name={`registration_fields.fields.${index}.placeholder`}
             render={({ field }) => (
-              <Field className="flex w-full flex-col gap-2.5">
+              <Field className="flex w-full flex-col gap-1.5">
                 <FieldLabel className="text-foreground-400 text-xs font-medium">
                   {__('Placeholder', 'yay-wholesale-b2b')}
                 </FieldLabel>
@@ -191,7 +191,7 @@ export function FieldRow({
             control={control}
             name={`registration_fields.fields.${index}.columnWidth`}
             render={({ field }) => (
-              <Field className="flex w-full flex-col gap-2.5">
+              <Field className="flex w-full flex-col gap-1.5">
                 <FieldLabel className="text-foreground-400 text-xs font-medium">
                   {__('Column Width', 'yay-wholesale-b2b')}
                 </FieldLabel>
