@@ -66,6 +66,8 @@ class Pricing {
                     $discounted_prices = ShopPricingHelper::get_cart_item_wholesale_price( $cart_item, $role_config, $quantity );
 
                     $cart_item['data']->set_price( $discounted_prices['final_price'] );
+                    $cart_item['data']->set_regular_price( $discounted_prices['final_price'] );
+                    $cart_item['data']->set_sale_price( $discounted_prices['final_price'] );
 
                     do_action( 'ywhs_after_cart_item_calculate_totals', $cart_item, $cart_item_key, $role_config );
                 }//end if

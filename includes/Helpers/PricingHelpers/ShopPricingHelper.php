@@ -89,8 +89,10 @@ class ShopPricingHelper {
 
         $discounted = [];
         foreach ( $product->get_children() as $vid ) {
-            $product      = wc_get_product( $vid );
-            $discounted[] = self::get_wholesale_price_for_display( $product, $role );
+            $product = wc_get_product( $vid );
+            if ( ! empty( $product ) ) {
+                $discounted[] = self::get_wholesale_price_for_display( $product, $role );
+            }
         }
         return $discounted;
     }
@@ -113,8 +115,10 @@ class ShopPricingHelper {
             // }
 
         foreach ( $product->get_children() as $child_id ) {
-            $product      = wc_get_product( $child_id );
-            $discounted[] = self::get_wholesale_price_for_display( $product, $role );
+            $product = wc_get_product( $child_id );
+            if ( ! empty( $product ) ) {
+                $discounted[] = self::get_wholesale_price_for_display( $product, $role );
+            }
         }
         return $discounted;
     }

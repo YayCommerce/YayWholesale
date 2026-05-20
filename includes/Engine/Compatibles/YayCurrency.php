@@ -402,12 +402,14 @@ class YayCurrency {
 
         $discount_price = $this->handle_wholesale_price_by_currency( $cart_item, $apply_currency );
 
-        $fallback_currency       = YayCurrencyHelper::get_fallback_currency();
-        $fallback_discount_price = $this->handle_wholesale_price_by_currency( $cart_item, $fallback_currency );
+        if ( method_exists( YayWholesaleB2B\Engine\Compatibles\YayCurrencyHelper::class, 'get_fallback_currency' ) ) {
+            $fallback_currency       = YayCurrencyHelper::get_fallback_currency();
+            $fallback_discount_price = $this->handle_wholesale_price_by_currency( $cart_item, $fallback_currency );
+            SupportHelper::set_cart_item_objects_property( $cart_contents[ $cart_item_key ]['data'], 'yay_currency_wholesale_price_fallback', $fallback_discount_price );
+        }
 
         SupportHelper::set_cart_item_objects_property( $cart_contents[ $cart_item_key ]['data'], 'yay_currency_wholesale_price', $discount_price );
         SupportHelper::set_cart_item_objects_property( $cart_contents[ $cart_item_key ]['data'], 'yay_currency_wholesale_price_default', $wholesale_price + $wholesale_extra );
-        SupportHelper::set_cart_item_objects_property( $cart_contents[ $cart_item_key ]['data'], 'yay_currency_wholesale_price_fallback', $fallback_discount_price );
     }
 
     public function get_price_with_options( $price, $product ) {
