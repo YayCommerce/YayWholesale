@@ -9,46 +9,52 @@ $product_based_discounts = get_post_meta( $variation->ID, 'yaywholesaleb2b_produ
 <?php do_action( 'ywhs_before_render_variable_product_based_discount', $wholesale_roles, $variation->ID, $index ); ?>
 <div class="ywhs_variable_product_based_discount_custom_container">
     <div class="ywhs_product_based_discount_title">
-        <?php esc_attr_e( 'Fixed discount for each wholesale role', 'yay-wholesale-b2b' ); ?>
+        <?php esc_attr_e( 'Product-based discount for each wholesale role', 'yay-wholesale-b2b' ); ?>
     </div>
     <div class="ywhs_product_based_discount_input_container">
         <i class="ywhs_product_based_discount_subtitle"><?php esc_html_e( 'You can manually set custom discount (fixed price / percentage) for each role.', 'yay-wholesale-b2b' ); ?></i>
 
-        <!-- Discount Mode -->
-        <div class="ywhs_product_based_discount_mode">
-            <label>
-                <input type="checkbox"
-                    id="ywhs_discount_mode_<?php echo ( esc_html( $index ) ); ?>"
-                    name="ywhs_discount_mode_<?php echo ( esc_html( $index ) ); ?>"
-                    value="custom"
-                    <?php checked( $product_based_discounts['discount_mode'] ?? 'default', 'custom' ); ?> />
-                <?php esc_html_e( 'Custom product-based discount for this role.', 'yay-wholesale-b2b' ); ?>
-            </label>
-        </div>
+        <!-- Discount Rule -->
+        <?php
+        woocommerce_wp_select(
+            [
+                'id'            => "yay-wholesale-b2b[discount-rule-$index]",
+                'value'         => $product_based_discounts['discount_rule'] ?? 'default',
+                'label'         => __( 'Discount rule', 'yay-wholesale-b2b' ),
+                'options'       => [
+                    'default' => __( 'Default', 'yay-wholesale-b2b' ),
+                    'custom'  => __( 'Custom', 'yay-wholesale-b2b' ),
+                ],
+                'desc_tip'      => 'true',
+                'description'   => __( '"Default" - use the role\'s default discount rate. "Custom" - use the discount rate defined below.', 'yay-wholesale-b2b' ),
+                'wrapper_class' => 'form-row form-row-full ywhs-product-based-discount-rule',
+            ]
+        );
+        ?>
 
         <div class="ywhs_product_based_discount_inputs">
             <!-- Discount Rule -->
-            <div class="ywhs_product_based_discount_rule">
-                <div class="ywhs_product_based_discount_rule_title">
-                    <?php esc_html_e( 'Discount with:', 'yay-wholesale-b2b' ); ?>
+            <div class="ywhs_product_based_discount_type">
+                <div class="ywhs_product_based_discount_type_title">
+                    <?php esc_html_e( 'Discount with', 'yay-wholesale-b2b' ); ?>
                 </div>
 
-                <div class="ywhs_product_based_discount_rule_radios">
+                <div class="ywhs_product_based_discount_type_radios">
                     <label class="ywhs_product_based_rule_fixed">
                         <input type="radio"
-                            id="ywhs_discount_rule_fixed_<?php echo ( esc_html( $index ) ); ?>"
-                            name="ywhs_discount_rule_<?php echo ( esc_html( $index ) ); ?>"
+                            id="ywhs_discount_type_fixed"
+                            name="yay-wholesale-b2b[discount-type-<?php echo ( esc_html( $index ) ); ?>]"
                             value="fixed"
-                            <?php checked( $product_based_discounts['discount_rule'] ?? 'fixed', 'fixed' ); ?> />
+                            <?php checked( $product_based_discounts['discount_type'] ?? 'fixed', 'fixed' ); ?> />
                         <?php esc_html_e( 'Fixed price', 'yay-wholesale-b2b' ); ?>
                     </label>
 
                     <label class="ywhs_product_based_rule_rate">
                         <input type="radio"
-                            id="ywhs_discount_rule_rate_<?php echo ( esc_html( $index ) ); ?>"
-                            name="ywhs_discount_rule_<?php echo ( esc_html( $index ) ); ?>"
+                            id="ywhs_discount_type_rate"
+                            name="yay-wholesale-b2b[discount-type-<?php echo ( esc_html( $index ) ); ?>]"
                             value="rate"
-                            <?php checked( $product_based_discounts['discount_rule'] ?? 'fixed', 'rate' ); ?> />
+                            <?php checked( $product_based_discounts['discount_type'] ?? 'fixed', 'rate' ); ?> />
                         <?php esc_html_e( 'Percentage', 'yay-wholesale-b2b' ); ?>
                     </label>
 
@@ -57,52 +63,55 @@ $product_based_discounts = get_post_meta( $variation->ID, 'yaywholesaleb2b_produ
 
             <!-- Role Discount Values -->
             <div class="ywhs_product_based_discount_roles">
-                <?php
-                foreach ( $wholesale_roles as $wholesale_role ) :
-                    ?>
-                    <div class="ywhs_product_based_discount_role">
-                        <div class="ywhs_product_based_discount_fixed">
-                            <?php
-                            woocommerce_wp_text_input(
-                                [
-                                    'id'                => "ywhs_fixed_price_{$wholesale_role['slug']}_{$index}",
-                                    'type'              => 'number',
-                                    'custom_attributes' => [
-                                        'step' => 'any',
-                                        'min'  => '0',
-                                    ],
-                                    'placeholder'       => __( 'Auto', 'yay-wholesale-b2b' ),
-                                    // translators: %s: Role's name, %s: currency symbol
-                                    'label'             => sprintf( esc_html__( '%1$s (%2$s)', 'yay-wholesale-b2b' ), esc_html( $wholesale_role['name'] ), get_woocommerce_currency_symbol() ),
-                                    'desc_tip'          => 'true',
-                                    'value'             => $product_based_discounts['discount_fixed'][ $wholesale_role['slug'] ] ?? '',
-                                ]
-                            );
-                            ?>
-                        </div>
-
-                        <div class="ywhs_product_based_discount_rate">
-                            <?php
-                            woocommerce_wp_text_input(
-                                [
-                                    'id'                => "ywhs_rate_price_{$wholesale_role['slug']}_{$index}",
-                                    'type'              => 'number',
-                                    'custom_attributes' => [
-                                        'step' => 'any',
-                                        'min'  => '0',
-                                        'max'  => '100',
-                                    ],
-                                    'placeholder'       => __( 'Auto', 'yay-wholesale-b2b' ),
-                                    // translators: %s: Role's name
-                                    'label'             => sprintf( esc_html__( '%1$s (%%)', 'yay-wholesale-b2b' ), esc_html( $wholesale_role['name'] ) ),
-                                    'desc_tip'          => 'true',
-                                    'value'             => $product_based_discounts['discount_rate'][ $wholesale_role['slug'] ] ?? '',
-                                ]
-                            );
-                            ?>
-                        </div>
-                    </div>
-                <?php endforeach ?>
+                <div class="ywhs_product_based_discount_roles_title">
+                    <?php esc_html_e( 'Discount value', 'yay-wholesale-b2b' ); ?>
+                </div>
+                <table class="ywhs_product_based_discount_rate_table">
+                    <thead>
+                        <tr>
+                            <th><?php esc_html_e( 'Role', 'yay-wholesale-b2b' ); ?></th>
+                            <th class="ywhs_product_based_discount_rate"><?php esc_html_e( 'Rate (%)', 'yay-wholesale-b2b' ); ?></th>
+                            <th class="ywhs_product_based_discount_fixed">
+                                <?php
+                                // translators: %s: currency symbol
+                                echo ( sprintf( esc_html__( 'Fixed (%s)', 'yay-wholesale-b2b' ), esc_html( get_woocommerce_currency_symbol() ) ) );
+                                ?>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ( $wholesale_roles as $wholesale_role ) : ?>
+                            <tr class="ywhs_product_based_discount_rate_row">
+                                <td class="ywhs_product_based_discount_rate_role">
+                                    <?php echo ( esc_html( $wholesale_role['name'] ) ); ?>
+                                </td>
+                                <td class="ywhs_product_based_discount_rate">
+                                    <input
+                                        type="number"
+                                        id="ywhs_product_based_rate_<?php echo ( esc_html( $wholesale_role['slug'] ) ); ?>"
+                                        name="yay-wholesale-b2b[discount-rates-<?php echo ( esc_html( $index ) ); ?>][<?php echo ( esc_html( $wholesale_role['slug'] ) ); ?>]"
+                                        placeholder="<?php esc_attr_e( 'Auto', 'yay-wholesale-b2b' ); ?>"
+                                        value=<?php echo ( esc_html( $product_based_discounts['discount_rate'][ $wholesale_role['slug'] ] ?? '' ) ); ?>
+                                        step="0.01"
+                                        min="0"
+                                        max="100" />
+                                    %
+                                </td>
+                                <td class="ywhs_product_based_discount_fixed">
+                                    <input
+                                        type="number"
+                                        id="ywhs_product_based_rate_<?php echo ( esc_html( $wholesale_role['slug'] ) ); ?>"
+                                        name="yay-wholesale-b2b[discount-fixed-<?php echo ( esc_html( $index ) ); ?>][<?php echo ( esc_html( $wholesale_role['slug'] ) ); ?>]"
+                                        placeholder="<?php esc_attr_e( 'Auto', 'yay-wholesale-b2b' ); ?>"
+                                        value=<?php echo ( esc_html( $product_based_discounts['discount_fixed'][ $wholesale_role['slug'] ] ?? '' ) ); ?>
+                                        step="0.01"
+                                        min="0" />
+                                    <?php echo ( esc_html( get_woocommerce_currency_symbol() ) ); ?>
+                                </td>
+                            </tr>
+                        <?php endforeach ?>
+                    </tbody>
+                </table>
             </div>
             <input type="hidden" name="ywhs-product-based-discount-nonce" value="<?php echo esc_attr( $custom_discounts_nonce ); ?>" />
         </div>

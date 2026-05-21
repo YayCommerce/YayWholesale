@@ -53,15 +53,15 @@ class ProductPricingHelper {
         $data = [];
         if ( empty( $role_config ) ) {
             $role_config = CustomerHelper::get_current_user_wholesale_role();
+        }
 
-            if ( empty( $role_config ) ) {
-                $data = [];
-            } else {
-                $data = [
-                    'wholesale_discount_type'  => 'rate',
-                    'wholesale_discount_value' => $role_config['discount'],
-                ];
-            }
+        if ( empty( $role_config ) ) {
+            $data = [];
+        } else {
+            $data = [
+                'wholesale_discount_type'  => 'rate',
+                'wholesale_discount_value' => $role_config['discount'],
+            ];
         }
 
         $data = apply_filters( 'ywhs_wholesale_discount_data', $data, $product, $role_config, $quantity );

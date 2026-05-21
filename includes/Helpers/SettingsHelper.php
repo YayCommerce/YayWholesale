@@ -12,22 +12,7 @@ class SettingsHelper {
 
     public static function get_settings(): array {
 
-        $settings = get_option( 'yaywholesaleb2b_settings', self::get_default_settings() );
-
-        // TODO: move to ActDeact::migration
-        if ( version_compare( YAYWHOLESALEB2B_VERSION, '1.0.6', '<=' ) ) {
-            $settings = self::add_input_name_for_fields( $settings );
-
-            if ( ! isset( $settings['general']['tax_display_mode'] ) ) {
-                $settings['general']['tax_display_mode'] = 'inherit';
-                update_option( 'yaywholesaleb2b_settings', $settings );
-            }
-
-            if ( ! isset( $settings['general']['wholesale_store_page'] ) ) {
-                $settings['general']['wholesale_store_page'] = 'inherit';
-                update_option( 'yaywholesaleb2b_settings', $settings );
-            }
-        }
+        $settings = array_replace_recursive( self::get_default_settings(), get_option( 'yaywholesaleb2b_settings', [] ) );
 
         return $settings;
     }
@@ -89,58 +74,6 @@ class SettingsHelper {
         return $wholesale_email_data;
     }
 
-    private static function add_input_name_for_fields( $setting ) {
-        $has_first_name       = false;
-        $has_last_name        = false;
-        $custom_field_counter = 0;
-
-        foreach ( $setting['registration_fields']['fields'] as &$field ) {
-            if ( isset( $field['inputName'] ) && ! empty( $field['inputName'] ) ) {
-                continue;
-            }
-            if ( ! $field['isDefault'] ) {
-                $field['inputName'] = 'custom_field_' . ( ++$custom_field_counter );
-            } else {
-                if ( 'email' === $field['type'] ) {
-                    $field['inputName'] = 'email_address';
-                    continue;
-                }
-
-                if ( 'textarea' === $field['type'] ) {
-                    $field['inputName'] = 'message';
-                    continue;
-                }
-
-                if ( str_contains( strtolower( $field['label'] ), __( 'first name', 'yay-wholesale-b2b' ) ) ) {
-                    $field['inputName'] = 'first_name';
-                    $has_first_name     = true;
-                    continue;
-                }
-
-                if ( str_contains( strtolower( $field['label'] ), __( 'last name', 'yay-wholesale-b2b' ) ) ) {
-                    $field['inputName'] = 'last_name';
-                    $has_last_name      = true;
-                    continue;
-                }
-
-                if ( ! $has_first_name ) {
-                    $field['inputName'] = 'first_name';
-                    $has_first_name     = true;
-                    continue;
-                }
-
-                if ( ! $has_last_name ) {
-                    $field['inputName'] = 'last_name';
-                    $has_last_name      = true;
-                    continue;
-                }
-            }//end if
-        }//end foreach
-
-        update_option( 'yaywholesaleb2b_settings', $setting );
-
-        return $setting;
-    }
 
     private static function get_default_settings(): array {
         return [

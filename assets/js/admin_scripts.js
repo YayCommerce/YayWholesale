@@ -17,19 +17,19 @@
   // Product-based behaviors
   function productBasedBehavioursSetting() {
     // Toggle the Inputs by Discount mode
-    $(".ywhs_product_based_discount_mode").each((index, el) => {
-      const input = $(el).find("input");
+    $(".ywhs-product-based-discount-rule").each((index, el) => {
+      const select = $(el).find("select");
       const inputs_container = $(el).siblings(
         ".ywhs_product_based_discount_inputs"
       );
-      if (input.is(":checked")) {
+      if (select.val() === "custom") {
         inputs_container.show();
       } else {
         inputs_container.hide();
       }
 
-      input.on("change", function () {
-        if ($(this).is(":checked")) {
+      select.on("change", function () {
+        if ($(this).val() === "custom") {
           inputs_container.slideDown(300);
         } else {
           inputs_container.slideUp(300);
@@ -92,9 +92,9 @@
 
   // Category-based behaviours
   function categoryBasedBehavioursSetting() {
-    const discountMode = $("#ywhs_category_based_discount_mode");
+    const discountMode = $("#ywhs_category_based_discount_rule");
     const discountRate = discountMode
-      .closest(".ywhs_category_based_discount_mode_wrapper")
+      .closest(".ywhs_category_based_discount_rule_wrapper")
       .siblings(".ywhs_category_based_discount_rates");
     const modeValue = discountMode.val();
     if (modeValue === "" || modeValue === "default") {

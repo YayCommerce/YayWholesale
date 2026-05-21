@@ -3,7 +3,6 @@ namespace YayWholesaleB2B\Engine\Frontend;
 
 use YayWholesaleB2B\Helpers\CustomerHelper;
 use YayWholesaleB2B\Helpers\PricingHelpers\OrderPricingHelper;
-use YayWholesaleB2B\Helpers\PricingHelpers\ProductPricingHelper;
 use YayWholesaleB2B\Utils\SingletonTrait;
 use YayWholesaleB2B\Helpers\SettingsHelper;
 use YayWholesaleB2B\Helpers\PricingHelpers\ShopPricingHelper;
@@ -49,6 +48,9 @@ class Pricing {
 
         $is_checking_mov = apply_filters( 'ywhs_is_force_checking_requirement', is_checkout() || Utils::is_checkout_blocks() );
         $role_config     = CustomerHelper::get_current_user_wholesale_role();
+        if ( ! isset( $role_config ) ) {
+            return;
+        }
 
         $is_discounted = true;
         if ( $is_checking_mov ) {
@@ -90,6 +92,9 @@ class Pricing {
 
         $cart_item_data = $cart_item['data'];
         $role_config    = CustomerHelper::get_current_user_wholesale_role();
+        if ( ! isset( $role_config ) ) {
+            return $price_html;
+        }
 
         $regular  = (float) $cart_item_data->get_regular_price();
         $quantity = $cart_item['quantity'];
@@ -146,6 +151,10 @@ class Pricing {
      * @return string The displayed HTML.
      */
     public function ywhs_display_wholesale_price_html( string $price_html, \WC_Product $product ) {
+        if ( is_admin() && ! wp_doing_ajax() ) {
+            return $price_html;
+        }
+
         $show_to_all                 = $this->settings['general']['show_wholesale_price'] ?? false;
         $display_mode                = $this->settings['display']['price_format'] ?? 'retail-and-wholesale';
         $current_user_wholesale_role = CustomerHelper::get_current_user_wholesale_role();
@@ -407,7 +416,6 @@ class Pricing {
     public function ywhs_checkout_wholesale_order_handling( $order_id, $posted_data, $order ) {
         $customer       = get_user_by( 'ID', $order->get_customer_id() );
         $wholesale_role = CustomerHelper::get_wholesale_role( $customer );
-
         if ( ! isset( $wholesale_role ) ) {
             return;
         }

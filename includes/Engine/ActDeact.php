@@ -1,6 +1,7 @@
 <?php
 namespace YayWholesaleB2B\Engine;
 
+use YayWholesaleB2B\Helpers\MigrationHelper;
 use YayWholesaleB2B\Helpers\RolesHelper;
 use YayWholesaleB2B\Helpers\SettingsHelper;
 
@@ -29,6 +30,7 @@ class ActDeact {
 
         // TODO: if activate network
         // TODO: add_input_name_for_fields
+        MigrationHelper::migrate_data();
 
         $setting         = SettingsHelper::get_settings();
         $wholesale_roles = RolesHelper::get_wholesale_roles();

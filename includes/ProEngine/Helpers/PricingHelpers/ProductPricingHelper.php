@@ -30,44 +30,43 @@ class ProductPricingHelper {
      */
     public static function handle_product_based_discount_data_from_post( $wholesale_roles, $post_data, $variation_index = null ) {
         $discount_data = [];
-        $prefix        = isset( $variation_index ) ? "_$variation_index" : '';
+        $prefix        = isset( $variation_index ) ? "-$variation_index" : '';
 
         // Discount mode: default (turn off) | custom (turn on)
-        if ( isset( $post_data[ "ywhs_discount_mode{$prefix}" ] ) ) {
-            $discount_data['discount_mode'] = $post_data[ "ywhs_discount_mode{$prefix}" ];
+        if ( isset( $post_data[ "discount-rule{$prefix}" ] ) ) {
+            $discount_data['discount_rule'] = $post_data[ "discount-rule{$prefix}" ];
         } else {
-            $discount_data['discount_mode'] = 'default';
+            $discount_data['discount_rule'] = 'default';
         }
 
         // Discount Rule: rate | fixed | tiers (incomming)
-        if ( isset( $post_data[ "ywhs_discount_rule{$prefix}" ] ) ) {
-            $discount_data['discount_rule'] = $post_data[ "ywhs_discount_rule{$prefix}" ];
+        if ( isset( $post_data[ "discount-type{$prefix}" ] ) ) {
+            $discount_data['discount_type'] = $post_data[ "discount-type{$prefix}" ];
         } else {
-            $discount_data['discount_mode'] = 'default';
-            $discount_data['discount_rule'] = 'fixed';
+            $discount_data['discount_rule'] = 'default';
+            $discount_data['discount_type'] = 'fixed';
         }
 
         foreach ( $wholesale_roles as $role ) {
-            $slug   = $role['slug'];
-            $prefix = isset( $variation_index ) ? "{$slug}_{$variation_index}" : $slug;
+            $slug = $role['slug'];
 
             // Fixed product based pricing
-            if ( ! empty( $post_data[ "ywhs_fixed_price_$prefix" ] ) ) {
-                $discount_fixed = $post_data[ "ywhs_fixed_price_$prefix" ];
+            if ( ! empty( $post_data[ "discount-fixed$prefix" ][ $slug ] ) ) {
+                $discount_fixed = $post_data[ "discount-fixed$prefix" ][ $slug ];
             } else {
                 $discount_fixed = '';
             }
 
             // Percentage product based pricing
-            if ( ! empty( $post_data[ "ywhs_rate_price_$prefix" ] ) ) {
-                $discount_rate = $post_data[ "ywhs_rate_price_$prefix" ];
+            if ( ! empty( $post_data[ "discount-rates$prefix" ][ $slug ] ) ) {
+                $discount_rate = $post_data[ "discount-rates$prefix" ][ $slug ];
             } else {
                 $discount_rate = '';
             }
 
             $discount_data['discount_fixed'][ $slug ] = $discount_fixed;
             $discount_data['discount_rate'][ $slug ]  = $discount_rate;
-        } //end foreach
+        }//end foreach
 
         return $discount_data;
     }
@@ -90,15 +89,19 @@ class ProductPricingHelper {
      * @return array | null
      */
     public static function get_product_based_discount( $product_id, $wholesale_role ) {
-        $product_based_discount_setting = get_post_meta( $product_id, self::PRODUCT_BASED_DISCOUNT_KEY, true );
-
-        if ( ! is_array( $product_based_discount_setting ) || ( isset( $product_based_discount_setting['discount_mode'] ) && 'default' === $product_based_discount_setting['discount_mode'] ) ) {
+        if ( ! isset( $wholesale_role ) ) {
             return false;
         }
 
-        $rule = $product_based_discount_setting['discount_rule'];
+        $product_based_discount_setting = get_post_meta( $product_id, self::PRODUCT_BASED_DISCOUNT_KEY, true );
 
-        switch ( $rule ) {
+        if ( ! is_array( $product_based_discount_setting ) || ( isset( $product_based_discount_setting['discount_rule'] ) && 'default' === $product_based_discount_setting['discount_rule'] ) ) {
+            return false;
+        }
+
+        $type = $product_based_discount_setting['discount_type'] ?? 'fixed';
+
+        switch ( $type ) {
             case 'fixed':
                 $product_based_discount = $product_based_discount_setting['discount_fixed'][ $wholesale_role['slug'] ];
                 break;
@@ -114,7 +117,7 @@ class ProductPricingHelper {
         }
 
         return [
-            'wholesale_discount_type'  => $rule,
+            'wholesale_discount_type'  => $type,
             'wholesale_discount_value' => (float) $product_based_discount,
         ];
     }

@@ -36,8 +36,12 @@ class YayExtra {
         $script_handle = 'yay-extra-compatible';
 
         $wholesale_role = CustomerHelper::get_current_user_wholesale_role();
-        $product_id     = get_the_ID();
-        $product        = wc_get_product( $product_id );
+        if ( ! isset( $wholesale_role ) ) {
+            return;
+        }
+
+        $product_id = get_the_ID();
+        $product    = wc_get_product( $product_id );
         if ( ! isset( $product ) ) {
             return;
         }

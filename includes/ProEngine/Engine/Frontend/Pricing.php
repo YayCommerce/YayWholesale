@@ -29,6 +29,9 @@ class Pricing {
      * @return float
      */
     public static function get_final_advanced_price( $discounted_price, $before_discounted_price, $product, $wholesale_role, $quantity = 1 ) {
+        if ( ! isset( $wholesale_role ) ) {
+            return $discounted_price;
+        }
 
         // Product based price
         $product_based_price = ProductPricingHelper::calculate_product_based_price( $before_discounted_price, $product->get_id(), $wholesale_role );
@@ -57,6 +60,10 @@ class Pricing {
      * @return array
      */
     public static function get_final_advanced_discount_data( $discount_data, $product, $wholesale_role, $quantity ) {
+        if ( ! isset( $wholesale_role ) ) {
+            return $discount_data;
+        }
+
         // Product based discount
         $product_based_discount = ProductPricingHelper::get_product_based_discount( $product->get_id(), $wholesale_role );
 

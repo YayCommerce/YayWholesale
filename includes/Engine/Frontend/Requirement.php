@@ -14,6 +14,11 @@ class Requirement {
     use SingletonTrait;
 
     protected function __construct() {
+
+        if ( ! CustomerHelper::is_current_wholesale_customer() ) {
+            return;
+        }
+
         // Hide checkout + place order buttons
         add_action( 'template_redirect', [ $this, 'remove_proceed_to_checkout_button' ], 999 );
         add_filter( 'woocommerce_order_button_html', [ $this, 'remove_checkout_buttons' ], 999, 1 );

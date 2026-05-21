@@ -20,18 +20,18 @@ class CategoryPricingHelper {
         $discount_data = [];
 
         // Discount mode: default (turn off) | custom (turn on)
-        if ( ! empty( $post_data['ywhs_category_based_discount_mode'] ) ) {
-            $discount_data['discount_mode'] = $post_data['ywhs_category_based_discount_mode'];
+        if ( ! empty( $post_data['discount-rule'] ) ) {
+            $discount_data['discount_rule'] = $post_data['discount-rule'];
         } else {
-            $discount_data['discount_mode'] = 'default';
+            $discount_data['discount_rule'] = 'default';
         }
 
         foreach ( $wholesale_roles as $role ) {
             $slug = $role['slug'];
 
             // Percentage category based pricing
-            if ( ! empty( $post_data[ "ywhs_category_based_rate_$slug" ] ) ) {
-                $discount_rate = $post_data[ "ywhs_category_based_rate_$slug" ];
+            if ( ! empty( $post_data['discount-rates'][ $slug ] ) ) {
+                $discount_rate = $post_data['discount-rates'][ $slug ];
             } else {
                 $discount_rate = '';
             }
@@ -60,6 +60,10 @@ class CategoryPricingHelper {
      * @return array | null
      */
     public static function get_category_based_discount( $product, $wholesale_role ) {
+        if ( ! isset( $wholesale_role ) ) {
+            return false;
+        }
+
         if ( is_int( $product ) ) {
             $product = wc_get_product( $product );
         }
@@ -68,9 +72,10 @@ class CategoryPricingHelper {
         $discounts    = [];
         foreach ( $category_ids as $cat_id ) {
             $cat_discount = get_term_meta( $cat_id, self::CATEGORY_BASED_DISCOUNT_KEY, true );
+            $rule         = $cat_discount['discount_rule'] ?? 'default';
 
             if ( $cat_discount &&
-                'custom' === $cat_discount['discount_mode'] &&
+                'custom' === $rule &&
                 ! empty( $cat_discount['discount_rate'][ $wholesale_role['slug'] ] ) ) {
                 $discounts[ $cat_id ] = $cat_discount['discount_rate'][ $wholesale_role['slug'] ];
                 continue;
@@ -80,10 +85,11 @@ class CategoryPricingHelper {
 
             foreach ( $ancestor_cat_ids as $ancestor_cat_id ) {
                 $cat_discount = get_term_meta( $ancestor_cat_id, self::CATEGORY_BASED_DISCOUNT_KEY, true );
+                $rule         = $cat_discount['discount_rule'] ?? 'default';
 
                 // only take discount from the first parent has discount
                 if ( $cat_discount &&
-                    'custom' === $cat_discount['discount_mode'] &&
+                    'custom' === $rule &&
                     ! empty( $cat_discount['discount_rate'][ $wholesale_role['slug'] ] )
                 ) {
                     $discounts[ $cat_id ] = $cat_discount['discount_rate'][ $wholesale_role['slug'] ];

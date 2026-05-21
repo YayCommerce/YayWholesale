@@ -51,8 +51,15 @@ class CategoryBasedPricing {
             return false;
         }
 
+        if ( empty( $_POST['yay-wholesale-b2b'] ) ) {
+            return false;
+        }
+
+        // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+        $post_data = wp_unslash( $_POST['yay-wholesale-b2b'] );
+
         $wholesale_roles      = RolesHelper::get_wholesale_roles();
-        $custom_discount_data = CategoryPricingHelper::handle_category_based_discount_data_from_post( $wholesale_roles, $_POST );
+        $custom_discount_data = CategoryPricingHelper::handle_category_based_discount_data_from_post( $wholesale_roles, $post_data );
 
         if ( empty( $custom_discount_data ) ) {
             return false;

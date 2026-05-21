@@ -373,8 +373,8 @@ class YayCurrency {
         $wholesale_extra = ShopPricingHelper::get_wholesale_extra_price_from_cart_item( $cart_item, $role_config );
 
         $wholesale_data  = ProductPricingHelper::get_product_wholesale_discount_data( $cart_item['data'], $role_config, $cart_item['quantity'] );
-        $wholesale_type  = $wholesale_data['wholesale_discount_type'];
-        $wholesale_value = $wholesale_data['wholesale_discount_value'];
+        $wholesale_type  = $wholesale_data['wholesale_discount_type'] ?? '';
+        $wholesale_value = $wholesale_data['wholesale_discount_value'] ?? '';
 
         $discount_price = -1;
         if ( $this->is_has_yaycurrency_fixed_price( $wholesale_price, $cart_item['data'], $currency, false ) && $wholesale_type === 'rate' ) {
