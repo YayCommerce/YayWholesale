@@ -7,8 +7,9 @@ import { __ } from '@wordpress/i18n';
 
 import { useActiveRolesQuery } from '@/lib/queries/roles.queries';
 import { RoleRelatedSetting, Settings } from '@/lib/schema/settings.schema';
-import { cn } from '@/lib/utils';
+import { cn, isPro } from '@/lib/utils';
 import { useUncontrolled } from '@/hooks/useUncontrolled';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
   ComboboxBadge,
@@ -77,7 +78,41 @@ export default function PaymentRolesTab() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {fields.length > 0 ? (
+            {!isPro ? (
+              <TableRow>
+                <TableCell colSpan={2} className="h-24 text-center">
+                  <Empty className="my-5">
+                    <EmptyHeader>
+                      <EmptyMedia variant="icon" className="h-15 w-15 rounded-full">
+                        <WalletCards className="min-h-6 min-w-6" />
+                      </EmptyMedia>
+                      <EmptyTitle className="flex items-center gap-1.5 font-bold">
+                        {__('Yay Wholesale B2B', 'yay-wholesale-b2b')}
+                        {!isPro && (
+                          <Badge variant="warning" className="text-white">
+                            {__('Pro', 'yay-wholesale-b2b')}
+                          </Badge>
+                        )}
+                      </EmptyTitle>
+                      <EmptyDescription>
+                        {__('Upgrade to PRO to unlock this feature now', 'yay-wholesale-b2b')}
+                      </EmptyDescription>
+                      <EmptyContent>
+                        <Button
+                          variant="warning"
+                          className="text-white"
+                          onClick={() => {
+                            window.open('https://yaycommerce.com/yay-wholesale-b2b-for-woocommerce/');
+                          }}
+                        >
+                          {__('Upgrade', 'yay-wholesale-b2b')}
+                        </Button>
+                      </EmptyContent>
+                    </EmptyHeader>
+                  </Empty>
+                </TableCell>
+              </TableRow>
+            ) : fields.length > 0 ? (
               fields.map((setting, index) => {
                 const onSettingChange = async (value: RoleRelatedSetting[]) => {
                   const updated = { ...fields[index] };

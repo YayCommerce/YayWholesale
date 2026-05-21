@@ -110,10 +110,15 @@ class Orders {
 
         $is_discounted = RequirementHelper::is_order_meet_requirement( $order, $wholesale_role );
         if ( $is_discounted && $is_disabled_tax ) {
+            $order->update_meta_data( 'is_vat_exempt', 'yes' );
+            $order->save_meta_data();
             return true;
         }
 
-        return $is_exempt;
+        $order->update_meta_data( 'is_vat_exempt', 'no' );
+        $order->save_meta_data();
+
+        return false;
     }
 
     /**

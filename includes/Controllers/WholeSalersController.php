@@ -50,10 +50,10 @@ class WholeSalersController extends BaseRestController {
     }
 
     public function get_wholesalers( WP_REST_Request $request ) {
-        $page      = intval( $request->get_param( 'page' ) || 1 );
-        $per_page  = intval( $request->get_param( 'per_page' ) || 10 );
-        $search    = sanitize_text_field( $request->get_param( 'search' ) || '' );
-        $role_slug = sanitize_text_field( $request->get_param( 'role_slug' ) || '' );
+        $page      = intval( $request->get_param( 'page' ) ?? 1 );
+        $per_page  = intval( $request->get_param( 'per_page' ) ?? 10 );
+        $search    = sanitize_text_field( $request->get_param( 'search' ) ?? '' );
+        $role_slug = sanitize_text_field( $request->get_param( 'role_slug' ) ?? '' );
 
         $response = WholeSalersHelper::get_paginated_wholesalers_list( $search, $page, $per_page, $role_slug );
         return $response;

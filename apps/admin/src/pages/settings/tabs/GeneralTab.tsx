@@ -4,7 +4,8 @@ import { __ } from '@wordpress/i18n';
 
 import { useActiveRolesQuery } from '@/lib/queries/roles.queries';
 import type { Settings } from '@/lib/schema/settings.schema';
-import { getPagesForWholesaleStore } from '@/lib/utils';
+import { getPagesForWholesaleStore, isPro } from '@/lib/utils';
+import { Badge } from '@/components/ui/badge';
 import { Field, FieldContent, FieldError, FieldLabel } from '@/components/ui/field';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
@@ -63,14 +64,19 @@ export default function GeneralTab() {
         render={({ field }) => (
           <div className="flex items-center justify-between rounded-md border p-4">
             <div>
-              <h2 className="text-foreground-400 text-sm leading-3.5 font-medium">
+              <h2 className="text-foreground-400 flex items-center gap-2 text-sm leading-3.5 font-medium">
                 {__('Wholesale Shop Page', 'yay-wholesale-b2b')}
+                {!isPro && (
+                  <Badge variant="warning" className="text-white">
+                    {__('Pro', 'yay-wholesale-b2b')}
+                  </Badge>
+                )}
               </h2>
               <p className="text-muted-foreground mt-2 text-xs font-normal">
                 {__('Set your wholesale shop page for wholesaler logged in', 'yay-wholesale-b2b')}
               </p>
             </div>
-            <Select value={String(field.value) ?? 'inherit'} onValueChange={field.onChange}>
+            <Select value={String(field.value) ?? 'inherit'} onValueChange={field.onChange} disabled={!isPro}>
               <SelectTrigger className="w-fit min-w-40 text-sm font-normal">
                 <SelectValue placeholder={__('Select your page', 'yay-wholesale-b2b')} />
               </SelectTrigger>
@@ -153,14 +159,19 @@ export default function GeneralTab() {
         render={({ field }) => (
           <div className="flex items-center justify-between gap-5 rounded-md border p-4">
             <div>
-              <h2 className="text-foreground-400 text-sm leading-3.5 font-medium">
+              <h2 className="text-foreground-400 flex items-center gap-2 text-sm leading-3.5 font-medium">
                 {__('Display prices in the shop', 'yay-wholesale-b2b')}
+                {!isPro && (
+                  <Badge variant="warning" className="text-white">
+                    {__('Pro', 'yay-wholesale-b2b')}
+                  </Badge>
+                )}
               </h2>
               <p className="text-muted-foreground mt-2 text-xs font-normal">
                 {__('Display product prices Including or Excluding tax for wholesalers in shop', 'yay-wholesale-b2b')}
               </p>
             </div>
-            <Select value={field.value ? field.value : 'inherit'} onValueChange={field.onChange}>
+            <Select value={field.value ? field.value : 'inherit'} onValueChange={field.onChange} disabled={!isPro}>
               <SelectTrigger className="min-w-20 text-sm font-normal sm:min-w-40">
                 <SelectValue placeholder={__('Select the display mode', 'yay-wholesale-b2b')} />
               </SelectTrigger>

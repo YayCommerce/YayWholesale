@@ -1,4 +1,5 @@
 <?php
+
 namespace YayWholesaleB2B\Engine\Frontend;
 
 use YayWholesaleB2B\Helpers\CustomerHelper;
@@ -11,6 +12,7 @@ defined( 'ABSPATH' ) || exit;
  * Requirement Progress feature
  */
 class Requirement {
+
     use SingletonTrait;
 
     protected function __construct() {
@@ -23,7 +25,7 @@ class Requirement {
         add_action( 'template_redirect', [ $this, 'remove_proceed_to_checkout_button' ], 999 );
         add_filter( 'woocommerce_order_button_html', [ $this, 'remove_checkout_buttons' ], 999, 1 );
         add_filter( 'render_block_woocommerce/mini-cart-checkout-button-block', [ $this, 'remove_checkout_buttons' ], 999, 1 );
-        add_action( 'wp_enqueue_scripts', [ $this, 'enqueue_checkout_hide_css' ], 999 );
+        // add_action( 'wp_enqueue_scripts', [ $this, 'enqueue_checkout_hide_css' ], 999 );
         add_action( 'wp_enqueue_scripts', [ $this, 'enqueue_yay_wholesale_toggle_checkout' ], 999 );
     }
 
@@ -69,6 +71,7 @@ class Requirement {
             [
                 '.wp-block-woocommerce-proceed-to-checkout-block',
                 'a.checkout',
+                '.wc-block-components-checkout-place-order-button',
             ]
         );
 
@@ -76,10 +79,6 @@ class Requirement {
 
         $css = "
         {$selector_string} {
-            display: none;
-        }
-
-        .wc-block-components-checkout-place-order-button {
             visibility: hidden;
         }
     ";
@@ -94,42 +93,39 @@ class Requirement {
      * Enqueue the toggle-checkout-buttons script by the cart and requirement
      */
     public function enqueue_yay_wholesale_toggle_checkout() {
-        if ( ( function_exists( 'is_checkout' ) && is_checkout() ) ||
-            ( function_exists( 'is_cart' ) && is_cart() ) ) {
-            $wholesale = CustomerHelper::get_current_user_wholesale_role();
-            $slug      = 'ywhs_wholesale_checkout';
+        $wholesale = CustomerHelper::get_current_user_wholesale_role();
+        $slug      = 'ywhs_wholesale_checkout';
 
-            // Enqueue the toggle-behavior script
-            wp_enqueue_script(
-                $slug,
-                YAYWHOLESALEB2B_PLUGIN_URL . 'assets/js/wholesale-toggle-checkout.js',
-                [ 'wp-data' ],
-                YAYWHOLESALEB2B_VERSION,
-                true
-            );
+        // Enqueue the toggle-behavior script
+        wp_enqueue_script(
+            $slug,
+            YAYWHOLESALEB2B_PLUGIN_URL . 'assets/js/wholesale-toggle-checkout.js',
+            [ 'wp-data' ],
+            YAYWHOLESALEB2B_VERSION,
+            true
+        );
 
-            // Get the original price map to check if it meet the requirments
-            $price_map = [];
-            $cart      = WC()->cart->get_cart();
+        // Get the original price map to check if it meet the requirments
+        $price_map = [];
+        $cart      = WC()->cart->get_cart();
 
-            foreach ( $cart as $cart_item_key => $cart_item ) {
-                $product                     = wc_get_product( $cart_item['data']->get_id() );
-                $price_map[ $cart_item_key ] = wc_get_price_excluding_tax( $product );
-            }
+        foreach ( $cart as $cart_item_key => $cart_item ) {
+            $product                     = wc_get_product( $cart_item['data']->get_id() );
+            $price_map[ $cart_item_key ] = wc_get_price_excluding_tax( $product );
+        }
 
-            $wholesale['minOrderQuantity'] = RequirementHelper::get_min_order_quantity( $wholesale );
-            $wholesale['minOrderAmount']   = RequirementHelper::get_min_order_amount( $wholesale );
+        $wholesale['minOrderQuantity'] = RequirementHelper::get_min_order_quantity( $wholesale );
+        $wholesale['minOrderAmount']   = RequirementHelper::get_min_order_amount( $wholesale );
 
-            // Localize script
-            wp_localize_script(
-                $slug,
-                'ywhsToggleCheckout',
-                [
-                    'wholesale'        => $wholesale,
-                    'priceMap'         => $price_map,
-                    'checkoutElements' => apply_filters( 'ywhs_checkout_query_selector', [] ),
-                ]
-            );
-        }//end if
+        // Localize script
+        wp_localize_script(
+            $slug,
+            'ywhsToggleCheckout',
+            [
+                'wholesale'        => $wholesale,
+                'priceMap'         => $price_map,
+                'checkoutElements' => apply_filters( 'ywhs_checkout_query_selector', [] ),
+            ]
+        );
     }
 }
