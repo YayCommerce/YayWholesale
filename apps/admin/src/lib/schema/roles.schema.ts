@@ -19,6 +19,21 @@ export const roleSchema = z.object({
   status: z.boolean(),
 });
 
+// TODO v1.1
+const paymentMethodSettingByRoleSchema = z.object({
+  enabled: z.enum(['enable-all', 'enable-selected-methods']),
+  selected_methods: z.array(z.string()), // method_id
+});
+const shippingMethodSettingByRoleSchema = z.object({
+  enabled: z.enum(['enable-all', 'enable-selected-methods']),
+  selected_methods: z.array(z.string()), // method_id
+});
+const roleFormSchema = z.object({
+  role: roleSchema,
+  paymentMethods: z.array(paymentMethodSettingByRoleSchema).optional(),
+  shippingMethods: z.array(shippingMethodSettingByRoleSchema).optional(),
+});
+
 export type RoleFormValues = z.infer<typeof roleSchema>;
 
 export type Role = RoleFormValues & {

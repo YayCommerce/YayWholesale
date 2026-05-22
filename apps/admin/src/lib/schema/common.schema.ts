@@ -1,10 +1,10 @@
 import { z } from 'zod';
 
-// TODO: apply to payment method, shipping method
+// TODO v1.1: apply to payment method, shipping method
 const enableByRoleSchema = z.object({
   retailers: z.enum(['enabled', 'disabled']),
-  wholesalers: z.enum(['enabled', 'disabled', 'disabled-specific-roles']),
-  disabled_specific_roles: z.array(z.string()), // RoleSlug[]
+  wholesalers: z.enum(['enabled', 'disabled', 'enabled-selected-roles']),
+  selected_roles: z.array(z.string()), // RoleSlug[]
 });
 
 type EnableByRole = z.infer<typeof enableByRoleSchema>;
