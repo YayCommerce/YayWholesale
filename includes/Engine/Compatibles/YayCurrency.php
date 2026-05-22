@@ -31,8 +31,7 @@ class YayCurrency {
             return;
         }
 
-        $this->apply_currency    = YayCurrencyHelper::detect_current_currency();
-        $this->is_handling_price = false;
+        $this->apply_currency = YayCurrencyHelper::detect_current_currency();
 
         // YayWholesale Hooks
         add_filter( 'ywhs_price_handle_processed', [ $this, 'convert_currency_price' ], 10, 3 );
@@ -397,7 +396,7 @@ class YayCurrency {
 
     public function product_addons_set_cart_contents( $cart_contents, $cart_item_key, $cart_item, $apply_currency ) {
         $role_config     = CustomerHelper::get_current_user_wholesale_role();
-        $wholesale_price = ProductPricingHelper::get_wholesale_price( $cart_item['data'], $role_config, $cart_item['quantity'] );
+        $wholesale_price = ProductPricingHelper::get_wholesale_price( wc_get_product( $cart_item['data']->get_id() ), $role_config, $cart_item['quantity'] );
         $wholesale_extra = ShopPricingHelper::get_wholesale_extra_price_from_cart_item( $cart_item, $role_config );
 
         $discount_price = $this->handle_wholesale_price_by_currency( $cart_item, $apply_currency );

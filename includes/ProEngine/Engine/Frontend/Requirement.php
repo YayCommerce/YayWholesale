@@ -49,8 +49,8 @@ class Requirement {
         $min_order_quantity = RequirementHelper::get_min_order_quantity( $wholesale );
         $min_order_amount   = RequirementHelper::get_min_order_amount( $wholesale );
 
-        $is_hidden_quantity = 0 === $min_order_quantity;
-        $is_hidden_amount   = 0.0 === $min_order_amount;
+        $is_hidden_quantity = 0.0 === (float) $min_order_quantity;
+        $is_hidden_amount   = 0.0 === (float) $min_order_amount;
 
         // if ( $is_hidden_quantity && $is_hidden_amount ) {
         // return;

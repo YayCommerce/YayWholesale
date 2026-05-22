@@ -107,6 +107,7 @@ export default function RolesList() {
         roleSlugs,
         status,
       });
+      table.resetRowSelection();
     } catch (error) {
       toast.error(await getErrorMsg(error));
     }

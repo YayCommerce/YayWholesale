@@ -60,6 +60,15 @@ body.yay-ui {
   z-index: 100 !important;
 }
 
+.notice,
+.notice-info,
+.notice-warning,
+.notice-error,
+.notice-success,
+.error,
+.success,
+.info,
+.warning,
 #screen-meta,
 #screen-meta-links {
   display: none !important;

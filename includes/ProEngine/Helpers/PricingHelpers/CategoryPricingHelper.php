@@ -68,6 +68,14 @@ class CategoryPricingHelper {
             $product = wc_get_product( $product );
         }
 
+        // If this is a variant product then use parent product's categories
+        if ( $product->get_type() === 'variation' ) {
+            $parent_id = $product->get_parent_id();
+            if ( ! empty( $parent_id ) ) {
+                $product = wc_get_product( $parent_id );
+            }
+        }
+
         $category_ids = $product->get_category_ids();
         $discounts    = [];
         foreach ( $category_ids as $cat_id ) {

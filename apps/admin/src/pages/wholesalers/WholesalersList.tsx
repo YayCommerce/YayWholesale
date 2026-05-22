@@ -93,6 +93,7 @@ export function WholesalersList() {
     if (userIds.length === 0 || isMutating > 0) return;
 
     try {
+      table.resetRowSelection();
       await bulkUpdateWholesalersRoleMutation.mutateAsync({
         userIds,
         roleSlug,

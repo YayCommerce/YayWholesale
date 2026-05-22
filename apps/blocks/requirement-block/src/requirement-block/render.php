@@ -20,8 +20,8 @@ $ywhs_wholesale = CustomerHelper::get_current_user_wholesale_role();
 $ywhs_wholesale['minOrderQuantity'] = $ywhs_wholesale === null ? 0 : RequirementHelper::get_min_order_quantity($ywhs_wholesale);
 $ywhs_wholesale['minOrderAmount'] = $ywhs_wholesale === null ? 0 : RequirementHelper::get_min_order_amount($ywhs_wholesale);
 
-$is_hidden_quantity = 0 === $ywhs_wholesale['minOrderQuantity'];
-$is_hidden_amount   = 0.0 == $ywhs_wholesale['minOrderAmount'];
+$is_hidden_quantity = 0.0 === (float) $ywhs_wholesale['minOrderQuantity'];
+$is_hidden_amount   = 0.0 == (float) $ywhs_wholesale['minOrderAmount'];
 
 wp_interactivity_config(
   'ywhs_wholesale_requirement',
