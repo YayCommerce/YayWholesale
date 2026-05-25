@@ -41,9 +41,9 @@ export function countRolesUser() {
 
 // TODO v1.2: add API
 export function getPromotionRule() {
-  return api.get('roles/promotion').json<PromotionRules>();
+  return api.get('roles/promotion-rules').json<PromotionRules>();
 }
 
 export function updatePromotionRule(data: PromotionRules) {
-  return api.put('roles/promotion', { json: data }).json<{ promotionRules: PromotionRules; roles: Role[] }>();
+  return api.put('roles/promotion-rules', { json: data }).json<{ promotionRules: PromotionRules; roles: Role[] }>();
 }
