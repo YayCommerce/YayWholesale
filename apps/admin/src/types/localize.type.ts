@@ -23,6 +23,10 @@ export type Meta = {
 
     version: string;
     reviewed: boolean;
+
+    experimentals: {
+      wholesale_store_page: boolean;
+    };
   };
   wcMeta: {
     ordersUrl: {
