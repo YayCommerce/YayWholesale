@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export const promotionSchema = z.object({
+export const promotionRulesSchema = z.object({
   enableAutoPromotion: z.boolean(),
   enablePromotionFromRetailers: z.boolean(),
 
@@ -15,4 +15,4 @@ export const promotionSchema = z.object({
   ),
 });
 
-export type PromotionSettings = z.infer<typeof promotionSchema>;
+export type PromotionRules = z.infer<typeof promotionRulesSchema>;
