@@ -83,7 +83,7 @@ export function EditRequestForm({ request }: { request: Request }) {
       <SheetHeader>
         <div className="flex items-start justify-between gap-2.5">
           <div>
-            <SheetTitle className="text-foreground flex items-center gap-2 text-[18px] font-semibold">
+            <SheetTitle className="flex items-center gap-2">
               {request.name}
               {request.status !== 'approved' && (
                 <WholeSaleToolTip
@@ -97,7 +97,7 @@ export function EditRequestForm({ request }: { request: Request }) {
                 />
               )}
             </SheetTitle>
-            <SheetDescription className="text-muted-foreground mt-[4px] text-sm leading-[20px] font-normal">
+            <SheetDescription className="mt-[4px] leading-[20px]">
               {__("Use the button below to approve or reject this user's wholesale user request", 'yay-wholesale-b2b')}
             </SheetDescription>
           </div>

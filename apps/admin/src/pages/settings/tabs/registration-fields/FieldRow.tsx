@@ -100,8 +100,8 @@ export function FieldRow({
             control={control}
             name={`registration_fields.fields.${index}.label`}
             render={({ field, fieldState }) => (
-              <Field className="flex w-full flex-col gap-1.5">
-                <FieldLabel className="text-foreground-400 text-xs font-medium">
+              <Field>
+                <FieldLabel>
                   {__('Label', 'yay-wholesale-b2b')}
                   {isRequired && <div className="text-destructive">*</div>}
                 </FieldLabel>
@@ -112,7 +112,6 @@ export function FieldRow({
                     value={field.value}
                     onChange={field.onChange}
                     aria-invalid={fieldState.invalid}
-                    className="h-9 w-full"
                     disabled={isHidden}
                   />
                 </FieldContent>
@@ -136,22 +135,20 @@ export function FieldRow({
             control={control}
             name={`registration_fields.fields.${index}.type`}
             render={({ field }) => (
-              <Field className="flex w-full flex-col gap-1.5">
-                <FieldLabel className="text-foreground-400 text-xs font-medium">
-                  {__('Type', 'yay-wholesale-b2b')}
-                </FieldLabel>
+              <Field>
+                <FieldLabel>{__('Type', 'yay-wholesale-b2b')}</FieldLabel>
                 <FieldContent>
                   <Select value={field.value} onValueChange={field.onChange} disabled={isDefault || isHidden}>
-                    <SelectTrigger className="bg-background h-9 w-full rounded-sm text-sm font-normal disabled:cursor-default">
-                      <SelectValue placeholder="Select an option" />
+                    <SelectTrigger className="w-full rounded-sm">
+                      <SelectValue placeholder={__('Select an option', 'yay-wholesale-b2b')} />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="text">Text</SelectItem>
-                      <SelectItem value="email">Email</SelectItem>
-                      <SelectItem value="number">Number</SelectItem>
-                      <SelectItem value="phone">Phone</SelectItem>
-                      <SelectItem value="date">Date</SelectItem>
-                      <SelectItem value="textarea">Textarea</SelectItem>
+                      <SelectItem value="text">{__('Text', 'yay-wholesale-b2b')}</SelectItem>
+                      <SelectItem value="email">{__('Email', 'yay-wholesale-b2b')}</SelectItem>
+                      <SelectItem value="number">{__('Number', 'yay-wholesale-b2b')}</SelectItem>
+                      <SelectItem value="phone">{__('Phone', 'yay-wholesale-b2b')}</SelectItem>
+                      <SelectItem value="date">{__('Date', 'yay-wholesale-b2b')}</SelectItem>
+                      <SelectItem value="textarea">{__('Textarea', 'yay-wholesale-b2b')}</SelectItem>
                       {/* <SelectItem value="select">Select</SelectItem> */}
                     </SelectContent>
                   </Select>
@@ -167,16 +164,13 @@ export function FieldRow({
             control={control}
             name={`registration_fields.fields.${index}.placeholder`}
             render={({ field }) => (
-              <Field className="flex w-full flex-col gap-1.5">
-                <FieldLabel className="text-foreground-400 text-xs font-medium">
-                  {__('Placeholder', 'yay-wholesale-b2b')}
-                </FieldLabel>
+              <Field>
+                <FieldLabel>{__('Placeholder', 'yay-wholesale-b2b')}</FieldLabel>
                 <FieldContent>
                   <Input
                     placeholder="Enter placeholder"
                     value={field.value}
                     onChange={field.onChange}
-                    className="bg-background h-9 w-full"
                     disabled={isHidden}
                   />
                 </FieldContent>
@@ -191,13 +185,11 @@ export function FieldRow({
             control={control}
             name={`registration_fields.fields.${index}.columnWidth`}
             render={({ field }) => (
-              <Field className="flex w-full flex-col gap-1.5">
-                <FieldLabel className="text-foreground-400 text-xs font-medium">
-                  {__('Column Width', 'yay-wholesale-b2b')}
-                </FieldLabel>
+              <Field>
+                <FieldLabel>{__('Column Width', 'yay-wholesale-b2b')}</FieldLabel>
                 <FieldContent>
                   <ToggleGroup
-                    className="border-border flex h-9 w-full gap-0.75 rounded-[8px] border bg-white p-[3px]"
+                    className="border-border h-9 w-full gap-0.75 border bg-white p-0.75"
                     type="single"
                     value={field.value}
                     onValueChange={(val) => {
@@ -205,12 +197,8 @@ export function FieldRow({
                     }}
                     disabled={isHidden}
                   >
-                    <ToggleGroupItem className="size-xs rounded-[6px]" value="50%">
-                      50%
-                    </ToggleGroupItem>
-                    <ToggleGroupItem className="size-xs rounded-[6px]" value="100%">
-                      100%
-                    </ToggleGroupItem>
+                    <ToggleGroupItem value="50%">50%</ToggleGroupItem>
+                    <ToggleGroupItem value="100%">100%</ToggleGroupItem>
                   </ToggleGroup>
                 </FieldContent>
               </Field>
@@ -236,7 +224,7 @@ export function FieldRow({
                   <div className="flex items-center justify-between p-2">
                     <Label>{__('Set as required', 'yay-wholesale-b2b')}</Label>
                     <Switch
-                      className="translate-y-0.5 scale-70"
+                      className="scale-70"
                       checked={field.value}
                       onCheckedChange={field.onChange}
                       disabled={isHidden}
@@ -245,7 +233,7 @@ export function FieldRow({
                 )}
               />
             </DropdownMenuGroup>
-            <DropdownMenuSeparator className="mx-0.25 mt-1" />
+            <DropdownMenuSeparator className="mx-0.25" />
             <DropdownMenuGroup>
               <DropdownMenuItem onClick={append} disabled={isHidden} className="mt-1">
                 <CirclePlus />
@@ -276,7 +264,7 @@ export function FieldRow({
                 )}
               />
             </DropdownMenuGroup>
-            <DropdownMenuSeparator className="mx-0.25 mt-1" />
+            <DropdownMenuSeparator className="mx-0.25" />
             <DropdownMenuGroup>
               <DropdownMenuItem
                 variant="destructive"
