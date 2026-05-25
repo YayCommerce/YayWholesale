@@ -1,6 +1,8 @@
 import { z } from 'zod';
 import { __ } from '@wordpress/i18n';
 
+import { enableByRoleSchema } from './common.schema';
+
 const fieldSchema = z.object({
   id: z.string(),
   label: z
@@ -18,6 +20,17 @@ const fieldSchema = z.object({
   isDefault: z.boolean(),
   isRequired: z.boolean(),
   isHidden: z.boolean(),
+});
+
+// TODO v1.1: update settings schema. move title, description to wcMeta
+const nextPaymentMethodSettingSchema = z.object({
+  method_id: z.string(),
+  enable_by_role: enableByRoleSchema,
+});
+const nextShippingMethodSettingSchema = z.object({
+  instance_id: z.number(),
+  method_id: z.string(),
+  enable_by_role: enableByRoleSchema,
 });
 
 const roleRelatedSettingSchema = z.object({
