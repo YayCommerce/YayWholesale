@@ -8,8 +8,8 @@
     "test:single": "playwright test --project=test_single",
     "test:multi": "playwright test --project=test_multisite",
     "test:ui": "playwright test --ui",
-    "env:start:single": "wp-env start --config=.wp-env.single.json && wp-env run tests --config=.wp-env.single.json wp user update admin --user_pass=1",
-    "env:start:multi": "wp-env start --config=.wp-env.multisite.json && wp-env run tests --config=.wp-env.multisite.json wp user update admin --user_pass=1",
+    "env:start:single": "wp-env start --config=.wp-env.single.json",
+    "env:start:multi": "wp-env start --config=.wp-env.multisite.json",
     "env:stop:single": "wp-env stop --config=.wp-env.single.json",
     "env:stop:multi": "wp-env stop --config=.wp-env.multisite.json",
     "env:clean": "wp-env clean --config=.wp-env.single.json && wp-env clean --config=.wp-env.multisite.json"
