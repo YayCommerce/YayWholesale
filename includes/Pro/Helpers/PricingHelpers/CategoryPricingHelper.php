@@ -1,6 +1,6 @@
 <?php
 
-namespace YayWholesaleB2B\ProEngine\Helpers\PricingHelpers;
+namespace YayWholesaleB2B\Pro\Helpers\PricingHelpers;
 
 /**
  * Category Based Pricing Helper

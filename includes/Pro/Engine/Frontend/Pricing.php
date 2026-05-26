@@ -1,8 +1,8 @@
 <?php
-namespace YayWholesaleB2B\ProEngine\Engine\Frontend;
+namespace YayWholesaleB2B\Pro\Engine\Frontend;
 
-use YayWholesaleB2B\ProEngine\Helpers\PricingHelpers\CategoryPricingHelper;
-use YayWholesaleB2B\ProEngine\Helpers\PricingHelpers\ProductPricingHelper;
+use YayWholesaleB2B\Pro\Helpers\PricingHelpers\CategoryPricingHelper;
+use YayWholesaleB2B\Pro\Helpers\PricingHelpers\ProductPricingHelper;
 use YayWholesaleB2B\Utils\SingletonTrait;
 
 defined( 'ABSPATH' ) || exit;

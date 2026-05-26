@@ -1,8 +1,8 @@
 <?php
-namespace YayWholesaleB2B\ProEngine\Engine\Admin;
+namespace YayWholesaleB2B\Pro\Engine\Admin;
 
 use YayWholesaleB2B\Helpers\RolesHelper;
-use YayWholesaleB2B\ProEngine\Helpers\PricingHelpers\ProductPricingHelper;
+use YayWholesaleB2B\Pro\Helpers\PricingHelpers\ProductPricingHelper;
 use YayWholesaleB2B\Utils\SingletonTrait;
 
 defined( 'ABSPATH' ) || exit;
@@ -30,7 +30,7 @@ class ProductBasedPricing {
         global $product_object;
         $allow_product_types = ProductPricingHelper::get_allowed_product_types_for_display_setting();
         if ( in_array( $product_object->get_type(), $allow_product_types, true ) ) {
-            require YAYWHOLESALEB2B_PLUGIN_DIR . 'includes/ProEngine/Templates/custom-fixed-discounts/simple-product.php';
+            require YAYWHOLESALEB2B_PLUGIN_DIR . 'includes/Pro/Templates/custom-fixed-discounts/simple-product.php';
         }
     }
 
@@ -42,7 +42,7 @@ class ProductBasedPricing {
      * @param \WC_Product_Variable $variation The current variation.
      */
     public function add_product_based_discount_inputs_variable_product( $index, $variation_data, $variation ) {
-        require YAYWHOLESALEB2B_PLUGIN_DIR . 'includes/ProEngine/Templates/custom-fixed-discounts/variable-product.php';
+        require YAYWHOLESALEB2B_PLUGIN_DIR . 'includes/Pro/Templates/custom-fixed-discounts/variable-product.php';
     }
 
     /**

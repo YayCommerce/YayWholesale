@@ -1,5 +1,5 @@
 <?php
-namespace YayWholesaleB2B\ProEngine\Engine\Frontend;
+namespace YayWholesaleB2B\Pro\Engine\Frontend;
 
 use YayWholesaleB2B\Helpers\CustomerHelper;
 use YayWholesaleB2B\Helpers\RequirementHelper;

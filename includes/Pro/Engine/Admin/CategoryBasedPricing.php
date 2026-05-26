@@ -1,9 +1,9 @@
 <?php
 
-namespace YayWholesaleB2B\ProEngine\Engine\Admin;
+namespace YayWholesaleB2B\Pro\Engine\Admin;
 
 use YayWholesaleB2B\Helpers\RolesHelper;
-use YayWholesaleB2B\ProEngine\Helpers\PricingHelpers\CategoryPricingHelper;
+use YayWholesaleB2B\Pro\Helpers\PricingHelpers\CategoryPricingHelper;
 use YayWholesaleB2B\Utils\SingletonTrait;
 
 defined( 'ABSPATH' ) || exit;
@@ -26,7 +26,7 @@ class CategoryBasedPricing {
      * Add UI for Creating-category page
      */
     public function add_custom_category_field() {
-        require YAYWHOLESALEB2B_PLUGIN_DIR . 'includes/ProEngine/Templates/custom-fixed-discounts/create-category.php';
+        require YAYWHOLESALEB2B_PLUGIN_DIR . 'includes/Pro/Templates/custom-fixed-discounts/create-category.php';
     }
 
     /**
@@ -35,7 +35,7 @@ class CategoryBasedPricing {
      * @param \WP_Term $term term object (Category).
      */
     public function edit_custom_category_field( $term ) {
-        require YAYWHOLESALEB2B_PLUGIN_DIR . 'includes/ProEngine/Templates/custom-fixed-discounts/edit-category.php';
+        require YAYWHOLESALEB2B_PLUGIN_DIR . 'includes/Pro/Templates/custom-fixed-discounts/edit-category.php';
     }
 
     /**
