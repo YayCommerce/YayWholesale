@@ -63,11 +63,15 @@ class LocalizeHelper {
 
             ],
             'wholesaleMeta' => [
-                'pluginUrl' => YAYWHOLESALEB2B_PLUGIN_URL,
-                'assetsUrl' => YAYWHOLESALEB2B_PLUGIN_URL . 'assets',
+                'pluginUrl'     => YAYWHOLESALEB2B_PLUGIN_URL,
+                'assetsUrl'     => YAYWHOLESALEB2B_PLUGIN_URL . 'assets',
 
-                'version'   => YAYWHOLESALEB2B_VERSION,
-                'reviewed'  => get_option( 'yaywholesaleb2b_reviewed', false ),
+                'version'       => YAYWHOLESALEB2B_VERSION,
+                'reviewed'      => get_option( 'yaywholesaleb2b_reviewed', false ),
+
+                'experimentals' => [
+                    'wholesale_store_page' => defined( 'YAYWHOLESALEB2B_EXPERIMENTAL_WHOLESALE_STORE_PAGE' ) && YAYWHOLESALEB2B_EXPERIMENTAL_WHOLESALE_STORE_PAGE === true,
+                ],
             ],
             'wcMeta'        => [
                 'ordersUrl'     => [
