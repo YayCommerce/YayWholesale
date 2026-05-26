@@ -17,4 +17,12 @@ package-lock.json
 .vscode/settings.json
 vendor-prefixed/
 
+.claude/settings.local.json
+
 .env.local
+
+# E2E test artifacts
+tests/e2e/.state/
+tests/e2e/test-results/
+tests/e2e/playwright-report/
+tests/e2e/.env
