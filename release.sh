@@ -108,9 +108,9 @@ cd "$PROJECT_PATH"
 set -euo pipefail
 # cd "$(dirname "$0")/.."
 if [ "${os#CYGWIN}" != "$os" ] || [ "${os#MINGW}" != "$os" ] || [ "${os#MSYS}" != "$os" ]; then
-    sh "$PROJECT_PATH/vendor/bin/yaycommerce-prerelease" 
+    sh "$PROJECT_PATH/vendor/bin/yaycommerce-prerelease"
 else
-    ./vendor/bin/yaycommerce-prerelease 
+    ./vendor/bin/yaycommerce-prerelease
 fi
 
 #
@@ -167,7 +167,7 @@ if [ "$IS_PRO" = "false" ]; then
     if [ -f "$DEST" ]; then
         mv -f "$TARGET" "$DEST" && echo "License Adapter: Switched to Lite Plugin Adapter"
     fi
-else 
+else
     if [ -f "$TARGET" ]; then
         rm -rf "$TARGET" && echo "License Adapter: Removed Lite Plugin Adapter"
     fi

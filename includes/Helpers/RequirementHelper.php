@@ -16,7 +16,7 @@ class RequirementHelper {
      */
     public static function get_min_order_amount( array $wholesale_role ) {
         // Handle price (Compatible to other price-related plugins)
-        return floatval( isset( $wholesale_role['minOrderAmount'] ) ? apply_filters( 'ywhs_price_handle_processed', $wholesale_role['minOrderAmount'], null, null ) : 0 );
+        return floatval( isset( $wholesale_role['minOrderAmount'] ) ? apply_filters( 'ywhs_after_calc_price_additional_processed', $wholesale_role['minOrderAmount'], null, null ) : 0 );
     }
 
     /**
@@ -108,7 +108,7 @@ class RequirementHelper {
             $product = wc_get_product( $cart_item['data']->get_id() );
             $extra   = apply_filters( 'ywhs_cart_item_extra_price_before_apply_discount', 0, $cart_item );
 
-            $extra     = apply_filters( 'ywhs_price_handle_processed', $extra, null, null );
+            $extra     = apply_filters( 'ywhs_after_calc_price_additional_processed', $extra, null, null );
             $price     = wc_get_price_excluding_tax( $product ) + $extra;
             $subtotal += $price * $cart_item['quantity'];
 

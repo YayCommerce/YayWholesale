@@ -65,7 +65,7 @@ class ProductPricingHelper {
             }
 
             $discount_data['discount_fixed'][ $slug ] = $discount_fixed;
-            $discount_data['discount_rate'][ $slug ]  = $discount_rate;
+            $discount_data['discount_rates'][ $slug ] = $discount_rate;
         }//end foreach
 
         return $discount_data;
@@ -103,10 +103,10 @@ class ProductPricingHelper {
 
         switch ( $type ) {
             case 'fixed':
-                $product_based_discount = $product_based_discount_setting['discount_fixed'][ $wholesale_role['slug'] ];
+                $product_based_discount = $product_based_discount_setting['discount_fixed'][ $wholesale_role['slug'] ] ?? 0;
                 break;
             case 'rate':
-                $product_based_discount = $product_based_discount_setting['discount_rate'][ $wholesale_role['slug'] ];
+                $product_based_discount = $product_based_discount_setting['discount_rates'][ $wholesale_role['slug'] ] ?? 0;
                 break;
             default:
                 return false;

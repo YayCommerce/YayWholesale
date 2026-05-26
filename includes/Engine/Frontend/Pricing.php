@@ -31,7 +31,7 @@ class Pricing {
 
         add_action( 'woocommerce_before_calculate_totals', [ $this, 'before_calculate_totals' ], 103 );
 
-        add_filter( 'woocommerce_cart_item_price', [ $this, 'cart_item_price' ], 999, 2 );
+        // add_filter( 'woocommerce_cart_item_price', [ $this, 'cart_item_price' ], 999, 2 );
 
         add_action( 'woocommerce_checkout_order_processed', [ $this, 'ywhs_checkout_wholesale_order_handling' ], 999, 3 );
     }
@@ -101,8 +101,8 @@ class Pricing {
 
         $discounted_prices = ShopPricingHelper::get_cart_item_wholesale_price( $cart_item, $role_config, $quantity );
 
-        $discounted_product = apply_filters( 'ywhs_price_handle_processed', $discounted_prices['product_price'], $cart_item_data, $role_config );
-        $discounted_extra   = apply_filters( 'ywhs_price_handle_processed', $discounted_prices['extra_price'], null, $role_config );
+        $discounted_product = apply_filters( 'ywhs_after_calc_price_additional_processed', $discounted_prices['product_price'], $cart_item_data, $role_config );
+        $discounted_extra   = apply_filters( 'ywhs_after_calc_price_additional_processed', $discounted_prices['extra_price'], null, $role_config );
 
         $discounted = $discounted_product + $discounted_extra;
 
