@@ -62,17 +62,13 @@ mkdir -p "$DEST_PATH"
 # 1) Build Admin App
 #
 echo "Installing Admin App dependencies..."
-cd "$PROJECT_PATH/apps/admin"
 pnpm install
+cd "$PROJECT_PATH/apps/admin"
 echo "Running JS Build..."
 if [ "$IS_PRO" = "true" ]; then
-    if [ "${os#CYGWIN}" != "$os" ] || [ "${os#MINGW}" != "$os" ] || [ "${os#MSYS}" != "$os" ]; then
-        pnpm build:window:pro
-    else
-        pnpm build:macos:pro
-    fi
+    pnpm build:pro
 else
-    pnpm build
+    pnpm build:lite
 fi
 cd "$PROJECT_PATH"
 
@@ -80,7 +76,6 @@ cd "$PROJECT_PATH"
 # 2) Build Request Form Block
 #
 cd "$PROJECT_PATH/apps/blocks/request-form-block"
-pnpm install
 echo "Running Request Form Block JS Build..."
 pnpm build
 cd "$PROJECT_PATH"
@@ -89,7 +84,6 @@ cd "$PROJECT_PATH"
 # 3) Build Requirement Slot Fill
 #
 cd "$PROJECT_PATH/apps/blocks/requirement-slot-fill"
-pnpm install
 echo "Running Reqirement Slot Fill JS Build..."
 pnpm build
 cd "$PROJECT_PATH"
@@ -97,7 +91,6 @@ cd "$PROJECT_PATH"
 # 4) Build Requirement Block
 #
 cd "$PROJECT_PATH/apps/blocks/requirement-block"
-pnpm install
 echo "Running Requirement Block JS Build..."
 pnpm build
 cd "$PROJECT_PATH"
@@ -134,47 +127,24 @@ fi
 # 8) Delete Pro folder if building Lite ver
 #
 if [ "$IS_PRO" = "false" ]; then
-    TARGET="$DEST_PATH/includes/ProEngine"
+    TARGET="$DEST_PATH/includes/Pro"
+    if [ -d "$TARGET" ]; then
+        rm -rf "$TARGET" && echo "Removed: $TARGET (and its content)"
+    fi
 
+    TARGET="$DEST_PATH/assets/pro"
     if [ -d "$TARGET" ]; then
         rm -rf "$TARGET" && echo "Removed: $TARGET (and its content)"
     fi
 fi
 
 #
-# 9) Run code formatter if tools directory exists before running lint
+# 9) Remove development-only code
 #
-if [ -d "$PROJECT_PATH/tools" ]; then
-    echo "Running PHP Code Beautifier..."
-    cd "$PROJECT_PATH/tools"
-    composer run cbf ../build
-    cd "$PROJECT_PATH"
-fi
-
-#
-# 10) Remove development-only code
-#
-sed -i "/'YAYWHOLESALEB2B_IS_DEVELOPMENT', true/d" "$DEST_PATH/yay-wholesale-b2b.php"
 rm -rf "$DEST_PATH/includes/Engine/Register/RegisterDev.php"
 
 #
-# 11) License Adapter by version (Lite / Pro)
-#
-TARGET="$DEST_PATH/assets/YayWholesaleB2bPluginAdapter.php"
-if [ "$IS_PRO" = "false" ]; then
-    DEST="$DEST_PATH/YayWholesaleB2bPluginAdapter.php"
-
-    if [ -f "$DEST" ]; then
-        mv -f "$TARGET" "$DEST" && echo "License Adapter: Switched to Lite Plugin Adapter"
-    fi
-else 
-    if [ -f "$TARGET" ]; then
-        rm -rf "$TARGET" && echo "License Adapter: Removed Lite Plugin Adapter"
-    fi
-fi
-
-#
-# 12) Generate ZIP
+# 10) Generate ZIP
 #
 echo "Generating zip file..."
 cd "$BUILD_PATH" || exit

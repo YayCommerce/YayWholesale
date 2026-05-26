@@ -4,7 +4,9 @@
   "private": true,
   "scripts": {
     "makepot": "wp i18n make-pot . languages/yay-wholesale-b2b.pot --exclude=vendor,node_modules,apps,tests --domain=yay-wholesale-b2b",
-    "release": "bash ./release.sh",
+    "release": "pnpm release:pro && pnpm release:lite",
+    "release:lite": "bash ./release.sh IS_PRO=false",
+    "release:pro": "bash ./release.sh IS_PRO=true",
     "env:start:single": "pnpm --filter @yay-wholesale/e2e env:start:single",
     "env:start:multi": "pnpm --filter @yay-wholesale/e2e env:start:multi",
     "env:stop:single": "pnpm --filter @yay-wholesale/e2e env:stop:single",

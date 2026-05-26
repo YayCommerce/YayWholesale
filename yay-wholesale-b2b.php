@@ -59,8 +59,6 @@ if ( ! defined( 'YAYWHOLESALEB2B_MENU_PRIORITY' ) ) {
     define( 'YAYWHOLESALEB2B_MENU_PRIORITY', 90 );
 }
 
-define( 'YAYWHOLESALEB2B_IS_DEVELOPMENT', true );
-
 spl_autoload_register(
     function ( $class ) {
         $prefix = __NAMESPACE__;
@@ -88,8 +86,6 @@ spl_autoload_register(
     }
 );
 
-
-
 if ( ! function_exists( 'YayWholesaleB2B\\plugin_init' ) ) {
     function plugin_init() {
         require_once __DIR__ . '/vendor/autoload.php';
@@ -100,30 +96,9 @@ if ( ! function_exists( 'YayWholesaleB2B\\plugin_init' ) ) {
             return;
         }
 
-        if ( class_exists( 'YayWholesaleB2B\ProEngine\ProInitialize', true ) ) {
-            define( 'YAYWHOLESALEB2B_IS_PRO', true );
-
-            // // Pro License handler
-            require_once __DIR__ . '/YayWholesaleB2bPluginAdapter.php';
-            \YayWholesaleB2BScoped\YayCommerce\AdminShell\AdminShell::register_plugin(
-                new \YayWholesaleB2bPluginAdapter()
-            );
-
-            if ( ! \YayWholesaleB2bPluginAdapter::is_licensed() ) {
-                return;
-            }
-
-            // Initialize Pro features
-            \YayWholesaleB2B\ProEngine\ProInitialize::get_instance();
-        } else {
-            define( 'YAYWHOLESALEB2B_IS_PRO', false );
-            \YayWholesaleB2BScoped\YayCommerce\AdminShell\AdminShell::register_plugin(
-                new \YayWholesaleB2bPluginAdapter()
-            );
-        }//end if
         add_action( 'before_woocommerce_init', [ \YayWholesaleB2B\Engine\ActDeact::class, 'before_woocommerce_init' ] );
 
-        Initialize::get_instance();
+        YayWholesaleB2B::initialize();
         I18n::load_plugin_textdomain();
     }
 }//end if
