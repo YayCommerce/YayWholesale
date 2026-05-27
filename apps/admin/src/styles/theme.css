@@ -1,13 +1,13 @@
 :root {
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: #171719;
 
-  --primary: #2271b1;
+  --primary: #3858e9;
   --primary-foreground: #ffffff;
-  --primary-accent: #135e96;
+  --primary-accent: #2f4ac4;
 
-  --secondary: #f5f5f5;
-  --secondary-foreground: #171717;
+  --secondary: #f4f4f5;
+  --secondary-foreground: #171719;
 
   --success: #16a34a;
   --success-foreground: #ffffff;
@@ -22,25 +22,25 @@
   --warning-accent: #f4a20a;
 
   --muted-400: #fafafa;
-  --muted: #f5f5f5;
+  --muted: #f4f4f5;
   --muted-foreground-400: #c7c7ca;
   --muted-foreground: #7b7c80;
   --muted-foreground-600: #495057;
 
-  --accent: #f5f5f5;
-  --accent-foreground: #171717;
+  --accent: #f4f4f5;
+  --accent-foreground: #171719;
 
-  --border: #e5e5e5;
-  --divider: #f5f5f5;
-  --input: #e5e5e5;
-  --ring: #2271b1;
+  --border: #e4e4e7;
+  --divider: #f4f4f5;
+  --input: #e4e4e7;
+  --ring: #3858e9;
   --ring-shadcn: #c7c7ca;
-  --ring-accent: #135e96;
+  --ring-accent: #2f4ac4;
 
   --card: #ffffff;
-  --card-foreground: #171717;
+  --card-foreground: #171719;
   --popover: #ffffff;
-  --popover-foreground: #171717;
+  --popover-foreground: #171719;
 
   --radius: 0.625rem;
   --default-transition-duration: 0.3s;
@@ -60,12 +60,12 @@
   --color-black: #000;
   --color-white: #fff;
   --color-background: var(--background) /* #ffffff */;
-  --color-foreground: var(--foreground) /* #171717 */;
-  --color-primary: var(--primary) /* #2271b1 */;
-  --color-primary-accent: var(--primary-accent) /* #135e96 */;
+  --color-foreground: var(--foreground) /* #171719 */;
+  --color-primary: var(--primary) /* #3858e9 */;
+  --color-primary-accent: var(--primary-accent) /* #2f4ac4 */;
   --color-primary-foreground: var(--primary-foreground) /* #ffffff */;
-  --color-secondary: var(--secondary) /* #f5f5f5 */;
-  --color-secondary-foreground: var(--secondary-foreground) /* #171717 */;
+  --color-secondary: var(--secondary) /* #f4f4f5 */;
+  --color-secondary-foreground: var(--secondary-foreground) /* #171719 */;
   --color-success: var(--success) /* #16a34a */;
   --color-success-foreground: var(--success-foreground) /* #ffffff */;
   --color-success-accent: var(--success-accent) /* #1f751f */;
@@ -77,23 +77,23 @@
   --color-warning-accent: var(--warning-accent) /* #f4a20a */;
 
   --color-muted-400: var(--muted-400) /* #fafafa */;
-  --color-muted: var(--muted) /* #f5f5f5 */;
+  --color-muted: var(--muted) /* #f4f4f5 */;
   --color-muted-foreground-400: var(--muted-foreground-400) /* #c7c7ca */;
   --color-muted-foreground: var(--muted-foreground) /* #7b7c80 */;
   --color-muted-foreground-600: var(--muted-foreground-600) /* #495057 */;
-  --color-accent: var(--accent) /* #f5f5f5 */;
-  --color-accent-foreground: var(--accent-foreground) /* #171717 */;
-  --color-border: var(--border) /* #e5e5e5 */;
-  --color-divider: var(--divider) /* #f5f5f5 */;
-  --color-input: var(--input) /* #e5e5e5 */;
-  --color-ring: var(--ring) /* #2271b1 */;
-  --color-ring-accent: var(--ring-accent) /* #135e96 */;
+  --color-accent: var(--accent) /* #f4f4f5 */;
+  --color-accent-foreground: var(--accent-foreground) /* #171719 */;
+  --color-border: var(--border) /* #e4e4e7 */;
+  --color-divider: var(--divider) /* #f4f4f5 */;
+  --color-input: var(--input) /* #e4e4e7 */;
+  --color-ring: var(--ring) /* #3858e9 */;
+  --color-ring-accent: var(--ring-accent) /* #2f4ac4 */;
   --color-ring-shadcn: var(--ring-shadcn) /* #c7c7ca */;
 
   --color-card: var(--card) /* #ffffff */;
-  --color-card-foreground: var(--card-foreground) /* #171717 */;
+  --color-card-foreground: var(--card-foreground) /* #171719 */;
   --color-popover: var(--popover) /* #ffffff */;
-  --color-popover-foreground: var(--popover-foreground) /* #171717 */;
+  --color-popover-foreground: var(--popover-foreground) /* #171719 */;
 
   --font-sans: 'Roboto', sans-serif;
 }
@@ -102,9 +102,9 @@
   --background: #0a0a0a;
   --foreground: #fafafa;
 
-  --primary: #2271b1;
+  --primary: #3858e9;
   --primary-foreground: #ffffff;
-  --primary-accent: #135e96; /* custom*/
+  --primary-accent: #2f4ac4; /* custom*/
 
   --secondary: #262626;
   --secondary-foreground: #fafafa;
@@ -136,8 +136,8 @@
   --ring: #c7c7c7;
   --ring-accent: #fafafa; /* custom*/
 
-  --card: #171717;
+  --card: #171719;
   --card-foreground: #fafafa;
-  --popover: #171717;
+  --popover: #171719;
   --popover-foreground: #fafafa;
 }
