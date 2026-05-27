@@ -1,10 +1,7 @@
 name: E2E Tests
 
 on:
-  push:
-    branches: [main]
-  pull_request:
-    branches: [main]
+  workflow_dispatch: # disabled until e2e tests are complete; re-enable push/pull_request triggers when ready
 
 jobs:
   e2e-single:
