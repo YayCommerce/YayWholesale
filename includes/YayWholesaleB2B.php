@@ -31,12 +31,11 @@ class YayWholesaleB2B {
         \YayWholesaleB2B\Engine\Compatibles::get_instance();
         \YayWholesaleB2B\Engine\Support\Support::get_instance();
 
-        if ( ! self::is_pro() ) {
-            \YayWholesaleB2BScoped\YayCommerce\AdminShell\AdminShell::register_plugin(
-                new YayWholesaleB2BLicenseAdapter()
-            );
-        } else {
+        if ( self::is_pro() ) {
             \YayWholesaleB2B\Pro\YayWholesaleB2BPro::initialize();
+            \YayWholesaleB2B\Pro\YayWholesaleB2BPro::register_admin_menu();
+        } else {
+            self::register_admin_menu();
         }
     }
 
@@ -46,5 +45,11 @@ class YayWholesaleB2B {
 
     public static function is_pro(): bool {
         return class_exists( 'YayWholesaleB2B\Pro\YayWholesaleB2BPro', true );
+    }
+
+    public static function register_admin_menu() {
+        \YayWholesaleB2BScoped\YayCommerce\AdminShell\AdminShell::register_plugin(
+            new YayWholesaleB2BLicenseAdapter()
+        );
     }
 }

@@ -13,10 +13,6 @@ class YayWholesaleB2BPro {
     use SingletonTrait;
 
     protected function __construct() {
-        \YayWholesaleB2BScoped\YayCommerce\AdminShell\AdminShell::register_plugin(
-            new YayWholesaleB2BProLicenseAdapter()
-        );
-
         if ( ! YayWholesaleB2BProLicenseAdapter::is_licensed() ) {
             return;
         }
@@ -32,5 +28,11 @@ class YayWholesaleB2BPro {
 
     public static function initialize() {
         self::get_instance();
+    }
+
+    public static function register_admin_menu() {
+        \YayWholesaleB2BScoped\YayCommerce\AdminShell\AdminShell::register_plugin(
+            new YayWholesaleB2BProLicenseAdapter()
+        );
     }
 }
