@@ -22,7 +22,7 @@ export default function RequestsForm() {
         if (!open) navigate('/requests');
       }}
     >
-      <SheetContent className="overflow-x-auto md:m-2.5 md:h-[calc(100%-52px)] md:min-w-[490px] md:rounded-md">
+      <SheetContent hasMargin>
         {isEditing && isLoading && <SheetSkeleton />}
         {isEditing && request !== undefined && <EditRequestForm request={request} />}
       </SheetContent>
