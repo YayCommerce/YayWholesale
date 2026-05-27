@@ -2,7 +2,7 @@
 
 namespace YayWholesaleB2B\Helpers\PricingHelpers;
 
-use YayWholesaleB2B\Utils\Utils;
+use YayWholesaleB2B\Helpers\CustomerHelper;
 
 /**
  * Product Pricing Helper
@@ -19,38 +19,53 @@ class ProductPricingHelper {
      */
     public static function get_wholesale_price( $product, $role_config = null, $quantity = 1 ) {
 
-        if ( $role_config === null ) {
-            return $product->get_price();
-        }
+        $regular_price = (float) $product->get_regular_price( 'edit' );
+        $sale_price    = (float) $product->get_price( 'edit' );
 
-        if ( Utils::is_pro() ) {
-            // Pro handle: (INCOMING)
-            // Quantity Tier
-            // Price for each Product
-            // Discount for each Category
-            $handled_price = null;
-            if ( isset( $handled_price ) ) {
-                return $handled_price;
+        if ( $role_config === null ) {
+            $before_discount_price = $sale_price;
+            $wholesale_price       = $sale_price;
+        } else {
+            $before_discount_price = ( $role_config['applyToSalePrice'] && $sale_price < $regular_price ) ? $sale_price : $regular_price;
+            $discount              = isset( $role_config['discount'] ) ? ( (float) $role_config['discount'] / 100 ) : 0;
+            if ( $discount <= 0 ) {
+                $wholesale_price = $before_discount_price;
+            } else {
+                $wholesale_price = max( 0, ( $before_discount_price ) * ( 1 - $discount ) );
             }
         }
 
-        $discount = isset( $role_config['discount'] ) ? ( (float) $role_config['discount'] / 100 ) : 0;
-        if ( $discount <= 0 ) {
-            return $product->get_price();
-        }
+        $wholesale_price = apply_filters( 'ywhs_calculate_wholesale_product_price', $wholesale_price, $before_discount_price, $product, $role_config, $quantity );
 
-        $price = self::get_product_price_before_apply_wholesale_discount( $product, $role_config['applyToSalePrice'] );
-
-        $wholesale_price = max( 0, ( $price ) * ( 1 - $discount ) );
-
-        return wc_format_decimal( $wholesale_price, wc_get_price_decimals() );
+        $decimals = absint( get_option( 'woocommerce_price_num_decimals', 2 ) );
+        return wc_format_decimal( $wholesale_price, $decimals );
     }
 
-    public static function get_product_price_before_apply_wholesale_discount( \WC_Product $product, bool $apply_to_sale ) {
-        $regular_price = (float) $product->get_regular_price();
-        $sale_price    = (float) $product->get_price();
-        $product_price = ( $apply_to_sale && $sale_price < $regular_price ) ? $sale_price : $regular_price;
+    /**
+     * Get the wholesale discount data of current product (discount type, discount value)
+     *
+     * @param \WC_Product $product
+     * @param array|null  $role_config The wholesale role configuration. Or null if guest or retailer.
+     * @param int         $quantity quantity in cart.
+     * @return array The discount data
+     */
+    public static function  get_product_wholesale_discount_data( $product, $role_config = null, $quantity = 0 ) {
+        $data = [];
+        if ( empty( $role_config ) ) {
+            $role_config = CustomerHelper::get_current_user_wholesale_role();
+        }
 
-        return apply_filters( 'ywhs_product_price_before_apply_wholesale_discount', $product_price, $product, $apply_to_sale );
+        if ( empty( $role_config ) ) {
+            $data = [];
+        } else {
+            $data = [
+                'wholesale_discount_type'  => 'rate',
+                'wholesale_discount_value' => $role_config['discount'],
+            ];
+        }
+
+        $data = apply_filters( 'ywhs_wholesale_discount_data', $data, $product, $role_config, $quantity );
+
+        return $data;
     }
 }

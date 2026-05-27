@@ -15,19 +15,24 @@ class Requirement {
 
     protected function __construct() {
             // --- WooCommerce hooks ---
-            // Legacy
-            add_action( 'woocommerce_widget_shopping_cart_before_buttons', [ $this, 'add_yay_wholesale_requirement' ], 999, 0 );
-            add_action( 'woocommerce_before_cart_totals', [ $this, 'add_yay_wholesale_requirement' ], 999, 0 );
-            add_action( 'woocommerce_review_order_before_payment', [ $this, 'add_yay_wholesale_requirement' ], 999, 0 );
 
-            // Block
-            add_action( 'wp_enqueue_scripts', [ $this, 'enqueue_yay_wholesale_requirement' ], 999 );
-            add_action( 'init', [ $this, 'create_ywhs_requirement_block_init' ], 999 );
-            add_filter( 'render_block_woocommerce/mini-cart-footer-block', [ $this, 'automatically_add_ywhs_to_mini_cart' ], 999 );
+        if ( ! CustomerHelper::is_current_wholesale_customer() ) {
+            return;
+        }
 
-            // Ajax
-            add_action( 'wp_ajax_ywhs_get_original_price_in_cart', [ $this, 'ywhs_get_original_price_in_cart' ] );
-            add_action( 'wp_ajax_nopriv_ywhs_get_original_price_in_cart', [ $this, 'ywhs_get_original_price_in_cart' ] );
+        // Legacy
+        add_action( 'woocommerce_widget_shopping_cart_before_buttons', [ $this, 'add_yay_wholesale_requirement' ], 999, 0 );
+        add_action( 'woocommerce_before_cart_totals', [ $this, 'add_yay_wholesale_requirement' ], 999, 0 );
+        add_action( 'woocommerce_review_order_before_payment', [ $this, 'add_yay_wholesale_requirement' ], 999, 0 );
+
+        // Block
+        add_action( 'wp_enqueue_scripts', [ $this, 'enqueue_yay_wholesale_requirement' ], 999 );
+        add_action( 'init', [ $this, 'create_ywhs_requirement_block_init' ], 999 );
+        add_filter( 'render_block_woocommerce/mini-cart-footer-block', [ $this, 'automatically_add_ywhs_to_mini_cart' ], 999 );
+
+        // Ajax
+        add_action( 'wp_ajax_ywhs_get_original_price_in_cart', [ $this, 'ywhs_get_original_price_in_cart' ] );
+        add_action( 'wp_ajax_nopriv_ywhs_get_original_price_in_cart', [ $this, 'ywhs_get_original_price_in_cart' ] );
     }
 
     /**
@@ -44,8 +49,8 @@ class Requirement {
         $min_order_quantity = RequirementHelper::get_min_order_quantity( $wholesale );
         $min_order_amount   = RequirementHelper::get_min_order_amount( $wholesale );
 
-        $is_hidden_quantity = 0 === $min_order_quantity;
-        $is_hidden_amount   = 0.0 === $min_order_amount;
+        $is_hidden_quantity = 0.0 === (float) $min_order_quantity;
+        $is_hidden_amount   = 0.0 === (float) $min_order_amount;
 
         // if ( $is_hidden_quantity && $is_hidden_amount ) {
         // return;
@@ -198,8 +203,12 @@ class Requirement {
             $cart      = WC()->cart->get_cart();
 
             foreach ( $cart as $cart_item_key => $cart_item ) {
-                $product                     = wc_get_product( $cart_item['data']->get_id() );
-                $price_map[ $cart_item_key ] = wc_get_price_excluding_tax( $product );
+                $product = wc_get_product( $cart_item['data']->get_id() );
+                $extra   = apply_filters( 'ywhs_cart_item_extra_price_before_apply_discount', 0, $cart_item );
+
+                $extra                       = apply_filters( 'ywhs_after_calc_price_additional_processed', $extra, null, $wholesale );
+                $price_map[ $cart_item_key ] = wc_get_price_excluding_tax( $product ) + $extra;
+
             }
 
             $wholesale['minOrderQuantity'] = RequirementHelper::get_min_order_quantity( $wholesale );
@@ -264,9 +273,12 @@ class Requirement {
 
         $price_map = [];
 
-        foreach ( $cart as $key => $cart_item ) {
-            $product           = $cart_item['data'];
-            $price_map[ $key ] = wc_get_price_excluding_tax( $product );
+        foreach ( $cart as $cart_item_key => $cart_item ) {
+            $product = wc_get_product( $cart_item['data']->get_id() );
+            $extra   = apply_filters( 'ywhs_cart_item_extra_price_before_apply_discount', 0, $cart_item );
+
+            $extra                       = apply_filters( 'ywhs_after_calc_price_additional_processed', $extra, null, null );
+            $price_map[ $cart_item_key ] = wc_get_price_excluding_tax( $product ) + $extra;
         }
 
         wp_send_json_success( $price_map );

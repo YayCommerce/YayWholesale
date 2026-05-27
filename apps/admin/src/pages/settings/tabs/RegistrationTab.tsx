@@ -1,9 +1,14 @@
+import { useRef } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { __ } from '@wordpress/i18n';
 
 import type { Settings } from '@/lib/schema/settings.schema';
+import { Badge } from '@/components/ui/badge';
+import { CopyButton } from '@/components/ui/copy-button';
+import { WholeSaleToolTip } from '@/components/ui/custom/WholeSaleToolTip';
 import { Field, FieldContent, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
+import { Separator } from '@/components/ui/separator';
 import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 
@@ -19,9 +24,25 @@ export default function RegistrationTab() {
         render={({ field }) => (
           <div className="flex items-center justify-between rounded-md border p-4">
             <div>
-              <h2 className="text-foreground-400 text-sm leading-3.5 font-medium">
-                {__('Moderate new registrations', 'yay-wholesale-b2b')}
-              </h2>
+              <span className="flex flex-wrap items-center gap-2">
+                <h2 className="leading-3.5 font-medium">{__('Moderate new registrations', 'yay-wholesale-b2b')}</h2>
+                <WholeSaleToolTip
+                  trigger={
+                    <Badge className="flex cursor-default items-center py-2.5" variant="primary-soft">
+                      <p className="text-xs">{'[ywhs_request_form]'}</p>
+                      <CopyButton
+                        variant="primary-soft"
+                        content="[ywhs_request_form title='(optional)']"
+                        className="h-4 w-6 scale-80 bg-transparent"
+                      />
+                    </Badge>
+                  }
+                  content={__(
+                    "Add the form with this shortcode or 'Request Registration Form' block.",
+                    'yay-wholesale-b2b',
+                  )}
+                />
+              </span>
               <p className="text-muted-foreground mt-2 text-xs font-normal">
                 {__('Hold new wholesale registrations for moderation by an administrator.', 'yay-wholesale-b2b')}
               </p>
@@ -33,7 +54,7 @@ export default function RegistrationTab() {
 
       {/* Two column layout */}
       {/* <div className="grid grid-cols-2 gap-6">
-        // Wholesale registration page 
+        // Wholesale registration page
         <Controller
           control={control}
           name="registration.wholesale_registration_page"
@@ -66,10 +87,8 @@ export default function RegistrationTab() {
           control={control}
           name="registration.successful_registration_message"
           render={({ field }) => (
-            <Field className="flex w-full flex-col gap-2.5">
-              <FieldLabel className="text-foreground-400 text-xs font-medium">
-                {__('Successful registration message', 'yay-wholesale-b2b')}
-              </FieldLabel>
+            <Field>
+              <FieldLabel>{__('Successful registration message', 'yay-wholesale-b2b')}</FieldLabel>
               <FieldContent>
                 <Textarea
                   id="successful-registration-message"
@@ -92,16 +111,13 @@ export default function RegistrationTab() {
           control={control}
           name="registration.submit_button_label"
           render={({ field }) => (
-            <Field className="flex w-62.5 flex-col gap-2.5">
-              <FieldLabel className="text-foreground-400 text-xs font-medium">
-                {__('Submit button label', 'yay-wholesale-b2b')}
-              </FieldLabel>
+            <Field className="w-62.5">
+              <FieldLabel>{__('Submit button label', 'yay-wholesale-b2b')}</FieldLabel>
               <FieldContent>
                 <Input
                   id="submit-label"
                   defaultValue={field.value}
                   placeholder={__('Register now', 'yay-wholesale-b2b')}
-                  className="h-9 w-full font-normal"
                   onChange={field.onChange}
                 />
               </FieldContent>

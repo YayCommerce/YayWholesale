@@ -31,21 +31,10 @@ class Pricing {
 
         add_action( 'woocommerce_before_calculate_totals', [ $this, 'before_calculate_totals' ], 103 );
 
-        add_filter( 'woocommerce_add_cart_item_data', [ $this, 'add_cart_item_wholesale_data' ], 999, 4 );
-
-        add_filter( 'woocommerce_cart_item_price', [ $this, 'cart_item_price' ], 999, 3 );
+        // add_filter( 'woocommerce_cart_item_price', [ $this, 'cart_item_price' ], 999, 2 );
 
         add_action( 'woocommerce_checkout_order_processed', [ $this, 'ywhs_checkout_wholesale_order_handling' ], 999, 3 );
     }
-
-    public function add_cart_item_wholesale_data( $cart_item_data, $product_id, $variation_id = 0, $quantity = 0 ) {
-        $role_config            = CustomerHelper::get_current_user_wholesale_role();
-        $cart_item_data['data'] = wc_get_product( $product_id );
-        $discounted_price       = ShopPricingHelper::get_cart_item_wholesale_price( $cart_item_data, $role_config, $quantity );
-
-        return $cart_item_data;
-    }
-
 
     /**
      * Update the wholesale price in cart / checkout
@@ -59,6 +48,9 @@ class Pricing {
 
         $is_checking_mov = apply_filters( 'ywhs_is_force_checking_requirement', is_checkout() || Utils::is_checkout_blocks() );
         $role_config     = CustomerHelper::get_current_user_wholesale_role();
+        if ( ! isset( $role_config ) ) {
+            return;
+        }
 
         $is_discounted = true;
         if ( $is_checking_mov ) {
@@ -72,12 +64,12 @@ class Pricing {
                     do_action( 'ywhs_before_cart_item_calculate_totals', $cart_item, $cart_item_key, $role_config );
 
                     $quantity = $cart_item['quantity'];
-                    // var_dump( $cart_item_data->get_price() );
 
-                    $discounted_price = ShopPricingHelper::get_cart_item_wholesale_price( $cart_item, $role_config, $quantity );
-                    // var_dump( $discounted_price );
+                    $discounted_prices = ShopPricingHelper::get_cart_item_wholesale_price( $cart_item, $role_config, $quantity );
 
-                    $cart_item['data']->set_price( $discounted_price );
+                    $cart_item['data']->set_price( $discounted_prices['final_price'] );
+                    $cart_item['data']->set_regular_price( $discounted_prices['final_price'] );
+                    $cart_item['data']->set_sale_price( $discounted_prices['final_price'] );
 
                     do_action( 'ywhs_after_cart_item_calculate_totals', $cart_item, $cart_item_key, $role_config );
                 }//end if
@@ -93,21 +85,26 @@ class Pricing {
      * @param array  $cart_item the cart item.
      * @return string
      */
-    public function cart_item_price( $price_html, $cart_item, $cart_item_key ) {
+    public function cart_item_price( $price_html, $cart_item ) {
         if ( empty( $cart_item['data'] ) ) {
             return $price_html;
         }
 
         $cart_item_data = $cart_item['data'];
         $role_config    = CustomerHelper::get_current_user_wholesale_role();
+        if ( ! isset( $role_config ) ) {
+            return $price_html;
+        }
 
         $regular  = (float) $cart_item_data->get_regular_price();
         $quantity = $cart_item['quantity'];
 
-        $discounted = ShopPricingHelper::get_cart_item_wholesale_price( $cart_item, $role_config, $quantity );
-        // var_dump( $cart_item['ywhs_wholesale_extra_price'] );
+        $discounted_prices = ShopPricingHelper::get_cart_item_wholesale_price( $cart_item, $role_config, $quantity );
 
-        $discounted = apply_filters( 'ywhs_price_handle_processed', $discounted, $cart_item_data );
+        $discounted_product = apply_filters( 'ywhs_after_calc_price_additional_processed', $discounted_prices['product_price'], $cart_item_data, $role_config );
+        $discounted_extra   = apply_filters( 'ywhs_after_calc_price_additional_processed', $discounted_prices['extra_price'], null, $role_config );
+
+        $discounted = $discounted_product + $discounted_extra;
 
         $tax_display_cart = get_option( 'woocommerce_tax_display_cart', 'excl' );
 
@@ -154,6 +151,10 @@ class Pricing {
      * @return string The displayed HTML.
      */
     public function ywhs_display_wholesale_price_html( string $price_html, \WC_Product $product ) {
+        if ( is_admin() && ! wp_doing_ajax() ) {
+            return $price_html;
+        }
+
         $show_to_all                 = $this->settings['general']['show_wholesale_price'] ?? false;
         $display_mode                = $this->settings['display']['price_format'] ?? 'retail-and-wholesale';
         $current_user_wholesale_role = CustomerHelper::get_current_user_wholesale_role();
@@ -415,10 +416,12 @@ class Pricing {
     public function ywhs_checkout_wholesale_order_handling( $order_id, $posted_data, $order ) {
         $customer       = get_user_by( 'ID', $order->get_customer_id() );
         $wholesale_role = CustomerHelper::get_wholesale_role( $customer );
-
         if ( ! isset( $wholesale_role ) ) {
             return;
         }
+
+        $wholesale_role['minOrderAmount']   = RequirementHelper::get_min_order_amount( $wholesale_role );
+        $wholesale_role['minOrderQuantity'] = RequirementHelper::get_min_order_quantity( $wholesale_role );
 
         $is_discounted = RequirementHelper::is_order_meet_requirement( $order, $wholesale_role );
 

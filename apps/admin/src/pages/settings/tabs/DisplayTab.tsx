@@ -33,13 +33,11 @@ export default function DisplayTab() {
           control={control}
           name="display.price_format"
           render={({ field }) => (
-            <Field className="flex w-full flex-col gap-2.5">
-              <FieldLabel className="text-foreground-400 text-xs font-medium">
-                {__('Display price format', 'yay-wholesale-b2b')}
-              </FieldLabel>
+            <Field>
+              <FieldLabel>{__('Display price format', 'yay-wholesale-b2b')}</FieldLabel>
               <FieldContent>
                 <Select defaultValue={field.value} onValueChange={field.onChange}>
-                  <SelectTrigger id="display-price-format" className="w-full font-normal">
+                  <SelectTrigger id="display-price-format" className="w-full">
                     <SelectValue placeholder={__('Select a option', 'yay-wholesale-b2b')} />
                   </SelectTrigger>
                   <SelectContent>
@@ -63,10 +61,8 @@ export default function DisplayTab() {
           control={control}
           name="display.wholesale_price_label"
           render={({ field }) => (
-            <Field className="flex w-full flex-col gap-2.5">
-              <FieldLabel className="text-foreground-400 text-xs font-medium">
-                {__('Wholesale price label', 'yay-wholesale-b2b')}
-              </FieldLabel>
+            <Field>
+              <FieldLabel>{__('Wholesale price label', 'yay-wholesale-b2b')}</FieldLabel>
               <FieldContent>
                 <Input
                   id="wholesale-price-label"
@@ -86,10 +82,8 @@ export default function DisplayTab() {
           control={control}
           name="display.wholesale_price_color"
           render={({ field }) => (
-            <Field className="flex w-full flex-col gap-2.5">
-              <FieldLabel className="text-foreground-400 text-xs font-medium">
-                {__('Wholesale price color', 'yay-wholesale-b2b')}
-              </FieldLabel>
+            <Field>
+              <FieldLabel>{__('Wholesale price color', 'yay-wholesale-b2b')}</FieldLabel>
               <FieldContent>
                 <CustomColorPicker value={field.value} onValueChange={(color: string) => field.onChange(color)} />
               </FieldContent>
@@ -101,24 +95,26 @@ export default function DisplayTab() {
         <div className="flex flex-col gap-4">
           <ProductImageSkeleton />
           <div className="flex flex-col gap-2.5">
-            <Skeleton className="h-2 w-[65px] animate-none bg-[#F1F3F6]" />
-            <Skeleton className="h-2 w-[130px] animate-none bg-[#F1F3F6]" />
+            <Skeleton className="bg-muted h-2 w-[65px] animate-none" />
+            <Skeleton className="bg-muted h-2 w-[130px] animate-none" />
           </div>
-          {['retail-and-wholesale', 'retail-only'].includes(displayFormat) && (
-            <p className="flex gap-1.5 text-[14px] leading-3.5 text-[#A0A0A7]">
-              {displayFormat === 'retail-and-wholesale' && <span>{__('Retail:', 'yay-wholesale-b2b')}</span>}
-              <del> {parseWPCurrency(20)} </del>
-              <span>{parseWPCurrency(18)}</span>
-            </p>
-          )}
-          {['retail-and-wholesale', 'wholesale-only'].includes(displayFormat) && (
-            <p className="flex gap-1.5 text-[14px] leading-3.5">
-              <span>{priceLabel}:</span>
-              <span className="font-bold" style={{ color: priceColor }}>
-                {parseWPCurrency(15)}
-              </span>
-            </p>
-          )}
+          <div className="flex flex-col gap-3">
+            {['retail-and-wholesale', 'retail-only'].includes(displayFormat) && (
+              <p className="flex gap-1.5 text-[14px] leading-3.5 text-[#A0A0A7]">
+                {displayFormat === 'retail-and-wholesale' && <span>{__('Retail:', 'yay-wholesale-b2b')}</span>}
+                <del> {parseWPCurrency(20)} </del>
+                <span>{parseWPCurrency(18)}</span>
+              </p>
+            )}
+            {['retail-and-wholesale', 'wholesale-only'].includes(displayFormat) && (
+              <p className="flex gap-1.5 text-[14px] leading-3.5">
+                <span>{priceLabel}:</span>
+                <span className="font-bold" style={{ color: priceColor }}>
+                  {parseWPCurrency(15)}
+                </span>
+              </p>
+            )}
+          </div>
           <AddToCartSkeleton />
         </div>
       </div>

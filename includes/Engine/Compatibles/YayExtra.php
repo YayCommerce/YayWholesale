@@ -3,6 +3,7 @@ namespace YayWholesaleB2B\Engine\Compatibles;
 
 use WC_Tax;
 use YayWholesaleB2B\Helpers\CustomerHelper;
+use YayWholesaleB2B\Helpers\PricingHelpers\ProductPricingHelper;
 use YayWholesaleB2B\Utils\SingletonTrait;
 
 defined( 'ABSPATH' ) || exit;
@@ -18,7 +19,15 @@ class YayExtra {
             return;
         }
 
+        add_filter( 'ywhs_force_recalculate_in_yay_currency', '__return_true', 999 );
+
         add_action( 'wp_enqueue_scripts', [ $this, 'enqueue_scripts' ] );
+
+        add_filter( 'ywhs_cart_item_extra_price_before_apply_discount', [ $this, 'get_extra_price_from_cart_item' ], 999, 2 );
+    }
+
+    public function get_extra_price_from_cart_item( $extra_price, $cart_item ) {
+        return ! empty( $cart_item['yaye_total_option_cost'] ) ? $cart_item['yaye_total_option_cost'] : $extra_price;
     }
 
     public function enqueue_scripts() {
@@ -29,8 +38,12 @@ class YayExtra {
         $script_handle = 'yay-extra-compatible';
 
         $wholesale_role = CustomerHelper::get_current_user_wholesale_role();
-        $product_id     = get_the_ID();
-        $product        = wc_get_product( $product_id );
+        if ( ! isset( $wholesale_role ) ) {
+            return;
+        }
+
+        $product_id = get_the_ID();
+        $product    = wc_get_product( $product_id );
         if ( ! isset( $product ) ) {
             return;
         }
@@ -38,6 +51,7 @@ class YayExtra {
         // Price
         $sale_prices    = [];
         $regular_prices = [];
+        $discount_data  = [];
 
         $children = $product->get_children();
         if ( count( $children ) ) {
@@ -45,10 +59,12 @@ class YayExtra {
                 $child_product            = wc_get_product( $child );
                 $sale_prices[ $child ]    = (float) $child_product->get_sale_price();
                 $regular_prices[ $child ] = (float) $child_product->get_regular_price();
+                $discount_data[ $child ]  = ProductPricingHelper::get_product_wholesale_discount_data( $child_product, $wholesale_role, 1 );
             }
         } else {
             $sale_prices[ $product_id ]    = (float) $product->get_sale_price();
             $regular_prices[ $product_id ] = (float) $product->get_regular_price();
+            $discount_data[ $product_id ]  = ProductPricingHelper::get_product_wholesale_discount_data( $product, $wholesale_role, 1 );
         }
 
         // Currency
@@ -80,6 +96,8 @@ class YayExtra {
                 'prices_include_tax' => wc_prices_include_tax(),
                 'tax_display_shop'   => get_option( 'woocommerce_tax_display_shop' ),
                 'tax_rate'           => $tax_rate,
+                // Advanced pricing
+                'discount_data'      => $discount_data,
             ]
         );
     }

@@ -63,10 +63,8 @@ export default function EditRoleForm({ role }: { role: Role }) {
         <SheetHeader>
           <div className="flex items-start justify-between">
             <div>
-              <SheetTitle className="text-foreground text-[18px] font-semibold">
-                {__('Edit Role', 'yay-wholesale-b2b')}
-              </SheetTitle>
-              <SheetDescription className="text-muted-foreground mt-[4px] text-sm leading-[20px] font-normal">
+              <SheetTitle>{__('Edit Role', 'yay-wholesale-b2b')}</SheetTitle>
+              <SheetDescription className="mt-[4px] leading-[20px]">
                 {__('Enter the information below to edit wholesale user role', 'yay-wholesale-b2b')}
               </SheetDescription>
             </div>
@@ -78,11 +76,9 @@ export default function EditRoleForm({ role }: { role: Role }) {
         <SheetFooter className="p-0">
           <div className="border-divider flex justify-end gap-4 border-t bg-white p-5">
             <SheetClose asChild>
-              <Button variant="outline" className="text-foreground-400 px-4.5">
-                {__('Cancel', 'yay-wholesale-b2b')}
-              </Button>
+              <Button variant="outline">{__('Cancel', 'yay-wholesale-b2b')}</Button>
             </SheetClose>
-            <Button type="submit" form="role-form" variant="primary" className="px-5">
+            <Button type="submit" form="role-form" variant="primary">
               {__('Save Changes', 'yay-wholesale-b2b')}
             </Button>
           </div>

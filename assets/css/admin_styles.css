@@ -1,28 +1,181 @@
 .ywhs_order_type_badge {
-    display: inline-flex;
-    line-height: 2.5em;
-    color: #454545;
-    background: #e5e5e5;
-    border-radius: 4px;
-    border-bottom: 1px solid rgba(0, 0, 0, .05);
-    margin: -.25em 0;
-    cursor: inherit !important;
-    white-space: nowrap;
-    max-width: 100%;
+  display: inline-flex;
+  line-height: 2.5em;
+  color: #454545;
+  background: #e5e5e5;
+  border-radius: 4px;
+  border-bottom: 1px solid rgba(0, 0, 0, .05);
+  margin: -.25em 0;
+  cursor: inherit !important;
+  white-space: nowrap;
+  max-width: 100%;
 }
 
 .ywhs_order_type_wholesale {
-    background: #f8dda7;
-    color: #573b00;
+  background: #f8dda7;
+  color: #573b00;
 }
 
 .ywhs_order_type_retail {
-    background: #c6e1c6;
-    color: #2c4700;
+  background: #c6e1c6;
+  color: #2c4700;
 }
 
-.ywhs_order_type_badge > span{
-    margin: 0 1em;
-    overflow: hidden;
-    text-overflow: ellipsis;
- }
+.ywhs_order_type_badge>span {
+  margin: 0 1em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Custom Pricing Value table */
+.ywhs_product_based_discount_rate_table,
+.ywhs_category_based_discount_rate_table {
+  border-collapse: separate;
+  border-spacing: 0;
+  border: 1px solid #c3c4c7 !important;
+  border-radius: 4px;
+  overflow: hidden;
+  width: fit-content !important;
+  padding: 0 !important;
+
+
+  th,
+  td {
+    background-color: #f6f7f7;
+    border: none !important;
+    padding: 10px !important;
+    white-space: nowrap !important;
+    width: auto !important;
+  }
+
+  tbody tr td,
+  tbody tr th {
+    border-top: 1px solid #c3c4c7 !important;
+  }
+
+  td+td,
+  th+th {
+    border-left: 1px solid #c3c4c7 !important;
+  }
+
+
+  .ywhs_product_based_discount_rate_role,
+  .ywhs_category_based_discount_rate_role {
+    font-weight: 500;
+    font-size: 13px;
+    max-width: 125px;
+    text-align: left;
+    text-wrap-mode: wrap;
+  }
+
+  td.ywhs_product_based_discount_rate,
+  td.ywhs_product_based_discount_fixed,
+  td.ywhs_category_based_discount_rate {
+    background-color: #ffffff;
+    gap: 5px;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin: 0 !important;
+  }
+
+  input {
+    width: 80px !important;
+    margin: 0 !important;
+  }
+}
+
+/* Fixed discount in product page */
+.ywhs_product_based_discount_title {
+  display: block;
+  margin: 0 0 0px 12px;
+}
+
+.ywhs_product_based_discount_subtitle {
+  display: block;
+  margin: 0 0 15px 12px;
+}
+
+.ywhs_product_based_discount_roles,
+.ywhs_product_based_discount_type {
+  display: flex;
+  margin: 0 0 15px 12px;
+  align-items: center;
+}
+
+.ywhs_product_based_discount_roles_title,
+.ywhs_product_based_discount_type_title {
+  width: 150px;
+}
+
+.ywhs_product_based_discount_roles {
+  display: flex;
+}
+
+.ywhs_product_based_discount_type_radios {
+  display: flex;
+  gap: 40px;
+}
+
+.ywhs_product_based_discount_type_radios label {
+  margin: 0 0 0 0 !important;
+  width: fit-content !important;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+
+.ywhs_product_based_discount_inputs {
+  display: none;
+}
+
+/* Fixed discount in product page (Variable) */
+.ywhs_variable_product_based_discount_custom_container {
+  display: table;
+  width: 100%;
+
+  .ywhs_product_based_discount_title {
+    display: block;
+    margin: 0 0 12px 0 !important;
+    font-size: 1.3em;
+    font-weight: 700;
+    color: #1d2327;
+  }
+
+  .ywhs_product_based_discount_subtitle {
+    display: block;
+    margin: 0 0 12px 0;
+  }
+
+
+  .ywhs_product_based_discount_rule,
+  .ywhs_product_based_discount_type {
+    margin-left: 0;
+  }
+
+  .ywhs_product_based_discount_roles {
+    margin-left: -26px !important;
+    padding: 0 0 1px 26px;
+    flex-wrap: wrap;
+  }
+}
+
+/* Category-based discount */
+.ywhs_category_based_discount_rates {
+  display: none;
+}
+
+.ywhs_category_based_discount_rate_table {
+
+  tbody tr td,
+  tbody tr th {
+    border-top: none !important;
+  }
+
+  tr:not(:first-child) td,
+  tr:not(:first-child) th {
+    border-top: 1px solid #c3c4c7 !important;
+  }
+}

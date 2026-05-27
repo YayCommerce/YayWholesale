@@ -29,7 +29,11 @@ class CustomerHelper {
      * @param \WP_User $user The user object.
      * @return array|null
      */
-    public static function get_wholesale_role( \WP_User $user ) {
+    public static function get_wholesale_role( $user ) {
+        if ( empty( $user ) ) {
+            return null;
+        }
+
         $wholesale_roles = RolesHelper::get_active_wholesale_roles();
 
         foreach ( $user->roles as $wp_role ) {

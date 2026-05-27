@@ -12,7 +12,7 @@
     "editor.formatOnSave": false
   },
   "phpSniffer.autoDetect": true,
-  
+
   "tailwindCSS.experimental.configFile": "./apps/admin/src/main.css",
   "prettier.ignorePath": "./apps/admin/.prettierignore",
 

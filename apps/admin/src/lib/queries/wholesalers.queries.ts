@@ -7,13 +7,14 @@ import {
   useQueryClient,
 } from '@tanstack/react-query';
 
+import { PaginatedResponse } from '@/lib/api/api.type';
 import { bulkUpdateWholesalerRole, getWholesalers, updateWholesalerRole } from '@/lib/api/wholesalers.api';
 import { Wholesaler, WholesalerFilter } from '@/lib/schema/wholesalers.type';
 import { ROLES_QUERIES } from './roles.queries';
 
 /** Options */
 
-const WHOLESALERS_QUERIES = {
+export const WHOLESALERS_QUERIES = {
   all: ['wholesalers'],
   list: (filter: WholesalerFilter) =>
     queryOptions({
@@ -41,8 +42,11 @@ export function useUpdateWholesalersRoleMutation(userId: number) {
         .getQueryCache()
         .findAll({ queryKey: WHOLESALERS_QUERIES.all })
         .forEach((query) => {
-          const previous = query.state.data as Wholesaler[];
-          query.setData(previous.map((item) => (item.id === userId ? { ...item, roleSlug } : item))); // Optimistic
+          const previous = query.state.data as PaginatedResponse<Wholesaler>;
+          query.setData({
+            ...previous,
+            data: previous.data.map((item) => (item.id === userId ? { ...item, wholesaleRoleSlug: roleSlug } : item)),
+          }); // Optimistic
         });
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ROLES_QUERIES.userCountByRole.queryKey }),
@@ -61,8 +65,13 @@ export function useBulkUpdateWholesalersRoleMutation() {
         .getQueryCache()
         .findAll({ queryKey: WHOLESALERS_QUERIES.all })
         .forEach((query) => {
-          const previous = query.state.data as Wholesaler[];
-          query.setData(previous.map((item) => (userIds.includes(item.id) ? { ...item, roleSlug } : item))); // Optimistic
+          const previous = query.state.data as PaginatedResponse<Wholesaler>;
+          query.setData({
+            ...previous,
+            data: previous.data.map((item) =>
+              userIds.includes(item.id) ? { ...item, wholesaleRoleSlug: roleSlug } : item,
+            ),
+          }); // Optimistic
         });
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ROLES_QUERIES.userCountByRole.queryKey }),

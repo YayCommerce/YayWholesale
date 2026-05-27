@@ -19,6 +19,7 @@ import {
   getRequests,
   rejectRequest,
 } from '@/lib/api/requests.api';
+import { WHOLESALERS_QUERIES } from '@/lib/queries/wholesalers.queries';
 import { Request, RequestFilter } from '@/lib/schema/requests.type';
 import { ROLES_QUERIES } from './roles.queries';
 
@@ -69,6 +70,7 @@ export function useApproveRequestMutation(requestId: number) {
     onSuccess: (updatedRequest) => {
       queryClient.invalidateQueries({ queryKey: REQUESTS_QUERIES.all });
       queryClient.invalidateQueries({ queryKey: ROLES_QUERIES.userCountByRole.queryKey });
+      queryClient.invalidateQueries({ queryKey: WHOLESALERS_QUERIES.all });
       cacheRequest(queryClient, updatedRequest);
     },
     onError: () => queryClient.invalidateQueries({ queryKey: REQUESTS_QUERIES.all }),
@@ -84,6 +86,7 @@ export function useBulkApproveRequestMutation() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: REQUESTS_QUERIES.all });
       queryClient.invalidateQueries({ queryKey: ROLES_QUERIES.userCountByRole.queryKey });
+      queryClient.invalidateQueries({ queryKey: WHOLESALERS_QUERIES.all });
     },
     onError: () => queryClient.invalidateQueries({ queryKey: REQUESTS_QUERIES.all }),
   });

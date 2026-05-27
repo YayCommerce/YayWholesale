@@ -1,15 +1,20 @@
 import { api } from '@/lib/api/api';
 import type { Role, RoleFormValues, UserCountByRole } from '@/lib/schema/roles.schema';
+import { Settings } from '@/lib/schema/settings.schema';
 
 export function getAllRoles() {
   return api.get('roles').json<Role[]>();
 }
 
 export function addRole(data: RoleFormValues) {
+  // TODO v1.1: onMutateSuccess => update settingsCache
+  // return api.post('roles', { json: data }).json<{ roles: Role[]; settings: Settings }>();
   return api.post('roles', { json: data }).json<Role[]>();
 }
 
 export function updateRole(roleSlug: string, data: RoleFormValues) {
+  // TODO v1.1: onMutateSuccess => update settingsCache
+  // return api.put(`roles/${roleSlug}`, { json: data }).json<{ roles: Role[]; settings: Settings }>();
   return api.put(`roles/${roleSlug}`, { json: data }).json<Role[]>();
 }
 

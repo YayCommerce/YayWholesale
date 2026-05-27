@@ -178,10 +178,10 @@ class RequestRestController extends BaseRestController {
     }
 
     public function get_request_list( WP_REST_Request $request ) {
-        $page     = intval( $request->get_param( 'page' ) || 1 );
-        $per_page = intval( $request->get_param( 'per_page' ) || 10 );
-        $search   = sanitize_text_field( $request->get_param( 'search' ) || '' );
-        $status   = sanitize_text_field( $request->get_param( 'status' ) || 'all' );
+        $page     = intval( $request->get_param( 'page' ) ?? 1 );
+        $per_page = intval( $request->get_param( 'per_page' ) ?? 10 );
+        $search   = sanitize_text_field( $request->get_param( 'search' ) ?? '' );
+        $status   = sanitize_text_field( $request->get_param( 'status' ) ?? 'all' );
 
         $response = RequestsHelper::get_paginated_request_post( $search, $page, $per_page, $status );
         return $response;

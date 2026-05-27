@@ -107,6 +107,7 @@ export default function RolesList() {
         roleSlugs,
         status,
       });
+      table.resetRowSelection();
     } catch (error) {
       toast.error(await getErrorMsg(error));
     }
@@ -116,9 +117,9 @@ export default function RolesList() {
   const selectedCount = table.getSelectedRowModel().rows.length;
 
   return (
-    <Card className="gap-4 shadow-sm">
+    <Card className="gap-4 p-4 shadow-sm md:p-5 2xl:p-6">
       {/* Header */}
-      <div className="flex flex-wrap items-center justify-between gap-3">
+      <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="flex items-center gap-2">
           <h1 className="text-2xl font-bold">{__('Roles', 'yay-wholesale-b2b')}</h1>
           <WholeSaleToolTip

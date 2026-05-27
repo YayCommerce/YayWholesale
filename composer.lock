@@ -8,16 +8,16 @@
     "packages": [
         {
             "name": "yaycommerce/admin-shell",
-            "version": "v2.6.1",
+            "version": "v2.6.2",
             "source": {
                 "type": "git",
                 "url": "git@github.com:YayCommerce/yaycommerce-plugin-admin-shell.git",
-                "reference": "3595641c459ea3394bf6ec2c066c822f08f0fe85"
+                "reference": "804c35ad454232d5348672bd251e3e81b3297edc"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/YayCommerce/yaycommerce-plugin-admin-shell/zipball/3595641c459ea3394bf6ec2c066c822f08f0fe85",
-                "reference": "3595641c459ea3394bf6ec2c066c822f08f0fe85",
+                "url": "https://api.github.com/repos/YayCommerce/yaycommerce-plugin-admin-shell/zipball/804c35ad454232d5348672bd251e3e81b3297edc",
+                "reference": "804c35ad454232d5348672bd251e3e81b3297edc",
                 "shasum": ""
             },
             "require": {
@@ -47,10 +47,10 @@
             ],
             "description": "Shared admin shell for YayCommerce plugins: top-level menu, Licenses page, Other Plugins, Help, optional license subsystem",
             "support": {
-                "source": "https://github.com/YayCommerce/yaycommerce-plugin-admin-shell/tree/v2.6.1",
+                "source": "https://github.com/YayCommerce/yaycommerce-plugin-admin-shell/tree/v2.6.2",
                 "issues": "https://github.com/YayCommerce/yaycommerce-plugin-admin-shell/issues"
             },
-            "time": "2026-05-07T02:19:24+00:00"
+            "time": "2026-05-11T08:12:50+00:00"
         }
     ],
     "packages-dev": [
@@ -1579,10 +1579,10 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {},
     "prefer-stable": false,
     "prefer-lowest": false,
-    "platform": [],
-    "platform-dev": [],
-    "plugin-api-version": "2.3.0"
+    "platform": {},
+    "platform-dev": {},
+    "plugin-api-version": "2.6.0"
 }
