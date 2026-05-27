@@ -8,8 +8,6 @@ use WC_Email;
  */
 class SettingsHelper {
 
-    public const B2C_ROLE_SLUG = 'ywhs_retail';
-
     public static function get_settings(): array {
 
         $settings = array_replace_recursive( self::get_default_settings(), get_option( 'yaywholesaleb2b_settings', [] ) );

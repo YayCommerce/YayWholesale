@@ -19,3 +19,11 @@ export function cn(...inputs: ClassValue[]) {
 export const getPagesForWholesaleStore = () => {
   return window.yayWholesaleB2BAdmin.valid_wholesale_store_pages;
 };
+
+export const getPaymentMethodsInfo = () => {
+  return window.yayWholesaleB2BMeta.wcMeta.payment_methods_info;
+};
+
+export const getShippingMethodsInfo = () => {
+  return window.yayWholesaleB2BMeta.wcMeta.shipping_methods_info;
+};

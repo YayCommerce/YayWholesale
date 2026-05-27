@@ -65,6 +65,7 @@ export default function SettingsPage() {
     try {
       await saveMutation.mutateAsync(data);
       toast.success(__('Settings saved!', 'yay-wholesale-b2b'));
+      form.reset(data);
     } catch (error) {
       toast.error(await getErrorMsg(error));
     }
@@ -90,7 +91,7 @@ export default function SettingsPage() {
             {/* Left Sidebar - Tab List */}
             <div className="shrink-0 sm:w-[176px]">
               <Card className="border-none bg-transparent p-0 shadow-none">
-                <CardContent className="w-full overflow-x-auto px-0 [scrollbar-width:thin]">
+                <CardContent className="w-full [scrollbar-width:thin] overflow-x-auto px-0">
                   <div className="flex h-fit w-full items-center gap-1 bg-transparent pb-2.5 sm:flex-col sm:items-stretch md:p-0">
                     {tabs.map((tab) => (
                       <Link

@@ -7,7 +7,7 @@ import { __ } from '@wordpress/i18n';
 
 import { useActiveRolesQuery } from '@/lib/queries/roles.queries';
 import { RoleRelatedSetting, Settings } from '@/lib/schema/settings.schema';
-import { cn, isPro } from '@/lib/utils';
+import { cn, getPaymentMethodsInfo, isPro } from '@/lib/utils';
 import { useUncontrolled } from '@/hooks/useUncontrolled';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -34,17 +34,19 @@ export default function PaymentRolesTab() {
 
   const { data: roles } = useActiveRolesQuery();
 
+  const retailerRole = useMemo(
+    () => ({
+      slug: 'ywhs_retail_' + crypto.randomUUID(),
+      name: __('Retail Customer (B2C)', 'yay-wholesale-b2b'),
+    }),
+    [],
+  );
+  const allRoles = useMemo(() => roles?.map((role) => ({ slug: role.slug, name: role.name })) ?? [], [roles]);
   const rolesSelect = useMemo(() => {
-    const handleRoles = roles?.map((role) => ({ slug: role.slug, name: role.name })) ?? [];
+    return [...allRoles, retailerRole];
+  }, [allRoles, retailerRole]);
 
-    return [
-      ...handleRoles,
-      {
-        slug: 'ywhs_retail',
-        name: 'Retail Customer (B2C)',
-      },
-    ];
-  }, [roles]);
+  const allPaymentsInfo = getPaymentMethodsInfo();
 
   return (
     <div className="flex flex-col gap-4 overflow-x-auto">
@@ -115,19 +117,62 @@ export default function PaymentRolesTab() {
             ) : fields.length > 0 ? (
               fields.map((setting, index) => {
                 const onSettingChange = async (value: RoleRelatedSetting[]) => {
-                  const updated = { ...fields[index] };
+                  const updated = fields[index];
 
-                  updated.roles = value;
+                  //Update retailers
+                  if (value.includes(retailerRole)) {
+                    updated.enable_by_role.retailers = 'enabled';
+                    value.splice(value.indexOf(retailerRole), 1);
+                  } else {
+                    updated.enable_by_role.retailers = 'disabled';
+                  }
+
+                  //Update wholesalers
+                  if (value.length === 0) {
+                    updated.enable_by_role.wholesalers = 'disabled';
+                    updated.enable_by_role.selected_roles = [];
+                  } else if (value.length === allRoles.length) {
+                    updated.enable_by_role.wholesalers = 'enabled';
+                    updated.enable_by_role.selected_roles = [];
+                  } else {
+                    updated.enable_by_role.wholesalers = 'enabled-selected-roles';
+                    updated.enable_by_role.selected_roles = value.map((r) => r.slug);
+                  }
+
                   update(index, updated);
                 };
 
+                const settingRolesValue = useMemo(() => {
+                  const roles: RoleRelatedSetting[] = [];
+
+                  // Wholesalers
+                  if (setting.enable_by_role.wholesalers === 'enabled') {
+                    roles.push(...allRoles);
+                  } else if (setting.enable_by_role.wholesalers === 'enabled-selected-roles') {
+                    const selected = allRoles.filter((r) => setting.enable_by_role.selected_roles.includes(r.slug));
+                    roles.push(...selected);
+                  }
+
+                  // Retailers
+                  if (setting.enable_by_role.retailers === 'enabled' && retailerRole) {
+                    roles.push(retailerRole);
+                  }
+
+                  return roles;
+                }, [setting, allRoles, retailerRole]);
+
                 const [value, setValue] = useUncontrolled<RoleRelatedSetting[]>({
-                  value: setting.roles,
-                  defaultValue: setting.roles,
+                  value: settingRolesValue,
+                  defaultValue: settingRolesValue,
                   onChange: onSettingChange,
                 });
 
                 const [open, setOpen] = useState(false);
+
+                const paymentInfo = useMemo(
+                  () => allPaymentsInfo.filter((pi) => pi.method_id === setting.method_id)[0] ?? undefined,
+                  [allPaymentsInfo],
+                );
 
                 const handleSelect = (role: RoleRelatedSetting) => {
                   const isSelected = value.some((v) => v.slug === role.slug);
@@ -160,21 +205,25 @@ export default function PaymentRolesTab() {
                   ));
                 }, [value, handleRemove]);
 
+                if (!paymentInfo) return null;
+
                 return (
                   <TableRow key={setting.method_id} className="border-divider border-b">
                     <TableCell className="w-80 px-2 py-3.5">
                       <p className="text-foreground flex items-center gap-1.5 font-extrabold whitespace-pre-line">
-                        {setting.method_title}
-                        {setting.description && (
+                        {paymentInfo.method_title}
+                        {paymentInfo.description && (
                           <span>
                             <WholeSaleToolTip
                               trigger={<InfoIcon className="h-3 w-3" />}
-                              content={setting.description}
+                              content={paymentInfo.description}
                             />
                           </span>
                         )}
                       </p>
-                      <p className="text-muted-foreground text-xs font-normal whitespace-pre-line">{setting.title}</p>
+                      <p className="text-muted-foreground text-xs font-normal whitespace-pre-line">
+                        {paymentInfo.title}
+                      </p>
                     </TableCell>
                     <TableCell>
                       <Popover open={open} onOpenChange={setOpen}>

@@ -55,41 +55,25 @@ class ShippingHelper {
     public static function get_shipping_roles_setting() {
         $all_shipping_settings = get_option( 'yaywholesaleb2b_shipping_roles', [] );
         $shipping_methods      = self::get_enabled_shipping_methods();
-        $roles                 = get_option( 'yaywholesaleb2b_roles', [] );
-        $handled_roles         = array_merge(
-            array_map(
-                fn( $role ) => [
-                    'slug' => $role['slug'],
-                    'name' => $role['name'],
-                ],
-                $roles
-            ),
-            [
-                [
-                    'slug' => SettingsHelper::B2C_ROLE_SLUG,
-                    'name' => __( 'Retail Customer (B2C)', 'yay-wholesale-b2b' ),
-                ],
-            ]
-        );
+        $default_settings      = [
+            'retailers'      => 'enabled',
+            'wholesalers'    => 'enabled',
+            'selected_roles' => [],
+        ];
 
         $shipping_keys = $all_shipping_settings ? array_column( $all_shipping_settings, 'instance_id' ) : [];
 
         $shipping_settings = [];
         foreach ( $shipping_methods as $shipping_method ) {
             $shipping = [
-                'instance_id'   => $shipping_method['instance_id'],
-                'method_id'     => $shipping_method['method_id'],
-                'instance_name' => $shipping_method['instance_name'],
-                'method_name'   => $shipping_method['method_name'],
-                'description'   => $shipping_method['description'],
-                'zone_id'       => $shipping_method['zone_id'],
-                'zone_name'     => $shipping_method['zone_name'],
+                'instance_id' => $shipping_method['instance_id'],
+                'zone_id'     => $shipping_method['zone_id'],
             ];
 
             if ( ! in_array( $shipping_method['instance_id'], $shipping_keys, true ) ) {
-                $shipping['roles'] = $handled_roles;
+                $shipping['enable_by_role'] = $default_settings;
             } else {
-                $shipping['roles'] = $all_shipping_settings[ array_search( $shipping_method['instance_id'], $shipping_keys, true ) ]['roles'];
+                $shipping['enable_by_role'] = $all_shipping_settings[ array_search( $shipping_method['instance_id'], $shipping_keys, true ) ]['enable_by_role'] ?? $default_settings;
             }
 
             $shipping_settings[] = $shipping;
@@ -116,7 +100,7 @@ class ShippingHelper {
         $setting_shippings = [];
 
         foreach ( $shipping_settings as $shipping ) {
-            if ( empty( $shipping['roles'] ) || empty( $shipping['method_id'] ) ) {
+            if ( empty( $shipping['enable_by_role'] ) || empty( $shipping['instance_id'] ) ) {
                 continue;
             }
 
@@ -124,21 +108,31 @@ class ShippingHelper {
                 continue;
             }
 
-            $shipping_role_slugs = array_column( $shipping['roles'], 'slug' );
+            if ( empty( $role_slug ) ) {
+                $is_retailers_enabled = 'enabled' === $shipping['enable_by_role']['retailers'];
 
-            if ( in_array( $role_slug, $shipping_role_slugs, true ) ) {
-                if ( ! isset( $allowed_shippings[ $shipping['method_id'] ] ) ) {
-                    $allowed_shippings[ $shipping['method_id'] ] = [];
+                if ( $is_retailers_enabled ) {
+                    $allowed_shippings[] = $shipping['instance_id'];
+                }
+            } else {
+                $wholesalers_mode = $shipping['enable_by_role']['wholesalers'];
+                if ( 'disabled' === $wholesalers_mode ) {
+                    $shipping_role_slugs = [];
                 }
 
-                $allowed_shippings[ $shipping['method_id'] ][] = $shipping['instance_id'];
-            }
+                if ( 'enabled' === $wholesalers_mode ) {
+                    $roles               = get_option( 'yaywholesaleb2b_roles', [] );
+                    $shipping_role_slugs = array_column( $roles, 'slug' );
+                } elseif ( 'enabled-selected-roles' === $wholesalers_mode ) {
+                    $shipping_role_slugs = $shipping['enable_by_role']['selected_roles'];
+                }
 
-            if ( ! isset( $setting_shippings[ $shipping['method_id'] ] ) ) {
-                $setting_shippings[ $shipping['method_id'] ] = [];
-            }
+                if ( in_array( $role_slug, $shipping_role_slugs, true ) ) {
+                    $allowed_shippings[] = $shipping['instance_id'];
+                }
+            }//end if
 
-            $setting_shippings[ $shipping['method_id'] ][] = $shipping['instance_id'];
+            $setting_shippings[] = $shipping['instance_id'];
 
         }//end foreach
 

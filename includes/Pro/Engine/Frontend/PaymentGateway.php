@@ -19,6 +19,7 @@ class PaymentGateway {
 
         add_filter( 'ywhs_full_settings', [ $this, 'get_payment_settings' ], 10, 1 );
         add_action( 'ywhs_settings_updated', [ $this, 'update_payment_settings' ], 10, 1 );
+        add_filter( 'ywhs_payment_methods_info_data', [ $this, 'get_payment_methods_info' ], 10, 1 );
     }
 
     /**
@@ -35,7 +36,7 @@ class PaymentGateway {
         $wholesale_role = CustomerHelper::get_current_user_wholesale_role();
 
         $all_role_slugs = PaymentGatewayHelper::get_allowed_payment_by_role_slugs(
-            isset( $wholesale_role ) ? $wholesale_role['slug'] : SettingsHelper::B2C_ROLE_SLUG
+            isset( $wholesale_role ) ? $wholesale_role['slug'] : ''
         );
 
         $allow_role_slugs   = $all_role_slugs['allowed'];
@@ -61,5 +62,9 @@ class PaymentGateway {
         if ( isset( $settings['payment_roles'] ) ) {
             PaymentGatewayHelper::save_payment_method_settings( $settings['payment_roles'] );
         }
+    }
+
+    public function get_payment_methods_info( array $info_data ) {
+        return array_merge( $info_data, PaymentGatewayHelper::get_enabled_payment_methods() );
     }
 }
