@@ -101,9 +101,9 @@ cd "$PROJECT_PATH"
 set -euo pipefail
 # cd "$(dirname "$0")/.."
 if [ "${os#CYGWIN}" != "$os" ] || [ "${os#MINGW}" != "$os" ] || [ "${os#MSYS}" != "$os" ]; then
-    sh "$PROJECT_PATH/vendor/bin/yaycommerce-prerelease" 
+    sh "$PROJECT_PATH/vendor/bin/yaycommerce-prerelease"
 else
-    ./vendor/bin/yaycommerce-prerelease 
+    ./vendor/bin/yaycommerce-prerelease
 fi
 
 #

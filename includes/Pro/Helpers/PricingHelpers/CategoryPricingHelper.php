@@ -36,7 +36,7 @@ class CategoryPricingHelper {
                 $discount_rate = '';
             }
 
-            $discount_data['discount_rate'][ $slug ] = $discount_rate;
+            $discount_data['discount_rates'][ $slug ] = $discount_rate;
         }//end foreach
 
         return $discount_data;
@@ -84,8 +84,8 @@ class CategoryPricingHelper {
 
             if ( $cat_discount &&
                 'custom' === $rule &&
-                ! empty( $cat_discount['discount_rate'][ $wholesale_role['slug'] ] ) ) {
-                $discounts[ $cat_id ] = $cat_discount['discount_rate'][ $wholesale_role['slug'] ];
+                ! empty( $cat_discount['discount_rates'][ $wholesale_role['slug'] ] ) ) {
+                $discounts[ $cat_id ] = $cat_discount['discount_rates'][ $wholesale_role['slug'] ];
                 continue;
             }
 
@@ -98,9 +98,9 @@ class CategoryPricingHelper {
                 // only take discount from the first parent has discount
                 if ( $cat_discount &&
                     'custom' === $rule &&
-                    ! empty( $cat_discount['discount_rate'][ $wholesale_role['slug'] ] )
+                    ! empty( $cat_discount['discount_rates'][ $wholesale_role['slug'] ] )
                 ) {
-                    $discounts[ $cat_id ] = $cat_discount['discount_rate'][ $wholesale_role['slug'] ];
+                    $discounts[ $cat_id ] = $cat_discount['discount_rates'][ $wholesale_role['slug'] ];
                     break;
                 }
             }

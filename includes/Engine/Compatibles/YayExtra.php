@@ -19,6 +19,8 @@ class YayExtra {
             return;
         }
 
+        add_filter( 'ywhs_force_recalculate_in_yay_currency', '__return_true', 999 );
+
         add_action( 'wp_enqueue_scripts', [ $this, 'enqueue_scripts' ] );
 
         add_filter( 'ywhs_cart_item_extra_price_before_apply_discount', [ $this, 'get_extra_price_from_cart_item' ], 999, 2 );

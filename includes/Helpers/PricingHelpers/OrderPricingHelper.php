@@ -67,7 +67,7 @@ class OrderPricingHelper {
         ReportsHelper::delete_ywhs_report_transient();
 
         // Handle the extra price map for each item
-        if ( empty( $order->get_meta( '_ywhs_extra_price_map', true ) ) ) {
+        if ( ! is_admin() ) {
             $extra_price_map = [];
             foreach ( $order->get_items() as $item ) {
                 if ( ! $item instanceof \WC_Order_Item_Product ) {
@@ -100,7 +100,7 @@ class OrderPricingHelper {
                     } else {
                         // Product can be wholesale fixed price
                         $custom_price = $discount_data['wholesale_discount_value'];
-                        $origin_price = apply_filters( 'ywhs_price_handle_processed', $custom_price, null, null );
+                        $origin_price = apply_filters( 'ywhs_after_calc_price_additional_processed', $custom_price, null, null );
                     }
                 }
 

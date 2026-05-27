@@ -41,7 +41,7 @@ export default function GeneralTab() {
             </FieldLabel>
             <FieldContent>
               <Select value={field.value ? field.value : ''} onValueChange={field.onChange}>
-                <SelectTrigger className="min-w-40 text-sm font-normal">
+                <SelectTrigger className="min-w-40">
                   <SelectValue placeholder={__('Select a role', 'yay-wholesale-b2b')} />
                 </SelectTrigger>
                 <SelectContent>
@@ -64,10 +64,16 @@ export default function GeneralTab() {
         render={({ field }) => (
           <div className="flex items-center justify-between rounded-md border p-4">
             <div>
-              <h2 className="text-foreground-400 flex items-center gap-2 text-sm leading-3.5 font-medium">
-                {__('Wholesale Shop Page', 'yay-wholesale-b2b')}
+              <h2 className="flex items-center gap-2 leading-3.5 font-medium">
+                {__('Wholesale shop page', 'yay-wholesale-b2b')}
                 {!isPro && (
-                  <Badge variant="warning" className="text-white">
+                  <Badge
+                    variant="warning"
+                    className="cursor-pointer text-white"
+                    onClick={() => {
+                      window.open('https://yaycommerce.com/yay-wholesale-b2b-for-woocommerce/');
+                    }}
+                  >
                     {__('Pro', 'yay-wholesale-b2b')}
                   </Badge>
                 )}
@@ -77,7 +83,7 @@ export default function GeneralTab() {
               </p>
             </div>
             <Select value={String(field.value) ?? 'inherit'} onValueChange={field.onChange} disabled={!isPro}>
-              <SelectTrigger className="w-fit min-w-40 text-sm font-normal">
+              <SelectTrigger className="min-w-40">
                 <SelectValue placeholder={__('Select your page', 'yay-wholesale-b2b')} />
               </SelectTrigger>
               <SelectContent align="end">
@@ -99,7 +105,7 @@ export default function GeneralTab() {
         render={({ field }) => (
           <div className="flex items-center justify-between rounded-md border p-4">
             <div>
-              <h2 className="text-foreground-400 text-sm leading-3.5 font-medium">
+              <h2 className="leading-3.5 font-medium">
                 {__('Show Wholesale Price to non-wholesale users', 'yay-wholesale-b2b')}
               </h2>
               <p className="text-muted-foreground mt-2 text-xs font-normal">
@@ -121,9 +127,7 @@ export default function GeneralTab() {
         render={({ field }) => (
           <div className="flex items-center justify-between rounded-lg border p-4">
             <div>
-              <h2 className="text-foreground-400 text-sm leading-3.5 font-medium">
-                {__('Disable coupon', 'yay-wholesale-b2b')}
-              </h2>
+              <h2 className="leading-3.5 font-medium">{__('Disable coupon', 'yay-wholesale-b2b')}</h2>
               <p className="text-muted-foreground mt-2 text-xs font-normal">
                 {__('Hide coupon field for wholesale users.', 'yay-wholesale-b2b')}
               </p>
@@ -141,9 +145,7 @@ export default function GeneralTab() {
         render={({ field }) => (
           <div className="flex items-center justify-between rounded-md border p-4">
             <div>
-              <h2 className="text-foreground-400 text-sm leading-3.5 font-medium">
-                {__('Disable tax', 'yay-wholesale-b2b')}
-              </h2>
+              <h2 className="leading-3.5 font-medium">{__('Disable tax', 'yay-wholesale-b2b')}</h2>
               <p className="text-muted-foreground mt-2 text-xs font-normal">
                 {__("Don't charge tax for wholesale users.", 'yay-wholesale-b2b')}
               </p>
@@ -159,20 +161,26 @@ export default function GeneralTab() {
         render={({ field }) => (
           <div className="flex items-center justify-between gap-5 rounded-md border p-4">
             <div>
-              <h2 className="text-foreground-400 flex items-center gap-2 text-sm leading-3.5 font-medium">
+              <h2 className="flex items-center gap-2 leading-3.5 font-medium">
                 {__('Display prices in the shop', 'yay-wholesale-b2b')}
                 {!isPro && (
-                  <Badge variant="warning" className="text-white">
+                  <Badge
+                    variant="warning"
+                    className="cursor-pointer text-white"
+                    onClick={() => {
+                      window.open('https://yaycommerce.com/yay-wholesale-b2b-for-woocommerce/');
+                    }}
+                  >
                     {__('Pro', 'yay-wholesale-b2b')}
                   </Badge>
                 )}
               </h2>
               <p className="text-muted-foreground mt-2 text-xs font-normal">
-                {__('Display product prices Including or Excluding tax for wholesalers in shop', 'yay-wholesale-b2b')}
+                {__('Display product prices including or excluding tax for wholesalers in shop', 'yay-wholesale-b2b')}
               </p>
             </div>
             <Select value={field.value ? field.value : 'inherit'} onValueChange={field.onChange} disabled={!isPro}>
-              <SelectTrigger className="min-w-20 text-sm font-normal sm:min-w-40">
+              <SelectTrigger className="min-w-20 sm:min-w-40">
                 <SelectValue placeholder={__('Select the display mode', 'yay-wholesale-b2b')} />
               </SelectTrigger>
               <SelectContent align="end">

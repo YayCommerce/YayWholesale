@@ -110,9 +110,9 @@ export function WholesalersList() {
   return (
     <Card className="gap-4 shadow-sm">
       {/* Header */}
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="flex items-center gap-2">
-          <h1 className="text-2xl font-bold">{__('Wholesalers List', 'yay-wholesale-b2b')}</h1>
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div className="flex w-fit items-center gap-2 overflow-visible sm:w-1 lg:w-fit">
+          <h1 className="text-2xl font-bold text-nowrap">{__('Wholesalers List', 'yay-wholesale-b2b')}</h1>
           {totalCount !== undefined && (
             <WholeSaleToolTip
               trigger={
@@ -131,44 +131,46 @@ export function WholesalersList() {
           )}
         </div>
 
-        <div className="flex flex-1 flex-col-reverse items-end gap-4 lg:flex-0 lg:flex-row">
-          <InputGroup className="w-full sm:w-80">
-            <InputGroupInput
-              placeholder="Search by ID, Email, Display Name"
-              defaultValue={search}
-              onChange={(e) => {
+        <div className="flex w-full flex-col-reverse items-end gap-4 sm:w-fit xl:flex-row">
+          <div className="flex w-full flex-col items-end gap-4 sm:w-fit sm:flex-row">
+            <InputGroup className="w-full sm:w-80">
+              <InputGroupInput
+                placeholder={__('Search by ID, Email, Display Name', 'yay-wholesale-b2b')}
+                defaultValue={search}
+                onChange={(e) => {
+                  table.setPageIndex(0);
+                  setSearchDebounced(e.target.value);
+                }}
+              />
+              <InputGroupAddon align="inline-end">
+                <Search className="size-4.5 text-[#A0A0A7]" />
+              </InputGroupAddon>
+            </InputGroup>
+            <Select
+              value={roleFilter}
+              onValueChange={(roleSlug) => {
                 table.setPageIndex(0);
-                setSearchDebounced(e.target.value);
+                setRoleFilter(roleSlug);
               }}
-            />
-            <InputGroupAddon align="inline-end">
-              <Search className="size-4.5 text-[#A0A0A7]" />
-            </InputGroupAddon>
-          </InputGroup>
-          <Select
-            value={roleFilter}
-            onValueChange={(roleSlug) => {
-              table.setPageIndex(0);
-              setRoleFilter(roleSlug);
-            }}
-          >
-            <SelectTrigger className="w-full sm:w-45.5">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectGroup>
-                <SelectLabel>{__('Wholesaler Role Filter', 'yay-wholesale-b2b')}</SelectLabel>
-                <SelectItem value="all">{__('All Roles', 'yay-wholesale-b2b')}</SelectItem>
-                {activeRoles?.map((role) => {
-                  return (
-                    <SelectItem key={role.id} value={role.slug}>
-                      {role.name}
-                    </SelectItem>
-                  );
-                })}
-              </SelectGroup>
-            </SelectContent>
-          </Select>
+            >
+              <SelectTrigger className="w-full sm:w-45.5">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  <SelectLabel>{__('Wholesaler Role Filter', 'yay-wholesale-b2b')}</SelectLabel>
+                  <SelectItem value="all">{__('All Roles', 'yay-wholesale-b2b')}</SelectItem>
+                  {activeRoles?.map((role) => {
+                    return (
+                      <SelectItem key={role.id} value={role.slug}>
+                        {role.name}
+                      </SelectItem>
+                    );
+                  })}
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+          </div>
           <Button variant="primary-outline-fill" asChild>
             <a href={window.yayWholesaleB2BMeta.wpMeta.usersUrl.new} target="_blank" rel="noopener noreferrer">
               <Plus className="size-4" />
@@ -188,7 +190,7 @@ export function WholesalersList() {
                   <TableHead
                     key={header.id}
                     className={cn(
-                      'text-foreground-400 py-2 text-sm font-medium',
+                      'py-2 text-sm font-medium',
                       header.column.columnDef.meta?.align === 'center' ? 'text-center' : 'text-left',
                       header.column.columnDef.meta?.isCheckbox ? 'w-9' : 'px-3',
                     )}

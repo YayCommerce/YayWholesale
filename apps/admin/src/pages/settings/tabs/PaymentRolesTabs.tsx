@@ -161,7 +161,7 @@ export default function PaymentRolesTab() {
                 }, [value, handleRemove]);
 
                 return (
-                  <TableRow key={setting.id} className="border-divider border-b">
+                  <TableRow key={setting.method_id} className="border-divider border-b">
                     <TableCell className="w-80 px-2 py-3.5">
                       <p className="text-foreground flex items-center gap-1.5 font-extrabold whitespace-pre-line">
                         {setting.method_title}

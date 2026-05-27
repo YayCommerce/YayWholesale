@@ -19,7 +19,7 @@ export default function Header() {
         'bg-background relative flex h-13.5 items-center justify-between gap-0 py-0 pr-3 lg:pr-6',
         scrolled ? 'top-0 shadow-[0_8px_8px_0_rgba(85,93,102,0.3)]' : 'top-11.5 shadow-none',
         'sm:top-11.5 md:top-8',
-        'md:pr-3',
+        'z-10 md:pr-3',
       )}
     >
       {/* Logo */}
