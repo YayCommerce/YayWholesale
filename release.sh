@@ -124,7 +124,7 @@ done
 fi
 
 #
-# 8) Delete Pro folder if building Lite ver
+# 8) Delete Pro folder if building Lite ver; Replace Plugin name if building Pro ver
 #
 if [ "$IS_PRO" = "false" ]; then
     TARGET="$DEST_PATH/includes/Pro"
@@ -136,6 +136,10 @@ if [ "$IS_PRO" = "false" ]; then
     if [ -d "$TARGET" ]; then
         rm -rf "$TARGET" && echo "Removed: $TARGET (and its content)"
     fi
+else
+    cp "$DEST_PATH/assets/pro/yay-wholesale-b2b-pro.php" "$DEST_PATH/"
+    rm "$DEST_PATH/assets/pro/yay-wholesale-b2b-pro.php"
+    rm "$DEST_PATH/yay-wholesale-b2b.php"
 fi
 
 #
@@ -150,6 +154,6 @@ echo "Generating zip file..."
 cd "$BUILD_PATH" || exit
 zip -q -r "${PLUGIN_SLUG}.zip" "$PLUGIN_SLUG/"
 rm -rf "$PLUGIN_SLUG"
-echo "${PLUGIN_SLUG}.zip file generated!"
+echo "${PLUGIN_SLUG}.zip file generated!"x
 
 echo "Build done!"
