@@ -1,5 +1,7 @@
-/vendor/
 node_modules
+.vscode/launch.json
+.vscode/settings.json
+.claude/settings.local.json
 
 /assets/dist/*
 /release/dest/*
@@ -8,13 +10,12 @@ node_modules
 /blocks/build/*
 /build
 /tools
-yay-wholesale-pro.zip
-yay-wholesale-pro-edd.zip
-yay-wholesale-lite.zip
-package-lock.json
+/vendor/
 .DS_Store
-.vscode/launch.json
-.vscode/settings.json
-vendor-prefixed/
-
 .env.local
+
+# E2E test artifacts
+tests/e2e/.state/
+tests/e2e/test-results/
+tests/e2e/playwright-report/
+tests/e2e/.env

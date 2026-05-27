@@ -1,7 +1,7 @@
 <?php
 namespace YayWholesaleB2B\Helpers;
 
-use YayWholesaleB2B\Utils\Utils;
+use YayWholesaleB2B\YayWholesaleB2B;
 
 /**
  * Requirements Helper Class
@@ -26,7 +26,7 @@ class RequirementHelper {
      * @return float
      */
     public static function get_min_order_quantity( array $wholesale_role ) {
-        if ( ! isset( $wholesale_role['minOrderQuantity'] ) || ! Utils::is_pro() ) {
+        if ( ! isset( $wholesale_role['minOrderQuantity'] ) || ! YayWholesaleB2B::is_pro() ) {
             return 0;
         }
 

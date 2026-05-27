@@ -1,0 +1,24 @@
+{
+  "name": "@yay-wholesale/e2e",
+  "description": "E2E tests for Yay Wholesale B2B plugin",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "test": "playwright test",
+    "test:single": "playwright test --project=test_single",
+    "test:multi": "playwright test --project=test_multisite",
+    "test:ui": "playwright test --ui",
+    "env:start:single": "wp-env start --config=.wp-env.single.json",
+    "env:start:multi": "wp-env start --config=.wp-env.multisite.json",
+    "env:stop:single": "wp-env stop --config=.wp-env.single.json",
+    "env:stop:multi": "wp-env stop --config=.wp-env.multisite.json",
+    "env:clean": "wp-env clean --config=.wp-env.single.json && wp-env clean --config=.wp-env.multisite.json"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.52.0",
+    "@types/node": "^20.0.0",
+    "@woocommerce/e2e-utils-playwright": "^0.4.0",
+    "@wordpress/env": "^10.0.0",
+    "dotenv": "^16.4.7"
+  }
+}
