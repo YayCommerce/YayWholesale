@@ -49,6 +49,10 @@
 		<exclude name="Universal.Arrays.DisallowShortArraySyntax"/>
 	</rule>
 
+	​<rule ref="Generic.Functions.CallTimePassByReference">
+		<exclude name="Generic.Functions.CallTimePassByReference"/>
+	</rule>
+
 	<rule ref="Squiz.Classes.ClassFileName" />
 	<rule ref="Squiz.Commenting.ClassComment.Missing"/>
 	<rule ref="Generic.Arrays.DisallowLongArraySyntax"/>
@@ -76,7 +80,6 @@
 	<exclude-pattern>/assets/</exclude-pattern>
 	<exclude-pattern>/dist/</exclude-pattern>
 	<exclude-pattern>index.php</exclude-pattern>
-
 	<!-- Do not fail on warnings -->
 	<config name="ignore_warnings_on_exit" value="1" />
 

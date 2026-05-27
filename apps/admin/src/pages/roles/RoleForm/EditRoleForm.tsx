@@ -62,12 +62,7 @@ export default function EditRoleForm({ role }: { role: Role }) {
       >
         <SheetHeader>
           <div className="flex items-start justify-between">
-            <div>
-              <SheetTitle>{__('Edit Role', 'yay-wholesale-b2b')}</SheetTitle>
-              <SheetDescription className="mt-[4px] leading-[20px]">
-                {__('Enter the information below to edit wholesale user role', 'yay-wholesale-b2b')}
-              </SheetDescription>
-            </div>
+            <SheetTitle>{__('Edit Role', 'yay-wholesale-b2b')}</SheetTitle>
           </div>
         </SheetHeader>
 

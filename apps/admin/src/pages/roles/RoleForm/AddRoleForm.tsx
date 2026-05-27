@@ -44,12 +44,7 @@ export default function AddRoleForm() {
       >
         <SheetHeader>
           <div className="flex items-start justify-between">
-            <div>
-              <SheetTitle>{__('Add New Role', 'yay-wholesale-b2b')}</SheetTitle>
-              <SheetDescription className="mt-[4px] leading-[20px]">
-                {__('Enter the information below to add a new wholesale user role', 'yay-wholesale-b2b')}
-              </SheetDescription>
-            </div>
+            <SheetTitle>{__('Add New Role', 'yay-wholesale-b2b')}</SheetTitle>
           </div>
         </SheetHeader>
 
