@@ -91,7 +91,7 @@ class WholeSalersHelper {
 
             if ( $order->get_user_id() === $user_id ) {
                 ++$completed_orders;
-                $revenue += (float) $order->get_total();
+                $revenue += (float) apply_filters( 'ywhs_revert_price_from_order', $order->get_total(), $order );
             }
         }
 

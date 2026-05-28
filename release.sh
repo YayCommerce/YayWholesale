@@ -136,6 +136,9 @@ if [ "$IS_PRO" = "false" ]; then
     if [ -d "$TARGET" ]; then
         rm -rf "$TARGET" && echo "Removed: $TARGET (and its content)"
     fi
+else
+    mv "$DEST_PATH/assets/pro/yay-wholesale-b2b.php" "$DEST_PATH/yay-wholesale-b2b.php"
+    echo "Switched: main php file of Pro ver"
 fi
 
 #
