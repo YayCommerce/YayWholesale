@@ -44,6 +44,11 @@ jobs:
         env:
           WP_ENV_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Debug wp-env cache location
+        run: |
+          echo "=== ~/.wp-env ===" && ls -la ~/.wp-env 2>/dev/null || echo "not found"
+          echo "=== find wp-env dirs ===" && find ~ -maxdepth 3 -name ".wp-env" -o -name "wp-env" 2>/dev/null | head -20
+
       - name: Run E2E tests (single-site)
         run: pnpm test:e2e:single
 
