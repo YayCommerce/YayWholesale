@@ -1,53 +1,14 @@
-import { useCallback, useMemo, useState } from 'react';
 import { QuestionIcon } from '@phosphor-icons/react';
-import { CommandGroup } from 'cmdk';
-import { InfoIcon, Truck } from 'lucide-react';
-import { useFieldArray, useFormContext } from 'react-hook-form';
 import { __ } from '@wordpress/i18n';
 
-import { useActiveRolesQuery } from '@/lib/queries/roles.queries';
-import { RoleRelatedSetting, Settings } from '@/lib/schema/settings.schema';
-import { cn, getShippingMethodsInfo, isPro } from '@/lib/utils';
-import { useUncontrolled } from '@/hooks/useUncontrolled';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import {
-  ComboboxBadge,
-  ComboboxCheckbox,
-  ComboboxIcon,
-  ComboboxRemove,
-  ComboboxTrigger,
-} from '@/components/ui/combobox';
-import { Command, CommandEmpty, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
+import { isPro } from '@/lib/utils';
 import { WholeSaleToolTip } from '@/components/ui/custom/WholeSaleToolTip';
-import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '@/components/ui/empty';
-import { Popover, PopoverContent } from '@/components/ui/popover';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { EmptyShippingMethod } from '@/pages/settings/tabs/shipping-roles/EmptyShippingMethod';
+import { ShippingRows } from '@/pages/settings/tabs/shipping-roles/ShippingRows';
+import { UpgradeToUnlockShipping } from '@/pages/settings/tabs/shipping-roles/UpgradeToUnlockShipping';
 
 export default function ShippingRolesTab() {
-  const { control } = useFormContext<Settings>();
-
-  const { fields, update } = useFieldArray({
-    control,
-    name: 'shipping_roles',
-  });
-
-  const { data: roles } = useActiveRolesQuery();
-
-  const retailerRole = useMemo(
-    () => ({
-      slug: 'ywhs_retail_' + crypto.randomUUID(),
-      name: __('Retail Customer (B2C)', 'yay-wholesale-b2b'),
-    }),
-    [],
-  );
-  const allRoles = useMemo(() => roles?.map((role) => ({ slug: role.slug, name: role.name })) ?? [], [roles]);
-  const rolesSelect = useMemo(() => {
-    return [...allRoles, retailerRole];
-  }, [allRoles, retailerRole]);
-
-  const allShippingsInfo = getShippingMethodsInfo();
-
   return (
     <div className="flex flex-col gap-4 overflow-x-auto">
       <div>
@@ -81,222 +42,11 @@ export default function ShippingRolesTab() {
           </TableHeader>
           <TableBody>
             {!isPro ? (
-              <TableRow>
-                <TableCell colSpan={2} className="h-24 text-center">
-                  <Empty className="my-5">
-                    <EmptyHeader>
-                      <EmptyMedia variant="icon" className="h-15 w-15 rounded-full">
-                        <Truck className="min-h-6 min-w-6" />
-                      </EmptyMedia>
-                      <EmptyTitle className="flex items-center gap-1.5 font-bold">
-                        {__('Yay Wholesale B2B', 'yay-wholesale-b2b')}
-                        {!isPro && (
-                          <Badge variant="warning" className="text-white">
-                            {__('Pro', 'yay-wholesale-b2b')}
-                          </Badge>
-                        )}
-                      </EmptyTitle>
-                      <EmptyDescription>
-                        {__('Upgrade to PRO to unlock this feature now', 'yay-wholesale-b2b')}
-                      </EmptyDescription>
-                      <EmptyContent>
-                        <Button
-                          variant="warning"
-                          className="text-white"
-                          onClick={() => {
-                            window.open('https://yaycommerce.com/yay-wholesale-b2b-for-woocommerce/');
-                          }}
-                        >
-                          {__('Upgrade', 'yay-wholesale-b2b')}
-                        </Button>
-                      </EmptyContent>
-                    </EmptyHeader>
-                  </Empty>
-                </TableCell>
-              </TableRow>
-            ) : fields.length > 0 ? (
-              fields.map((setting, index) => {
-                const onSettingChange = async (value: RoleRelatedSetting[]) => {
-                  const updated = fields[index];
-
-                  //Update retailers
-                  if (value.includes(retailerRole)) {
-                    updated.enable_by_role.retailers = 'enabled';
-                    value.splice(value.indexOf(retailerRole), 1);
-                  } else {
-                    updated.enable_by_role.retailers = 'disabled';
-                  }
-
-                  //Update wholesalers
-                  if (value.length === 0) {
-                    updated.enable_by_role.wholesalers = 'disabled';
-                    updated.enable_by_role.selected_roles = [];
-                  } else if (value.length === allRoles.length) {
-                    updated.enable_by_role.wholesalers = 'enabled';
-                    updated.enable_by_role.selected_roles = [];
-                  } else {
-                    updated.enable_by_role.wholesalers = 'enabled-selected-roles';
-                    updated.enable_by_role.selected_roles = value.map((r) => r.slug);
-                  }
-
-                  update(index, updated);
-                };
-
-                const settingRolesValue = useMemo(() => {
-                  const roles: RoleRelatedSetting[] = [];
-
-                  // Wholesalers
-                  if (setting.enable_by_role.wholesalers === 'enabled') {
-                    roles.push(...allRoles);
-                  } else if (setting.enable_by_role.wholesalers === 'enabled-selected-roles') {
-                    const selected = allRoles.filter((r) => setting.enable_by_role.selected_roles.includes(r.slug));
-                    roles.push(...selected);
-                  }
-
-                  // Retailers
-                  if (setting.enable_by_role.retailers === 'enabled' && retailerRole) {
-                    roles.push(retailerRole);
-                  }
-
-                  return roles;
-                }, [setting, allRoles, retailerRole]);
-
-                const [value, setValue] = useUncontrolled<RoleRelatedSetting[]>({
-                  value: settingRolesValue,
-                  defaultValue: settingRolesValue,
-                  onChange: onSettingChange,
-                });
-
-                const [open, setOpen] = useState(false);
-
-                const shippingInfo = useMemo(
-                  () => allShippingsInfo.filter((si) => si.instance_id === setting.instance_id)[0] ?? undefined,
-                  [allShippingsInfo],
-                );
-
-                const handleSelect = (role: RoleRelatedSetting) => {
-                  const isSelected = value.some((v) => v.slug === role.slug);
-                  if (isSelected) {
-                    setValue(value.filter((v) => v.slug !== role.slug));
-                  } else {
-                    setValue([...value, role]);
-                  }
-                };
-
-                const handleRemove = useCallback(
-                  (role: RoleRelatedSetting, e: React.MouseEvent) => {
-                    e.stopPropagation();
-                    e.preventDefault();
-                    setValue(value.filter((v) => v.slug !== role.slug));
-                  },
-                  [value, setValue],
-                );
-
-                const labels = useMemo(() => {
-                  if (value.length === 0)
-                    return (
-                      <span className="text-muted-foreground">{__('Select your roles', 'yay_wholesale_b2b')}</span>
-                    );
-                  return value.map((role) => (
-                    <ComboboxBadge key={role.slug}>
-                      {role.name}
-                      <ComboboxRemove onRemove={(e) => handleRemove(role, e)} />
-                    </ComboboxBadge>
-                  ));
-                }, [value, handleRemove]);
-
-                if (!shippingInfo) return null;
-
-                return (
-                  <TableRow key={setting.instance_id} className="border-divider border-b">
-                    <TableCell className="w-80 px-2 pt-3.5 pb-1">
-                      <p className="text-foreground flex items-center gap-1.5 font-extrabold whitespace-pre-line">
-                        {shippingInfo.instance_name}
-                        {shippingInfo.description && (
-                          <span>
-                            <WholeSaleToolTip
-                              trigger={<InfoIcon className="h-3 w-3" />}
-                              content={shippingInfo.description}
-                            />
-                          </span>
-                        )}
-                      </p>
-                      <p className="text-muted-foreground text-xs font-normal whitespace-pre-line">
-                        {shippingInfo.method_name}
-                      </p>
-                      <p className="text-muted-foreground mt-4 flex items-center gap-1.5 text-xs font-normal">
-                        {__('Shipping Zone: ', 'yay_wholesale_b2b')}
-                        <Badge className="" variant={setting.zone_id ? 'primary-soft' : 'secondary'}>
-                          {setting.zone_id ? shippingInfo.zone_name : __('Rest of the World', 'yay_wholesale_b2b')}
-                        </Badge>
-                      </p>
-                    </TableCell>
-                    <TableCell>
-                      <Popover open={open} onOpenChange={setOpen}>
-                        <ComboboxTrigger disabled={false} className="my-3 w-full">
-                          <div className={cn('flex flex-wrap gap-1', value.length > 0 && '-ml-2')}>{labels}</div>
-                          <ComboboxIcon />
-                        </ComboboxTrigger>
-                        <PopoverContent className="w-(--radix-popover-trigger-width) p-0" align="start">
-                          <Command>
-                            {rolesSelect.length > 10 && <CommandInput placeholder="Search roles" />}
-                            <CommandList>
-                              <CommandEmpty>{__('No roles found')}</CommandEmpty>
-                              <CommandGroup>
-                                {rolesSelect.map((role) => {
-                                  const isSelected = value.some((v) => v.slug === role.slug);
-                                  return (
-                                    <CommandItem
-                                      key={role.slug}
-                                      value={role.slug}
-                                      onSelect={() => {
-                                        handleSelect(role);
-                                      }}
-                                    >
-                                      <ComboboxCheckbox selected={isSelected} />
-                                      {role.name}
-                                    </CommandItem>
-                                  );
-                                })}
-                              </CommandGroup>
-                            </CommandList>
-                          </Command>
-                        </PopoverContent>
-                      </Popover>
-                    </TableCell>
-                  </TableRow>
-                );
-              })
+              <UpgradeToUnlockShipping />
+            ) : wooShippingMethods.length === 0 ? (
+              <EmptyShippingMethod />
             ) : (
-              <TableRow>
-                <TableCell colSpan={2} className="h-24 text-center">
-                  <Empty className="my-5">
-                    <EmptyHeader>
-                      <EmptyMedia variant="icon" className="h-15 w-15 rounded-full">
-                        <Truck className="min-h-7 min-w-7" />
-                      </EmptyMedia>
-                      <EmptyTitle className="font-bold">
-                        {__('No Enabled Shipping Methods Found', 'yay-wholesale-b2b')}
-                      </EmptyTitle>
-                      <EmptyDescription>
-                        {__(
-                          "You haven't enabled any shipping methods. Get started with Woocommerce Shippings.",
-                          'yay-wholesale-b2b',
-                        )}
-                      </EmptyDescription>
-                      <EmptyContent>
-                        <Button
-                          onClick={() => {
-                            window.open(window.yayWholesaleB2BMeta.wcMeta.setting_urls.shipping);
-                          }}
-                        >
-                          {__('Configure', 'yay-wholesale-b2b')}
-                        </Button>
-                      </EmptyContent>
-                    </EmptyHeader>
-                  </Empty>
-                </TableCell>
-              </TableRow>
+              <ShippingRows />
             )}
           </TableBody>
         </Table>
@@ -304,3 +54,5 @@ export default function ShippingRolesTab() {
     </div>
   );
 }
+
+const wooShippingMethods = window.yayWholesaleB2BMeta.wcMeta.shipping_methods_info;

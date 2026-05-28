@@ -52,6 +52,7 @@ export type Meta = {
     }[];
     shipping_methods_info: {
       instance_id: number;
+      zone_id: number;
       instance_name: string;
       zone_name: string;
       method_name: string;

@@ -89,8 +89,8 @@ class LocalizeHelper {
                     'decimal_sep'  => get_option( 'woocommerce_price_decimal_sep' ),
                     'num_decimals' => intval( get_option( 'woocommerce_price_num_decimals' ) ),
                 ],
-                'payment_methods_info'  => apply_filters( 'ywhs_payment_methods_info_data', [] ),
-                'shipping_methods_info' => apply_filters( 'ywhs_shipping_methods_info_data', [] ),
+                'payment_methods_info'  => WoocommerceHelper::get_enabled_payment_methods(),
+                'shipping_methods_info' => WoocommerceHelper::get_enabled_shipping_methods(),
             ],
         ];
 

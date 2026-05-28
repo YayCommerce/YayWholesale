@@ -3,7 +3,6 @@ namespace YayWholesaleB2B\Pro\Engine\Frontend;
 
 use YayWholesaleB2B\Helpers\CustomerHelper;
 use YayWholesaleB2B\Utils\SingletonTrait;
-use YayWholesaleB2B\Helpers\SettingsHelper;
 use YayWholesaleB2B\Pro\Helpers\PaymentGatewayHelper;
 
 defined( 'ABSPATH' ) || exit;
@@ -19,7 +18,6 @@ class PaymentGateway {
 
         add_filter( 'ywhs_full_settings', [ $this, 'get_payment_settings' ], 10, 1 );
         add_action( 'ywhs_settings_updated', [ $this, 'update_payment_settings' ], 10, 1 );
-        add_filter( 'ywhs_payment_methods_info_data', [ $this, 'get_payment_methods_info' ], 10, 1 );
     }
 
     /**
@@ -35,18 +33,14 @@ class PaymentGateway {
 
         $wholesale_role = CustomerHelper::get_current_user_wholesale_role();
 
-        $all_role_slugs = PaymentGatewayHelper::get_allowed_payment_by_role_slugs(
-            isset( $wholesale_role ) ? $wholesale_role['slug'] : ''
-        );
-
-        $allow_role_slugs   = $all_role_slugs['allowed'];
-        $setting_role_slugs = $all_role_slugs['settings'];
-
         foreach ( $available_gateways as $gateway_id => $gateway ) {
-            if ( in_array( $gateway_id, $setting_role_slugs, true ) ) {
-                if ( ! in_array( $gateway_id, $allow_role_slugs, true ) ) {
-                    unset( $available_gateways[ $gateway_id ] );
-                }
+            $is_payment_method_allowed = PaymentGatewayHelper::is_payment_method_allowed(
+                $gateway_id,
+                isset( $wholesale_role ) ? $wholesale_role['slug'] : null
+            );
+
+            if ( ! $is_payment_method_allowed ) {
+                unset( $available_gateways[ $gateway_id ] );
             }
         }
 
@@ -62,9 +56,5 @@ class PaymentGateway {
         if ( isset( $settings['payment_roles'] ) ) {
             PaymentGatewayHelper::save_payment_method_settings( $settings['payment_roles'] );
         }
-    }
-
-    public function get_payment_methods_info( array $info_data ) {
-        return array_merge( $info_data, PaymentGatewayHelper::get_enabled_payment_methods() );
     }
 }

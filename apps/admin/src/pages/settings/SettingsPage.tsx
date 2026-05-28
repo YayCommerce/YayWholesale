@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { Link, useParams } from 'react-router-dom';
@@ -13,6 +13,7 @@ import { useRouteLeaveGuard } from '@/hooks/useRouteLeaveGuard';
 import { Card, CardContent } from '@/components/ui/card';
 import { FormProvider } from '@/components/ui/form';
 import { UnsavedChangeDialog } from '@/components/ui/unsaved-changed-dialog';
+import { makeDefaultSettings } from './settings.helper';
 import DisplayTab from './tabs/DisplayTab';
 import EmailsTab from './tabs/EmailsTab';
 import GeneralTab from './tabs/GeneralTab';
@@ -54,9 +55,13 @@ export default function SettingsPage() {
   const saveMutation = useSaveSettingsMutation();
   const isMutating = useIsMutatingSettings();
 
+  const defaultValues = useMemo(() => {
+    return makeDefaultSettings(settings);
+  }, [settings]);
+
   const form = useForm<Settings>({
     resolver: zodResolver(settingsFormSchema),
-    defaultValues: settings,
+    defaultValues: defaultValues,
   });
 
   async function onSubmit(data: Settings) {
