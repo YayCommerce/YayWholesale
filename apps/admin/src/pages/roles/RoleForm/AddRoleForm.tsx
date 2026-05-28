@@ -7,7 +7,7 @@ import { getErrorMsg } from '@/lib/helpers/response.helper';
 import { useAddRoleMutation, useIsMutatingRoles } from '@/lib/queries/roles.queries';
 import { RoleFormValues, roleSchema } from '@/lib/schema/roles.schema';
 import { Button } from '@/components/ui/button';
-import { SheetClose, SheetDescription, SheetFooter, SheetHeader, SheetTitle } from '@/components/ui/sheet';
+import { SheetClose, SheetFooter, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { toast } from '@/components/ui/sonner';
 import RoleFormContent from './RoleFormContent';
 

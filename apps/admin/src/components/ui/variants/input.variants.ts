@@ -3,7 +3,8 @@ import { cva, VariantProps } from 'class-variance-authority';
 export const inputVariants = cva('border-input', {
   variants: {
     variant: {
-      input: 'focus-visible:ring-ring has-[[data-slot=input-group-control]:focus-visible]:ring-ring',
+      input:
+        'focus-visible:ring-foreground has-[[data-slot=input-group-control]:focus-visible]:ring-foreground hover:border-muted-foreground focus-visible:hover:border-border has-[[data-slot=input-group-control]:focus-visible]:hover:border-border',
       picker: 'cursor-pointer shadow-xs hover:bg-muted-400 focus-visible:ring-ring',
 
       /* Shadcn variants: override ring-offset */
@@ -22,7 +23,7 @@ export type InputVariantProps = VariantProps<typeof inputVariants>;
 
 export const inputGroupVariants = cva(
   [
-    'group/input-group border border-input dark:bg-input/30 shadow-xs relative flex w-full items-center outline-none transition-default duration-300 min-w-0 has-[>textarea]:h-auto data-[disabled=true]:opacity-70 data-[disabled=true]:pointer-events-none data-[disabled=true]:cursor-not-allowed has-[>[data-align=block-end]]:h-auto has-[>[data-align=block-end]]:flex-col has-[>[data-align=block-start]]:h-auto has-[>[data-align=block-start]]:flex-col',
+    'group/input-group border hover:border-muted-foreground border-input dark:bg-input/30 shadow-xs relative flex w-full items-center outline-none transition-default duration-300 min-w-0 has-[>textarea]:h-auto data-[disabled=true]:opacity-70 data-[disabled=true]:pointer-events-none data-[disabled=true]:cursor-not-allowed has-[>[data-align=block-end]]:h-auto has-[>[data-align=block-end]]:flex-col has-[>[data-align=block-start]]:h-auto has-[>[data-align=block-start]]:flex-col focus-visible:group-hover:border-border',
     'has-[>[data-align=inline-start]]:[&>input]:pl-2 has-[>[data-align=inline-end]]:[&>input]:pr-2',
   ],
   {
