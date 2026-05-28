@@ -41,6 +41,8 @@ jobs:
 
       - name: Start wp-env
         run: pnpm env:start:single
+        env:
+          WP_ENV_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Run E2E tests (single-site)
         run: pnpm test:e2e:single
