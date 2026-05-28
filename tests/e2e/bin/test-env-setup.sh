@@ -22,5 +22,8 @@ wp-env run cli --config="$CONFIG" wp user create customer customer@woocommerceco
 echo -e 'Update Blog Name \n'
 wp-env run cli --config="$CONFIG" wp option update blogname 'YayCommerce E2E Test Suite'
 
+echo -e 'Disable WooCommerce coming soon \n'
+wp-env run cli --config="$CONFIG" wp option update woocommerce_coming_soon no
+
 echo -e 'Upload test images \n'
 wp-env run cli --config="$CONFIG" wp media import './test-data/images/image-01.png' './test-data/images/image-02.png' './test-data/images/image-03.png'
