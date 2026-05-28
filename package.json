@@ -3,7 +3,7 @@
   "title": "Yay Wholesale Plugin",
   "private": true,
   "scripts": {
-    "postinstall": "composer install",
+    "postinstall": "[ \"$CI\" = \"true\" ] || composer install",
     "makepot": "wp i18n make-pot . languages/yay-wholesale-b2b.pot --exclude=vendor,node_modules,apps,tests --domain=yay-wholesale-b2b",
     "release": "pnpm release:lite && pnpm release:pro",
     "release:lite": "bash ./release.sh IS_PRO=false",
