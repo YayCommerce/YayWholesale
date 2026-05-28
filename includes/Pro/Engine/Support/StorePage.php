@@ -1,8 +1,7 @@
 <?php
-namespace YayWholesaleB2B\Engine\Support;
+namespace YayWholesaleB2B\Pro\Engine\Support;
 
 use YayWholesaleB2B\Helpers\CustomerHelper;
-use YayWholesaleB2B\Helpers\RolesHelper;
 use YayWholesaleB2B\Helpers\SettingsHelper;
 use YayWholesaleB2B\Helpers\SupportHelper;
 use YayWholesaleB2B\Utils\SingletonTrait;

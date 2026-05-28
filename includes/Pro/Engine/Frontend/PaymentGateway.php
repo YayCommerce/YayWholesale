@@ -3,7 +3,6 @@ namespace YayWholesaleB2B\Pro\Engine\Frontend;
 
 use YayWholesaleB2B\Helpers\CustomerHelper;
 use YayWholesaleB2B\Utils\SingletonTrait;
-use YayWholesaleB2B\Helpers\SettingsHelper;
 use YayWholesaleB2B\Pro\Helpers\PaymentGatewayHelper;
 
 defined( 'ABSPATH' ) || exit;
@@ -34,18 +33,14 @@ class PaymentGateway {
 
         $wholesale_role = CustomerHelper::get_current_user_wholesale_role();
 
-        $all_role_slugs = PaymentGatewayHelper::get_allowed_payment_by_role_slugs(
-            isset( $wholesale_role ) ? $wholesale_role['slug'] : SettingsHelper::B2C_ROLE_SLUG
-        );
-
-        $allow_role_slugs   = $all_role_slugs['allowed'];
-        $setting_role_slugs = $all_role_slugs['settings'];
-
         foreach ( $available_gateways as $gateway_id => $gateway ) {
-            if ( in_array( $gateway_id, $setting_role_slugs, true ) ) {
-                if ( ! in_array( $gateway_id, $allow_role_slugs, true ) ) {
-                    unset( $available_gateways[ $gateway_id ] );
-                }
+            $is_payment_method_allowed = PaymentGatewayHelper::is_payment_method_allowed(
+                $gateway_id,
+                isset( $wholesale_role ) ? $wholesale_role['slug'] : null
+            );
+
+            if ( ! $is_payment_method_allowed ) {
+                unset( $available_gateways[ $gateway_id ] );
             }
         }
 

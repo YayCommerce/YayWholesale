@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { Link, useParams } from 'react-router-dom';
@@ -13,6 +13,7 @@ import { useRouteLeaveGuard } from '@/hooks/useRouteLeaveGuard';
 import { Card, CardContent } from '@/components/ui/card';
 import { FormProvider } from '@/components/ui/form';
 import { UnsavedChangeDialog } from '@/components/ui/unsaved-changed-dialog';
+import { makeDefaultSettings } from './settings.helper';
 import DisplayTab from './tabs/DisplayTab';
 import EmailsTab from './tabs/EmailsTab';
 import GeneralTab from './tabs/GeneralTab';
@@ -54,9 +55,13 @@ export default function SettingsPage() {
   const saveMutation = useSaveSettingsMutation();
   const isMutating = useIsMutatingSettings();
 
+  const defaultValues = useMemo(() => {
+    return makeDefaultSettings(settings);
+  }, [settings]);
+
   const form = useForm<Settings>({
     resolver: zodResolver(settingsFormSchema),
-    defaultValues: settings,
+    defaultValues: defaultValues,
   });
 
   async function onSubmit(data: Settings) {
@@ -65,6 +70,7 @@ export default function SettingsPage() {
     try {
       await saveMutation.mutateAsync(data);
       toast.success(__('Settings saved!', 'yay-wholesale-b2b'));
+      form.reset(data);
     } catch (error) {
       toast.error(await getErrorMsg(error));
     }
@@ -90,7 +96,7 @@ export default function SettingsPage() {
             {/* Left Sidebar - Tab List */}
             <div className="shrink-0 sm:w-[176px]">
               <Card className="border-none bg-transparent p-0 shadow-none">
-                <CardContent className="w-full overflow-x-auto px-0 [scrollbar-width:thin]">
+                <CardContent className="w-full [scrollbar-width:thin] overflow-x-auto px-0">
                   <div className="flex h-fit w-full items-center gap-1 bg-transparent pb-2.5 sm:flex-col sm:items-stretch md:p-0">
                     {tabs.map((tab) => (
                       <Link
