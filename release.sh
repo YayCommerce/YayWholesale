@@ -152,8 +152,8 @@ rm -rf "$DEST_PATH/includes/Engine/Register/RegisterDev.php"
 #
 echo "Generating zip file..."
 cd "$BUILD_PATH" || exit
-zip -q -r "${PLUGIN_SLUG}.zip" "$PLUGIN_SLUG/"
-rm -rf "$PLUGIN_SLUG"
-echo "${PLUGIN_SLUG}.zip file generated!"x
+zip -q -r "../${PLUGIN_SLUG}.zip" "$PLUGIN_SLUG/"
+rm -rf "$BUILD_PATH"
+echo "${PLUGIN_SLUG}.zip file generated!"
 
 echo "Build done!"

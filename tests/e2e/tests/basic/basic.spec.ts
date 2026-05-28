@@ -19,6 +19,8 @@ test("load wp-admin as admin", async ({ page }) => {
 test("YayWholesale plugin is active", async ({ page }) => {
   await page.goto("./wp-admin/plugins.php");
   await expect(
-    page.getByText("Yay Wholesale B2B for WooCommerce"),
+    page.locator("tr.active").filter({
+      has: page.locator("strong").getByText("Yay Wholesale B2B for WooCommerce", { exact: true }),
+    }),
   ).toBeVisible();
 });
