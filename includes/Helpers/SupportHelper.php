@@ -87,7 +87,7 @@ class SupportHelper {
      * @return bool
      */
     public static function is_using_wc_shop_page( $setting ) {
-        return 'inherit' === $setting['general']['wholesale_store_page'];
+        return empty( $setting['general']['wholesale_store_page'] );
     }
 
     /**
@@ -119,7 +119,7 @@ class SupportHelper {
     public static function get_wholesale_store_url( $setting ) {
         $page = $setting['general']['wholesale_store_page'];
 
-        if ( 'inherit' === $page ) {
+        if ( empty( $page ) ) {
             $page_id = wc_get_page_id( 'shop' );
         } else {
             $page_id = (int) $page;

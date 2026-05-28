@@ -29,7 +29,6 @@ class YayWholesaleB2B {
         \YayWholesaleB2B\Engine\Frontend\Requirement::get_instance();
 
         \YayWholesaleB2B\Engine\Compatibles::get_instance();
-        \YayWholesaleB2B\Engine\Support\Support::get_instance();
 
         if ( self::is_pro() ) {
             \YayWholesaleB2B\Pro\YayWholesaleB2BPro::initialize();

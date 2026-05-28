@@ -2,9 +2,6 @@
 
 namespace YayWholesaleB2B\Pro\Helpers;
 
-use WC_Shipping_Zones;
-use YayWholesaleB2B\Helpers\SettingsHelper;
-
 /**
  * Shipping Helper
  */
@@ -24,10 +21,11 @@ class ShippingHelper {
     }
 
     /**
-     * Get the currently allow-in-checkout payment methods by current user's role
+     * Check the currently allow-in-checkout shipping methods by current user's role
      *
-     * @param string $role_slug the current user's role slug.
-     * @param int    $zone_id the current user's zone id.
+     * @param int         $shipping_instance_id the shipping's instance id.
+     * @param int         $shipping_zone_id the shipping's zone id.
+     * @param string|null $wholesale_role_slug the current user's wholesale role slug (null if retailer | guest).
      * @return array
      */
     public static function is_shipping_method_allowed( $shipping_instance_id, $shipping_zone_id, $wholesale_role_slug ) {

@@ -81,7 +81,7 @@ class SettingsHelper {
                 'disable_coupon'       => false,
                 'disable_tax'          => false,
                 'tax_display_mode'     => 'inherit',
-                'wholesale_store_page' => 'inherit',
+                'wholesale_store_page' => '',
             ],
             'display'             => [
                 'price_format'          => 'retail-and-wholesale',
