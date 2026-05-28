@@ -25,11 +25,8 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install
-
-      - name: Install Dependencies
-        run: composer install
         env:
-          COMPOSER_AUTH: '{"github-oauth": {"github.com": "${{ secrets.GITHUB_TOKEN }}"}}'
+          COMPOSER_AUTH: '{"github-oauth":{"github.com":"${{ secrets.COMPOSER_TOKEN }}"}}'
 
       - name: Install Playwright browsers
         run: pnpm test:e2e:install
