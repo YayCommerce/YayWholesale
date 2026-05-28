@@ -13,5 +13,12 @@
     "WP_DEBUG_DISPLAY": true
   },
   "port": 8889,
-  "testsEnvironment": false
+  "testsEnvironment": false,
+  "lifecycleScripts": {
+		"afterStart": "./bin/test-env-setup.sh .wp-env.single.json",
+		"afterClean": "./bin/test-env-setup.sh .wp-env.single.json"
+	},
+  "mappings": {
+    "test-data/images/": "./test-data/images/"
+  }
 }

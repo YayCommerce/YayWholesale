@@ -14,5 +14,12 @@
   },
   "multisite": true,
   "port": 8890,
-  "testsEnvironment": false
+  "testsEnvironment": false,
+  "lifecycleScripts": {
+		"afterStart": "./bin/test-env-setup.sh .wp-env.multisite.json",
+		"afterClean": "./bin/test-env-setup.sh .wp-env.multisite.json"
+	},
+  "mappings": {
+    "test-data/images/": "./test-data/images/"
+  }
 }
