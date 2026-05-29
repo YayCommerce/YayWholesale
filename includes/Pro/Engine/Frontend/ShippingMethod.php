@@ -3,7 +3,6 @@ namespace YayWholesaleB2B\Pro\Engine\Frontend;
 
 use YayWholesaleB2B\Helpers\CustomerHelper;
 use YayWholesaleB2B\Utils\SingletonTrait;
-use YayWholesaleB2B\Helpers\SettingsHelper;
 use YayWholesaleB2B\Pro\Helpers\ShippingHelper;
 
 defined( 'ABSPATH' ) || exit;
@@ -38,25 +37,22 @@ class ShippingMethod {
         $zone    = wc_get_shipping_zone( $package );
         $zone_id = $zone->get_id();
 
-        $shipping_role_slugs = ShippingHelper::get_shipping_by_role_slug(
-            isset( $wholesale_role ) ? $wholesale_role['slug'] : SettingsHelper::B2C_ROLE_SLUG,
-            $zone_id
-        );
-
-        $allow_role_slugs   = $shipping_role_slugs['allowed'];
-        $setting_role_slugs = $shipping_role_slugs['setting'];
-
         foreach ( $rates as $rate_id => $rate ) {
             // format: method:instance_id:___other_info
             $instance_id = (int) explode( ':', $rate->id )[1];
 
             // Check if the shipping is in setting and the shipping is allowed or not (Won't delete the dynamid shippings)
-            if ( isset( $setting_role_slugs[ $rate->method_id ] ) && in_array( $instance_id, $setting_role_slugs[ $rate->method_id ], true ) ) {
-                if ( ! isset( $allow_role_slugs[ $rate->method_id ] ) || ! in_array( $instance_id, $allow_role_slugs[ $rate->method_id ], true ) ) {
-                    unset( $rates[ $rate_id ] );
-                }
+            $is_shipping_allowed = ShippingHelper::is_shipping_method_allowed(
+                $instance_id,
+                $zone_id,
+                isset( $wholesale_role ) ? $wholesale_role['slug'] : null
+            );
+
+            if ( ! $is_shipping_allowed ) {
+                unset( $rates[ $rate_id ] );
             }
         }
+
         return $rates;
     }
 

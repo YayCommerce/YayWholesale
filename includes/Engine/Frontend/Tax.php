@@ -2,7 +2,6 @@
 namespace YayWholesaleB2B\Engine\Frontend;
 
 use YayWholesaleB2B\Helpers\CustomerHelper;
-use YayWholesaleB2B\Helpers\PricingHelpers\ShopPricingHelper;
 use YayWholesaleB2B\Helpers\RequirementHelper;
 use YayWholesaleB2B\Utils\SingletonTrait;
 use YayWholesaleB2B\Helpers\SettingsHelper;
@@ -17,15 +16,12 @@ class Tax {
 
     private $disable_tax;
 
-    private $tax_display_mode;
-
     protected function __construct() {
-        $setting                = SettingsHelper::get_settings();
-        $this->disable_tax      = $setting['general']['disable_tax'] ?? false;
-        $this->tax_display_mode = $setting['general']['tax_display_mode'] ?? 'inherit';
+        $setting           = SettingsHelper::get_settings();
+        $this->disable_tax = $setting['general']['disable_tax'] ?? false;
 
-        add_action( 'wp', [ $this, 'ywhs_set_customer_vat_exempt' ], PHP_INT_MAX );
-        add_filter( 'pre_option_woocommerce_tax_display_shop', [ $this, 'ywhs_force_display_excl_tax' ], PHP_INT_MAX );
+        add_action( 'wp', [ $this, 'ywhs_set_customer_vat_exempt' ], 100 );
+        add_filter( 'pre_option_woocommerce_tax_display_shop', [ $this, 'ywhs_force_display_excl_tax' ], 100 );
         // add_filter( 'woocommerce_calc_tax', [ $this, 'ywhs_maybe_disable_tax_calc' ], 9999 );
         add_filter( 'woocommerce_calc_shipping_tax', [ $this, 'ywhs_maybe_disable_tax_calc' ], 999 );
     }
@@ -74,10 +70,6 @@ class Tax {
 
         if ( isset( $wholesale_role ) && $this->disable_tax && RequirementHelper::is_cart_meet_requirement( $wholesale_role ) ) {
             return 'excl';
-        }
-
-        if ( isset( $wholesale_role ) && 'inherit' !== $this->tax_display_mode ) {
-            return $this->tax_display_mode;
         }
 
         return $pre_option;

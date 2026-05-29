@@ -23,37 +23,21 @@ const fieldSchema = z.object({
 });
 
 // TODO v1.1: update settings schema. move title, description to wcMeta
-const nextPaymentMethodSettingSchema = z.object({
-  method_id: z.string(),
-  enable_by_role: enableByRoleSchema,
-});
-const nextShippingMethodSettingSchema = z.object({
-  instance_id: z.number(),
-  method_id: z.string(),
-  enable_by_role: enableByRoleSchema,
-});
 
 const roleRelatedSettingSchema = z.object({
   slug: z.string(),
   name: z.string(),
 });
+
 const paymentMethodSettingSchema = z.object({
   method_id: z.string(),
-  method_title: z.string(),
-  title: z.string().optional(),
-  description: z.string().optional(),
-  roles: z.array(roleRelatedSettingSchema).optional(),
+  enable_by_role: enableByRoleSchema,
 });
 
 const shippingMethodSettingSchema = z.object({
   instance_id: z.number(),
-  instance_name: z.string(),
-  method_id: z.string(),
-  method_name: z.string(),
-  description: z.string().optional(),
   zone_id: z.number(),
-  zone_name: z.string(),
-  roles: z.array(roleRelatedSettingSchema).optional(),
+  enable_by_role: enableByRoleSchema,
 });
 
 export const settingsFormSchema = z.object({

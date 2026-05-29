@@ -1,10 +1,10 @@
-import { Suspense, useEffect } from 'react';
+import { Suspense, useEffect, useMemo } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { FieldErrors, useForm } from 'react-hook-form';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'sonner';
 import { __ } from '@wordpress/i18n';
-
+import { SideNavMenuItem, SideNavMenuList } from '@/components/ui/navmenu-side';
 import { getErrorMsg } from '@/lib/helpers/response.helper';
 import { useIsMutatingSettings, useSaveSettingsMutation, useSettingsQuery } from '@/lib/queries/settings.queries';
 import { Settings, settingsFormSchema } from '@/lib/schema/settings.schema';
@@ -13,29 +13,46 @@ import { useRouteLeaveGuard } from '@/hooks/useRouteLeaveGuard';
 import { Card, CardContent } from '@/components/ui/card';
 import { FormProvider } from '@/components/ui/form';
 import { UnsavedChangeDialog } from '@/components/ui/unsaved-changed-dialog';
-
+import * as TabsPrimitive from '@radix-ui/react-tabs';
 import { Button } from '@/components/ui/button';
 import { createPortal } from 'react-dom';
-import { CircleNotchIcon } from '@phosphor-icons/react';
-import { useSettingsTab } from './hooks';
-import { usePortal } from './hooks';
-import { useErrorRedirect } from './hooks';
-import { SETTINGS_TABS } from './constants';
-export default function SettingsPage() {
-  const activeTab = useSettingsTab();
-  const headerActionPortal = usePortal('yay-wholesale-b2b-header-actions');
-  const onError = useErrorRedirect();
 
+import { getFirstErrorSection } from './settings.helper';
+import { makeDefaultSettings } from './settings.helper';
+import DisplayTab from './tabs/DisplayTab';
+import EmailsTab from './tabs/EmailsTab';
+import GeneralTab from './tabs/GeneralTab';
+import PaymentRolesTab from './tabs/PaymentRolesTabs';
+import RegistrationFieldsTab from './tabs/registration-fields/RegistrationFieldsTab';
+import RegistrationTab from './tabs/RegistrationTab';
+import ShippingRolesTab from './tabs/ShippingRolesTabs';
+import { Loader2 } from 'lucide-react';
+export default function SettingsPage() {
+  const { subMenu } = useParams();
+  const tabs = ['general', 'display', 'registration', 'registration-fields', 'payment-roles', 'shipping-roles'];
+  const activeTab = tabs.find((tab) => tab === subMenu) ?? tabs[0];
+  const headerActionPortal = document.getElementById('yay-wholesale-b2b-header-actions');
+
+  const navigate = useNavigate();
   const { data: settings } = useSettingsQuery();
   const saveMutation = useSaveSettingsMutation();
   const isMutating = useIsMutatingSettings();
-  const isSavingSettings = isMutating > 0;
+
+  const defaultValues = useMemo(() => {
+    return makeDefaultSettings(settings);
+  }, [settings]);
+
   const form = useForm<Settings>({
     resolver: zodResolver(settingsFormSchema),
-    defaultValues: settings,
+    defaultValues: defaultValues,
   });
 
-  const { handleSubmit, formState: { isDirty, isSubmitting, errors } } = form;
+  const setActiveTab = (tab: typeof tabs[number]) => {
+    console.log('setActiveTab', tab);
+    navigate(`/settings/${tab}`);
+  };
+
+  const { handleSubmit, formState: { isDirty, errors } } = form;
 
   async function onSubmit(data: Settings) {
     if (isMutating > 0) return;
@@ -49,6 +66,8 @@ export default function SettingsPage() {
     }
   }
 
+  const onError = getFirstErrorSection();
+
   const { showDialog, confirmLeave, cancelLeave } = useRouteLeaveGuard(isDirty, ['/settings/*']);
 
   useEffect(() => {
@@ -61,79 +80,126 @@ export default function SettingsPage() {
     return () => window.removeEventListener('beforeunload', handleBeforeUnload);
   }, [isDirty]);
 
-  const hasTabError = (tab: typeof SETTINGS_TABS[number]) => {
-    return !!errors?.[tab.errorKey as keyof FieldErrors<Settings>];
+  const hasTabError = (tab: typeof tabs[number]) => {
+    return !!errors?.[tab as keyof FieldErrors<Settings>];
+  };
+
+  const handleTabChange = (tab: typeof tabs[number]) => {
+    setActiveTab(tab);
   };
 
   return (
     <>
       {headerActionPortal &&
         createPortal(
-          <Button type="submit" form="settings-form" data-submitting={isSubmitting} disabled={isSavingSettings} className="relative ms-4">
-            <span className={isSavingSettings ? 'opacity-0' : 'opacity-100'}>
+          <Button
+            type="submit"
+            form="settings-form"
+            className="relative ms-4"
+            disabled={!form.formState.isDirty || saveMutation.isPending}
+            data-submitting={saveMutation.isPending}
+
+          >
+            <span className={saveMutation.isPending ? 'opacity-0' : 'opacity-100'}>
               <span className="max-sm:hidden">{__('Save Changes', 'yay-wholesale-b2b')}</span>
               <span className="sm:hidden">{__('Save', 'yay-wholesale-b2b')}</span>
             </span>
-            {isSavingSettings && (
-              <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-                <CircleNotchIcon className="animate-spin" />
-              </span>
-            )}
+            {saveMutation.isPending && <span className="absolute top-1/2 left-1/2 -translate-1/2 transition-opacity group-data-[submitting=false]:opacity-0">
+              <Loader2 className="text-primary-foreground animate-spin stroke-3" />
+            </span>}
           </Button>,
           headerActionPortal
         )}
       <FormProvider {...form}>
 
         <form id="settings-form" onSubmit={handleSubmit(onSubmit, onError)}>
-          <div className="mx-auto flex max-w-7xl flex-col gap-6 px-6">
-            <div className="flex w-full flex-col gap-4 sm:flex-row 2xl:gap-8">
-              {/* Left Sidebar - Tab List */}
-              <div className="shrink-0 sm:w-[176px]">
-                <Card className="border-none bg-transparent p-0 shadow-none">
-                  <CardContent className="w-full overflow-x-auto px-0 [scrollbar-width:thin]">
-                    <div className="flex h-fit w-full items-center gap-1 bg-transparent pb-2.5 sm:flex-col sm:items-stretch md:p-0">
-                      {SETTINGS_TABS.map((tab) => {
-                        const isActive = tab.path === activeTab.path;
-                        const hasError = hasTabError(tab);
+          <div className="xs:p-6 px-6 pt-8 pb-4 max-w-7xl mx-auto">
+            <TabsPrimitive.Root value={activeTab} onValueChange={(value) => handleTabChange(value as typeof tabs[number])}>
+              <div className="flex flex-col gap-4 sm:flex-row">
+                <div className="w-full sm:w-37.5">
+                  <TabsPrimitive.List asChild>
+                    <SideNavMenuList mode="tabs" className="flex w-full items-start justify-start sm:flex-col">
+                      <TabsPrimitive.Trigger value="general" asChild>
+                        <SideNavMenuItem>
+                          <span>General</span>
+                          {/* <GeneralErrorIndicator /> */}
+                        </SideNavMenuItem>
+                      </TabsPrimitive.Trigger>
+                      <TabsPrimitive.Trigger value="display" asChild>
+                        <SideNavMenuItem>
+                          <span>Display</span>
+                          {/* <AppearanceErrorIndicator /> */}
+                        </SideNavMenuItem>
+                      </TabsPrimitive.Trigger>
+                      <TabsPrimitive.Trigger value="registration" asChild>
+                        <SideNavMenuItem>
+                          <span>Registration</span>
+                          {/* <RegistrationErrorIndicator /> */}
+                        </SideNavMenuItem>
+                      </TabsPrimitive.Trigger>
 
-                        return (
-                          <Link
-                            key={tab.path}
-                            to={`/settings/${tab.path}`}
-                            className={cn(
-                              'flex items-center gap-2 rounded-none border-none p-4 py-2.5 text-left text-sm font-normal text-nowrap outline-none ring-0 transition-all',
-                              'hover:text-primary hover:rounded-md hover:bg-white',
-                              'focus:outline-none focus:ring-0',
-                              'sm:text-wrap',
-                              isActive &&
-                              'text-primary rounded-md bg-white font-medium shadow-none',
-                            )}
-                          >
-                            <div>{tab.label}</div>
-                            {hasError && (
-                              <span className="bg-destructive size-1.25 rounded-full"></span>
-                            )}
-                          </Link>
-                        );
-                      })}
+                      <TabsPrimitive.Trigger value="registration-fields" asChild>
+                        <SideNavMenuItem>
+                          <span>Registration Fields</span>
+                          {/* <RegistrationErrorIndicator /> */}
+                        </SideNavMenuItem>
+                      </TabsPrimitive.Trigger>
+                      <TabsPrimitive.Trigger value="payment-roles" asChild>
+                        <SideNavMenuItem>
+                          <span>Payment Roles</span>
+                          {/* <RegistrationErrorIndicator /> */}
+                        </SideNavMenuItem>
+                      </TabsPrimitive.Trigger>
+                      <TabsPrimitive.Trigger value="shipping-roles" asChild>
+                        <SideNavMenuItem>
+                          <span>Shipping Roles</span>
+                          {/* <RegistrationErrorIndicator /> */}
+                        </SideNavMenuItem>
+                      </TabsPrimitive.Trigger>
+                    </SideNavMenuList>
+                  </TabsPrimitive.List>
+                </div>
+                <div className="flex flex-col bg-muted flex-1">
+                  <TabsPrimitive.Content value="general" style={{ height: '100%' }}>
+                    <div className="rounded-md border p-6 bg-card sm:w-full h-full">
+                      <GeneralTab />
                     </div>
-                  </CardContent>
-                </Card>
-              </div>
+                  </TabsPrimitive.Content>
 
-              {/* Right Content Area - Tab Contents */}
-              <div className="flex-1">
-                <Card className="p-4 md:p-5 2xl:p-6">
-                  <CardContent className="w-full overflow-x-visible px-0">
-                    {SETTINGS_TABS.map((tab) => (
-                      <div key={tab.path} className="mt-0 px-0">
-                        {activeTab.path === tab.path && <tab.component />}
-                      </div>
-                    ))}
-                  </CardContent>
-                </Card>
+                  <TabsPrimitive.Content value="display" style={{ height: '100%' }}>
+                    <div className="rounded-md border p-6 bg-card sm:w-full h-full">
+                      <DisplayTab />
+                    </div>
+                  </TabsPrimitive.Content>
+                  <TabsPrimitive.Content value="registration" style={{ height: '100%' }}>
+                    <div className="rounded-md border p-6 bg-card sm:w-full h-full">
+                      <RegistrationTab />
+                    </div>
+                  </TabsPrimitive.Content>
+                  <TabsPrimitive.Content value="registration-fields" style={{ height: '100%' }}>
+                    <div className="rounded-md border p-6 bg-card sm:w-full h-full">
+                      <RegistrationFieldsTab />
+                    </div>
+                  </TabsPrimitive.Content>
+                  <TabsPrimitive.Content value="payment-roles" style={{ height: '100%' }}>
+                    <div className="rounded-md border p-6 bg-card sm:w-full h-full">
+                      <PaymentRolesTab />
+                    </div>
+                  </TabsPrimitive.Content>
+                  <TabsPrimitive.Content value="shipping-roles" style={{ height: '100%' }}>
+                    <div className="rounded-md border p-6 bg-card sm:w-full h-full">
+                      <ShippingRolesTab />
+                    </div>
+                  </TabsPrimitive.Content>
+                  <TabsPrimitive.Content value="emails" style={{ height: '100%' }}>
+                    <div className="rounded-md border p-6 bg-card sm:w-full h-full">
+                      <EmailsTab />
+                    </div>
+                  </TabsPrimitive.Content>
+
+                </div>
               </div>
-            </div>
+            </TabsPrimitive.Root>
           </div>
 
           <UnsavedChangeDialog
@@ -149,8 +215,8 @@ export default function SettingsPage() {
               }
             }}
           />
-        </form>
-      </FormProvider>
+        </form >
+      </FormProvider >
     </>
   );
 }
