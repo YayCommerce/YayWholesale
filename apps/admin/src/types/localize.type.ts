@@ -73,9 +73,5 @@ export type AdminData = {
     recipients: string;
     url: string;
   }[];
-  valid_wholesale_store_pages: {
-    id: string;
-    title: string;
-    slug: string;
-  }[];
+  wc_page_ids: number[];
 };

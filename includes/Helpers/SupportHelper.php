@@ -11,44 +11,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 class SupportHelper {
 
     /**
-     * Get the valid pages for wholesale store setting
-     *
-     * @return array
-     */
-    public static function get_valid_pages_for_wholesale_store() {
-        $exclude_ids = array_filter(
-            [
-                get_option( 'woocommerce_shop_page_id' ),
-                get_option( 'woocommerce_cart_page_id' ),
-                get_option( 'woocommerce_checkout_page_id' ),
-                get_option( 'woocommerce_myaccount_page_id' ),
-                get_option( 'woocommerce_terms_page_id' ),
-            ]
-        );
-
-        $pages = get_posts(
-            [
-                'post_type'      => 'page',
-                'post_status'    => 'publish',
-                'posts_per_page' => -1,
-                'post__not_in'   => $exclude_ids,
-            ]
-        );
-
-        $data = [];
-
-        foreach ( $pages as $page ) {
-            $data[] = [
-                'id'    => $page->ID,
-                'title' => $page->post_title,
-                'slug'  => $page->post_name,
-            ];
-        }
-
-        return $data;
-    }
-
-    /**
      * Check whether the current theme has a block template for the given name.
      *
      * @param  string $template_name

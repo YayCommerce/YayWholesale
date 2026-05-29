@@ -4,11 +4,12 @@ import { __ } from '@wordpress/i18n';
 
 import { useActiveRolesQuery } from '@/lib/queries/roles.queries';
 import type { Settings } from '@/lib/schema/settings.schema';
-import { getPagesForWholesaleStore, isPro } from '@/lib/utils';
+import { isPro } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { Field, FieldContent, FieldError, FieldLabel } from '@/components/ui/field';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
+import { usePagesQuery } from '@/lib/queries/pages.queries';
 
 const isWholesaleStoreExperimental = window.yayWholesaleB2BMeta.wholesaleMeta.experimentals.wholesale_store_page;
 
@@ -16,6 +17,7 @@ export default function GeneralTab() {
   const { control } = useFormContext<Settings>();
 
   const { data: activeRoles } = useActiveRolesQuery();
+  const { data: pages = [] } = usePagesQuery();
 
   const rolesList = useMemo(() => {
     return (
@@ -26,9 +28,10 @@ export default function GeneralTab() {
     );
   }, [activeRoles]);
 
-  const validPagesforWholesaleStore = getPagesForWholesaleStore();
-
-  // const roleSlugs = useMemo(() => new Set(rolesList.map((r) => r.slug)), [rolesList]);
+  const validPagesforWholesaleStore = useMemo(() => {
+    const excludeIds = window.yayWholesaleB2BAdmin.wc_page_ids;
+    return pages.filter((page) => !excludeIds.includes(page.id));
+  }, [pages]);
 
   return (
     <div className="flex flex-col gap-4">

@@ -14,15 +14,26 @@ class LocalizeHelper {
     public const VAR_META  = 'yayWholesaleB2BMeta';
 
     public static function get_admin_data() {
-        $settings = SettingsHelper::get_full_settings();
-        $roles    = RolesHelper::get_wholesale_roles();
-        $pages    = SupportHelper::get_valid_pages_for_wholesale_store();
-
+        $settings   = SettingsHelper::get_full_settings();
+        $roles      = RolesHelper::get_wholesale_roles();
         $admin_data = [
-            'settings'                    => $settings,
-            'wholesale_emails'            => SettingsHelper::get_email_templates(),
-            'roles'                       => RolesHelper::handle_roles_data( $roles, $settings ),
-            'valid_wholesale_store_pages' => $pages,
+            'settings'         => $settings,
+            'wholesale_emails' => SettingsHelper::get_email_templates(),
+            'roles'            => RolesHelper::handle_roles_data( $roles, $settings ),
+            'wc_page_ids'      => array_values(
+                array_filter(
+                    array_map(
+                        'intval',
+                        [
+                            get_option( 'woocommerce_shop_page_id' ),
+                            get_option( 'woocommerce_cart_page_id' ),
+                            get_option( 'woocommerce_checkout_page_id' ),
+                            get_option( 'woocommerce_myaccount_page_id' ),
+                            get_option( 'woocommerce_terms_page_id' ),
+                        ]
+                    )
+                )
+            ),
         ];
 
         return apply_filters( 'ywhs_localize_admin_data', $admin_data );
