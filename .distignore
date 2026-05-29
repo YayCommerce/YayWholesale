@@ -20,7 +20,6 @@ yay-wholesale-lite.zip
 /tools
 /blocks/src
 /build
-readme.txt
 README.md
 
 .prettierrc
@@ -35,3 +34,4 @@ vendor/*
 scoper.inc.php
 composer.json
 composer.lock
+/assets/pro/.gitkeep

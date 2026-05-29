@@ -1,6 +1,9 @@
 <?php
 
 use YayWholesaleB2B\Helpers\RolesHelper;
+if ( ! defined( 'ABSPATH' ) ) {
+    exit;
+}
 
 $wholesale_roles        = RolesHelper::get_wholesale_roles();
 $custom_discounts_nonce = wp_create_nonce( 'ywhs-category-based-discount-nonce' );
