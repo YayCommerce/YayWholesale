@@ -10,6 +10,8 @@ import { Field, FieldContent, FieldError, FieldLabel } from '@/components/ui/fie
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 
+const isWholesaleStoreExperimental = window.yayWholesaleB2BMeta.wholesaleMeta.experimentals.wholesale_store_page;
+
 export default function GeneralTab() {
   const { control } = useFormContext<Settings>();
 
@@ -58,46 +60,48 @@ export default function GeneralTab() {
         )}
       />
 
-      <Controller
-        control={control}
-        name="general.wholesale_store_page"
-        render={({ field }) => (
-          <div className="flex items-center justify-between rounded-md border p-4">
-            <div>
-              <h2 className="flex items-center gap-2 leading-3.5 font-medium">
-                {__('Wholesale shop page', 'yay-wholesale-b2b')}
-                {!isPro && (
-                  <Badge
-                    variant="warning"
-                    className="cursor-pointer text-white"
-                    onClick={() => {
-                      window.open('https://yaycommerce.com/yay-wholesale-b2b-for-woocommerce/');
-                    }}
-                  >
-                    {__('Pro', 'yay-wholesale-b2b')}
-                  </Badge>
-                )}
-              </h2>
-              <p className="text-muted-foreground mt-2 text-xs font-normal">
-                {__('Set your wholesale shop page for wholesaler logged in', 'yay-wholesale-b2b')}
-              </p>
+      {isWholesaleStoreExperimental && (
+        <Controller
+          control={control}
+          name="general.wholesale_store_page"
+          render={({ field }) => (
+            <div className="flex items-center justify-between rounded-md border p-4">
+              <div>
+                <h2 className="flex items-center gap-2 leading-3.5 font-medium">
+                  {__('Wholesale shop page', 'yay-wholesale-b2b')}
+                  {!isPro && (
+                    <Badge
+                      variant="warning"
+                      className="cursor-pointer text-white"
+                      onClick={() => {
+                        window.open('https://yaycommerce.com/yay-wholesale-b2b-for-woocommerce/');
+                      }}
+                    >
+                      {__('Pro', 'yay-wholesale-b2b')}
+                    </Badge>
+                  )}
+                </h2>
+                <p className="text-muted-foreground mt-2 text-xs font-normal">
+                  {__('Set your wholesale shop page for wholesaler logged in', 'yay-wholesale-b2b')}
+                </p>
+              </div>
+              <Select value={String(field.value) ?? 'inherit'} onValueChange={field.onChange} disabled={!isPro}>
+                <SelectTrigger className="min-w-40">
+                  <SelectValue placeholder={__('Select your page', 'yay-wholesale-b2b')} />
+                </SelectTrigger>
+                <SelectContent align="end">
+                  <SelectItem value="inherit">{__('WooCommerce shop page', 'yay-wholesale-b2b')}</SelectItem>
+                  {validPagesforWholesaleStore.map((page) => (
+                    <SelectItem key={page.id} value={String(page.id)}>
+                      {page.title}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
-            <Select value={String(field.value) ?? 'inherit'} onValueChange={field.onChange} disabled={!isPro}>
-              <SelectTrigger className="min-w-40">
-                <SelectValue placeholder={__('Select your page', 'yay-wholesale-b2b')} />
-              </SelectTrigger>
-              <SelectContent align="end">
-                <SelectItem value="inherit">{__('WooCommerce shop page', 'yay-wholesale-b2b')}</SelectItem>
-                {validPagesforWholesaleStore.map((page) => (
-                  <SelectItem key={page.id} value={String(page.id)}>
-                    {page.title}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-        )}
-      />
+          )}
+        />
+      )}
 
       <Controller
         control={control}
@@ -184,7 +188,7 @@ export default function GeneralTab() {
                 <SelectValue placeholder={__('Select the display mode', 'yay-wholesale-b2b')} />
               </SelectTrigger>
               <SelectContent align="end">
-                <SelectItem value="inherit">{__('Inherit (default)', 'yay-wholesale-b2b')}</SelectItem>
+                <SelectItem value="inherit">{__('Woocommerce setting', 'yay-wholesale-b2b')}</SelectItem>
                 <SelectItem value="incl">{__('Including tax', 'yay-wholesale-b2b')}</SelectItem>
                 <SelectItem value="excl">{__('Excluding tax', 'yay-wholesale-b2b')}</SelectItem>
               </SelectContent>

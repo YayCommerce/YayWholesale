@@ -18,7 +18,8 @@ class ShopPricingHelper {
      * @return array The discounted price map
      */
     public static function  get_cart_item_wholesale_price( &$cart_item, $role_config, $quantity ) {
-        $wholesale_price = ProductPricingHelper::get_wholesale_price( $cart_item['data'], $role_config, $quantity );
+        $extra_included  = apply_filters( 'ywhs_cart_item_extra_included_in_price', 0, $cart_item );
+        $wholesale_price = ProductPricingHelper::get_wholesale_price( $cart_item['data'], $role_config, $quantity, $extra_included );
 
         $wholesale_extra = self::get_wholesale_extra_price_from_cart_item( $cart_item, $role_config );
 

@@ -13,7 +13,7 @@ defined( 'ABSPATH' ) || exit;
 /**
  * YayWholesaleB2B Adapter (Lite)
  */
-class YayWholesaleB2BLicenseAdapter implements \YayWholesaleB2BScoped\YayCommerce\AdminShell\License\Contracts\LicenseConfigAdapter {
+class YayWholesaleB2BLicenseAdapter implements \YayWholesaleB2BScoped\YayCommerce\AdminShell\Contracts\PluginMenuAdapter {
     // --- Menu methods ---
     public function get_menu_title(): string {
         return 'Yay Wholesale B2B'; }
@@ -37,30 +37,5 @@ class YayWholesaleB2BLicenseAdapter implements \YayWholesaleB2BScoped\YayCommerc
     public function get_docs_url(): string {
         return 'https://docs.yaycommerce.com/yaywholesale/'; }
     public function get_pro_url(): string {
-        return ''; }
-
-    // --- License methods ---
-    public function get_plugin_slug(): string {
-        return 'yay-wholesale-b2b-pro'; }
-    public function get_plugin_name(): string {
-        return 'Yay Wholesale B2B Pro'; }
-    public function get_plugin_version(): string {
-        return defined( 'YAYWHOLESALEB2B_VERSION' ) ? YAYWHOLESALEB2B_VERSION : '0.0.0'; }
-    public function get_plugin_file(): string {
-        return YAYWHOLESALEB2B_PLUGIN_DIR . 'yay-wholesale-b2b.php'; }
-    public function get_item_id(): int {
-        return 66637; }
-    public function get_store_url(): string {
-        return 'https://yaycommerce.com/'; }
-    public function get_store_link(): string {
         return 'https://yaycommerce.com/yay-wholesale-b2b-for-woocommerce/'; }
-
-    /**
-     * Check if this plugin has an active, non-expired license.
-     */
-    public static function is_licensed(): bool {
-        $info = get_option( 'yay-wholesale-b2b-pro_license_info', [] );
-        $key  = get_option( 'yay-wholesale-b2b-pro_license_key', '' );
-        return ! empty( $key ) && ! empty( $info ) && 'expired' !== ( $info['license'] ?? '' );
-    }
 }
