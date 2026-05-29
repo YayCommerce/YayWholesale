@@ -18,9 +18,8 @@ class ShopPricingHelper {
      * @return array The discounted price map
      */
     public static function  get_cart_item_wholesale_price( &$cart_item, $role_config, $quantity ) {
-        $product = wc_get_product( $cart_item['data']->get_id() );
-
-        $wholesale_price = ProductPricingHelper::get_wholesale_price( $product, $role_config, $quantity );
+        $extra_included  = apply_filters( 'ywhs_cart_item_extra_included_in_price', 0, $cart_item );
+        $wholesale_price = ProductPricingHelper::get_wholesale_price( $cart_item['data'], $role_config, $quantity, $extra_included );
 
         $wholesale_extra = self::get_wholesale_extra_price_from_cart_item( $cart_item, $role_config );
 
@@ -68,7 +67,7 @@ class ShopPricingHelper {
 
         $discounted = (float) wc_format_decimal( $discounted, $decimals );
 
-        return apply_filters( 'ywhs_price_handle_processed', $discounted, $product, $role );
+        return apply_filters( 'ywhs_display_wholesale_price_additional_processed', $discounted, $product, $role );
     }
 
     /**

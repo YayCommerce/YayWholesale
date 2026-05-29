@@ -74,14 +74,14 @@ class LocalizeHelper {
                 ],
             ],
             'wcMeta'        => [
-                'ordersUrl'     => [
+                'ordersUrl'             => [
                     'list' => esc_url_raw( admin_url( 'edit.php?post_type=shop_order' ) ),
                 ],
-                'setting_urls'  => [
+                'setting_urls'          => [
                     'payment'  => esc_url_raw( admin_url( 'admin.php?page=wc-settings&tab=checkout' ) ),
                     'shipping' => esc_url_raw( admin_url( 'admin.php?page=wc-settings&tab=shipping' ) ),
                 ],
-                'currency_data' => [
+                'currency_data'         => [
                     'currency'     => get_woocommerce_currency(),
                     'symbol'       => html_entity_decode( \get_woocommerce_currency_symbol(), ENT_COMPAT ),
                     'position'     => get_option( 'woocommerce_currency_pos' ),
@@ -89,6 +89,8 @@ class LocalizeHelper {
                     'decimal_sep'  => get_option( 'woocommerce_price_decimal_sep' ),
                     'num_decimals' => intval( get_option( 'woocommerce_price_num_decimals' ) ),
                 ],
+                'payment_methods_info'  => WoocommerceHelper::get_enabled_payment_methods(),
+                'shipping_methods_info' => WoocommerceHelper::get_enabled_shipping_methods(),
             ],
         ];
 

@@ -153,11 +153,11 @@ export default function RequestsList() {
   const noFilteredRequest = !isLoading && requestsPage?.data.length === 0;
 
   return (
-    <Card className="gap-4 shadow-sm">
+    <Card className="gap-4 p-4 shadow-sm md:p-5 2xl:p-6">
       {/* Header */}
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="flex items-center gap-2">
-          <h1 className="text-2xl font-bold">{__('Wholesaler Requests', 'yay-wholesale-b2b')}</h1>
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div className="flex w-fit items-center gap-2 overflow-visible sm:w-1 md:w-fit">
+          <h1 className="text-2xl font-bold text-nowrap">{__('Wholesaler Requests', 'yay-wholesale-b2b')}</h1>
           {totalCount !== undefined && (
             <WholeSaleToolTip
               trigger={
@@ -176,7 +176,20 @@ export default function RequestsList() {
           )}
         </div>
 
-        <div className="flex flex-1 flex-col items-end gap-4 lg:flex-0 lg:flex-row">
+        <div className="flex w-full flex-col items-end justify-end gap-4 sm:flex-row xl:w-fit">
+          <InputGroup className="w-full md:w-76">
+            <InputGroupInput
+              placeholder="Search by Email, Display Name"
+              defaultValue={search}
+              onChange={(e) => {
+                table.setPageIndex(0);
+                setSearchDebounced(e.target.value);
+              }}
+            />
+            <InputGroupAddon align="inline-end">
+              <Search className="size-4.5 text-[#A0A0A7]" />
+            </InputGroupAddon>
+          </InputGroup>
           <Select
             value={statusFilter}
             onValueChange={(status: RequestFilter['status']) => {
@@ -202,19 +215,6 @@ export default function RequestsList() {
               </SelectGroup>
             </SelectContent>
           </Select>
-          <InputGroup className="w-full md:w-76">
-            <InputGroupInput
-              placeholder="Search"
-              defaultValue={search}
-              onChange={(e) => {
-                table.setPageIndex(0);
-                setSearchDebounced(e.target.value);
-              }}
-            />
-            <InputGroupAddon align="inline-end">
-              <Search className="size-4.5 text-[#A0A0A7]" />
-            </InputGroupAddon>
-          </InputGroup>
         </div>
       </div>
 

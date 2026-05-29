@@ -1,9 +1,9 @@
 === Yay Wholesale B2B for WooCommerce ===
 Contributors: YayCommerce
 Tags: wholesale, b2b, wholesale pricing, discount rules, sale
-Requires at least: 3.0
-Tested up to: 6.9
-Stable tag: 1.0.6
+Requires at least: 6.5
+Tested up to: 7.0
+Stable tag: 1.1.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 

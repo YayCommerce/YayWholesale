@@ -8,8 +8,6 @@ use WC_Email;
  */
 class SettingsHelper {
 
-    public const B2C_ROLE_SLUG = 'ywhs_retail';
-
     public static function get_settings(): array {
 
         $settings = array_replace_recursive( self::get_default_settings(), get_option( 'yaywholesaleb2b_settings', [] ) );
@@ -83,7 +81,7 @@ class SettingsHelper {
                 'disable_coupon'       => false,
                 'disable_tax'          => false,
                 'tax_display_mode'     => 'inherit',
-                'wholesale_store_page' => 'inherit',
+                'wholesale_store_page' => '',
             ],
             'display'             => [
                 'price_format'          => 'retail-and-wholesale',

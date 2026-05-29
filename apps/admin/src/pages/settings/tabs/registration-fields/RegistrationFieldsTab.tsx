@@ -49,15 +49,11 @@ export default function RegistrationFieldsTab() {
     <div className="flex flex-col gap-4">
       {/* Custom Fields */}
       <div className="flex items-center justify-between">
-        <span className="text-foreground-400 text-2xl leading-[100%] font-bold tracking-[-2%]">
+        <span className="text-lg leading-[100%] font-bold tracking-[-2%] lg:text-2xl">
           {__('Registration Fields', 'yay-wholesale-b2b')}
         </span>
         {/* Add new field */}
-        <Button
-          variant="primary-outline"
-          onClick={addNewField}
-          className="rounded-1.5 hover:bg-primary hover:text-primary-foreground gap-0.25 p-3 shadow-xs"
-        >
+        <Button variant="primary-outline-fill" onClick={addNewField}>
           <Plus className="h-4 w-4" />
           <span className="px-0.75">{__('Add New Field', 'yay-wholesale-b2b')}</span>
         </Button>

@@ -1,5 +1,5 @@
 {
-  "name": "admin-yay-wholesale-b2b",
+  "name": "@yay-wholesale/admin-page",
   "description": "Admin React application",
   "private": true,
   "version": "1.0.0",
@@ -10,10 +10,11 @@
   "author": "Yay Commerce",
   "scripts": {
     "preinstall": "npx only-allow pnpm",
-    "build": "tsc --noEmit && vite build --outDir ../../../assets/dist/admin",
-    "build:window:pro": "set VITE_IS_PRO=true&& tsc --noEmit && vite build --outDir ../../../assets/dist/admin",
-    "build:macos:pro": "VITE_IS_PRO=true tsc --noEmit && vite build --outDir ../../../assets/dist/admin",
-    "dev": "vite"
+    "dev": "vite",
+    "dev:pro": "vite --mode development ",
+    "dev:lite": "vite --mode development-lite",
+    "build:pro": "tsc --noEmit && vite build --mode production --outDir ../../../assets/dist/admin",
+    "build:lite": "tsc --noEmit && vite build --mode production-lite --outDir ../../../assets/dist/admin"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
