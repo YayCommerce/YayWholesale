@@ -1,13 +1,10 @@
 import { useEffect, useState } from 'react';
-import { useMatch } from 'react-router-dom';
 import { __ } from '@wordpress/i18n';
 import { cn } from '@/lib/utils';
 import { HeaderMenu } from './HeaderMenu';
 
 export default function Header() {
   const scrolled = useScrolled();
-  const isSettingRoute = useMatch({ path: '/settings/*' });
-
   return (
     <header
       className={cn(
@@ -29,10 +26,7 @@ export default function Header() {
       <HeaderMenu />
 
       <div className="flex items-center">
-        {/* Save button (Settings only) */}
-        {isSettingRoute && (
-          <div id="yay-wholesale-b2b-header-actions" />
-        )}
+        <div id="yay-wholesale-b2b-header-actions" />
       </div>
     </header>
   );

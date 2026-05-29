@@ -1,16 +1,14 @@
-import { Suspense, useEffect, useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { FieldErrors, useForm } from 'react-hook-form';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { useForm, useFormContext } from 'react-hook-form';
+import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'sonner';
 import { __ } from '@wordpress/i18n';
 import { SideNavMenuItem, SideNavMenuList } from '@/components/ui/navmenu-side';
 import { getErrorMsg } from '@/lib/helpers/response.helper';
 import { useIsMutatingSettings, useSaveSettingsMutation, useSettingsQuery } from '@/lib/queries/settings.queries';
 import { Settings, settingsFormSchema } from '@/lib/schema/settings.schema';
-import { cn } from '@/lib/utils';
 import { useRouteLeaveGuard } from '@/hooks/useRouteLeaveGuard';
-import { Card, CardContent } from '@/components/ui/card';
 import { FormProvider } from '@/components/ui/form';
 import { UnsavedChangeDialog } from '@/components/ui/unsaved-changed-dialog';
 import * as TabsPrimitive from '@radix-ui/react-tabs';
@@ -48,11 +46,10 @@ export default function SettingsPage() {
   });
 
   const setActiveTab = (tab: typeof tabs[number]) => {
-    console.log('setActiveTab', tab);
     navigate(`/settings/${tab}`);
   };
 
-  const { handleSubmit, formState: { isDirty, errors } } = form;
+  const { handleSubmit, formState: { isDirty } } = form;
 
   async function onSubmit(data: Settings) {
     if (isMutating > 0) return;
@@ -80,14 +77,6 @@ export default function SettingsPage() {
     return () => window.removeEventListener('beforeunload', handleBeforeUnload);
   }, [isDirty]);
 
-  const hasTabError = (tab: typeof tabs[number]) => {
-    return !!errors?.[tab as keyof FieldErrors<Settings>];
-  };
-
-  const handleTabChange = (tab: typeof tabs[number]) => {
-    setActiveTab(tab);
-  };
-
   return (
     <>
       {headerActionPortal &&
@@ -96,7 +85,7 @@ export default function SettingsPage() {
             type="submit"
             form="settings-form"
             className="relative ms-4"
-            disabled={!form.formState.isDirty || saveMutation.isPending}
+            disabled={saveMutation.isPending}
             data-submitting={saveMutation.isPending}
 
           >
@@ -114,7 +103,7 @@ export default function SettingsPage() {
 
         <form id="settings-form" onSubmit={handleSubmit(onSubmit, onError)}>
           <div className="xs:p-6 px-6 pt-8 pb-4 max-w-7xl mx-auto">
-            <TabsPrimitive.Root value={activeTab} onValueChange={(value) => handleTabChange(value as typeof tabs[number])}>
+            <TabsPrimitive.Root value={activeTab} onValueChange={(value) => navigate(`/settings/${value}`)}>
               <div className="flex flex-col gap-4 sm:flex-row">
                 <div className="w-full sm:w-37.5">
                   <TabsPrimitive.List asChild>
@@ -122,38 +111,38 @@ export default function SettingsPage() {
                       <TabsPrimitive.Trigger value="general" asChild>
                         <SideNavMenuItem>
                           <span>General</span>
-                          {/* <GeneralErrorIndicator /> */}
+                          <SettingsErrorIndicator tab="general" />
                         </SideNavMenuItem>
                       </TabsPrimitive.Trigger>
                       <TabsPrimitive.Trigger value="display" asChild>
                         <SideNavMenuItem>
                           <span>Display</span>
-                          {/* <AppearanceErrorIndicator /> */}
+                          <SettingsErrorIndicator tab="display" />
                         </SideNavMenuItem>
                       </TabsPrimitive.Trigger>
                       <TabsPrimitive.Trigger value="registration" asChild>
                         <SideNavMenuItem>
                           <span>Registration</span>
-                          {/* <RegistrationErrorIndicator /> */}
+                          <SettingsErrorIndicator tab="registration" />
                         </SideNavMenuItem>
                       </TabsPrimitive.Trigger>
 
                       <TabsPrimitive.Trigger value="registration-fields" asChild>
                         <SideNavMenuItem>
                           <span>Registration Fields</span>
-                          {/* <RegistrationErrorIndicator /> */}
+                          <SettingsErrorIndicator tab="registration_fields" />
                         </SideNavMenuItem>
                       </TabsPrimitive.Trigger>
                       <TabsPrimitive.Trigger value="payment-roles" asChild>
                         <SideNavMenuItem>
                           <span>Payment Roles</span>
-                          {/* <RegistrationErrorIndicator /> */}
+                          <SettingsErrorIndicator tab="payment_roles" />
                         </SideNavMenuItem>
                       </TabsPrimitive.Trigger>
                       <TabsPrimitive.Trigger value="shipping-roles" asChild>
                         <SideNavMenuItem>
                           <span>Shipping Roles</span>
-                          {/* <RegistrationErrorIndicator /> */}
+                          <SettingsErrorIndicator tab="shipping_roles" />
                         </SideNavMenuItem>
                       </TabsPrimitive.Trigger>
                     </SideNavMenuList>
@@ -219,4 +208,11 @@ export default function SettingsPage() {
       </FormProvider >
     </>
   );
+}
+
+function SettingsErrorIndicator({ tab }: { tab: keyof Settings }) {
+  const { formState } = useFormContext<Settings>();
+  const hasErrors = !!formState.errors?.[tab];
+  if (!hasErrors) return null;
+  return <span className='bg-destructive size-1.25 rounded-full'></span>;
 }
