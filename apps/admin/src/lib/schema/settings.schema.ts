@@ -29,13 +29,6 @@ const fieldSchema = z.object({
   isHidden: z.boolean(),
 });
 
-// TODO v1.1: update settings schema. move title, description to wcMeta
-
-const roleRelatedSettingSchema = z.object({
-  slug: z.string(),
-  name: z.string(),
-});
-
 const paymentMethodSettingSchema = z.object({
   method_id: z.string(),
   enable_by_role: enableByRoleSchema,
@@ -89,4 +82,3 @@ export const settingsFormSchema = z.object({
 });
 
 export type Settings = z.infer<typeof settingsFormSchema>;
-export type RoleRelatedSetting = z.infer<typeof roleRelatedSettingSchema>;

@@ -1,6 +1,5 @@
 import { z } from 'zod';
 
-// TODO v1.1: settings - payment method, shipping method
 export const enableByRoleSchema = z.object({
   retailers: z.enum(['enabled', 'disabled']),
   wholesalers: z.enum(['enabled', 'disabled', 'enabled-selected-roles']),
