@@ -11,9 +11,23 @@
     "editor.defaultFormatter": "esbenp.prettier-vscode",
     "editor.formatOnSave": false
   },
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit"
+  },
+
   "phpSniffer.autoDetect": true,
+  "eslint.format.enable": true,
+  "eslint.validate": ["javascript", "javascriptreact", "typescript", "typescriptreact"],
+  "eslint.workingDirectories": [{ "mode": "auto" }],
 
   "tailwindCSS.experimental.configFile": "./apps/admin/src/main.css",
+  "tailwindCSS.lint.suggestCanonicalClasses": "ignore",
+  "tailwindCSS.experimental.classRegex": [
+    ["cva\\(([^;]*)\\);", "(?:'|\"|`)([^,]*)(?:'|\"|`),"],
+    ["cn\\(([^)]*)\\)", "(?:'|\"|`)([^']*)(?:'|\"|`)"],
+    ["styled\\.\\w+\\(([^;]*)\\)", "(?:'|\"|`)([^']*)(?:'|\"|`)"]
+  ],
+
   "prettier.ignorePath": "./apps/admin/.prettierignore",
 
   "intelephense.environment.includePaths": ["../../.."],
