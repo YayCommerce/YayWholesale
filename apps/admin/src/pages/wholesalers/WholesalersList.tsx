@@ -260,7 +260,7 @@ export function WholesalersList() {
               </Button>
             </DropdownMenuTrigger>
 
-            <DropdownMenuContent align="start" sideOffset={9} className="w-fit min-w-[20px] p-1">
+            <DropdownMenuContent align="start" sideOffset={9} className="w-fit min-w-5 p-1">
               {activeRoles?.map((role) => {
                 const isUpdating =
                   bulkUpdateWholesalersRoleMutation.isPending &&

@@ -39,7 +39,7 @@ export default function EmailsTab() {
 
         <TableBody>
           {emails?.map((email) => (
-            <TableRow key={email.id} className="border-divider h-[52px] border-b last:border-0">
+            <TableRow key={email.id} className="border-divider h-13 border-b last:border-0">
               <TableCell className="px-4">
                 <Switch
                   disabled={loadingId === email.id}

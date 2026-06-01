@@ -39,7 +39,11 @@ export function FieldRow({
   remove: (index: number) => void;
   append: () => void;
 }) {
-  const { control, watch, formState: { errors } } = useFormContext<Settings>();
+  const {
+    control,
+    watch,
+    formState: { errors },
+  } = useFormContext<Settings>();
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: field.id,
   });
@@ -59,13 +63,13 @@ export function FieldRow({
       ref={setNodeRef}
       style={style}
       className={cn(
-        'flex flex-wrap  gap-4 border-b border-[#F4F4F7] p-4 transition-colors last:border-0 last:pb-0',
+        'flex flex-wrap gap-4 border-b border-[#F4F4F7] p-4 transition-colors last:border-0 last:pb-0',
         !rowHasError && 'items-end',
         isDragging && 'bg-[#F9FAFB]',
       )}
     >
       {/* Drag handle */}
-      <div className="flex w-[32px] shrink-0 items-center justify-center">
+      <div className="flex w-8 shrink-0 items-center justify-center">
         {isHidden ? (
           <WholeSaleToolTip
             trigger={
@@ -73,9 +77,9 @@ export function FieldRow({
                 type="button"
                 variant="ghost"
                 size="icon"
-                className="hover:text-foreground text-muted-foreground h-9 w-9 hover:bg-transparent"
+                className="hover:text-foreground text-muted-foreground size-9 hover:bg-transparent"
               >
-                <EyeOff className="h-5 w-5 cursor-default" />
+                <EyeOff className="size-5 cursor-default" />
               </Button>
             }
             content={<span>{__('Field is hidden', 'yay-wholesale-b2b')}</span>}
@@ -85,18 +89,18 @@ export function FieldRow({
             type="button"
             variant="ghost"
             size="icon"
-            className="hover:text-foreground text-muted-foreground hover:bg-muted h-9 w-9 cursor-grab rounded-sm active:cursor-grabbing"
+            className="hover:text-foreground text-muted-foreground hover:bg-muted size-9 cursor-grab rounded-sm active:cursor-grabbing"
             {...attributes}
             {...listeners}
           >
-            <GripVertical className="h-5 w-5" />
+            <GripVertical className="size-5" />
           </Button>
         )}
       </div>
 
       <div className="flex flex-1 flex-wrap gap-4">
         {/* Label */}
-        <div className="min-w-[160px] flex-1">
+        <div className="min-w-40 flex-1">
           <Controller
             control={control}
             name={`registration_fields.fields.${index}.label`}
@@ -131,7 +135,7 @@ export function FieldRow({
         </div>
 
         {/* Type */}
-        <div className="min-w-[160px] flex-1">
+        <div className="min-w-40 flex-1">
           <Controller
             control={control}
             name={`registration_fields.fields.${index}.type`}
@@ -160,7 +164,7 @@ export function FieldRow({
         </div>
 
         {/* Placeholder */}
-        <div className="min-w-[160px] flex-1">
+        <div className="min-w-40 flex-1">
           <Controller
             control={control}
             name={`registration_fields.fields.${index}.placeholder`}
@@ -181,7 +185,7 @@ export function FieldRow({
         </div>
 
         {/* Column Width */}
-        <div className="min-w-[160px] flex-1">
+        <div className="min-w-40 flex-1">
           <Controller
             control={control}
             name={`registration_fields.fields.${index}.columnWidth`}
@@ -234,7 +238,7 @@ export function FieldRow({
                 )}
               />
             </DropdownMenuGroup>
-            <DropdownMenuSeparator className="mx-0.25" />
+            <DropdownMenuSeparator className="mx-px" />
             <DropdownMenuGroup>
               <DropdownMenuItem onClick={append} disabled={isHidden} className="mt-1">
                 <CirclePlus />
@@ -265,7 +269,7 @@ export function FieldRow({
                 )}
               />
             </DropdownMenuGroup>
-            <DropdownMenuSeparator className="mx-0.25" />
+            <DropdownMenuSeparator className="mx-px" />
             <DropdownMenuGroup>
               <DropdownMenuItem
                 variant="destructive"

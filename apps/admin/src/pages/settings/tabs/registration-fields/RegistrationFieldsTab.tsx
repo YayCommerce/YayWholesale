@@ -54,7 +54,7 @@ export default function RegistrationFieldsTab() {
         </span>
         {/* Add new field */}
         <Button variant="primary-outline-fill" onClick={addNewField}>
-          <Plus className="h-4 w-4" />
+          <Plus className="size-4" />
           <span className="px-0.75">{__('Add New Field', 'yay-wholesale-b2b')}</span>
         </Button>
       </div>

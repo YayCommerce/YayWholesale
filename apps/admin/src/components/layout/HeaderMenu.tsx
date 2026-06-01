@@ -75,7 +75,7 @@ function PendingRequestCount({ className, ...props }: ComponentProps<typeof Badg
       <TooltipTrigger asChild>
         <Badge
           variant="destructive"
-          className={cn('h-5 min-w-5 px-1 leading-0 tabular-nums', !!requestsCount?.pending ? '' : 'hidden', className)}
+          className={cn('h-5 min-w-5 px-1 leading-0 tabular-nums', requestsCount?.pending ? '' : 'hidden', className)}
         >
           {requestsCount?.pending}
         </Badge>

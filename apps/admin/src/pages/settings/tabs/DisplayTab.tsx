@@ -95,19 +95,19 @@ export default function DisplayTab() {
         <div className="flex flex-col gap-4">
           <ProductImageSkeleton />
           <div className="flex flex-col gap-2.5">
-            <Skeleton className="bg-muted h-2 w-[65px] animate-none" />
-            <Skeleton className="bg-muted h-2 w-[130px] animate-none" />
+            <Skeleton className="bg-muted h-2 w-16.25 animate-none" />
+            <Skeleton className="bg-muted h-2 w-32.5 animate-none" />
           </div>
           <div className="flex flex-col gap-3">
             {['retail-and-wholesale', 'retail-only'].includes(displayFormat) && (
-              <p className="flex gap-1.5 text-[14px] leading-3.5 text-[#A0A0A7]">
+              <p className="flex gap-1.5 text-sm/3.5  text-[#A0A0A7]">
                 {displayFormat === 'retail-and-wholesale' && <span>{__('Retail:', 'yay-wholesale-b2b')}</span>}
                 <del> {parseWPCurrency(20)} </del>
                 <span>{parseWPCurrency(18)}</span>
               </p>
             )}
             {['retail-and-wholesale', 'wholesale-only'].includes(displayFormat) && (
-              <p className="flex gap-1.5 text-[14px] leading-3.5">
+              <p className="flex gap-1.5 text-sm/3.5 ">
                 <span>{priceLabel}:</span>
                 <span className="font-bold" style={{ color: priceColor }}>
                   {parseWPCurrency(15)}

@@ -20,7 +20,7 @@ export function PaymentRows() {
                 {method.method_title}
                 {method.description && (
                   <span>
-                    <WholeSaleToolTip trigger={<InfoIcon className="h-3 w-3" />} content={method.description} />
+                    <WholeSaleToolTip trigger={<InfoIcon className="size-3" />} content={method.description} />
                   </span>
                 )}
               </p>
