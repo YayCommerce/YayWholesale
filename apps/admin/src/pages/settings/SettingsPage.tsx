@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { Link, useParams } from 'react-router-dom';
@@ -13,6 +13,7 @@ import { useRouteLeaveGuard } from '@/hooks/useRouteLeaveGuard';
 import { Card, CardContent } from '@/components/ui/card';
 import { FormProvider } from '@/components/ui/form';
 import { UnsavedChangeDialog } from '@/components/ui/unsaved-changed-dialog';
+import { makeDefaultSettings } from './settings.helper';
 import DisplayTab from './tabs/DisplayTab';
 import EmailsTab from './tabs/EmailsTab';
 import GeneralTab from './tabs/GeneralTab';
@@ -54,9 +55,13 @@ export default function SettingsPage() {
   const saveMutation = useSaveSettingsMutation();
   const isMutating = useIsMutatingSettings();
 
+  const defaultValues = useMemo(() => {
+    return makeDefaultSettings(settings);
+  }, [settings]);
+
   const form = useForm<Settings>({
     resolver: zodResolver(settingsFormSchema),
-    defaultValues: settings,
+    defaultValues: defaultValues,
   });
 
   async function onSubmit(data: Settings) {
@@ -65,6 +70,7 @@ export default function SettingsPage() {
     try {
       await saveMutation.mutateAsync(data);
       toast.success(__('Settings saved!', 'yay-wholesale-b2b'));
+      form.reset(data);
     } catch (error) {
       toast.error(await getErrorMsg(error));
     }
@@ -86,18 +92,18 @@ export default function SettingsPage() {
     <FormProvider {...form}>
       <form id="settings-form" onSubmit={form.handleSubmit(onSubmit, (err) => console.log(err))}>
         <div className="mx-auto flex max-w-7xl flex-col gap-6 px-6">
-          <div className="flex w-full flex-col gap-8 sm:flex-row">
+          <div className="flex w-full flex-col gap-4 sm:flex-row 2xl:gap-8">
             {/* Left Sidebar - Tab List */}
             <div className="shrink-0 sm:w-[176px]">
-              <Card className="m-0 rounded-lg border-none bg-transparent p-0 shadow-none">
-                <CardContent className="w-full overflow-x-auto px-0 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-                  <div className="flex h-fit w-full items-center gap-1 bg-transparent p-0 sm:flex-col sm:items-stretch">
+              <Card className="border-none bg-transparent p-0 shadow-none">
+                <CardContent className="w-full [scrollbar-width:thin] overflow-x-auto px-0">
+                  <div className="flex h-fit w-full items-center gap-1 bg-transparent pb-2.5 sm:flex-col sm:items-stretch md:p-0">
                     {tabs.map((tab) => (
                       <Link
                         key={tab.path}
                         to={`/settings/${tab.path}`}
                         className={cn(
-                          'text-foreground-400 justify-start rounded-none border-none p-4 py-2.5 text-left text-sm font-normal text-nowrap ring-0 outline-none focus:ring-0 focus:outline-none sm:text-wrap',
+                          'justify-start rounded-none border-none p-4 py-2.5 text-left text-sm font-normal text-nowrap ring-0 outline-none focus:ring-0 focus:outline-none sm:text-wrap',
                           'hover:text-primary hover:rounded-md hover:bg-white',
                           tab.path === subMenu && 'text-primary rounded-md bg-white font-medium shadow-none',
                         )}
@@ -112,7 +118,7 @@ export default function SettingsPage() {
 
             {/* Right Content Area - Tab Contents */}
             <div className="flex-1">
-              <Card>
+              <Card className="p-4 md:p-5 2xl:p-6">
                 <CardContent className="w-full overflow-x-visible px-0">
                   {/* Other Tab Contents */}
                   {tabs.map((tab) => (

@@ -1,0 +1,25 @@
+{
+  "name": "plugin-yay-wholesale-b2b",
+  "title": "Yay Wholesale Plugin",
+  "private": true,
+  "scripts": {
+    "postinstall": "composer install",
+    "makepot": "wp i18n make-pot . languages/yay-wholesale-b2b.pot --exclude=vendor,node_modules,apps,tests --domain=yay-wholesale-b2b",
+    "release": "pnpm release:lite && pnpm release:pro",
+    "release:lite": "bash ./release.sh IS_PRO=false",
+    "release:pro": "bash ./release.sh IS_PRO=true",
+    "env:start:single": "pnpm --filter @yay-wholesale/e2e env:start:single",
+    "env:start:multi": "pnpm --filter @yay-wholesale/e2e env:start:multi",
+    "env:stop:single": "pnpm --filter @yay-wholesale/e2e env:stop:single",
+    "env:stop:multi": "pnpm --filter @yay-wholesale/e2e env:stop:multi",
+    "env:clean": "pnpm --filter @yay-wholesale/e2e env:clean",
+    "test:e2e": "pnpm --filter @yay-wholesale/e2e run test",
+    "test:e2e:single": "pnpm --filter @yay-wholesale/e2e run test:single",
+    "test:e2e:multi": "pnpm --filter @yay-wholesale/e2e run test:multi",
+    "test:e2e:ui": "pnpm --filter @yay-wholesale/e2e run test:ui",
+    "test:e2e:install": "pnpm --filter @yay-wholesale/e2e exec playwright install chromium --with-deps"
+  },
+  "keywords": [],
+  "author": "Yay Commerce",
+  "packageManager": "pnpm@10.15.0+sha512.486ebc259d3e999a4e8691ce03b5cac4a71cbeca39372a9b762cb500cfdf0873e2cb16abe3d951b1ee2cf012503f027b98b6584e4df22524e0c7450d9ec7aa7b"
+}

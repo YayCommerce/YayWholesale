@@ -15,8 +15,7 @@
   },
   "autoload": {
     "classmap": [
-      "vendor-prefixed/src",
-      "YayWholesaleB2bPluginAdapter.php"
+      "vendor-prefixed/src"
     ]
   }
 }

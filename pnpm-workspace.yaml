@@ -1,0 +1,4 @@
+packages:
+  - "apps/admin"
+  - "apps/blocks/*"
+  - "tests/e2e"

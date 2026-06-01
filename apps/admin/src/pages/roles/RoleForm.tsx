@@ -22,7 +22,7 @@ export default function RoleForm() {
         if (!open) navigate('/roles');
       }}
     >
-      <SheetContent className="overflow-x-auto md:m-2.5 md:h-[calc(100%-52px)] md:min-w-[490px] md:rounded-md">
+      <SheetContent hasMargin>
         {isAdding && <AddRoleForm />}
         {isEditing && editingRole !== null && <EditRoleForm role={editingRole} />}
       </SheetContent>

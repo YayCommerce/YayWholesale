@@ -15,9 +15,10 @@ class ProductPricingHelper {
      * @param \WC_Product $product
      * @param array|null  $role_config The wholesale role configuration. Or null if guest or retailer.
      * @param int         $quantity quantity in cart.
+     * @param int         $extra_included The extra which is included in the price of the product.
      * @return float The discounted price
      */
-    public static function get_wholesale_price( $product, $role_config = null, $quantity = 1 ) {
+    public static function get_wholesale_price( $product, $role_config = null, $quantity = 1, $extra_included = 0 ) {
 
         $regular_price = (float) $product->get_regular_price( 'edit' );
         $sale_price    = (float) $product->get_price( 'edit' );
@@ -27,7 +28,10 @@ class ProductPricingHelper {
             $wholesale_price       = $sale_price;
         } else {
             $before_discount_price = ( $role_config['applyToSalePrice'] && $sale_price < $regular_price ) ? $sale_price : $regular_price;
-            $discount              = isset( $role_config['discount'] ) ? ( (float) $role_config['discount'] / 100 ) : 0;
+            if ( $extra_included > 0 ) {
+                $before_discount_price = $before_discount_price - $extra_included;
+            }
+            $discount = isset( $role_config['discount'] ) ? ( (float) $role_config['discount'] / 100 ) : 0;
             if ( $discount <= 0 ) {
                 $wholesale_price = $before_discount_price;
             } else {
