@@ -28,7 +28,7 @@ const roleShippingMethodsSchema = z.object({
   selected_methods: z.array(z.string()), // method_id
 });
 
-// TODO v1.1: update role schema
+// TODO v1.2: update role schema
 const roleFormSchema = z.object({
   role: roleSchema,
   paymentMethods: z.array(rolePaymentMethodsSchema).optional(),

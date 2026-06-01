@@ -3,6 +3,7 @@
         "bmewburn.vscode-intelephense-client",
         "esbenp.prettier-vscode",
         "wongjn.php-sniffer",
-        "bradlc.vscode-tailwindcss"
+        "bradlc.vscode-tailwindcss",
+        "dbaeumer.vscode-eslint"
     ]
 }
