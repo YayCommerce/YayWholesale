@@ -1,12 +1,12 @@
 import * as React from 'react';
 import { Slot } from '@radix-ui/react-slot';
-import { useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router';
 
 import { cn } from '@/lib/utils';
 import { useCombinedRefs } from '@/hooks/useCombinedRefs';
 
 const SideNavMenuList = React.forwardRef<HTMLUListElement, SideNavMenuListProps>(
-  ({ mode = 'router', activeTab, className, asChild = false, children, ...props }, ref) => {
+  ({ mode = 'router', className, asChild = false, children, ...props }, ref) => {
     const Comp = asChild ? Slot : 'ul';
     const listRef = React.useRef<HTMLUListElement>(null);
     const combinedRef = useCombinedRefs(ref, listRef);
@@ -66,19 +66,9 @@ const SideNavMenuItem = React.forwardRef<HTMLLIElement, SideNavMenuItemProps>(
   },
 );
 
-type NavMode =
-  | {
-      mode?: 'router';
-      activeTab?: undefined;
-    }
-  | {
-      mode: 'tabs';
-      activeTab: string;
-    };
-
-type SideNavMenuListProps = React.ComponentProps<'ul'> &
-  NavMode & {
-    asChild?: boolean;
-  };
+type SideNavMenuListProps = React.ComponentProps<'ul'> & {
+  mode?: 'tabs' | 'router';
+  asChild?: boolean;
+};
 
 export { SideNavMenuList, SideNavMenuItem };

@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Slot } from '@radix-ui/react-slot';
-import { useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router';
 
 import { cn } from '@/lib/utils';
 import { useCombinedRefs } from '@/hooks/useCombinedRefs';
@@ -56,7 +56,7 @@ const HeaderNavMenuList = React.forwardRef<HTMLUListElement, HeaderNavMenuListPr
 
         <div
           data-slot="header-navigation-menu-indicator"
-          className="bg-foreground absolute bottom-0 h-[3px]"
+          className="bg-foreground absolute bottom-0 h-0.75"
           ref={indicatorRef}
           style={{
             transition: 'width 0.3s, left 0.3s',

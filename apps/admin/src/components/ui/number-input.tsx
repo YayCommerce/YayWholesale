@@ -26,8 +26,10 @@ export const useNumberInputContext = () => {
   return ctx;
 };
 
-interface NumberInputRootProps
-  extends Omit<NumericFormatProps, 'value' | 'onChange' | 'onValueChange' | 'step' | 'size'> {
+interface NumberInputRootProps extends Omit<
+  NumericFormatProps,
+  'value' | 'onChange' | 'onValueChange' | 'step' | 'size'
+> {
   defaultValue?: number;
   value?: number;
   onValueChange?: (value: number) => void;

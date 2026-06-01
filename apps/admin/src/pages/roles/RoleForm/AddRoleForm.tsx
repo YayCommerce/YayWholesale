@@ -7,7 +7,7 @@ import { getErrorMsg } from '@/lib/helpers/response.helper';
 import { useAddRoleMutation, useIsMutatingRoles } from '@/lib/queries/roles.queries';
 import { RoleFormValues, roleSchema } from '@/lib/schema/roles.schema';
 import { Button } from '@/components/ui/button';
-import { SheetClose, SheetDescription, SheetFooter, SheetHeader, SheetTitle } from '@/components/ui/sheet';
+import { SheetClose, SheetFooter, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { toast } from '@/components/ui/sonner';
 import RoleFormContent from './RoleFormContent';
 
@@ -44,12 +44,7 @@ export default function AddRoleForm() {
       >
         <SheetHeader>
           <div className="flex items-start justify-between">
-            <div>
-              <SheetTitle>{__('Add New Role', 'yay-wholesale-b2b')}</SheetTitle>
-              <SheetDescription className="mt-[4px] leading-[20px]">
-                {__('Enter the information below to add a new wholesale user role', 'yay-wholesale-b2b')}
-              </SheetDescription>
-            </div>
+            <SheetTitle>{__('Add New Role', 'yay-wholesale-b2b')}</SheetTitle>
           </div>
         </SheetHeader>
 

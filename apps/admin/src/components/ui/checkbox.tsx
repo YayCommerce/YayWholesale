@@ -15,7 +15,7 @@ const Checkbox = React.forwardRef<
       data-slot="checkbox"
       className={cn(
         focusVariants(),
-        'peer border-input dark:bg-input/30 hover:border-ring focus-visible:hover:border-ring-accent focus-visible:border-ring disabled:border-input disabled:bg-accent relative flex size-4.5 shrink-0 cursor-pointer items-center justify-center rounded-[4px] border shadow-xs transition outline-none after:absolute after:-inset-x-3 after:-inset-y-3 disabled:cursor-not-allowed',
+        'peer border-input dark:bg-input/30 hover:border-ring focus-visible:hover:border-ring-accent focus-visible:border-ring disabled:border-input disabled:bg-accent relative flex size-4.5 shrink-0 cursor-pointer items-center justify-center rounded-[4px] border shadow-xs transition outline-none after:absolute after:-inset-3 disabled:cursor-not-allowed',
         'data-[state=checked]:bg-primary data-[state=checked]:hover:border-primary-accent data-[state=checked]:hover:bg-primary-accent dark:data-[state=checked]:bg-primary data-[state=checked]:border-primary data-[state=checked]:text-primary-foreground data-[state=checked]:disabled:opacity-60',
         className,
       )}

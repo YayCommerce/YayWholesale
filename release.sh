@@ -124,7 +124,7 @@ done
 fi
 
 #
-# 8) Delete Pro folder if building Lite ver; Replace Plugin name if building Pro ver
+# 8) Delete Pro folder if building Lite ver
 #
 if [ "$IS_PRO" = "false" ]; then
     TARGET="$DEST_PATH/includes/Pro"

@@ -39,7 +39,7 @@ export function FieldRow({
   remove: (index: number) => void;
   append: () => void;
 }) {
-  const { control, watch } = useFormContext<Settings>();
+  const { control, watch, formState: { errors } } = useFormContext<Settings>();
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: field.id,
   });
@@ -53,13 +53,14 @@ export function FieldRow({
   const isHidden = watch(`registration_fields.fields.${index}.isHidden`);
 
   const isDefault: boolean = useMemo(() => field.isDefault, [field]);
-
+  const rowHasError = !!errors?.registration_fields?.fields?.[index];
   return (
     <div
       ref={setNodeRef}
       style={style}
       className={cn(
-        'flex flex-wrap items-end gap-4 border-b border-[#F4F4F7] p-4 transition-colors last:border-0 last:pb-0',
+        'flex flex-wrap  gap-4 border-b border-[#F4F4F7] p-4 transition-colors last:border-0 last:pb-0',
+        !rowHasError && 'items-end',
         isDragging && 'bg-[#F9FAFB]',
       )}
     >
