@@ -61,7 +61,7 @@ class Pricing {
     /**
      * Get final advanced wholesale discount data: discount type (rule), discount value (fixed or rate)
      *
-     * @param array       $discount_data The discount data (included discount type, discount value)
+     * @param array       $discount_data The discount data (included discount type, discount value).
      * @param \WC_Product $product The current handling product.
      * @param array       $wholesale_role The wholesale role.
      * @param int         $quantity the quantity of product.

@@ -136,7 +136,7 @@ function CustomColorPicker({ children, ...props }: ColorPickerProps) {
           <ColorPickerSwatch swatchValue="#ea580c" title="Orange" />
           <ColorPickerSwatch swatchValue="#f9bd09" title="Yellow" />
           <ColorPickerSwatch swatchValue="#16a34a" title="Green" />
-          <ColorPickerSwatch swatchValue="#2271b1" title="Blue" />
+          <ColorPickerSwatch swatchValue="#3858e9" title="Blue" />
           <ColorPickerSwatch swatchValue="#6d28d9" title="Violet" />
         </div>
       </ColorPickerContent>

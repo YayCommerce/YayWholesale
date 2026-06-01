@@ -5,11 +5,21 @@
     "https://downloads.wordpress.org/plugin/woocommerce.zip",
     "https://github.com/WP-API/Basic-Auth/archive/master.zip"
   ],
+  "themes": [
+    "https://downloads.wordpress.org/theme/brandy.zip"
+  ],
   "config": {
     "WP_DEBUG_LOG": true,
     "WP_DEBUG_DISPLAY": true
   },
-  "env": {
-    "tests": { "port": 8890, "multisite": true }
+  "multisite": true,
+  "port": 8890,
+  "testsEnvironment": false,
+  "lifecycleScripts": {
+		"afterStart": "./bin/test-env-setup.sh .wp-env.multisite.json",
+		"afterClean": "./bin/test-env-setup.sh .wp-env.multisite.json"
+	},
+  "mappings": {
+    "test-data/images/": "./test-data/images/"
   }
 }
