@@ -8,7 +8,7 @@ export default function DeleteIcon({ className = '', ...props }) {
       viewBox="0 0 16 16"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
-      className={cn('ml-0.25', className)}
+      className={cn('ml-px', className)}
       {...props}
     >
       <path

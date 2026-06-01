@@ -65,7 +65,7 @@ export default function TopProducts(props: { reportQuery: ReturnType<typeof useR
                       <div className="flex items-center gap-3">
                         <div
                           className={cn(
-                            'h-8 w-8 overflow-hidden rounded-md',
+                            'size-8  overflow-hidden rounded-md',
                             reportData.topProducts.indexOf(data) < 3 &&
                               'border-ring ring-1 ring-[#F9BD09] ring-offset-1',
                           )}
@@ -77,7 +77,7 @@ export default function TopProducts(props: { reportQuery: ReturnType<typeof useR
                                 : `${window.yayWholesaleB2BMeta.wholesaleMeta.assetsUrl}/images/favicon.svg`
                             }
                             alt={data.name}
-                            className="h-full w-full object-cover"
+                            className="size-full  object-cover"
                           />
                         </div>
                         <div className="flex w-full flex-1 items-center gap-1 md:w-15 md:flex-wrap lg:w-40 lg:flex-nowrap">

@@ -1,7 +1,13 @@
 name: E2E Tests
 
 on:
-  workflow_dispatch: # disabled until e2e tests are complete; re-enable push/pull_request triggers when ready
+  push:
+    branches:
+      - develop
+  pull_request:
+    branches:
+      - develop
+  workflow_dispatch:
 
 jobs:
   e2e-single:
@@ -11,22 +17,32 @@ jobs:
       - uses: actions/checkout@v4
 
       - uses: pnpm/action-setup@v4
-        with:
-          version: '10.15.0'
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          cache: 'pnpm'
+          node-version: "20"
+          cache: "pnpm"
 
       - name: Install dependencies
         run: pnpm install
+        env:
+          COMPOSER_AUTH: '{"github-oauth":{"github.com":"${{ secrets.COMPOSER_TOKEN }}"}}'
 
       - name: Install Playwright browsers
         run: pnpm test:e2e:install
 
+      - name: Cache wp-env downloads
+        uses: actions/cache@v4
+        with:
+          path: /home/runner/wp-env
+          key: wp-env-${{ hashFiles('tests/e2e/.wp-env.single.json') }}
+          restore-keys: |
+            wp-env-
+
       - name: Start wp-env
         run: pnpm env:start:single
+        env:
+          WP_ENV_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Run E2E tests (single-site)
         run: pnpm test:e2e:single
@@ -36,40 +52,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: e2e-results-single
-          path: tests/e2e/test-results/
-          retention-days: 7
-
-  e2e-multisite:
-    name: E2E – Multisite
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: pnpm/action-setup@v4
-        with:
-          version: '10.15.0'
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'pnpm'
-
-      - name: Install dependencies
-        run: pnpm install
-
-      - name: Install Playwright browsers
-        run: pnpm test:e2e:install
-
-      - name: Start wp-env
-        run: pnpm env:start:multi
-
-      - name: Run E2E tests (multisite)
-        run: pnpm test:e2e:multi
-
-      - name: Upload test artifacts
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: e2e-results-multisite
-          path: tests/e2e/test-results/
+          path: |
+            tests/e2e/test-results/
+            tests/e2e/playwright-report/
           retention-days: 7

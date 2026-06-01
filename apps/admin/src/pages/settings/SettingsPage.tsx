@@ -1,22 +1,22 @@
 import { useEffect, useMemo } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
+import * as TabsPrimitive from '@radix-ui/react-tabs';
+import { Loader2 } from 'lucide-react';
+import { createPortal } from 'react-dom';
 import { useForm, useFormContext } from 'react-hook-form';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router';
 import { toast } from 'sonner';
 import { __ } from '@wordpress/i18n';
-import { SideNavMenuItem, SideNavMenuList } from '@/components/ui/navmenu-side';
+
 import { getErrorMsg } from '@/lib/helpers/response.helper';
 import { useIsMutatingSettings, useSaveSettingsMutation, useSettingsQuery } from '@/lib/queries/settings.queries';
 import { Settings, settingsFormSchema } from '@/lib/schema/settings.schema';
 import { useRouteLeaveGuard } from '@/hooks/useRouteLeaveGuard';
-import { FormProvider } from '@/components/ui/form';
-import { UnsavedChangeDialog } from '@/components/ui/unsaved-changed-dialog';
-import * as TabsPrimitive from '@radix-ui/react-tabs';
 import { Button } from '@/components/ui/button';
-import { createPortal } from 'react-dom';
-
-import { getFirstErrorSection } from './settings.helper';
-import { makeDefaultSettings } from './settings.helper';
+import { FormProvider } from '@/components/ui/form';
+import { SideNavMenuItem, SideNavMenuList } from '@/components/ui/navmenu-side';
+import { UnsavedChangeDialog } from '@/components/ui/unsaved-changed-dialog';
+import { getFirstErrorSection, makeDefaultSettings } from './settings.helper';
 import DisplayTab from './tabs/DisplayTab';
 import EmailsTab from './tabs/EmailsTab';
 import GeneralTab from './tabs/GeneralTab';
@@ -24,7 +24,7 @@ import PaymentRolesTab from './tabs/PaymentRolesTabs';
 import RegistrationFieldsTab from './tabs/registration-fields/RegistrationFieldsTab';
 import RegistrationTab from './tabs/RegistrationTab';
 import ShippingRolesTab from './tabs/ShippingRolesTabs';
-import { Loader2 } from 'lucide-react';
+
 export default function SettingsPage() {
   const { subMenu } = useParams();
   const tabs = ['general', 'display', 'registration', 'registration-fields', 'payment-roles', 'shipping-roles'];
@@ -45,11 +45,14 @@ export default function SettingsPage() {
     defaultValues: defaultValues,
   });
 
-  const setActiveTab = (tab: typeof tabs[number]) => {
+  const setActiveTab = (tab: (typeof tabs)[number]) => {
     navigate(`/settings/${tab}`);
   };
 
-  const { handleSubmit, formState: { isDirty } } = form;
+  const {
+    handleSubmit,
+    formState: { isDirty },
+  } = form;
 
   async function onSubmit(data: Settings) {
     if (isMutating > 0) return;
@@ -87,22 +90,22 @@ export default function SettingsPage() {
             className="relative ms-4"
             disabled={saveMutation.isPending}
             data-submitting={saveMutation.isPending}
-
           >
             <span className={saveMutation.isPending ? 'opacity-0' : 'opacity-100'}>
               <span className="max-sm:hidden">{__('Save Changes', 'yay-wholesale-b2b')}</span>
               <span className="sm:hidden">{__('Save', 'yay-wholesale-b2b')}</span>
             </span>
-            {saveMutation.isPending && <span className="absolute top-1/2 left-1/2 -translate-1/2 transition-opacity group-data-[submitting=false]:opacity-0">
-              <Loader2 className="text-primary-foreground animate-spin stroke-3" />
-            </span>}
+            {saveMutation.isPending && (
+              <span className="absolute top-1/2 left-1/2 -translate-1/2 transition-opacity group-data-[submitting=false]:opacity-0">
+                <Loader2 className="text-primary-foreground animate-spin stroke-3" />
+              </span>
+            )}
           </Button>,
-          headerActionPortal
+          headerActionPortal,
         )}
       <FormProvider {...form}>
-
         <form id="settings-form" onSubmit={handleSubmit(onSubmit, onError)}>
-          <div className="xs:p-6 px-6 pt-8 pb-4 max-w-7xl mx-auto">
+          <div className="xs:p-6 mx-auto max-w-7xl px-6 pt-8 pb-4">
             <TabsPrimitive.Root value={activeTab} onValueChange={(value) => navigate(`/settings/${value}`)}>
               <div className="flex flex-col gap-4 sm:flex-row">
                 <div className="w-full sm:w-37.5">
@@ -148,44 +151,43 @@ export default function SettingsPage() {
                     </SideNavMenuList>
                   </TabsPrimitive.List>
                 </div>
-                <div className="flex flex-col bg-muted flex-1">
+                <div className="bg-muted flex flex-1 flex-col">
                   <TabsPrimitive.Content value="general" style={{ height: '100%' }}>
-                    <div className="rounded-md border p-6 bg-card sm:w-full h-full">
+                    <div className="bg-card h-full rounded-md border p-6 sm:w-full">
                       <GeneralTab />
                     </div>
                   </TabsPrimitive.Content>
 
                   <TabsPrimitive.Content value="display" style={{ height: '100%' }}>
-                    <div className="rounded-md border p-6 bg-card sm:w-full h-full">
+                    <div className="bg-card h-full rounded-md border p-6 sm:w-full">
                       <DisplayTab />
                     </div>
                   </TabsPrimitive.Content>
                   <TabsPrimitive.Content value="registration" style={{ height: '100%' }}>
-                    <div className="rounded-md border p-6 bg-card sm:w-full h-full">
+                    <div className="bg-card h-full rounded-md border p-6 sm:w-full">
                       <RegistrationTab />
                     </div>
                   </TabsPrimitive.Content>
                   <TabsPrimitive.Content value="registration-fields" style={{ height: '100%' }}>
-                    <div className="rounded-md border p-6 bg-card sm:w-full h-full">
+                    <div className="bg-card h-full rounded-md border p-6 sm:w-full">
                       <RegistrationFieldsTab />
                     </div>
                   </TabsPrimitive.Content>
                   <TabsPrimitive.Content value="payment-roles" style={{ height: '100%' }}>
-                    <div className="rounded-md border p-6 bg-card sm:w-full h-full">
+                    <div className="bg-card h-full rounded-md border p-6 sm:w-full">
                       <PaymentRolesTab />
                     </div>
                   </TabsPrimitive.Content>
                   <TabsPrimitive.Content value="shipping-roles" style={{ height: '100%' }}>
-                    <div className="rounded-md border p-6 bg-card sm:w-full h-full">
+                    <div className="bg-card h-full rounded-md border p-6 sm:w-full">
                       <ShippingRolesTab />
                     </div>
                   </TabsPrimitive.Content>
                   <TabsPrimitive.Content value="emails" style={{ height: '100%' }}>
-                    <div className="rounded-md border p-6 bg-card sm:w-full h-full">
+                    <div className="bg-card h-full rounded-md border p-6 sm:w-full">
                       <EmailsTab />
                     </div>
                   </TabsPrimitive.Content>
-
                 </div>
               </div>
             </TabsPrimitive.Root>
@@ -204,8 +206,8 @@ export default function SettingsPage() {
               }
             }}
           />
-        </form >
-      </FormProvider >
+        </form>
+      </FormProvider>
     </>
   );
 }
@@ -214,5 +216,5 @@ function SettingsErrorIndicator({ tab }: { tab: keyof Settings }) {
   const { formState } = useFormContext<Settings>();
   const hasErrors = !!formState.errors?.[tab];
   if (!hasErrors) return null;
-  return <span className='bg-destructive size-1.25 rounded-full'></span>;
+  return <span className="bg-destructive size-1.25 rounded-full"></span>;
 }

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { DialogClose } from '@radix-ui/react-dialog';
 import { useQueryClient } from '@tanstack/react-query';
 import { ColumnDef } from '@tanstack/react-table';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 import { __ } from '@wordpress/i18n';
 
 import { parseWPDate, parseWPTime } from '@/lib/helpers/format.helper';
@@ -90,13 +90,13 @@ export const requestColumns: ColumnDef<Request>[] = [
                   <Button
                     size="icon"
                     variant="ghost"
-                    className="hover:text-primary text-muted-foreground h-8 w-8 hover:bg-white hover:shadow-xs"
+                    className="hover:text-primary text-muted-foreground size-8 hover:bg-white hover:shadow-xs"
                     onClick={() => {
                       cacheRequest(queryClient, row.original);
                       navigate(`/request/edit/${row.original.id}`);
                     }}
                   >
-                    <SettingsIcon className="h-4 w-4" />
+                    <SettingsIcon className="size-4" />
                   </Button>
                 }
                 content={<span>{__('See details', 'yay-wholesale-b2b')}</span>}
@@ -107,11 +107,11 @@ export const requestColumns: ColumnDef<Request>[] = [
                   <Button
                     size="icon"
                     variant="ghost"
-                    className="hover:text-destructive text-muted-foreground m-0 h-8 w-8 hover:bg-white hover:shadow-xs"
+                    className="hover:text-destructive text-muted-foreground m-0 size-8 hover:bg-white hover:shadow-xs"
                     onClick={() => setOpenDialog(true)}
                     disabled={isDeletingRequestPending || queryClient.isMutating({ mutationKey: ['requests'] }) > 0}
                   >
-                    <DeleteIcon className="h-4 w-4" />
+                    <DeleteIcon className="size-4" />
                   </Button>
                 }
                 content={<span>{__('Delete request', 'yay-wholesale-b2b')}</span>}

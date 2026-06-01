@@ -178,7 +178,7 @@ export default function RoleFormContent() {
                   placeholder={__('e.g. 200.00 (min total value required per order)', 'yay-wholesale-b2b')}
                   aria-invalid={invalid}
                 />
-                <div className="absolute inset-y-0 end-0 flex">
+                <div className="absolute inset-y-0 inset-e-0 flex">
                   <NumberInputChevrons hasUnit />
                   <NumberInputUnit unit={symbol ?? '$'} />
                 </div>

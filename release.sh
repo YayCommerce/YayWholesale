@@ -137,8 +137,9 @@ if [ "$IS_PRO" = "false" ]; then
         rm -rf "$TARGET" && echo "Removed: $TARGET (and its content)"
     fi
 else
-    mv "$DEST_PATH/assets/pro/yay-wholesale-b2b.php" "$DEST_PATH/yay-wholesale-b2b.php"
-    echo "Switched: main php file of Pro ver"
+    cp "$DEST_PATH/assets/pro/yay-wholesale-b2b-pro.php" "$DEST_PATH/"
+    rm "$DEST_PATH/assets/pro/yay-wholesale-b2b-pro.php"
+    rm "$DEST_PATH/yay-wholesale-b2b.php"
 fi
 
 #
@@ -151,8 +152,8 @@ rm -rf "$DEST_PATH/includes/Engine/Register/RegisterDev.php"
 #
 echo "Generating zip file..."
 cd "$BUILD_PATH" || exit
-zip -q -r "${PLUGIN_SLUG}.zip" "$PLUGIN_SLUG/"
-rm -rf "$PLUGIN_SLUG"
+zip -q -r "../${PLUGIN_SLUG}.zip" "$PLUGIN_SLUG/"
+rm -rf "$BUILD_PATH"
 echo "${PLUGIN_SLUG}.zip file generated!"
 
 echo "Build done!"

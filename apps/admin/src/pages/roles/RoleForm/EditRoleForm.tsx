@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { FormProvider, useForm } from 'react-hook-form';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 import { useDidUpdate } from 'rooks';
 import { __ } from '@wordpress/i18n';
 

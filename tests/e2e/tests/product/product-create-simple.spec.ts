@@ -69,7 +69,7 @@ for ( const productType of Object.keys( productData ) ) {
 		await test.step( 'verify product on the frontend', async () => {
 			const permalink = await page.locator( '#sample-permalink a' ).innerText();
 			await page.goto( permalink );
-			await expect( page.getByRole( 'heading', { name: data.name } ) ).toBeVisible();
+			await expect( page.getByRole( 'heading', { name: data.name } ).first() ).toBeVisible();
 			await expect( page.getByText( data.regularPrice ).first() ).toBeVisible();
 			await expect( page.getByText( data.shortDescription ).first() ).toBeVisible();
 		} );
@@ -77,9 +77,9 @@ for ( const productType of Object.keys( productData ) ) {
 		await test.step( 'shopper can add the product to cart', async () => {
 			await page.context().clearCookies();
 			await page.reload();
-			await page.getByRole( 'button', { name: 'Add to cart' } ).click();
-			await page.getByRole( 'link', { name: 'View cart' } ).click();
-			await expect( page.getByText( data.name ) ).toBeVisible();
+			await page.locator( 'button[name="add-to-cart"]' ).click();
+			await page.locator( '#content' ).getByRole( 'link', { name: 'View cart' } ).first().click();
+			await expect( page.getByText( data.name ).first() ).toBeVisible();
 		} );
 	} );
 }

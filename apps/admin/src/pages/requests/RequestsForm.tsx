@@ -1,4 +1,4 @@
-import { useMatch, useNavigate, useParams } from 'react-router-dom';
+import { useMatch, useNavigate, useParams } from 'react-router';
 import { __ } from '@wordpress/i18n';
 
 import { useSingleRequestQuery } from '@/lib/queries/requests.queries';

@@ -5,7 +5,7 @@
   "scripts": {
     "postinstall": "composer install",
     "makepot": "wp i18n make-pot . languages/yay-wholesale-b2b.pot --exclude=vendor,node_modules,apps,tests --domain=yay-wholesale-b2b",
-    "release": "pnpm release:pro && pnpm release:lite",
+    "release": "pnpm release:lite && pnpm release:pro",
     "release:lite": "bash ./release.sh IS_PRO=false",
     "release:pro": "bash ./release.sh IS_PRO=true",
     "env:start:single": "pnpm --filter @yay-wholesale/e2e env:start:single",

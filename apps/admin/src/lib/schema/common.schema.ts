@@ -9,7 +9,7 @@ export const enableByRoleSchema = z.object({
 
 // TODO v1.2: add to Product Option, Category Option
 const accessByRoleSchema = z.object({
-  access_rule: z.enum(['visible-all', 'visible-specific-roles']),
+  rule: z.enum(['visible-all', 'visible-specific-roles']),
   retailers: z.enum(['enabled', 'disabled']),
   wholesalers: z.enum(['enabled', 'disabled', 'enabled-selected-roles']),
   selected_roles: z.array(z.string()), // RoleSlug[]

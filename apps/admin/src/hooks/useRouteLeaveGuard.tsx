@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { matchPath, useBlocker } from 'react-router-dom';
+import { matchPath, useBlocker } from 'react-router';
 
 /**
  * Hook that guards unsaved form changes.
