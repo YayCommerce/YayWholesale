@@ -4,6 +4,7 @@ namespace YayWholesaleB2B\Engine\Compatibles;
 use YayWholesaleB2B\Utils\SingletonTrait;
 
 use Yay_Currency\Helpers\YayCurrencyHelper;
+use Yay_Currency\Helpers\Helper;
 use Yay_Currency\Helpers\SupportHelper;
 use YayWholesaleB2B\Helpers\CustomerHelper;
 use YayWholesaleB2B\Helpers\PricingHelpers\ProductPricingHelper;
@@ -33,6 +34,9 @@ class YayCurrency {
 
         $this->apply_currency = YayCurrencyHelper::detect_current_currency();
 
+        // Convert Revenue from customer (WholesalerList Page)
+        add_filter( 'ywhs_wholesaler_stats_extra_joins', [ $this, 'stats_extra_joins' ], 10, 2 );
+        add_filter( 'ywhs_wholesaler_revenue_sql', [ $this, 'wholesaler_revenue_sql' ], 10, 2 );
         // YayWholesale Hooks
         add_filter( 'ywhs_after_calc_price_additional_processed', [ $this, 'convert_currency_price' ], 10, 3 );
         add_filter( 'ywhs_display_wholesale_price_additional_processed', [ $this, 'convert_currency_price' ], 10, 3 );
@@ -164,6 +168,22 @@ class YayCurrency {
 
             return $price;
         }//end if
+    }
+
+    public function stats_extra_joins( $extra_joins, $is_hpos ) {
+        global $wpdb;
+        if ( ! $is_hpos ) {
+            return $extra_joins;
+        }
+        return $extra_joins . " LEFT JOIN {$wpdb->prefix}wc_orders_meta rate ON rate.order_id = o.id AND rate.meta_key = 'yay_currency_order_rate'";
+    }
+
+    public function wholesaler_revenue_sql( $revenue_sql, $is_hpos ) {
+        if ( ! $is_hpos ) {
+            return $revenue_sql;
+        }
+        $store_currency = esc_sql( Helper::default_currency_code() );
+        return "SUM(CASE WHEN o.currency = '{$store_currency}' THEN o.total_amount ELSE o.total_amount / GREATEST(1,CAST(rate.meta_value AS DECIMAL(20,8))) END)";
     }
 
     /* Convert the final price with YayCurrency */
