@@ -1,5 +1,8 @@
 import { wordpressApi } from './api';
 
+/**
+ * The WordPress page response
+ */
 interface WpPageResponse {
   id: number;
   slug: string;
@@ -8,42 +11,55 @@ interface WpPageResponse {
   };
 }
 
-function mapPage(page: WpPageResponse) {
+/**
+ * The page size
+ */
+const PAGE_SIZE = 100;
+
+/**
+ * Map the page response to the page type
+ * @param page - The page response
+ * @returns The page
+ */
+function mapPage({ id, slug, title }: WpPageResponse) {
   return {
-    id: page.id,
-    title: page.title.rendered,
-    slug: page.slug,
+    id,
+    slug,
+    title: title.rendered,
   };
 }
 
-async function fetchPage(page: number) {
-  return wordpressApi.get('pages', {
+/**
+ * Get pages from the WordPress API
+ * @param page - The page number to get
+ * @returns The total number of pages and the pages for the given page number
+ */
+async function getPages(page: number) {
+  const response = await wordpressApi.get('pages', {
     searchParams: {
-      per_page: '100',
+      page,
+      per_page: PAGE_SIZE.toString(),
       status: 'publish',
       _fields: 'id,title,slug',
-      page: page,
     },
   });
+
+  return {
+    totalPages: Number(response.headers.get('X-WP-TotalPages') ?? 1),
+    pages: await response.json<WpPageResponse[]>(),
+  };
 }
 
-async function fetchPageData(page: number) {
-  const response = await fetchPage(page);
-  return response.json<WpPageResponse[]>();
-}
-
+/**
+ * Fetch all pages from the WordPress API
+ * @returns The pages
+ */
 export async function fetchAllPages() {
-  const firstResponse = await fetchPage(1);
-  const totalPages = Number(firstResponse.headers.get('X-WP-TotalPages') ?? 1);
-  const firstPages = await firstResponse.json<WpPageResponse[]>();
-
-  if (totalPages === 1) {
-    return firstPages.map(mapPage);
-  }
+  const { totalPages, pages: firstPage } = await getPages(1);
 
   const remainingPages = await Promise.all(
-    Array.from({ length: totalPages - 1 }, (_, index) => fetchPageData(index + 2)),
+    Array.from({ length: totalPages - 1 }, (_, index) => getPages(index + 2).then(({ pages }) => pages)),
   );
 
-  return [...firstPages, ...remainingPages.flat()].map(mapPage);
+  return [firstPage, ...remainingPages].flat().map(mapPage);
 }
