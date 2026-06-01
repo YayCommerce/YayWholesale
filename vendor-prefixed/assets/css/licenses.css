@@ -191,6 +191,7 @@
 }
 .yaycommerce-license-card .yaycommerce-license-card-body {
   padding: 8px 24px 12px;
+  margin-top: auto;
 }
 
 .yaycommerce-license-settings .yaycommerce-license-card-body {
@@ -206,6 +207,9 @@
 
 .yaycommerce-license-input-row input {
   flex: 1;
+  min-height: 30px;
+  border-radius: 6px;
+  border-color: #d9d9d9;
 }
 
 .yaycommerce-license-input-row input:disabled {
@@ -358,6 +362,8 @@ p.yaycommerce_expired_text::before {
   cursor: pointer;
   transition: all 0.3s ease-in-out;
   color: #414141;
+  min-height: 30px !important;
+  border-radius: 6px !important;
 }
 .yaycommerce-license-button:hover {
   box-shadow: 0px 2px 0px rgba(0, 0, 0, 0.063);
