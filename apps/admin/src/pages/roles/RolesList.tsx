@@ -8,7 +8,7 @@ import {
 } from '@tanstack/react-table';
 import clsx from 'clsx';
 import { ChevronsUpDown, Loader2, Plus, Search } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 import { __, sprintf } from '@wordpress/i18n';
 
 import { getErrorMsg } from '@/lib/helpers/response.helper';

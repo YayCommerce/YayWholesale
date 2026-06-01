@@ -1,5 +1,5 @@
 import { ComponentProps, useMemo } from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink } from 'react-router';
 import { __, _n, sprintf } from '@wordpress/i18n';
 
 import { useCountByStatusQuery } from '@/lib/queries/requests.queries';

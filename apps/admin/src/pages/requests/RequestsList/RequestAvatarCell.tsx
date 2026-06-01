@@ -1,5 +1,5 @@
 import { useQueryClient } from '@tanstack/react-query';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 
 import { cacheRequest } from '@/lib/queries/requests.queries';
 import { Request } from '@/lib/schema/requests.type';

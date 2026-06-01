@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { DialogClose } from '@radix-ui/react-dialog';
 import { useQueryClient } from '@tanstack/react-query';
 import { ColumnDef } from '@tanstack/react-table';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 import { __ } from '@wordpress/i18n';
 
 import { parseWPDate, parseWPTime } from '@/lib/helpers/format.helper';

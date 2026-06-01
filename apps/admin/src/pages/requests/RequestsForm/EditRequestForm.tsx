@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { Ellipsis } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 import { __, sprintf } from '@wordpress/i18n';
 
 import { parseWPDate, parseWPTime } from '@/lib/helpers/format.helper';
