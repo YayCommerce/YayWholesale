@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { FormProvider, useForm } from 'react-hook-form';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 import { useDidUpdate } from 'rooks';
 import { __ } from '@wordpress/i18n';
 
@@ -9,7 +9,7 @@ import { getErrorMsg } from '@/lib/helpers/response.helper';
 import { useIsMutatingRoles, useUpdateRoleMutation } from '@/lib/queries/roles.queries';
 import { Role, RoleFormValues, roleSchema } from '@/lib/schema/roles.schema';
 import { Button } from '@/components/ui/button';
-import { SheetClose, SheetDescription, SheetFooter, SheetHeader, SheetTitle } from '@/components/ui/sheet';
+import { SheetClose, SheetFooter, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { toast } from '@/components/ui/sonner';
 import RoleFormContent from './RoleFormContent';
 
@@ -62,12 +62,7 @@ export default function EditRoleForm({ role }: { role: Role }) {
       >
         <SheetHeader>
           <div className="flex items-start justify-between">
-            <div>
-              <SheetTitle>{__('Edit Role', 'yay-wholesale-b2b')}</SheetTitle>
-              <SheetDescription className="mt-[4px] leading-[20px]">
-                {__('Enter the information below to edit wholesale user role', 'yay-wholesale-b2b')}
-              </SheetDescription>
-            </div>
+            <SheetTitle>{__('Edit Role', 'yay-wholesale-b2b')}</SheetTitle>
           </div>
         </SheetHeader>
 

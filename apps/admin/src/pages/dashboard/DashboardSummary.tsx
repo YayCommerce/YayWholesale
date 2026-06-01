@@ -1,5 +1,5 @@
 import { Loader2, TrendingDown, TrendingUp } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 import { __ } from '@wordpress/i18n';
 
 import { parseWPCurrency, parseWPDecimal } from '@/lib/helpers/format.helper';
@@ -7,7 +7,6 @@ import { useReportsQuery } from '@/lib/queries/reports.queries';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription } from '@/components/ui/card';
-import { Skeleton } from '@/components/ui/skeleton';
 
 export default function DashboardSummary({ reportQuery }: { reportQuery: ReturnType<typeof useReportsQuery> }) {
   const { data: reportData, isFetching, isLoading } = reportQuery;
@@ -29,7 +28,7 @@ export default function DashboardSummary({ reportQuery }: { reportQuery: ReturnT
             <TrendBadge percent={wholesalersIncreaseRate} isFetching={isFetching || isLoading} />
           </div>
           <p className="text-foreground mb-1.5 text-3xl leading-none font-semibold">
-            {isFetching || isLoading ? <Skeleton className="h-7.5 w-15" /> : wholesalersAmount}
+            {isFetching || isLoading ? <AmountSkeleton /> : wholesalersAmount}
           </p>
           <CardDescription className="mb-4">{__('Total Wholesalers', 'yay-wholesale-b2b')}</CardDescription>
           <Button variant="outline" size="sm" className="w-fit" onClick={() => navigate('/wholesalers')}>
@@ -45,7 +44,7 @@ export default function DashboardSummary({ reportQuery }: { reportQuery: ReturnT
             <TrendBadge percent={wholesaleOrderIncreaseRate} isFetching={isFetching || isLoading} />
           </div>
           <p className="text-foreground mb-1.5 text-3xl leading-none font-semibold">
-            {isFetching || isLoading ? <Skeleton className="h-7.5 w-15" /> : wholesaleOrderAmount}
+            {isFetching || isLoading ? <AmountSkeleton /> : wholesaleOrderAmount}
           </p>
           <CardDescription className="mb-4">{__('Total Orders', 'yay-wholesale-b2b')}</CardDescription>
           <Button variant="outline" size="sm" className="w-fit" asChild>
@@ -63,7 +62,7 @@ export default function DashboardSummary({ reportQuery }: { reportQuery: ReturnT
             <TrendBadge percent={wholesaleRevenueIncreaseRate} isFetching={isFetching || isLoading} />
           </div>
           <p className="text-foreground mb-1.5 text-3xl leading-none font-semibold">
-            {isFetching || isLoading ? <Skeleton className="h-7.5 w-15" /> : parseWPCurrency(wholesaleRevenue)}
+            {isFetching || isLoading ? <AmountSkeleton /> : parseWPCurrency(wholesaleRevenue)}
           </p>
           <CardDescription className="mb-4">{__('Total Revenue', 'yay-wholesale-b2b')}</CardDescription>
           <Button variant="outline" size="sm" className="w-fit" asChild>
@@ -93,4 +92,8 @@ function TrendBadge({ percent, isFetching }: { percent: number; isFetching: bool
       </p>
     </Badge>
   );
+}
+
+function AmountSkeleton() {
+  return <span className="bg-muted h-7.5 w-15 animate-pulse rounded-md" />;
 }

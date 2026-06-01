@@ -30,7 +30,7 @@ export default function PaymentRolesTab() {
                   {__('Roles', 'yay_wholesale_b2b')}
                   <WholeSaleToolTip
                     className="w-57"
-                    trigger={<QuestionIcon className="h-4 w-4" />}
+                    trigger={<QuestionIcon className="size-4" />}
                     content={__(
                       'The payment method is only available to users with the selected roles.',
                       'yay_wholesale_b2b',

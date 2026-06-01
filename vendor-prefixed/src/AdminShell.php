@@ -29,7 +29,7 @@ use YayWholesaleB2BScoped\YayCommerce\AdminShell\Support\Constants;
 class AdminShell
 {
     /** Package version — used for cross-scope version election. */
-    const VERSION = '2.6.1';
+    const VERSION = '2.6.5';
     private static ?self $instance = null;
     private static bool $booted = \false;
     private static array $enabled_slugs = [];

@@ -1,12 +1,14 @@
 'use client';
 
-import { useCallback, useEffect, useState, type MouseEvent } from 'react';
+import { useCallback, type MouseEvent } from 'react';
 import { type VariantProps } from 'class-variance-authority';
 import { CheckIcon, CopyIcon } from 'lucide-react';
 import { AnimatePresence, HTMLMotionProps } from 'motion/react';
 import * as m from 'motion/react-m';
+import { useClipboard, usePreviousDifferent } from 'rooks';
 
 import { cn } from '@/lib/utils';
+import { useUncontrolled } from '@/hooks/useUncontrolled';
 import { buttonVariants } from './button';
 
 type CopyButtonProps = Omit<HTMLMotionProps<'button'>, 'children' | 'onCopy'> &
@@ -25,44 +27,39 @@ function CopyButton({
   delay = 3000,
   onClick,
   onCopy,
-  isCopied,
+  isCopied: controlledIsCopied,
   onCopyChange,
   ...props
 }: CopyButtonProps) {
-  const [localIsCopied, setLocalIsCopied] = useState(isCopied ?? false);
-  const [isDirty, setIsDirty] = useState(false);
+  const { copy, text, isSupported } = useClipboard();
 
-  useEffect(() => {
-    setLocalIsCopied(isCopied ?? false);
-    setIsDirty(true);
-  }, [isCopied]);
-  const handleIsCopied = useCallback(
-    (isCopied: boolean) => {
-      setLocalIsCopied(isCopied);
-      setIsDirty(true);
-      onCopyChange?.(isCopied);
-    },
-    [onCopyChange],
-  );
+  const [isCopied, setIsCopied] = useUncontrolled({
+    value: controlledIsCopied,
+    defaultValue: text !== null && text === content,
+    onChange: onCopyChange,
+  });
+
+  const previousIsCopied = usePreviousDifferent(isCopied);
+  const isDirty = previousIsCopied !== null;
+
   const handleCopy = useCallback(
-    (e: MouseEvent<HTMLButtonElement>) => {
+    async (e: MouseEvent<HTMLButtonElement>) => {
       e.preventDefault();
-      if (isCopied) return;
-      if (content) {
-        navigator.clipboard
-          .writeText(content)
-          .then(() => {
-            handleIsCopied(true);
-            setTimeout(() => handleIsCopied(false), delay);
-            onCopy?.(content);
-          })
-          .catch((error) => {
-            console.error('Error copying command', error);
-          });
-      }
       onClick?.(e);
+
+      if (isCopied || !isSupported || content === undefined) return;
+
+      try {
+        await copy(content);
+        setIsCopied(true);
+        onCopy?.(content);
+
+        setTimeout(() => setIsCopied(false), delay);
+      } catch (err) {
+        console.error('Failed to copy:', err);
+      }
     },
-    [isCopied, content, delay, onClick, onCopy, handleIsCopied],
+    [isCopied, isSupported, content, delay, onClick, onCopy, setIsCopied, copy],
   );
 
   return (
@@ -76,18 +73,18 @@ function CopyButton({
     >
       <AnimatePresence mode="wait">
         <m.span
-          key={localIsCopied ? 'check' : 'copy'}
+          key={isCopied ? 'check' : 'copy'}
           data-slot="copy-button-icon"
-          initial={{ scale: isDirty ? 0 : 1 }} // prevent animation on first render
+          initial={{ scale: isDirty ? 0 : 1 }} // start scale animation when isDirty
           animate={{ scale: 1 }}
           exit={{ scale: 0 }}
           transition={{ duration: 0.15 }}
         >
-          {localIsCopied ? <CheckIcon /> : <CopyIcon />}
+          {isCopied ? <CheckIcon /> : <CopyIcon />}
         </m.span>
       </AnimatePresence>
     </m.button>
   );
 }
 
-export { CopyButton, buttonVariants, type CopyButtonProps };
+export { buttonVariants, CopyButton, type CopyButtonProps };

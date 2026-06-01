@@ -1,4 +1,4 @@
-import { useMatch, useNavigate, useParams } from 'react-router-dom';
+import { useMatch, useNavigate, useParams } from 'react-router';
 
 import { useRoleQuery } from '@/lib/queries/roles.queries';
 import { Sheet, SheetContent } from '@/components/ui/sheet';

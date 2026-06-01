@@ -1,5 +1,5 @@
 import { ComponentProps, useMemo } from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink } from 'react-router';
 import { __, _n, sprintf } from '@wordpress/i18n';
 
 import { useCountByStatusQuery } from '@/lib/queries/requests.queries';
@@ -75,7 +75,7 @@ function PendingRequestCount({ className, ...props }: ComponentProps<typeof Badg
       <TooltipTrigger asChild>
         <Badge
           variant="destructive"
-          className={cn('h-5 min-w-5 px-1 leading-0 tabular-nums', !!requestsCount?.pending ? '' : 'hidden', className)}
+          className={cn('h-5 min-w-5 px-1 leading-0 tabular-nums', requestsCount?.pending ? '' : 'hidden', className)}
         >
           {requestsCount?.pending}
         </Badge>

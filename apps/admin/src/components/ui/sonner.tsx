@@ -1,7 +1,6 @@
-import { CheckCircleIcon, InfoIcon, WarningCircleIcon, XCircleIcon } from '@phosphor-icons/react';
 import clsx from 'clsx';
 import { Check, X } from 'lucide-react';
-import { Toaster as Sonner, toast as sonnerToast, ToasterProps } from 'sonner';
+import { Toaster as Sonner, toast, ToasterProps } from 'sonner';
 
 import { useTheme } from './theme-provider';
 
@@ -51,24 +50,5 @@ function ToastCircleIcon({ children, className }: { children: React.ReactNode; c
     <span className={clsx('inline-flex size-4 items-center justify-center rounded-full', className)}>{children}</span>
   );
 }
-
-const toast = {
-  success: (message: string) =>
-    sonnerToast.success(message, {
-      icon: <CheckCircleIcon size={20} color="#16a34a" weight="fill" />,
-    }),
-  error: (message: string) =>
-    sonnerToast.error(message, {
-      icon: <XCircleIcon size={20} color="#dc2626" weight="fill" />,
-    }),
-  warning: (message: string) =>
-    sonnerToast(message, {
-      icon: <WarningCircleIcon size={20} color="#eab308" weight="fill" />,
-    }),
-  info: (message: string) =>
-    sonnerToast(message, {
-      icon: <InfoIcon size={20} color="#2563eb" weight="fill" />,
-    }),
-};
 
 export { Toaster, toast };

@@ -9,7 +9,7 @@ interface TextareaProps extends React.ComponentProps<'textarea'> {
 }
 
 const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
-  ({ className, readOnly, autoSize = false, ...props }, ref) => {
+  ({ className, autoSize = false, ...props }, ref) => {
     return (
       <textarea
         ref={ref}
@@ -19,7 +19,6 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
           autoSize && 'field-sizing-content',
           focusVariants(),
           inputVariants(),
-          readOnly && 'border-border bg-muted-400 hover:border-border cursor-default shadow-xs',
           className,
         )}
         {...props}

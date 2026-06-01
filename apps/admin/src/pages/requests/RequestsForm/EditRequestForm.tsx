@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { Ellipsis } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 import { __, sprintf } from '@wordpress/i18n';
 
 import { parseWPDate, parseWPTime } from '@/lib/helpers/format.helper';
@@ -62,12 +62,12 @@ export function EditRequestForm({ request }: { request: Request }) {
   }
 
   const phoneFields = useMemo(() => {
-    let phoneFields: RequestField[] = [];
+    const phoneFields: RequestField[] = [];
 
     if (!request) {
       return phoneFields;
     }
-    let fields = request.fields;
+    const fields = request.fields;
 
     request.fields.forEach((field) => {
       if (isPhoneField(field)) {
@@ -89,7 +89,7 @@ export function EditRequestForm({ request }: { request: Request }) {
                 <WholeSaleToolTip
                   trigger={
                     <div>
-                      <RequestsStatusIcon status={request.status ?? 'pending'} className="h-3.5 w-3.5" />
+                      <RequestsStatusIcon status={request.status ?? 'pending'} className="size-3.5" />
                     </div>
                   }
                   content={<span className="capitalize">{request.status}</span>}
@@ -97,7 +97,7 @@ export function EditRequestForm({ request }: { request: Request }) {
                 />
               )}
             </SheetTitle>
-            <SheetDescription className="mt-[4px] leading-[20px]">
+            <SheetDescription className="mt-1 leading-5">
               {__("Use the button below to approve or reject this user's wholesale user request", 'yay-wholesale-b2b')}
             </SheetDescription>
           </div>

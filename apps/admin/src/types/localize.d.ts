@@ -4,6 +4,7 @@ declare global {
   interface Window {
     yayWholesaleB2BMeta: Meta;
     yayWholesaleB2BAdmin: AdminData;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     wp: any;
   }
 }
@@ -16,6 +17,7 @@ declare module '@tanstack/react-table' {
 }
 
 declare module 'rooks' {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   type AnyFunction = (...args: any[]) => any;
   type DebounceOptions = {
     leading?: boolean;

@@ -1,3 +1,6 @@
+import { FieldErrors } from 'react-hook-form';
+import { useNavigate } from 'react-router';
+
 import { Settings } from '@/lib/schema/settings.schema';
 import { isPro } from '@/lib/utils';
 
@@ -7,10 +10,8 @@ export function makeDefaultSettings(settings: Settings): Settings {
 
   if (isPro) {
     defaultValues.payment_roles = payment_methods_info.map((paymentMethod) => {
-      const foundSettings = (settings.payment_roles ?? []).find(
-        (setting) => setting.method_id === paymentMethod.method_id,
-      );
-      if (foundSettings && foundSettings.method_id && foundSettings.enable_by_role) return foundSettings;
+      const foundSettings = settings.payment_roles?.find((s) => s.method_id === paymentMethod.method_id);
+      if (foundSettings && foundSettings.enable_by_role) return foundSettings;
 
       return {
         method_id: paymentMethod.method_id,
@@ -23,10 +24,8 @@ export function makeDefaultSettings(settings: Settings): Settings {
     });
 
     defaultValues.shipping_roles = shipping_methods_info.map((shippingMethod) => {
-      const existingShippingMethodSettings = (settings.shipping_roles ?? []).find(
-        (setting) => setting.instance_id === shippingMethod.instance_id,
-      );
-      if (existingShippingMethodSettings) return existingShippingMethodSettings;
+      const foundSettings = settings.shipping_roles?.find((s) => s.instance_id === shippingMethod.instance_id);
+      if (foundSettings && foundSettings.enable_by_role) return foundSettings;
 
       return {
         instance_id: shippingMethod.instance_id,
@@ -41,4 +40,23 @@ export function makeDefaultSettings(settings: Settings): Settings {
   }
 
   return defaultValues;
+}
+
+export function getFirstErrorSection() {
+  const navigate = useNavigate();
+
+  return (errors: FieldErrors<Settings>) => {
+    const errorKeys = [
+      'general',
+      'display',
+      'registration',
+      'registration_fields',
+      'payment_roles',
+      'shipping_roles',
+    ] satisfies (keyof Settings)[];
+    const firstErrorKey = errorKeys.find((errorKey) => !!errors?.[errorKey]);
+    console.log('firstErrorKey', firstErrorKey);
+    if (!firstErrorKey) return;
+    navigate(`/settings/${firstErrorKey.replace('_', '-')}`);
+  };
 }

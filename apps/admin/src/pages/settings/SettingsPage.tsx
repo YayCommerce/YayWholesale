@@ -1,19 +1,22 @@
 import { useEffect, useMemo } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
-import { Link, useParams } from 'react-router-dom';
+import * as TabsPrimitive from '@radix-ui/react-tabs';
+import { Loader2 } from 'lucide-react';
+import { createPortal } from 'react-dom';
+import { useForm, useFormContext } from 'react-hook-form';
+import { useNavigate, useParams } from 'react-router';
 import { toast } from 'sonner';
 import { __ } from '@wordpress/i18n';
 
 import { getErrorMsg } from '@/lib/helpers/response.helper';
 import { useIsMutatingSettings, useSaveSettingsMutation, useSettingsQuery } from '@/lib/queries/settings.queries';
 import { Settings, settingsFormSchema } from '@/lib/schema/settings.schema';
-import { cn } from '@/lib/utils';
 import { useRouteLeaveGuard } from '@/hooks/useRouteLeaveGuard';
-import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { FormProvider } from '@/components/ui/form';
+import { SideNavMenuItem, SideNavMenuList } from '@/components/ui/navmenu-side';
 import { UnsavedChangeDialog } from '@/components/ui/unsaved-changed-dialog';
-import { makeDefaultSettings } from './settings.helper';
+import { getFirstErrorSection, makeDefaultSettings } from './settings.helper';
 import DisplayTab from './tabs/DisplayTab';
 import EmailsTab from './tabs/EmailsTab';
 import GeneralTab from './tabs/GeneralTab';
@@ -22,35 +25,13 @@ import RegistrationFieldsTab from './tabs/registration-fields/RegistrationFields
 import RegistrationTab from './tabs/RegistrationTab';
 import ShippingRolesTab from './tabs/ShippingRolesTabs';
 
-const tabs = [
-  { path: 'general', label: __('General', 'yay_wholesale_b2b'), component: <GeneralTab /> },
-  { path: 'display', label: __('Display', 'yay_wholesale_b2b'), component: <DisplayTab /> },
-  {
-    path: 'registration',
-    label: __('Registration', 'yay_wholesale_b2b'),
-    component: <RegistrationTab />,
-  },
-  {
-    path: 'registration-fields',
-    label: __('Registration Fields', 'yay_wholesale_b2b'),
-    component: <RegistrationFieldsTab />,
-  },
-  { path: 'emails', label: __('Emails', 'yay_wholesale_b2b'), component: <EmailsTab /> },
-  {
-    path: 'payment-roles',
-    label: __('Payment Roles', 'yay_wholesale_b2b'),
-    component: <PaymentRolesTab />,
-  },
-  {
-    path: 'shipping-roles',
-    label: __('Shipping Roles', 'yay_wholesale_b2b'),
-    component: <ShippingRolesTab />,
-  },
-];
-
 export default function SettingsPage() {
   const { subMenu } = useParams();
+  const tabs = ['general', 'display', 'registration', 'registration-fields', 'payment-roles', 'shipping-roles'];
+  const activeTab = tabs.find((tab) => tab === subMenu) ?? tabs[0];
+  const headerActionPortal = document.getElementById('yay-wholesale-b2b-header-actions');
 
+  const navigate = useNavigate();
   const { data: settings } = useSettingsQuery();
   const saveMutation = useSaveSettingsMutation();
   const isMutating = useIsMutatingSettings();
@@ -64,88 +45,176 @@ export default function SettingsPage() {
     defaultValues: defaultValues,
   });
 
+  const setActiveTab = (tab: (typeof tabs)[number]) => {
+    navigate(`/settings/${tab}`);
+  };
+
+  const {
+    handleSubmit,
+    formState: { isDirty },
+  } = form;
+
   async function onSubmit(data: Settings) {
     if (isMutating > 0) return;
 
     try {
       await saveMutation.mutateAsync(data);
-      toast.success(__('Settings saved!', 'yay-wholesale-b2b'));
       form.reset(data);
+      toast.success(__('Settings saved!', 'yay-wholesale-b2b'));
     } catch (error) {
       toast.error(await getErrorMsg(error));
     }
   }
 
-  const { showDialog, confirmLeave, cancelLeave } = useRouteLeaveGuard(form.formState.isDirty, ['/settings/*']);
+  const onError = getFirstErrorSection();
+
+  const { showDialog, confirmLeave, cancelLeave } = useRouteLeaveGuard(isDirty, ['/settings/*']);
 
   useEffect(() => {
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-      if (!form.formState.isDirty) return;
+      if (!isDirty) return;
       e.preventDefault();
     };
 
     window.addEventListener('beforeunload', handleBeforeUnload);
     return () => window.removeEventListener('beforeunload', handleBeforeUnload);
-  }, [form.formState.isDirty]);
+  }, [isDirty]);
 
   return (
-    <FormProvider {...form}>
-      <form id="settings-form" onSubmit={form.handleSubmit(onSubmit, (err) => console.log(err))}>
-        <div className="mx-auto flex max-w-7xl flex-col gap-6 px-6">
-          <div className="flex w-full flex-col gap-4 sm:flex-row 2xl:gap-8">
-            {/* Left Sidebar - Tab List */}
-            <div className="shrink-0 sm:w-[176px]">
-              <Card className="border-none bg-transparent p-0 shadow-none">
-                <CardContent className="w-full [scrollbar-width:thin] overflow-x-auto px-0">
-                  <div className="flex h-fit w-full items-center gap-1 bg-transparent pb-2.5 sm:flex-col sm:items-stretch md:p-0">
-                    {tabs.map((tab) => (
-                      <Link
-                        key={tab.path}
-                        to={`/settings/${tab.path}`}
-                        className={cn(
-                          'justify-start rounded-none border-none p-4 py-2.5 text-left text-sm font-normal text-nowrap ring-0 outline-none focus:ring-0 focus:outline-none sm:text-wrap',
-                          'hover:text-primary hover:rounded-md hover:bg-white',
-                          tab.path === subMenu && 'text-primary rounded-md bg-white font-medium shadow-none',
-                        )}
-                      >
-                        {tab.label}
-                      </Link>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
+    <>
+      {headerActionPortal &&
+        createPortal(
+          <Button
+            type="submit"
+            form="settings-form"
+            className="relative ms-4"
+            disabled={saveMutation.isPending}
+            data-submitting={saveMutation.isPending}
+          >
+            <span className={saveMutation.isPending ? 'opacity-0' : 'opacity-100'}>
+              <span className="max-sm:hidden">{__('Save Changes', 'yay-wholesale-b2b')}</span>
+              <span className="sm:hidden">{__('Save', 'yay-wholesale-b2b')}</span>
+            </span>
+            {saveMutation.isPending && (
+              <span className="absolute top-1/2 left-1/2 -translate-1/2 transition-opacity group-data-[submitting=false]:opacity-0">
+                <Loader2 className="text-primary-foreground animate-spin stroke-3" />
+              </span>
+            )}
+          </Button>,
+          headerActionPortal,
+        )}
+      <FormProvider {...form}>
+        <form id="settings-form" onSubmit={handleSubmit(onSubmit, onError)}>
+          <div className="xs:p-6 mx-auto max-w-7xl px-6 pt-8 pb-4">
+            <TabsPrimitive.Root value={activeTab} onValueChange={(value) => navigate(`/settings/${value}`)}>
+              <div className="flex flex-col gap-4 sm:flex-row">
+                <div className="w-full sm:w-37.5">
+                  <TabsPrimitive.List asChild>
+                    <SideNavMenuList mode="tabs" className="flex w-full items-start justify-start sm:flex-col">
+                      <TabsPrimitive.Trigger value="general" asChild>
+                        <SideNavMenuItem>
+                          <span>General</span>
+                          <SettingsErrorIndicator tab="general" />
+                        </SideNavMenuItem>
+                      </TabsPrimitive.Trigger>
+                      <TabsPrimitive.Trigger value="display" asChild>
+                        <SideNavMenuItem>
+                          <span>Display</span>
+                          <SettingsErrorIndicator tab="display" />
+                        </SideNavMenuItem>
+                      </TabsPrimitive.Trigger>
+                      <TabsPrimitive.Trigger value="registration" asChild>
+                        <SideNavMenuItem>
+                          <span>Registration</span>
+                          <SettingsErrorIndicator tab="registration" />
+                        </SideNavMenuItem>
+                      </TabsPrimitive.Trigger>
 
-            {/* Right Content Area - Tab Contents */}
-            <div className="flex-1">
-              <Card className="p-4 md:p-5 2xl:p-6">
-                <CardContent className="w-full overflow-x-visible px-0">
-                  {/* Other Tab Contents */}
-                  {tabs.map((tab) => (
-                    <div key={tab.path} className="mt-0 px-0">
-                      {subMenu === tab.path && tab.component}
+                      <TabsPrimitive.Trigger value="registration-fields" asChild>
+                        <SideNavMenuItem>
+                          <span>Registration Fields</span>
+                          <SettingsErrorIndicator tab="registration_fields" />
+                        </SideNavMenuItem>
+                      </TabsPrimitive.Trigger>
+                      <TabsPrimitive.Trigger value="payment-roles" asChild>
+                        <SideNavMenuItem>
+                          <span>Payment Roles</span>
+                          <SettingsErrorIndicator tab="payment_roles" />
+                        </SideNavMenuItem>
+                      </TabsPrimitive.Trigger>
+                      <TabsPrimitive.Trigger value="shipping-roles" asChild>
+                        <SideNavMenuItem>
+                          <span>Shipping Roles</span>
+                          <SettingsErrorIndicator tab="shipping_roles" />
+                        </SideNavMenuItem>
+                      </TabsPrimitive.Trigger>
+                    </SideNavMenuList>
+                  </TabsPrimitive.List>
+                </div>
+                <div className="bg-muted flex flex-1 flex-col">
+                  <TabsPrimitive.Content value="general" style={{ height: '100%' }}>
+                    <div className="bg-card h-full rounded-md border p-6 sm:w-full">
+                      <GeneralTab />
                     </div>
-                  ))}
-                </CardContent>
-              </Card>
-            </div>
-          </div>
-        </div>
+                  </TabsPrimitive.Content>
 
-        <UnsavedChangeDialog
-          open={showDialog}
-          onDiscard={confirmLeave}
-          onSave={() => {
-            cancelLeave();
-            form.handleSubmit(onSubmit)();
-          }}
-          onOpenChange={(open) => {
-            if (!open) {
+                  <TabsPrimitive.Content value="display" style={{ height: '100%' }}>
+                    <div className="bg-card h-full rounded-md border p-6 sm:w-full">
+                      <DisplayTab />
+                    </div>
+                  </TabsPrimitive.Content>
+                  <TabsPrimitive.Content value="registration" style={{ height: '100%' }}>
+                    <div className="bg-card h-full rounded-md border p-6 sm:w-full">
+                      <RegistrationTab />
+                    </div>
+                  </TabsPrimitive.Content>
+                  <TabsPrimitive.Content value="registration-fields" style={{ height: '100%' }}>
+                    <div className="bg-card h-full rounded-md border p-6 sm:w-full">
+                      <RegistrationFieldsTab />
+                    </div>
+                  </TabsPrimitive.Content>
+                  <TabsPrimitive.Content value="payment-roles" style={{ height: '100%' }}>
+                    <div className="bg-card h-full rounded-md border p-6 sm:w-full">
+                      <PaymentRolesTab />
+                    </div>
+                  </TabsPrimitive.Content>
+                  <TabsPrimitive.Content value="shipping-roles" style={{ height: '100%' }}>
+                    <div className="bg-card h-full rounded-md border p-6 sm:w-full">
+                      <ShippingRolesTab />
+                    </div>
+                  </TabsPrimitive.Content>
+                  <TabsPrimitive.Content value="emails" style={{ height: '100%' }}>
+                    <div className="bg-card h-full rounded-md border p-6 sm:w-full">
+                      <EmailsTab />
+                    </div>
+                  </TabsPrimitive.Content>
+                </div>
+              </div>
+            </TabsPrimitive.Root>
+          </div>
+
+          <UnsavedChangeDialog
+            open={showDialog}
+            onDiscard={confirmLeave}
+            onSave={() => {
               cancelLeave();
-            }
-          }}
-        />
-      </form>
-    </FormProvider>
+              handleSubmit(onSubmit)();
+            }}
+            onOpenChange={(open) => {
+              if (!open) {
+                cancelLeave();
+              }
+            }}
+          />
+        </form>
+      </FormProvider>
+    </>
   );
+}
+
+function SettingsErrorIndicator({ tab }: { tab: keyof Settings }) {
+  const { formState } = useFormContext<Settings>();
+  const hasErrors = !!formState.errors?.[tab];
+  if (!hasErrors) return null;
+  return <span className="bg-destructive size-1.25 rounded-full"></span>;
 }
