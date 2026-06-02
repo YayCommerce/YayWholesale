@@ -134,6 +134,11 @@ export default function SettingsPage() {
                           <SettingsErrorIndicator tab="registration_fields" />
                         </SideNavMenuItem>
                       </TabsPrimitive.Trigger>
+                      <TabsPrimitive.Trigger value="emails" asChild>
+                        <SideNavMenuItem>
+                          <span>{__('Emails', 'yay-wholesale-b2b')}</span>
+                        </SideNavMenuItem>
+                      </TabsPrimitive.Trigger>
                       <TabsPrimitive.Trigger value="payment-roles" asChild>
                         <SideNavMenuItem>
                           <span>{__('Payment Roles', 'yay-wholesale-b2b')}</span>
@@ -162,14 +167,14 @@ export default function SettingsPage() {
                   <TabsPrimitive.Content value="registration-fields" className="bg-card h-full rounded-md border p-6 sm:w-full">
                     <RegistrationFieldsTab />
                   </TabsPrimitive.Content>
+                  <TabsPrimitive.Content value="emails" className="bg-card h-full rounded-md border p-6 sm:w-full">
+                    <EmailsTab />
+                  </TabsPrimitive.Content>
                   <TabsPrimitive.Content value="payment-roles" className="bg-card h-full rounded-md border p-6 sm:w-full">
                     <PaymentRolesTab />
                   </TabsPrimitive.Content>
                   <TabsPrimitive.Content value="shipping-roles" className="bg-card h-full rounded-md border p-6 sm:w-full">
                     <ShippingRolesTab />
-                  </TabsPrimitive.Content>
-                  <TabsPrimitive.Content value="emails" className="bg-card h-full rounded-md border p-6 sm:w-full">
-                    <EmailsTab />
                   </TabsPrimitive.Content>
                 </div>
               </div>
