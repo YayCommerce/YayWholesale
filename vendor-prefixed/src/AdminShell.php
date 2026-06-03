@@ -17,6 +17,7 @@ use YayWholesaleB2BScoped\YayCommerce\AdminShell\Pages\RecommendedPluginsPage;
 use YayWholesaleB2BScoped\YayCommerce\AdminShell\Registry\AddonBridge;
 use YayWholesaleB2BScoped\YayCommerce\AdminShell\Registry\LegacyBridge;
 use YayWholesaleB2BScoped\YayCommerce\AdminShell\Registry\LicenseRegistry;
+use YayWholesaleB2BScoped\YayCommerce\AdminShell\Support\AdminContext;
 use YayWholesaleB2BScoped\YayCommerce\AdminShell\Support\Constants;
 \defined('ABSPATH') || exit;
 /**
@@ -30,7 +31,7 @@ use YayWholesaleB2BScoped\YayCommerce\AdminShell\Support\Constants;
 class AdminShell
 {
     /** Package version — used for cross-scope version election. */
-    const VERSION = '2.6.6';
+    const VERSION = '2.7.0';
     private static ?self $instance = null;
     private static bool $booted = \false;
     private static array $enabled_slugs = [];
@@ -66,9 +67,11 @@ class AdminShell
             $GLOBALS['yaycommerce_admin_shell_versions'] = [];
         }
         $GLOBALS['yaycommerce_admin_shell_versions'][self::$prefix] = ['version' => self::VERSION, 'registry' => $instance->registry, 'boot_cb' => [static::class, 'do_shell_registration']];
-        // Register the version election — only once (first copy to call boot sets it up)
+        // Register the version election — only once (first copy to call boot sets it up).
+        // Bound to both admin_menu and network_admin_menu so election runs in the
+        // Multisite Network Admin too; only the firing hook's election actually runs.
         if (1 === \count($GLOBALS['yaycommerce_admin_shell_versions'])) {
-            add_action('admin_menu', [static::class, 'elect_version'], 8);
+            AdminContext::bind_menu([static::class, 'elect_version'], 8);
         }
         // Legacy bridge — reads yaycommerce_licensing_plugins filter.
         // Runs for ALL versions (uses global WP hooks, contributes to any winning registry).

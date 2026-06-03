@@ -2,6 +2,7 @@
 
 namespace YayWholesaleB2BScoped\YayCommerce\AdminShell\Menu;
 
+use YayWholesaleB2BScoped\YayCommerce\AdminShell\Support\AdminContext;
 /**
  * Applies the intended ordering to the YayCommerce submenu.
  *
@@ -26,7 +27,8 @@ class SubmenuPositioner
     {
         // Priority 9999: run after every plugin (<=10) and TopLevelMenu's parent
         // submenu cleanup (999) have finished, so the array is complete.
-        add_action('admin_menu', [$this, 'reorder'], 9999);
+        // Bound to both hooks so reordering also applies in Network Admin.
+        AdminContext::bind_menu([$this, 'reorder'], 9999);
     }
     /**
      * Reorder $submenu['yaycommerce'] by declared position.

@@ -101,7 +101,7 @@ class YayCurrency {
 
     // Order have Meta-data: yay_currency_order_rate to revert the original price of order
     public function convert_price_in_order( $price, \WC_Order $order, $product ) {
-        $original_currency = get_woocommerce_currency();
+        $original_currency = get_option( 'woocommerce_currency' );
 
         // If the order's currency is same as store system then do nothing
         if ( $order->get_currency() === $original_currency ) {
@@ -134,7 +134,7 @@ class YayCurrency {
     }
 
     public function revert_price_in_order( $price, \WC_Order $order ) {
-        $original_currency = get_woocommerce_currency();
+        $original_currency = get_option( 'woocommerce_currency' );
 
         // If the order's currency is same as store system then do nothing
         if ( $order->get_currency() === $original_currency ) {

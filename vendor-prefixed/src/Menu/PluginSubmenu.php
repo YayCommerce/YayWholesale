@@ -5,6 +5,7 @@ namespace YayWholesaleB2BScoped\YayCommerce\AdminShell\Menu;
 use YayWholesaleB2BScoped\YayCommerce\AdminShell\Contracts\PluginMenuAdapter;
 use YayWholesaleB2BScoped\YayCommerce\AdminShell\License\Contracts\LicenseConfigAdapter;
 use YayWholesaleB2BScoped\YayCommerce\AdminShell\License\License;
+use YayWholesaleB2BScoped\YayCommerce\AdminShell\Support\AdminContext;
 /**
  * Registers a plugin-named submenu under YayCommerce.
  * Works with any PluginMenuAdapter (lite or pro).
@@ -22,10 +23,22 @@ class PluginSubmenu
     }
     public function init() : void
     {
-        add_action('admin_menu', [$this, 'register'], 10);
+        // Bound to both hooks; the context gate in register() decides whether the
+        // plugin actually registers in the current (site vs network) context.
+        AdminContext::bind_menu([$this, 'register'], 10);
     }
     public function register() : void
     {
+        // Context gate: register only where the plugin opted in. Network Admin
+        // requires wants_network_menu(); site dashboard requires wants_site_menu().
+        // Defaults (legacy adapters): site=true, network=false.
+        if (AdminContext::is_network()) {
+            if (!AdminContext::wants_network($this->adapter)) {
+                return;
+            }
+        } elseif (!AdminContext::wants_site($this->adapter)) {
+            return;
+        }
         $menu_slug = $this->adapter->get_menu_slug();
         if (empty($menu_slug)) {
             return;
@@ -68,7 +81,8 @@ class PluginSubmenu
             'yaycommerce',
             $this->adapter->get_page_title(),
             $this->adapter->get_menu_title(),
-            $this->adapter->get_capability(),
+            // In Network Admin, elevate to manage_network (super-admin only).
+            AdminContext::capability($this->adapter->get_capability()),
             $menu_slug,
             $callback ?? '__return_false',
             // Position intentionally null here. WP treats add_submenu_page()'s
@@ -86,7 +100,11 @@ class PluginSubmenu
     }
     public static function redirect_to_licenses() : void
     {
-        wp_safe_redirect(\admin_url('admin.php?page=yaycommerce-licenses'));
+        // The load hook fires in the current context — target the matching dashboard
+        // so a network-flagged pro plugin redirects within Network Admin, not the site.
+        $path = 'admin.php?page=yaycommerce-licenses';
+        $url = AdminContext::is_network() ? network_admin_url($path) : \admin_url($path);
+        wp_safe_redirect($url);
         exit;
     }
 }
