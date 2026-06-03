@@ -35,7 +35,7 @@ if ( ! defined( 'YAYWHOLESALEB2B_FILE' ) ) {
 }
 
 if ( ! defined( 'YAYWHOLESALEB2B_VERSION' ) ) {
-    define( 'YAYWHOLESALEB2B_VERSION', '1.1.rc.3' );
+    define( 'YAYWHOLESALEB2B_VERSION', '1.1.0' );
 }
 
 if ( ! defined( 'YAYWHOLESALEB2B_PLUGIN_URL' ) ) {
@@ -51,7 +51,7 @@ if ( ! defined( 'YAYWHOLESALEB2B_BASE_NAME' ) ) {
 }
 
 if ( ! defined( 'YAYWHOLESALEB2B_MENU_ORDER' ) ) {
-    define( 'YAYWHOLESALEB2B_MENU_ORDER', 2 );
+    define( 'YAYWHOLESALEB2B_MENU_ORDER', 100 );
 }
 if ( ! defined( 'YAYWHOLESALEB2B_MENU_PRIORITY' ) ) {
     define( 'YAYWHOLESALEB2B_MENU_PRIORITY', 90 );

@@ -64,7 +64,19 @@ class PluginSubmenu
                 $callback = null;
             }
         }
-        $page_id = add_submenu_page('yaycommerce', $this->adapter->get_page_title(), $this->adapter->get_menu_title(), $this->adapter->get_capability(), $menu_slug, $callback ?? '__return_false', $this->adapter->get_settings_page_position());
+        $page_id = add_submenu_page(
+            'yaycommerce',
+            $this->adapter->get_page_title(),
+            $this->adapter->get_menu_title(),
+            $this->adapter->get_capability(),
+            $menu_slug,
+            $callback ?? '__return_false',
+            // Position intentionally null here. WP treats add_submenu_page()'s
+            // $position as a fragile array insertion index, not an ordering rank.
+            // Final ordering is applied later by SubmenuPositioner, which reorders
+            // the assembled $submenu['yaycommerce'] from the shared position map.
+            null
+        );
         if ($is_override) {
             \remove_all_actions('load-' . $page_id);
         }

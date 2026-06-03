@@ -111,6 +111,16 @@ For documentation, support, and updates, visit our website or [contact YayCommer
 
 ## Changelog
 
+= June 01, 2026 - Version 1.1.0 =
+- Improved: Registration field settings
+- Improved: Requirements progress bar (hide condition row if it's not set)
+- Implement the checkout restriction for wholesaler
+- Implement the displaying price in shop setting for wholesaler (Pro version)
+- Implement the role-based shipping methods (Pro version)
+- Implement the role-based payment methods (Pro version)
+- Implement the product-based price or discount (Pro version)
+- Implement the category-based discount (Pro version)
+
 = Mar 24, 2026 - Version 1.0.6 =
 - Improved: Registration fields setting
 - Improved: Registration form mechanic

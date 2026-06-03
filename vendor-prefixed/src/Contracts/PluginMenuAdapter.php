@@ -29,7 +29,9 @@ interface PluginMenuAdapter
      */
     public function get_settings_page_callback() : ?callable;
     /**
-     * Position of the plugin submenu. Return null for WP default ordering.
+     * Ordering rank of the plugin submenu under the YayCommerce menu.
+     * Lower numbers appear first; ties keep registration order. Values may be
+     * sparse (e.g. 10, 20, 21, 40). Return null to append after positioned items.
      */
     public function get_settings_page_position() : ?int;
     /**

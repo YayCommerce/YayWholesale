@@ -11,6 +11,7 @@ use YayWholesaleB2BScoped\YayCommerce\AdminShell\Menu\ExternalPluginMenuAdapter;
 use YayWholesaleB2BScoped\YayCommerce\AdminShell\Menu\PluginSubmenu;
 use YayWholesaleB2BScoped\YayCommerce\AdminShell\Menu\MenuSuppressor;
 use YayWholesaleB2BScoped\YayCommerce\AdminShell\Menu\PagesRouter;
+use YayWholesaleB2BScoped\YayCommerce\AdminShell\Menu\SubmenuPositioner;
 use YayWholesaleB2BScoped\YayCommerce\AdminShell\Menu\TopLevelMenu;
 use YayWholesaleB2BScoped\YayCommerce\AdminShell\Pages\RecommendedPluginsPage;
 use YayWholesaleB2BScoped\YayCommerce\AdminShell\Registry\AddonBridge;
@@ -29,7 +30,7 @@ use YayWholesaleB2BScoped\YayCommerce\AdminShell\Support\Constants;
 class AdminShell
 {
     /** Package version — used for cross-scope version election. */
-    const VERSION = '2.6.5';
+    const VERSION = '2.6.6';
     private static ?self $instance = null;
     private static bool $booted = \false;
     private static array $enabled_slugs = [];
@@ -133,6 +134,10 @@ class AdminShell
         $top_menu->init();
         $router = new PagesRouter($instance->registry);
         $router->init();
+        // Order all submenus by declared position — runs once, only for the
+        // winning version, so a single authority reorders every plugin's submenu.
+        $positioner = new SubmenuPositioner();
+        $positioner->init();
     }
     /**
      * Register a plugin with the admin shell.
@@ -142,6 +147,18 @@ class AdminShell
     public static function register_plugin(PluginMenuAdapter $adapter) : void
     {
         self::validate_adapter($adapter);
+        // Publish this plugin's intended submenu position into a shared,
+        // cross-scope map (keyed by menu slug). The version-elected winner reads
+        // this in SubmenuPositioner to order ALL submenus after registration.
+        // Request-scoped: not pruned (globals don't persist between requests),
+        // and stale/unknown slugs are harmless — reorder() sorts them last.
+        $menu_slug = $adapter->get_menu_slug();
+        if (!empty($menu_slug)) {
+            if (!isset($GLOBALS[SubmenuPositioner::POSITION_KEY])) {
+                $GLOBALS[SubmenuPositioner::POSITION_KEY] = [];
+            }
+            $GLOBALS[SubmenuPositioner::POSITION_KEY][$menu_slug] = $adapter->get_settings_page_position();
+        }
         // Submenu registration — per-plugin, all versions
         $submenu = new PluginSubmenu($adapter);
         $submenu->init();
@@ -283,5 +300,6 @@ class AdminShell
         self::$prefix = '';
         unset($GLOBALS['yaycommerce_admin_shell_versions']);
         unset($GLOBALS['yaycommerce_ajax_handlers_registered']);
+        unset($GLOBALS[SubmenuPositioner::POSITION_KEY]);
     }
 }

@@ -39,7 +39,7 @@ class ShippingHelper {
             )
         ) ?? null;
 
-        if ( empty( $shipping_method_setting ) ) {
+        if ( empty( $shipping_method_setting ) || empty( $shipping_method_setting['enable_by_role'] ) ) {
             return true;
         }
 

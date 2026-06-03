@@ -38,7 +38,7 @@ class PaymentGatewayHelper {
             )
         ) ?? null;
 
-        if ( empty( $payment_method_setting ) ) {
+        if ( empty( $payment_method_setting ) || empty( $payment_method_setting['enable_by_role'] ) ) {
             return true;
         }
 

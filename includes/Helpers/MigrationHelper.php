@@ -1,8 +1,6 @@
 <?php
 namespace YayWholesaleB2B\Helpers;
 
-use YayWholesaleB2B\Helpers\RolesHelper;
-
 /**
  * WholeSalers Helper Class
  */
@@ -18,16 +16,17 @@ class MigrationHelper {
 
     public static function get_available_migrations() {
         return [
-            [ self::class, 'v1_0_6_add_input_name_for_registration_fields_settings' ],
+            [ self::class, 'v1_1_6_add_input_name_for_registration_fields_settings' ],
         ];
     }
 
-    public static function v1_0_6_add_input_name_for_registration_fields_settings() {
-        if ( ! version_compare( YAYWHOLESALEB2B_VERSION, '1.0.6', '<=' ) ) {
-            return;
-        }
+    public static function v1_1_6_add_input_name_for_registration_fields_settings() {
+        // if ( ! version_compare( YAYWHOLESALEB2B_VERSION, '1.0.6', '<=' ) ) {
+        // return;
+        // }
 
         $setting              = SettingsHelper::get_settings();
+        $is_changing          = false;
         $has_first_name       = false;
         $has_last_name        = false;
         $custom_field_counter = 0;
@@ -36,6 +35,7 @@ class MigrationHelper {
             if ( isset( $field['inputName'] ) && ! empty( $field['inputName'] ) ) {
                 continue;
             }
+            $is_changing = true;
             if ( ! $field['isDefault'] ) {
                 $field['inputName'] = 'custom_field_' . ( ++$custom_field_counter );
             } else {
@@ -75,7 +75,9 @@ class MigrationHelper {
             }//end if
         }//end foreach
 
-        update_option( 'yaywholesaleb2b_settings', $setting );
+        if ( $is_changing ) {
+            update_option( 'yaywholesaleb2b_settings', $setting );
+        }
 
         return $setting;
     }
