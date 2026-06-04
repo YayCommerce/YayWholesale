@@ -26,7 +26,8 @@ export function makeDefaultSettings(settings: Settings): Settings {
       const existingShippingMethodSettings = (settings.shipping_roles ?? []).find(
         (setting) => setting.instance_id === shippingMethod.instance_id,
       );
-      if (existingShippingMethodSettings) return existingShippingMethodSettings;
+      if (existingShippingMethodSettings && existingShippingMethodSettings.enable_by_role)
+        return existingShippingMethodSettings;
 
       return {
         instance_id: shippingMethod.instance_id,
