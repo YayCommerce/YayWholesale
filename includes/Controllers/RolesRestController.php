@@ -37,28 +37,13 @@ class RolesRestController extends BaseRestController {
 
         register_rest_route(
             self::REST_NAMESPACE,
-            '/roles/(?P<roleSlug>[\w-]+)',
-            [
-                [
-                    'methods'             => 'PUT',
-                    'callback'            => [ $this, 'update_role' ],
-                    'permission_callback' => [ $this, 'can_manage_roles' ],
-                ],
-                [
-                    'methods'             => 'DELETE',
-                    'callback'            => [ $this, 'delete_role' ],
-                    'permission_callback' => [ $this, 'can_manage_roles' ],
-                ],
-            ]
-        );
-
-        register_rest_route(
-            self::REST_NAMESPACE,
             '/roles/bulk-delete',
             [
-                'methods'             => 'DELETE',
-                'callback'            => [ $this, 'bulk_delete_roles' ],
-                'permission_callback' => [ $this, 'can_manage_roles' ],
+                [
+                    'methods'             => 'DELETE',
+                    'callback'            => [ $this, 'bulk_delete_roles' ],
+                    'permission_callback' => [ $this, 'can_manage_roles' ],
+                ],
             ]
         );
 
@@ -66,9 +51,11 @@ class RolesRestController extends BaseRestController {
             self::REST_NAMESPACE,
             '/roles/bulk-status',
             [
-                'methods'             => 'PUT',
-                'callback'            => [ $this, 'bulk_update_role_status' ],
-                'permission_callback' => [ $this, 'can_manage_roles' ],
+                [
+                    'methods'             => 'PUT',
+                    'callback'            => [ $this, 'bulk_update_role_status' ],
+                    'permission_callback' => [ $this, 'can_manage_roles' ],
+                ],
             ]
         );
 
@@ -79,6 +66,24 @@ class RolesRestController extends BaseRestController {
                 [
                     'methods'             => 'GET',
                     'callback'            => [ $this, 'count_users_by_roles' ],
+                    'permission_callback' => [ $this, 'can_manage_roles' ],
+                ],
+            ]
+        );
+
+        // Register dynamid route at last to prevent from blocking others (with same regex of '-')
+        register_rest_route(
+            self::REST_NAMESPACE,
+            '/roles/(?P<roleSlug>[\w-]+)',
+            [
+                [
+                    'methods'             => 'PUT',
+                    'callback'            => [ $this, 'update_role' ],
+                    'permission_callback' => [ $this, 'can_manage_roles' ],
+                ],
+                [
+                    'methods'             => 'DELETE',
+                    'callback'            => [ $this, 'delete_role' ],
                     'permission_callback' => [ $this, 'can_manage_roles' ],
                 ],
             ]
