@@ -37,7 +37,7 @@ class RolesRestController extends BaseRestController {
 
         register_rest_route(
             self::REST_NAMESPACE,
-            '/roles/(?P<roleSlug>\w+)',
+            '/roles/(?P<roleSlug>[\w-]+)',
             [
                 [
                     'methods'             => 'PUT',
