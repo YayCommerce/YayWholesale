@@ -411,7 +411,7 @@ class YayCurrency {
         // }
         $role_config = CustomerHelper::get_current_user_wholesale_role();
 
-        $origin_price    = $cart_item['data']->get_regular_price( 'edit' );
+        $origin_price    = $cart_item['data']->get_price( 'edit' );
         $wholesale_extra = ShopPricingHelper::get_wholesale_extra_price_from_cart_item( $cart_item, $role_config );
         $wholesale_price = $origin_price - $wholesale_extra;
 

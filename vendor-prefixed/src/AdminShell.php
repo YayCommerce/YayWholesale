@@ -31,7 +31,7 @@ use YayWholesaleB2BScoped\YayCommerce\AdminShell\Support\Constants;
 class AdminShell
 {
     /** Package version — used for cross-scope version election. */
-    const VERSION = '2.7.0';
+    const VERSION = '2.7.1';
     private static ?self $instance = null;
     private static bool $booted = \false;
     private static array $enabled_slugs = [];
@@ -72,6 +72,24 @@ class AdminShell
         // Multisite Network Admin too; only the firing hook's election actually runs.
         if (1 === \count($GLOBALS['yaycommerce_admin_shell_versions'])) {
             AdminContext::bind_menu([static::class, 'elect_version'], 8);
+            // bind_menu() already wired BOTH hooks here, so mark the network election
+            // as done. This is load-bearing: it stops the safety net below from adding
+            // a SECOND network binding (elect_version is NOT idempotent — a double
+            // binding would run do_shell_registration twice). Only one copy ever sees
+            // count==1, so this path wires network at most once.
+            $GLOBALS['yaycommerce_network_election_wired'] = \true;
+        }
+        // Network Admin safety net for MIXED-VERSION installs. Older copies (≤2.6.x)
+        // wire the election to admin_menu ONLY — they predate network support — and the
+        // first-boot guard above lets whichever copy loads first (often an old one, by
+        // plugin folder order) own the wiring. So network_admin_menu would never get an
+        // election binding even when a newer copy is present. This block is NOT gated by
+        // that guard: any 2.7.1+ copy wires the network election exactly once (dedicated
+        // flag), independent of load order, so Network Admin works whenever ≥1 updated
+        // plugin is active. elect_version still elects the highest version as the winner.
+        if (empty($GLOBALS['yaycommerce_network_election_wired'])) {
+            $GLOBALS['yaycommerce_network_election_wired'] = \true;
+            add_action('network_admin_menu', [static::class, 'elect_version'], 8);
         }
         // Legacy bridge — reads yaycommerce_licensing_plugins filter.
         // Runs for ALL versions (uses global WP hooks, contributes to any winning registry).
@@ -303,6 +321,7 @@ class AdminShell
         self::$prefix = '';
         unset($GLOBALS['yaycommerce_admin_shell_versions']);
         unset($GLOBALS['yaycommerce_ajax_handlers_registered']);
+        unset($GLOBALS['yaycommerce_network_election_wired']);
         unset($GLOBALS[SubmenuPositioner::POSITION_KEY]);
     }
 }

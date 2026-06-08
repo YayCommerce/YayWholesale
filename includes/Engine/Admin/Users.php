@@ -1,6 +1,7 @@
 <?php
 namespace YayWholesaleB2B\Engine\Admin;
 
+use YayWholesaleB2B\Helpers\RequestsHelper;
 use YayWholesaleB2B\Utils\SingletonTrait;
 
 defined( 'ABSPATH' ) || exit;
@@ -13,6 +14,9 @@ class Users {
     protected function __construct() {
         // Filter editable roles
         add_filter( 'editable_roles', [ $this, 'editable_roles' ], 10, 1 );
+
+        add_action( 'show_user_profile', [ $this, 'add_custom_user_fields' ], 99 );
+        add_action( 'edit_user_profile', [ $this, 'add_custom_user_fields' ], 99 );
     }
 
     public function editable_roles( $roles ) {
@@ -41,5 +45,9 @@ class Users {
 
         // If no wholesale roles are found, return the original roles
         return $wholesale_roles ? $wholesale_roles : $roles;
+    }
+
+    public function add_custom_user_fields( \WP_User $user ) {
+        require YAYWHOLESALEB2B_PLUGIN_DIR . 'includes/Templates/user/edit-user.php';
     }
 }
