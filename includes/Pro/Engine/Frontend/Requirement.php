@@ -52,9 +52,9 @@ class Requirement {
         $is_hidden_quantity = 0.0 === (float) $min_order_quantity;
         $is_hidden_amount   = 0.0 === (float) $min_order_amount;
 
-        // if ( $is_hidden_quantity && $is_hidden_amount ) {
-        // return;
-        // }
+        if ( $is_hidden_quantity && $is_hidden_amount ) {
+            return;
+        }
 
         $is_discounted   = isset( $wholesale ) && RequirementHelper::is_cart_meet_requirement( $wholesale );
         $actual_subtotal = RequirementHelper::calc_actual_subtotal_of_cart();

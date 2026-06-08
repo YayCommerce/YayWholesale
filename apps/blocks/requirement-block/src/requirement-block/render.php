@@ -38,7 +38,7 @@ wp_interactivity_config(
 
 ?>
 <?php if ($ywhs_wholesale
-	// && !($is_hidden_quantity && $is_hidden_amount)
+	&& !($is_hidden_quantity && $is_hidden_amount)
 ) : ?>
 <div
 <?php
