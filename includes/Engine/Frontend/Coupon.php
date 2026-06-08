@@ -14,6 +14,8 @@ class Coupon {
     protected function __construct() {
         // Enable/disable Coupon
         add_filter( 'woocommerce_coupons_enabled', [ $this, 'ywhs_coupons_enabled' ], PHP_INT_MAX, 1 );
+
+        add_action( 'woocommerce_before_calculate_totals', [ $this, 'maybe_remove_coupon_items' ] );
     }
 
     /**
@@ -40,5 +42,21 @@ class Coupon {
         }
 
         return $enabled;
+    }
+
+    /**
+     * Removed already existed coupons if disabled coupon currently for wholesalers
+     *
+     * @param \WC_Cart $cart The cart object.
+     */
+    public function maybe_remove_coupon_items( $cart ) {
+        $disable_coupons = SettingsHelper::get_settings()['general']['disable_coupon'] ?? false;
+        if ( CustomerHelper::is_current_wholesale_customer() && $disable_coupons && ! empty( WC()->cart->get_applied_coupons() ) ) {
+            $coupons = WC()->cart->get_applied_coupons();
+
+            foreach ( $coupons as $coupon_code ) {
+                WC()->cart->remove_coupon( $coupon_code );
+            }
+        }
     }
 }

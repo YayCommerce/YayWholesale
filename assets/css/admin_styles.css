@@ -179,3 +179,12 @@
     border-top: 1px solid #c3c4c7 !important;
   }
 }
+
+/* User wholesaler information */
+#ywhs_wholesaler_user_table {
+
+  input,
+  textarea {
+    background: #ffffff;
+  }
+}
