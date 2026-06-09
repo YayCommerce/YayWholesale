@@ -403,18 +403,6 @@ class RequestsHelper {
         $message   = get_post_meta( $request_id, self::REQUEST_META_MESSAGE, true );
         $user_id   = 0;
 
-        $first_name = '';
-        $last_name  = '';
-        foreach ( $post_meta as $key => $val ) {
-            if ( 'first_name' === $val['key'] ) {
-                $first_name = $val['value'];
-            }
-
-            if ( 'last_name' === $val['key'] ) {
-                $last_name = $val['value'];
-            }
-        }
-
         if ( $request->post_author < 1 ) {
             $display_name = get_post_meta( $request_id, self::REQUEST_META_DISPLAY_NAME, true );
             $email        = get_post_meta( $request_id, self::REQUEST_META_EMAIL, true );
@@ -461,8 +449,7 @@ class RequestsHelper {
         }//end if
 
         if ( $user_id > 0 ) {
-            update_user_meta( $user_id, 'first_name', $first_name );
-            update_user_meta( $user_id, 'last_name', $last_name );
+            self::update_billing_data_for_user( $user_id, $post_meta );
             update_user_meta( $user_id, self::USER_META_REQUEST, $request_id );
         }
 
@@ -529,5 +516,73 @@ class RequestsHelper {
         $query = new WP_Query( $args );
 
         return $query->post_count;
+    }
+
+    protected static function update_billing_data_for_user( int $user_id, array $request_data ) {
+        $customer    = new \WC_Customer( $user_id );
+        $updated_map = [];
+        foreach ( $request_data as $key => $val ) {
+            if ( 'first_name' === $val['key'] ) {
+                $customer->set_first_name( $val['value'] );
+                $customer->set_billing_first_name( $val['value'] );
+            }
+
+            if ( 'last_name' === $val['key'] ) {
+                $customer->set_last_name( $val['value'] );
+                $customer->set_billing_last_name( $val['value'] );
+            }
+
+            if ( ! $val['is_default'] ) {
+                if ( str_contains( strtolower( $key ), 'company name' ) &&
+                ! in_array( 'company', $updated_map, true ) ) {
+                    $customer->set_billing_company( $val['value'] );
+                    $updated_map[] = 'company';
+                }
+
+                if ( str_contains( strtolower( $key ), 'address' ) &&
+                ! str_contains( 'email', strtolower( $key ) ) &&
+                ! in_array( 'address', $updated_map, true ) ) {
+                    $customer->set_billing_address( $val['value'] );
+                    $updated_map[] = 'address';
+                }
+
+                if ( ( str_contains( strtolower( $key ), 'phone' ) || 'phone' === $val['type'] ) &&
+                ! in_array( 'phone', $updated_map, true ) ) {
+                    $customer->set_billing_phone( $val['value'] );
+                    $updated_map[] = 'phone';
+                }
+
+                if ( str_contains( strtolower( $key ), 'city' ) &&
+                ! in_array( 'city', $updated_map, true ) ) {
+                    $customer->set_billing_city( $val['value'] );
+                    $updated_map[] = 'city';
+                }
+            }//end if
+        }//end foreach
+
+        $customer->save();
+    }
+
+    public static function get_the_last_approved_request_id_of_user( int $user_id ) {
+        $args = [
+            'post_type'      => self::REQUEST_POST_TYPE,
+            'author'         => $user_id,
+            'posts_per_page' => 1,
+            'orderby'        => 'modified',
+            'order'          => 'DESC',
+            'fields'         => 'ids',
+            'meta_query'     => [
+                [
+                    'key'     => self::REQUEST_META_STATUS,
+                    'value'   => self::STATUS_APPROVED,
+                    'compare' => '==',
+                    'type'    => 'CHAR',
+                ],
+            ],
+        ];
+
+        $query = new WP_Query( $args );
+
+        return $query->posts[0] ?? 0;
     }
 }

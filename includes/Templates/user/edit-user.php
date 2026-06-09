@@ -8,7 +8,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 $approved_request_id = get_user_meta( $user->ID, RequestsHelper::USER_META_REQUEST, true );
 if ( empty( $approved_request_id ) ) {
-    return;
+    $approved_request_id = RequestsHelper::get_the_last_approved_request_id_of_user( $user->ID );
+    if ( empty( $approved_request_id ) ) {
+        return;
+    }
+    update_user_meta( $user->ID, RequestsHelper::USER_META_REQUEST, $approved_request_id );
 }
 
 $data                = get_post_meta( $approved_request_id, RequestsHelper::REQUEST_META_DATA, true );
@@ -16,7 +20,7 @@ $approved_at_date    = get_the_modified_date( '', $approved_request_id );
 $approved_at_time    = get_the_modified_time( '', $approved_request_id );
 $excluded_fields_key = [ 'first_name', 'last_name', 'message', 'email_address' ];
 ?>
-<h2><?php esc_html_e( 'Wholesaler Infomation', 'yay-wholesale-b2b' ); ?></h2>
+<h2><?php esc_html_e( 'Wholesaler Information', 'yay-wholesale-b2b' ); ?></h2>
 <table class="form-table" id="ywhs_wholesaler_user_table">
     <tbody>
     <tr>
