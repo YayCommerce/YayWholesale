@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { FormProvider, useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router';
@@ -5,10 +6,12 @@ import { __ } from '@wordpress/i18n';
 
 import { getErrorMsg } from '@/lib/helpers/response.helper';
 import { useAddRoleMutation, useIsMutatingRoles } from '@/lib/queries/roles.queries';
+import { useSettingsQuery } from '@/lib/queries/settings.queries';
 import { roleFormSchema, RoleFormValues } from '@/lib/schema/roles.schema';
 import { Button } from '@/components/ui/button';
 import { SheetClose, SheetFooter, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { toast } from '@/components/ui/sonner';
+import { makeDefaultAddRole } from '@/pages/roles/roles.helper';
 import RoleFormContent from './RoleFormContent';
 
 export default function AddRoleForm() {
@@ -16,11 +19,14 @@ export default function AddRoleForm() {
 
   const addRoleMutation = useAddRoleMutation();
   const isMutating = useIsMutatingRoles();
+  const { data: settings } = useSettingsQuery();
+
+  const defaultValues = useMemo(() => makeDefaultAddRole(settings), [settings]);
 
   const form = useForm<RoleFormValues>({
     resolver: zodResolver(roleFormSchema),
     mode: 'onChange',
-    defaultValues: DEFAULT_ROLE,
+    defaultValues,
   });
 
   async function onSubmit(data: RoleFormValues) {
@@ -64,23 +70,3 @@ export default function AddRoleForm() {
     </FormProvider>
   );
 }
-
-const DEFAULT_ROLE: RoleFormValues = {
-  role: {
-    name: '',
-    description: '',
-    discount: 0,
-    minOrderQuantity: 0,
-    minOrderAmount: 0,
-    applyToSalePrice: false,
-    status: true,
-  },
-  paymentMethods: {
-    enabled: 'enable-all',
-    selected_methods: [],
-  },
-  shippingMethods: {
-    enabled: 'enable-all',
-    selected_methods: [],
-  },
-};

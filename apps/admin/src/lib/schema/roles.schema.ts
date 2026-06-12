@@ -28,7 +28,6 @@ const roleShippingMethodsSchema = z.object({
   selected_methods: z.array(z.number()), // instance_id
 });
 
-// TODO v1.2: update role schema
 export const roleFormSchema = z.object({
   role: roleSchema,
   paymentMethods: rolePaymentMethodsSchema.optional(),

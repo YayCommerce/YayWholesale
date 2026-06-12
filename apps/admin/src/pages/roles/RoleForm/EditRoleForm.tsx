@@ -6,16 +6,13 @@ import { useDidUpdate } from 'rooks';
 import { __ } from '@wordpress/i18n';
 
 import { getErrorMsg } from '@/lib/helpers/response.helper';
-import {
-  useIsMutatingRoles,
-  useRolePayments,
-  useRoleShippings,
-  useUpdateRoleMutation,
-} from '@/lib/queries/roles.queries';
+import { useIsMutatingRoles, useUpdateRoleMutation } from '@/lib/queries/roles.queries';
+import { useSettingsQuery } from '@/lib/queries/settings.queries';
 import { Role, roleFormSchema, RoleFormValues } from '@/lib/schema/roles.schema';
 import { Button } from '@/components/ui/button';
 import { SheetClose, SheetFooter, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { toast } from '@/components/ui/sonner';
+import { makeDefaultEditRole } from '@/pages/roles/roles.helper';
 import RoleFormContent from './RoleFormContent';
 
 export default function EditRoleForm({ role }: { role: Role }) {
@@ -23,25 +20,9 @@ export default function EditRoleForm({ role }: { role: Role }) {
 
   const updateRoleMutation = useUpdateRoleMutation(role.slug);
   const isMutating = useIsMutatingRoles();
+  const { data: settings } = useSettingsQuery();
 
-  const rolePayments = useRolePayments(role);
-  const roleShippings = useRoleShippings(role);
-
-  const defaultValues = useMemo(() => {
-    return {
-      role: {
-        name: role.name,
-        description: role.description,
-        discount: role.discount,
-        minOrderQuantity: role.minOrderQuantity,
-        minOrderAmount: role.minOrderAmount,
-        applyToSalePrice: role.applyToSalePrice,
-        status: role.status,
-      },
-      paymentMethods: rolePayments,
-      shippingMethods: roleShippings,
-    } satisfies RoleFormValues;
-  }, [role, rolePayments, roleShippings]);
+  const defaultValues = useMemo(() => makeDefaultEditRole(role, settings), [role, settings]);
 
   const form = useForm<RoleFormValues>({
     resolver: zodResolver(roleFormSchema),

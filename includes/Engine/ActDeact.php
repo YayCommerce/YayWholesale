@@ -29,7 +29,6 @@ class ActDeact {
         }
 
         // TODO: if activate network
-        // TODO: add_input_name_for_fields
         MigrationHelper::migrate_data();
 
         $setting         = SettingsHelper::get_settings();

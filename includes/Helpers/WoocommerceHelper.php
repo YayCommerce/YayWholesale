@@ -33,7 +33,6 @@ class WoocommerceHelper {
         return $methods;
     }
 
-    // TODO review: thêm method tương tự cho shipping
     /**
      * Get the currently enabled shipping methods
      *

@@ -1,7 +1,6 @@
 <?php
 namespace YayWholesaleB2B\Controllers;
 
-use Couchbase\Role;
 use YayWholesaleB2B\Utils\SingletonTrait;
 use YayWholesaleB2B\Helpers\RolesHelper;
 use WP_REST_Request;
