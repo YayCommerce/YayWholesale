@@ -6,6 +6,7 @@ use YayWholesaleB2BScoped\YayCommerce\AdminShell\Pages\LicensesPage;
 use YayWholesaleB2BScoped\YayCommerce\AdminShell\Pages\RecommendedPluginsPage;
 use YayWholesaleB2BScoped\YayCommerce\AdminShell\Pages\HelpPage;
 use YayWholesaleB2BScoped\YayCommerce\AdminShell\Registry\LicenseRegistry;
+use YayWholesaleB2BScoped\YayCommerce\AdminShell\Support\AdminContext;
 /**
  * Registers Licenses, Other Plugins, and Help submenus under 'yaycommerce'.
  * Ported from YayMail Pro RegisterMenu::add_submenus() — de-branded and
@@ -21,7 +22,9 @@ class PagesRouter
     }
     public function init() : void
     {
-        add_action('admin_menu', [$this, 'register_submenus'], 11);
+        // Bind on both admin_menu and network_admin_menu so the shell pages
+        // (Help, Licenses, Recommended) appear in the Multisite Network Admin too.
+        AdminContext::bind_menu([$this, 'register_submenus'], 11);
         // Instantiate RecommendedPluginsPage to register its wp_ajax_* handlers.
         RecommendedPluginsPage::get_instance();
     }
@@ -40,13 +43,15 @@ class PagesRouter
         $submenus = [];
         // Plugin submenus use position 0-99 (via adapter).
         // Shell pages use 900+ so they always appear at the bottom.
-        $submenus['yaycommerce-help'] = ['parent' => 'yaycommerce', 'name' => \__('Help', 'yaycommerce'), 'capability' => 'manage_options', 'render_callback' => [HelpPage::class, 'render'], 'load_callback' => [HelpPage::class, 'load_data'], 'position' => 900];
+        // In Network Admin the capability is elevated to manage_network.
+        $capability = AdminContext::capability('manage_options');
+        $submenus['yaycommerce-help'] = ['parent' => 'yaycommerce', 'name' => \__('Help', 'yaycommerce'), 'capability' => $capability, 'render_callback' => [HelpPage::class, 'render'], 'load_callback' => [HelpPage::class, 'load_data'], 'position' => 900];
         // Licenses submenu — only shown if any plugins are registered.
         $has_any = !empty($this->registry->all());
         if ($has_any) {
-            $submenus['yaycommerce-licenses'] = ['parent' => 'yaycommerce', 'name' => \__('Licenses', 'yaycommerce'), 'capability' => 'manage_options', 'render_callback' => [LicensesPage::class, 'render'], 'load_callback' => [LicensesPage::class, 'load_data'], 'position' => 910];
+            $submenus['yaycommerce-licenses'] = ['parent' => 'yaycommerce', 'name' => \__('Licenses', 'yaycommerce'), 'capability' => $capability, 'render_callback' => [LicensesPage::class, 'render'], 'load_callback' => [LicensesPage::class, 'load_data'], 'position' => 910];
         }
-        $submenus['yaycommerce-other-plugins'] = ['parent' => 'yaycommerce', 'name' => \__('Recommended Plugins', 'yaycommerce'), 'capability' => 'manage_options', 'render_callback' => [RecommendedPluginsPage::class, 'render'], 'load_callback' => [RecommendedPluginsPage::class, 'load_data'], 'position' => 920];
+        $submenus['yaycommerce-other-plugins'] = ['parent' => 'yaycommerce', 'name' => \__('Recommended Plugins', 'yaycommerce'), 'capability' => $capability, 'render_callback' => [RecommendedPluginsPage::class, 'render'], 'load_callback' => [RecommendedPluginsPage::class, 'load_data'], 'position' => 920];
         return $submenus;
     }
 }
