@@ -25,19 +25,19 @@ const rolePaymentMethodsSchema = z.object({
 });
 const roleShippingMethodsSchema = z.object({
   enabled: z.enum(['enable-all', 'enable-selected-methods']),
-  selected_methods: z.array(z.string()), // method_id
+  selected_methods: z.array(z.number()), // instance_id
 });
 
 // TODO v1.2: update role schema
-const roleFormSchema = z.object({
+export const roleFormSchema = z.object({
   role: roleSchema,
-  paymentMethods: z.array(rolePaymentMethodsSchema).optional(),
-  shippingMethods: z.array(roleShippingMethodsSchema).optional(),
+  paymentMethods: rolePaymentMethodsSchema.optional(),
+  shippingMethods: roleShippingMethodsSchema.optional(),
 });
 
-export type RoleFormValues = z.infer<typeof roleSchema>;
+export type RoleFormValues = z.infer<typeof roleFormSchema>;
 
-export type Role = RoleFormValues & {
+export type Role = z.infer<typeof roleSchema> & {
   /** @deprecated use slug instead */
   id: number;
   slug: string;

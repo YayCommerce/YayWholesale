@@ -24,7 +24,7 @@ export default function RoleFormContent() {
     <div className="grid gap-5 overflow-auto p-5">
       <Controller
         control={control}
-        name="name"
+        name="role.name"
         render={({ field: { ref, ...field }, fieldState: { error, invalid } }) => (
           <Field>
             <FieldLabel>{__('Role Name', 'yay-wholesale-b2b')}</FieldLabel>
@@ -51,7 +51,7 @@ export default function RoleFormContent() {
 
       <Controller
         control={control}
-        name="description"
+        name="role.description"
         render={({ field: { ref, ...field }, fieldState: { error, invalid } }) => (
           <Field>
             <FieldLabel>{__('Role description', 'yay-wholesale-b2b')}</FieldLabel>
@@ -78,7 +78,7 @@ export default function RoleFormContent() {
 
       <Controller
         control={control}
-        name="discount"
+        name="role.discount"
         render={({ field: { ref, ...field }, fieldState: { error, invalid } }) => (
           <Field>
             <FieldLabel>{__('Discount', 'yay-wholesale-b2b')}</FieldLabel>
@@ -111,7 +111,7 @@ export default function RoleFormContent() {
 
       <Controller
         control={control}
-        name="minOrderQuantity"
+        name="role.minOrderQuantity"
         render={({ field: { ref, ...field }, fieldState: { error, invalid } }) =>
           isPro ? (
             <Field>
@@ -159,7 +159,7 @@ export default function RoleFormContent() {
 
       <Controller
         control={control}
-        name="minOrderAmount"
+        name="role.minOrderAmount"
         render={({ field: { ref, ...field }, fieldState: { error, invalid } }) => (
           <Field>
             <FieldLabel>{__('Min Order Amount', 'yay-wholesale-b2b')}</FieldLabel>
@@ -199,7 +199,7 @@ export default function RoleFormContent() {
 
       <Controller
         control={control}
-        name="applyToSalePrice"
+        name="role.applyToSalePrice"
         render={({ field: { ref, ...field }, fieldState: { error } }) => (
           <Field>
             <FieldContent>

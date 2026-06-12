@@ -5,7 +5,7 @@ import type { Settings } from '@/lib/schema/settings.schema';
 
 /** Options */
 
-const SETTINGS_QUERIES = {
+export const SETTINGS_QUERIES = {
   main: queryOptions({
     queryKey: ['settings', 'main'],
     queryFn: async () => {

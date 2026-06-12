@@ -15,9 +15,6 @@ class ShippingMethod {
 
     protected function __construct() {
         add_filter( 'woocommerce_package_rates', [ $this, 'restrict_shipping_methods_by_role_checkout' ], 999, 2 );
-
-        add_filter( 'ywhs_full_settings', [ $this, 'get_shipping_settings' ], 10, 1 );
-        add_action( 'ywhs_settings_updated', [ $this, 'update_shipping_settings' ], 10, 1 );
     }
 
     /**
@@ -54,16 +51,5 @@ class ShippingMethod {
         }
 
         return $rates;
-    }
-
-    public function get_shipping_settings( array $settings ) {
-        $settings['shipping_roles'] = ShippingHelper::get_shipping_roles_setting();
-        return $settings;
-    }
-
-    public function update_shipping_settings( array $settings ) {
-        if ( isset( $settings['shipping_roles'] ) ) {
-            ShippingHelper::save_shipping_method_settings( $settings['shipping_roles'] );
-        }
     }
 }

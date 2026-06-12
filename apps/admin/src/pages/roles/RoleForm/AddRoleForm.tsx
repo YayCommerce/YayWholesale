@@ -5,7 +5,7 @@ import { __ } from '@wordpress/i18n';
 
 import { getErrorMsg } from '@/lib/helpers/response.helper';
 import { useAddRoleMutation, useIsMutatingRoles } from '@/lib/queries/roles.queries';
-import { RoleFormValues, roleSchema } from '@/lib/schema/roles.schema';
+import { roleFormSchema, RoleFormValues } from '@/lib/schema/roles.schema';
 import { Button } from '@/components/ui/button';
 import { SheetClose, SheetFooter, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { toast } from '@/components/ui/sonner';
@@ -18,7 +18,7 @@ export default function AddRoleForm() {
   const isMutating = useIsMutatingRoles();
 
   const form = useForm<RoleFormValues>({
-    resolver: zodResolver(roleSchema),
+    resolver: zodResolver(roleFormSchema),
     mode: 'onChange',
     defaultValues: DEFAULT_ROLE,
   });
@@ -66,11 +66,21 @@ export default function AddRoleForm() {
 }
 
 const DEFAULT_ROLE: RoleFormValues = {
-  name: '',
-  description: '',
-  discount: 0,
-  minOrderQuantity: 0,
-  minOrderAmount: 0,
-  applyToSalePrice: false,
-  status: true,
+  role: {
+    name: '',
+    description: '',
+    discount: 0,
+    minOrderQuantity: 0,
+    minOrderAmount: 0,
+    applyToSalePrice: false,
+    status: true,
+  },
+  paymentMethods: {
+    enabled: 'enable-all',
+    selected_methods: [],
+  },
+  shippingMethods: {
+    enabled: 'enable-all',
+    selected_methods: [],
+  },
 };

@@ -6,8 +6,13 @@ import { useDidUpdate } from 'rooks';
 import { __ } from '@wordpress/i18n';
 
 import { getErrorMsg } from '@/lib/helpers/response.helper';
-import { useIsMutatingRoles, useUpdateRoleMutation } from '@/lib/queries/roles.queries';
-import { Role, RoleFormValues, roleSchema } from '@/lib/schema/roles.schema';
+import {
+  useIsMutatingRoles,
+  useRolePayments,
+  useRoleShippings,
+  useUpdateRoleMutation,
+} from '@/lib/queries/roles.queries';
+import { Role, roleFormSchema, RoleFormValues } from '@/lib/schema/roles.schema';
 import { Button } from '@/components/ui/button';
 import { SheetClose, SheetFooter, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { toast } from '@/components/ui/sonner';
@@ -19,20 +24,27 @@ export default function EditRoleForm({ role }: { role: Role }) {
   const updateRoleMutation = useUpdateRoleMutation(role.slug);
   const isMutating = useIsMutatingRoles();
 
+  const rolePayments = useRolePayments(role);
+  const roleShippings = useRoleShippings(role);
+
   const defaultValues = useMemo(() => {
     return {
-      name: role.name,
-      description: role.description,
-      discount: role.discount,
-      minOrderQuantity: role.minOrderQuantity,
-      minOrderAmount: role.minOrderAmount,
-      applyToSalePrice: role.applyToSalePrice,
-      status: role.status,
+      role: {
+        name: role.name,
+        description: role.description,
+        discount: role.discount,
+        minOrderQuantity: role.minOrderQuantity,
+        minOrderAmount: role.minOrderAmount,
+        applyToSalePrice: role.applyToSalePrice,
+        status: role.status,
+      },
+      paymentMethods: rolePayments,
+      shippingMethods: roleShippings,
     } satisfies RoleFormValues;
-  }, [role]);
+  }, [role, rolePayments, roleShippings]);
 
   const form = useForm<RoleFormValues>({
-    resolver: zodResolver(roleSchema),
+    resolver: zodResolver(roleFormSchema),
     mode: 'onChange',
     defaultValues,
   });

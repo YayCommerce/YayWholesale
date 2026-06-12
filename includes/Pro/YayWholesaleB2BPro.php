@@ -24,6 +24,8 @@ class YayWholesaleB2BPro {
 
         \YayWholesaleB2B\Pro\Engine\Admin\ProductBasedPricing::get_instance();
         \YayWholesaleB2B\Pro\Engine\Admin\CategoryBasedPricing::get_instance();
+        \YayWholesaleB2B\Pro\Engine\Admin\PaymentGateway::get_instance();
+        \YayWholesaleB2B\Pro\Engine\Admin\ShippingMethod::get_instance();
 
         \YayWholesaleB2B\Pro\Engine\Support\Support::get_instance();
     }

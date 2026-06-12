@@ -11,8 +11,8 @@ import {
   updateRole,
   updateRoleStatus,
 } from '@/lib/api/roles.api';
-import { RoleFormValues } from '@/lib/schema/roles.schema';
-import { useSettingsQuery } from './settings.queries';
+import { Role, RoleFormValues } from '@/lib/schema/roles.schema';
+import { SETTINGS_QUERIES, useSettingsQuery } from './settings.queries';
 
 /** Options */
 
@@ -72,7 +72,11 @@ export function useAddRoleMutation() {
   return useMutation({
     mutationKey: ['roles', 'add'],
     mutationFn: addRole,
-    onSuccess: (res) => queryClient.setQueryData(ROLES_QUERIES.all.queryKey, res),
+    onSuccess: (res) => {
+      queryClient.setQueryData(ROLES_QUERIES.all.queryKey, res.roles);
+      queryClient.setQueryData(SETTINGS_QUERIES.main.queryKey, res.settings);
+      window.yayWholesaleB2BAdmin.settings = res.settings;
+    },
     onError: () => queryClient.invalidateQueries({ queryKey: ROLES_QUERIES.all.queryKey }),
   });
 }
@@ -82,7 +86,11 @@ export function useUpdateRoleMutation(roleSlug: string) {
   return useMutation({
     mutationKey: ['roles', roleSlug, 'update'],
     mutationFn: (data: RoleFormValues) => updateRole(roleSlug, data),
-    onSuccess: (res) => queryClient.setQueryData(ROLES_QUERIES.all.queryKey, res),
+    onSuccess: (res) => {
+      queryClient.setQueryData(ROLES_QUERIES.all.queryKey, res.roles);
+      queryClient.setQueryData(SETTINGS_QUERIES.main.queryKey, res.settings);
+      window.yayWholesaleB2BAdmin.settings = res.settings;
+    },
     onError: () => queryClient.invalidateQueries({ queryKey: ROLES_QUERIES.all.queryKey }),
   });
 }
@@ -165,4 +173,56 @@ export function useDefaultRole() {
 
     return defaultRole;
   }, [settings, activeRoles]);
+}
+
+export function useRolePayments(role: Role) {
+  const { data: settings } = useSettingsQuery();
+
+  return useMemo(() => {
+    if (!role.slug || !settings.payment_roles) return;
+    const rolePayments: RoleFormValues['paymentMethods'] = {
+      enabled: 'enable-all',
+      selected_methods: [],
+    };
+
+    settings.payment_roles.forEach((pr) => {
+      if (pr.enable_by_role.wholesalers === 'disabled') return;
+
+      if (pr.enable_by_role.wholesalers === 'enabled' || pr.enable_by_role.selected_roles.includes(role.slug)) {
+        rolePayments.selected_methods!.push(pr.method_id);
+      }
+    });
+
+    if (rolePayments.selected_methods!.length < settings.payment_roles.length) {
+      rolePayments.enabled = 'enable-selected-methods';
+    }
+
+    return rolePayments;
+  }, [settings, role]);
+}
+
+export function useRoleShippings(role: Role) {
+  const { data: settings } = useSettingsQuery();
+
+  return useMemo(() => {
+    if (!role.slug || !settings.shipping_roles) return;
+    const roleShippings: RoleFormValues['shippingMethods'] = {
+      enabled: 'enable-all',
+      selected_methods: [],
+    };
+
+    settings.shipping_roles.forEach((sr) => {
+      if (sr.enable_by_role.wholesalers === 'disabled') return;
+
+      if (sr.enable_by_role.wholesalers === 'enabled' || sr.enable_by_role.selected_roles.includes(role.slug)) {
+        roleShippings.selected_methods!.push(sr.instance_id);
+      }
+    });
+
+    if (roleShippings.selected_methods!.length < settings.shipping_roles.length) {
+      roleShippings.enabled = 'enable-selected-methods';
+    }
+
+    return roleShippings;
+  }, [settings, role]);
 }
