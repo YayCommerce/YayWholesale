@@ -1,6 +1,7 @@
 <?php
 namespace YayWholesaleB2B\Pro\Engine\Admin;
 
+use YayWholesaleB2B\Helpers\WoocommerceHelper;
 use YayWholesaleB2B\Utils\SingletonTrait;
 use YayWholesaleB2B\Pro\Helpers\ShippingHelper;
 
@@ -34,61 +35,45 @@ class ShippingMethod {
             return;
         }
 
-        $settings           = ShippingHelper::get_shipping_roles_setting();
-        $settings_from_role = $payload['shippingMethods'];
-        $assign_to_all      = 'enable-all' === $settings_from_role['enabled'];
+        $settings            = ShippingHelper::get_shipping_roles_setting();
+        $settings_from_role  = $payload['shippingMethods'];
+        $assign_to_all       = 'enable-all' === $settings_from_role['enabled'];
+        $wc_shipping_methods = WoocommerceHelper::get_enabled_shipping_methods();
 
-        foreach ( $settings as &$setting ) {
-            $shipping_roles  = $setting['enable_by_role'];
-            $already_setting = in_array( $slug, $shipping_roles['selected_roles'], true ) || 'enabled' === $shipping_roles['wholesalers'];
+        foreach ( $wc_shipping_methods as $shipping ) {
+            $setting = ShippingHelper::get_default_setting( $shipping['instance_id'], $shipping['zone_id'] );
+            $index   = -1;
+
+            if ( ! empty( $settings ) ) {
+                $tmp = array_search(
+                    $shipping['instance_id'],
+                    array_column( $settings, 'instance_id' ),
+                    true
+                );
+                if ( isset( $tmp ) && is_numeric( $tmp ) ) {
+                    $index   = $tmp;
+                    $setting = $settings[ $index ];
+                }
+            }
+
+            $payment_roles   = $setting['enable_by_role'];
+            $already_setting = in_array( $slug, $payment_roles['selected_roles'], true ) || 'enabled' === $payment_roles['wholesalers'];
             $need_to_remove  = ! in_array( $setting['instance_id'], $settings_from_role['selected_methods'], true );
             $need_to_add     = in_array( $setting['instance_id'], $settings_from_role['selected_methods'], true );
 
-            // ADD
             if ( ( $assign_to_all || $need_to_add ) && ! $already_setting ) {
-                // Add role
-                $shipping_roles['selected_roles'] = array_merge( $shipping_roles['selected_roles'], [ $slug ] );
-
-                // Update other settings
-                if ( 'disabled' === $shipping_roles['wholesalers'] ) {
-                    $shipping_roles['wholesalers'] = 'enabled-selected-roles';
-                } elseif ( count( $shipping_roles['selected_roles'] ) === count( $roles ) ) {
-                    $shipping_roles['wholesalers']    = 'enabled';
-                    $shipping_roles['selected_roles'] = [];
-                }
-                $setting['enable_by_role'] = $shipping_roles;
-                continue;
-            }
-
-            // Remove
-            if ( $already_setting && $need_to_remove ) {
-                switch ( $shipping_roles['wholesalers'] ) {
-                    case 'enabled':
-                        $shipping_roles['wholesalers']    = 'enabled-selected-roles';
-                        $shipping_roles['selected_roles'] = array_column(
-                            array_filter(
-                                $roles,
-                                fn( $role ) => $role['slug'] !== $slug
-                            ),
-                            'slug'
-                        );
-                        break;
-                    case 'enabled-selected-roles':
-                        $shipping_roles['selected_roles'] = array_values(
-                            array_diff( $shipping_roles['selected_roles'], [ $slug ] )
-                        );
-
-                        if ( count( $shipping_roles['selected_roles'] ) < 1 ) {
-                            $shipping_roles['wholesalers'] = 'disabled';
-                        }
-
-                        break;
-                    case 'disabled':
-                    default:
-                        break;
-                }//end switch
-                $setting['enable_by_role'] = $shipping_roles;
+                // ADD
+                $setting['enable_by_role'] = ShippingHelper::handle_add_data_from_role( $payment_roles, $slug, $roles );
+            } elseif ( $already_setting && $need_to_remove ) {
+                // REMOVE
+                $setting['enable_by_role'] = ShippingHelper::handle_remove_data_from_role( $payment_roles, $slug, $roles );
             }//end if
+
+            if ( $index < 0 ) {
+                $settings[] = $setting;
+            } else {
+                $settings[ $index ] = $setting;
+            }
         }//end foreach
 
         ShippingHelper::save_shipping_method_settings( $settings );

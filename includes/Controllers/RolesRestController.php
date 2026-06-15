@@ -100,7 +100,7 @@ class RolesRestController extends BaseRestController {
         if ( array_key_exists( 'role', $payload ) ) {
             $role_data = $payload['role'];
         } else {
-            $role_data = $payload;
+            return $this->error_invalid_arguments();
         }
 
         $role_name = sanitize_text_field( $role_data['name'] ?? '' );
@@ -143,7 +143,7 @@ class RolesRestController extends BaseRestController {
         if ( array_key_exists( 'role', $payload ) ) {
             $role_data = $payload['role'];
         } else {
-            $role_data = $payload;
+            return $this->error_invalid_arguments();
         }
 
         foreach ( $roles as $key => $role ) {

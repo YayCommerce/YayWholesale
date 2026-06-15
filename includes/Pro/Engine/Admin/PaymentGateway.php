@@ -1,6 +1,7 @@
 <?php
 namespace YayWholesaleB2B\Pro\Engine\Admin;
 
+use YayWholesaleB2B\Helpers\WoocommerceHelper;
 use YayWholesaleB2B\Utils\SingletonTrait;
 use YayWholesaleB2B\Pro\Helpers\PaymentGatewayHelper;
 
@@ -37,58 +38,42 @@ class PaymentGateway {
         $settings           = PaymentGatewayHelper::get_payment_roles_setting();
         $settings_from_role = $payload['paymentMethods'];
         $assign_to_all      = 'enable-all' === $settings_from_role['enabled'];
+        $wc_payment_methods = WoocommerceHelper::get_enabled_payment_methods();
 
-        foreach ( $settings as &$setting ) {
+        foreach ( $wc_payment_methods as $payment ) {
+            $setting = PaymentGatewayHelper::get_default_setting( $payment['method_id'] );
+            $index   = -1;
+
+            if ( ! empty( $settings ) ) {
+                $tmp = array_search(
+                    $payment['method_id'],
+                    array_column( $settings, 'method_id' ),
+                    true
+                );
+                if ( isset( $tmp ) && is_numeric( $tmp ) ) {
+                    $index   = $tmp;
+                    $setting = $settings[ $index ];
+                }
+            }
+
             $payment_roles   = $setting['enable_by_role'];
             $already_setting = in_array( $slug, $payment_roles['selected_roles'], true ) || 'enabled' === $payment_roles['wholesalers'];
             $need_to_remove  = ! in_array( $setting['method_id'], $settings_from_role['selected_methods'], true );
             $need_to_add     = in_array( $setting['method_id'], $settings_from_role['selected_methods'], true );
 
-            // ADD
             if ( ( $assign_to_all || $need_to_add ) && ! $already_setting ) {
-                // Add role
-                $payment_roles['selected_roles'] = array_merge( $payment_roles['selected_roles'], [ $slug ] );
-
-                // Update other settings
-                if ( 'disabled' === $payment_roles['wholesalers'] ) {
-                    $payment_roles['wholesalers'] = 'enabled-selected-roles';
-                } elseif ( count( $payment_roles['selected_roles'] ) === count( $roles ) ) {
-                    $payment_roles['wholesalers']    = 'enabled';
-                    $payment_roles['selected_roles'] = [];
-                }
-                $setting['enable_by_role'] = $payment_roles;
-                continue;
-            }
-
-            // Remove
-            if ( $already_setting && $need_to_remove ) {
-                switch ( $payment_roles['wholesalers'] ) {
-                    case 'enabled':
-                        $payment_roles['wholesalers']    = 'enabled-selected-roles';
-                        $payment_roles['selected_roles'] = array_column(
-                            array_filter(
-                                $roles,
-                                fn( $role ) => $role['slug'] !== $slug
-                            ),
-                            'slug'
-                        );
-                        break;
-                    case 'enabled-selected-roles':
-                        $payment_roles['selected_roles'] = array_values(
-                            array_diff( $payment_roles['selected_roles'], [ $slug ] )
-                        );
-
-                        if ( count( $payment_roles['selected_roles'] ) < 1 ) {
-                            $payment_roles['wholesalers'] = 'disabled';
-                        }
-
-                        break;
-                    case 'disabled':
-                    default:
-                        break;
-                }//end switch
-                $setting['enable_by_role'] = $payment_roles;
+                // ADD
+                $setting['enable_by_role'] = PaymentGatewayHelper::handle_add_data_from_role( $payment_roles, $slug, $roles );
+            } elseif ( $already_setting && $need_to_remove ) {
+                // REMOVE
+                $setting['enable_by_role'] = PaymentGatewayHelper::handle_remove_data_from_role( $payment_roles, $slug, $roles );
             }//end if
+
+            if ( $index < 0 ) {
+                $settings[] = $setting;
+            } else {
+                $settings[ $index ] = $setting;
+            }
         }//end foreach
 
         PaymentGatewayHelper::save_payment_method_settings( $settings );

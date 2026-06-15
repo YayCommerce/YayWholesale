@@ -23,10 +23,14 @@ import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 import { isDefaultRoleSlug } from '@/pages/roles/roles.helper';
 
-export default function RoleFormContent() {
-  const { control, watch } = useFormContext<RoleFormValues>();
+type FormContentProps = {
+  slug?: string;
+};
 
-  const isDefaultRole = useMemo(() => isDefaultRoleSlug(watch('slug') ?? ''), [watch]);
+export default function RoleFormContent({ slug }: FormContentProps) {
+  const { control } = useFormContext<RoleFormValues>();
+
+  const isDefaultRole = useMemo(() => (slug ? isDefaultRoleSlug(slug) : false), [slug]);
 
   return (
     <div className="grid gap-5 overflow-auto p-5">

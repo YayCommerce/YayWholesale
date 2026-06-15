@@ -12,7 +12,6 @@ import { Button } from '@/components/ui/button';
 import { SheetClose, SheetFooter, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { toast } from '@/components/ui/sonner';
 import { makeDefaultAddRole } from '@/pages/roles/roles.helper';
-import { makeDefaultSettings } from '@/pages/settings/settings.helper';
 import RoleFormContent from './RoleFormContent';
 
 export default function AddRoleForm() {
@@ -22,10 +21,7 @@ export default function AddRoleForm() {
   const isMutating = useIsMutatingRoles();
   const { data: settings } = useSettingsQuery();
 
-  const defaultValues = useMemo(() => {
-    const handledSettings = makeDefaultSettings(settings);
-    return makeDefaultAddRole(handledSettings);
-  }, [settings]);
+  const defaultValues = useMemo(() => makeDefaultAddRole(settings), [settings]);
 
   const form = useForm<RoleFormValues>({
     resolver: zodResolver(roleFormSchema),

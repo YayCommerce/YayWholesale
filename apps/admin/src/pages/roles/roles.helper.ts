@@ -23,7 +23,6 @@ export function makeDefaultEditRole(role: Role, settings: Settings) {
       applyToSalePrice: role.applyToSalePrice,
       status: role.status,
     },
-    slug: role.slug,
   };
 
   //Payment Methods
@@ -54,20 +53,37 @@ export function makeDefaultAddRole(settings: Settings) {
 }
 
 export function getEditRolePaymentsField(role: Role, settings: Settings) {
+  if (!isPro) return;
   const rolePayments: RoleFormValues['paymentMethods'] = {
     enabled: 'enable-all',
     selected_methods: [],
   };
-  if (isPro && role.slug && settings.payment_roles) {
-    settings.payment_roles.forEach((pr) => {
-      if (pr.enable_by_role.wholesalers === 'disabled') return;
 
-      if (pr.enable_by_role.wholesalers === 'enabled' || pr.enable_by_role.selected_roles.includes(role.slug)) {
-        rolePayments.selected_methods!.push(pr.method_id);
+  const wcMeta = window.yayWholesaleB2BMeta.wcMeta;
+  if (role.slug) {
+    wcMeta.payment_methods_info.forEach((pm) => {
+      if (!settings.payment_roles) {
+        rolePayments.selected_methods.push(pm.method_id);
+        return;
+      }
+
+      const setting = settings.payment_roles.filter((s) => s.method_id === pm.method_id)[0] ?? false;
+      if (!setting) {
+        rolePayments.selected_methods.push(pm.method_id);
+        return;
+      }
+
+      if (setting.enable_by_role.wholesalers === 'disabled') return;
+      if (
+        setting.enable_by_role.wholesalers === 'enabled' ||
+        setting.enable_by_role.selected_roles.includes(role.slug)
+      ) {
+        rolePayments.selected_methods.push(pm.method_id);
+        return;
       }
     });
 
-    if (rolePayments.selected_methods!.length < settings.payment_roles.length) {
+    if (rolePayments.selected_methods!.length < wcMeta.payment_methods_info.length) {
       rolePayments.enabled = 'enable-selected-methods';
     }
   }
@@ -75,20 +91,37 @@ export function getEditRolePaymentsField(role: Role, settings: Settings) {
 }
 
 export function getEditRoleShippingsField(role: Role, settings: Settings) {
+  if (!isPro) return;
   const roleShippings: RoleFormValues['shippingMethods'] = {
     enabled: 'enable-all',
     selected_methods: [],
   };
-  if (isPro && role.slug && settings.shipping_roles) {
-    settings.shipping_roles.forEach((sr) => {
-      if (sr.enable_by_role.wholesalers === 'disabled') return;
 
-      if (sr.enable_by_role.wholesalers === 'enabled' || sr.enable_by_role.selected_roles.includes(role.slug)) {
-        roleShippings.selected_methods!.push(sr.instance_id);
+  const wcMeta = window.yayWholesaleB2BMeta.wcMeta;
+  if (role.slug) {
+    wcMeta.shipping_methods_info.forEach((sm) => {
+      if (!settings.shipping_roles) {
+        roleShippings.selected_methods.push(sm.instance_id);
+        return;
+      }
+
+      const setting = settings.shipping_roles.filter((s) => s.instance_id === sm.instance_id)[0] ?? false;
+      if (!setting) {
+        roleShippings.selected_methods.push(sm.instance_id);
+        return;
+      }
+
+      if (setting.enable_by_role.wholesalers === 'disabled') return;
+      if (
+        setting.enable_by_role.wholesalers === 'enabled' ||
+        setting.enable_by_role.selected_roles.includes(role.slug)
+      ) {
+        roleShippings.selected_methods.push(sm.instance_id);
+        return;
       }
     });
 
-    if (roleShippings.selected_methods!.length < settings.shipping_roles.length) {
+    if (roleShippings.selected_methods!.length < wcMeta.shipping_methods_info.length) {
       roleShippings.enabled = 'enable-selected-methods';
     }
   }
@@ -96,35 +129,58 @@ export function getEditRoleShippingsField(role: Role, settings: Settings) {
 }
 
 export function getAddRolePaymentsField(settings: Settings) {
+  if (!isPro) return;
   const rolePayments: RoleFormValues['paymentMethods'] = {
     enabled: 'enable-all',
     selected_methods: [],
   };
-  if (isPro && settings.payment_roles) {
-    settings.payment_roles.forEach((pr) => {
-      if (pr.enable_by_role.wholesalers != 'enabled') {
-        rolePayments.enabled = 'enable-selected-methods';
-      } else {
-        rolePayments.selected_methods.push(pr.method_id);
-      }
-    });
-  }
+  const wcMeta = window.yayWholesaleB2BMeta.wcMeta;
+  wcMeta.payment_methods_info.forEach((pm) => {
+    if (!settings.payment_roles) {
+      rolePayments.selected_methods.push(pm.method_id);
+      return;
+    }
+
+    const setting = settings.payment_roles.filter((s) => s.method_id === pm.method_id)[0] ?? false;
+    if (!setting) {
+      rolePayments.selected_methods.push(pm.method_id);
+      return;
+    }
+
+    if (setting.enable_by_role.wholesalers != 'enabled') {
+      rolePayments.enabled = 'enable-selected-methods';
+    } else {
+      rolePayments.selected_methods.push(pm.method_id);
+    }
+  });
+
   return rolePayments;
 }
 
 export function getAddRoleShippingsField(settings: Settings) {
+  if (!isPro) return;
   const roleShippings: RoleFormValues['shippingMethods'] = {
     enabled: 'enable-all',
     selected_methods: [],
   };
-  if (isPro && settings.shipping_roles) {
-    settings.shipping_roles.forEach((pr) => {
-      if (pr.enable_by_role.wholesalers != 'enabled') {
-        roleShippings.enabled = 'enable-selected-methods';
-      } else {
-        roleShippings.selected_methods.push(pr.instance_id);
-      }
-    });
-  }
+  const wcMeta = window.yayWholesaleB2BMeta.wcMeta;
+  wcMeta.shipping_methods_info.forEach((sm) => {
+    if (!settings.shipping_roles) {
+      roleShippings.selected_methods.push(sm.instance_id);
+      return;
+    }
+
+    const setting = settings.shipping_roles.filter((s) => s.instance_id === sm.instance_id)[0] ?? false;
+    if (!setting) {
+      roleShippings.selected_methods.push(sm.instance_id);
+      return;
+    }
+
+    if (setting.enable_by_role.wholesalers != 'enabled') {
+      roleShippings.enabled = 'enable-selected-methods';
+    } else {
+      roleShippings.selected_methods.push(sm.instance_id);
+    }
+  });
   return roleShippings;
 }

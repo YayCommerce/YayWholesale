@@ -16,7 +16,7 @@ export function updateRole(roleSlug: string, data: RoleFormValues) {
 }
 
 export function updateRoleStatus(roleSlug: string, status: boolean) {
-  return api.put(`roles/${roleSlug}`, { json: { status } }).json<Role[]>();
+  return api.put(`roles/${roleSlug}`, { json: { role: { status } } }).json<{ roles: Role[]; settings: Settings }>();
 }
 
 export function deleteRole(roleSlug: string) {

@@ -32,7 +32,6 @@ export const roleFormSchema = z.object({
   role: roleSchema,
   paymentMethods: rolePaymentMethodsSchema.optional(),
   shippingMethods: roleShippingMethodsSchema.optional(),
-  slug: z.string().optional(),
 });
 
 export type RoleFormValues = z.infer<typeof roleFormSchema>;

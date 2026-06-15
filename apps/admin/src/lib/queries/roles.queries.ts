@@ -112,7 +112,11 @@ export function useUpdateRoleStatusMutation(roleSlug: string) {
       return { previous };
     },
 
-    onSuccess: (res) => queryClient.setQueryData(ROLES_QUERIES.all.queryKey, res),
+    onSuccess: (res) => {
+      queryClient.setQueryData(ROLES_QUERIES.all.queryKey, res.roles);
+      queryClient.setQueryData(SETTINGS_QUERIES.main.queryKey, res.settings);
+      window.yayWholesaleB2BAdmin.settings = res.settings;
+    },
     onError: (_err, _variables, context) => {
       if (context?.previous) {
         window.yayWholesaleB2BAdmin.roles = context.previous;
