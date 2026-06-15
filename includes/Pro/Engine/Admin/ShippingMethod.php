@@ -52,17 +52,18 @@ class ShippingMethod {
                 // Update other settings
                 if ( 'disabled' === $shipping_roles['wholesalers'] ) {
                     $shipping_roles['wholesalers'] = 'enabled-selected-roles';
-                } elseif ( count( $shipping_roles['wholesalers'] ) === count( $roles ) ) {
+                } elseif ( count( $shipping_roles['selected_roles'] ) === count( $roles ) ) {
                     $shipping_roles['wholesalers']    = 'enabled';
                     $shipping_roles['selected_roles'] = [];
                 }
+                $setting['enable_by_role'] = $shipping_roles;
                 continue;
             }
 
             // Remove
             if ( $already_setting && $need_to_remove ) {
                 switch ( $shipping_roles['wholesalers'] ) {
-                    case 'enable':
+                    case 'enabled':
                         $shipping_roles['wholesalers']    = 'enabled-selected-roles';
                         $shipping_roles['selected_roles'] = array_column(
                             array_filter(
@@ -86,7 +87,7 @@ class ShippingMethod {
                     default:
                         break;
                 }//end switch
-                continue;
+                $setting['enable_by_role'] = $shipping_roles;
             }//end if
         }//end foreach
 

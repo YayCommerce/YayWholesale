@@ -13,6 +13,7 @@ import { Button } from '@/components/ui/button';
 import { SheetClose, SheetFooter, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { toast } from '@/components/ui/sonner';
 import { makeDefaultEditRole } from '@/pages/roles/roles.helper';
+import { makeDefaultSettings } from '@/pages/settings/settings.helper';
 import RoleFormContent from './RoleFormContent';
 
 export default function EditRoleForm({ role }: { role: Role }) {
@@ -22,7 +23,10 @@ export default function EditRoleForm({ role }: { role: Role }) {
   const isMutating = useIsMutatingRoles();
   const { data: settings } = useSettingsQuery();
 
-  const defaultValues = useMemo(() => makeDefaultEditRole(role, settings), [role, settings]);
+  const defaultValues = useMemo(() => {
+    const handledSettings = makeDefaultSettings(settings);
+    return makeDefaultEditRole(role, handledSettings);
+  }, [role, settings]);
 
   const form = useForm<RoleFormValues>({
     resolver: zodResolver(roleFormSchema),

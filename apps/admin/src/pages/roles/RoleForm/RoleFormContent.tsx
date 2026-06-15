@@ -1,4 +1,6 @@
+import { useMemo } from 'react';
 import { Label } from '@radix-ui/react-label';
+import { DotIcon } from 'lucide-react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { __ } from '@wordpress/i18n';
 
@@ -19,9 +21,12 @@ import { Segmented, SegmentedItem } from '@/components/ui/segmented';
 import { Separator } from '@/components/ui/separator';
 import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
+import { isDefaultRoleSlug } from '@/pages/roles/roles.helper';
 
 export default function RoleFormContent() {
-  const { control } = useFormContext<RoleFormValues>();
+  const { control, watch } = useFormContext<RoleFormValues>();
+
+  const isDefaultRole = useMemo(() => isDefaultRoleSlug(watch('slug') ?? ''), [watch]);
 
   return (
     <div className="grid gap-5 overflow-auto p-5">
@@ -207,29 +212,31 @@ export default function RoleFormContent() {
           control={control}
           name="paymentMethods"
           render={({ field: { ref, ...field }, fieldState: { error } }) => (
-            <Field>
-              <FieldLabel>{__('Payment methods', 'yay-wholesale-b2b')}</FieldLabel>
-              <FieldContent>
-                <Segmented
-                  className="w-full rounded-md"
-                  value={field.value?.enabled}
-                  onValueChange={(value) => {
-                    if (value && value.length > 0) {
-                      field.onChange({ ...field.value, enabled: value });
-                    }
-                  }}
-                >
-                  <SegmentedItem value="enable-all" className="w-1/2 rounded-md!">
-                    {__('Enable All', 'yay-wholesale-b2b')}
-                  </SegmentedItem>
-                  <SegmentedItem value="enable-selected-methods" className="w-1/2 rounded-md!">
-                    {__('Enable Selected', 'yay-wholesale-b2b')}
-                  </SegmentedItem>
-                </Segmented>
+            <Field className="border-muted border-b pb-5">
+              <FieldContent className="flex flex-col gap-4">
+                <div>
+                  <FieldLabel>{__('Payment methods', 'yay-wholesale-b2b')}</FieldLabel>
+                  <Segmented
+                    className="w-full rounded-md"
+                    value={field.value?.enabled}
+                    onValueChange={(value) => {
+                      if (value && value.length > 0) {
+                        field.onChange({ ...field.value, enabled: value });
+                      }
+                    }}
+                  >
+                    <SegmentedItem value="enable-all" className="w-1/2 rounded-md!">
+                      {__('Enable All', 'yay-wholesale-b2b')}
+                    </SegmentedItem>
+                    <SegmentedItem value="enable-selected-methods" className="w-1/2 rounded-md!">
+                      {__('Enable Selected', 'yay-wholesale-b2b')}
+                    </SegmentedItem>
+                  </Segmented>
+                </div>
                 {field.value?.enabled && field.value.enabled === 'enable-selected-methods' && (
-                  <div className="grid grid-cols-2">
+                  <div className="grid grid-cols-2 gap-4">
                     {wooPaymentMethods.map((method) => (
-                      <div className="my-4 flex items-center gap-2.5">
+                      <div key={method.method_id} className="flex items-center gap-2.5">
                         <Checkbox
                           id={method.method_id}
                           checked={field.value && field.value.selected_methods.includes(method.method_id)}
@@ -272,28 +279,30 @@ export default function RoleFormContent() {
           name="shippingMethods"
           render={({ field: { ref, ...field }, fieldState: { error } }) => (
             <Field>
-              <FieldLabel>{__('Shipping methods', 'yay-wholesale-b2b')}</FieldLabel>
-              <FieldContent>
-                <Segmented
-                  className="w-full rounded-md"
-                  value={field.value?.enabled}
-                  onValueChange={(value) => {
-                    if (value && value.length > 0) {
-                      field.onChange({ ...field.value, enabled: value });
-                    }
-                  }}
-                >
-                  <SegmentedItem value="enable-all" className="w-1/2 rounded-md!">
-                    {__('Enable All', 'yay-wholesale-b2b')}
-                  </SegmentedItem>
-                  <SegmentedItem value="enable-selected-methods" className="w-1/2 rounded-md!">
-                    {__('Enable Selected', 'yay-wholesale-b2b')}
-                  </SegmentedItem>
-                </Segmented>
+              <FieldContent className="flex flex-col gap-4">
+                <div>
+                  <FieldLabel>{__('Shipping methods', 'yay-wholesale-b2b')}</FieldLabel>
+                  <Segmented
+                    className="w-full rounded-md"
+                    value={field.value?.enabled}
+                    onValueChange={(value) => {
+                      if (value && value.length > 0) {
+                        field.onChange({ ...field.value, enabled: value });
+                      }
+                    }}
+                  >
+                    <SegmentedItem value="enable-all" className="w-1/2 rounded-md!">
+                      {__('Enable All', 'yay-wholesale-b2b')}
+                    </SegmentedItem>
+                    <SegmentedItem value="enable-selected-methods" className="w-1/2 rounded-md!">
+                      {__('Enable Selected', 'yay-wholesale-b2b')}
+                    </SegmentedItem>
+                  </Segmented>
+                </div>
                 {field.value?.enabled && field.value.enabled === 'enable-selected-methods' && (
-                  <div className="grid grid-cols-2">
+                  <div className="flex flex-col gap-4">
                     {wooShippingMethods.map((method) => (
-                      <div className="my-4 flex items-center gap-2.5">
+                      <div key={method.instance_id} className="flex gap-2.5">
                         <Checkbox
                           id={method.instance_id.toString()}
                           checked={field.value && field.value.selected_methods.includes(method.instance_id)}
@@ -314,7 +323,9 @@ export default function RoleFormContent() {
                         />
                         <Label htmlFor={method.instance_id.toString()} className="hover:cursor-pointer">
                           {method.instance_name}
-                          <div className="text-muted-foreground text-xs">
+                          <div className="text-muted-foreground flex items-center text-xs">
+                            {method.method_name}
+                            <DotIcon className="text-muted-foreground-400 size-4.5" />
                             {method.zone_id > 0 ? method.zone_name : __('Rest of the World', 'yay-wholesale-b2b')}
                           </div>
                         </Label>
@@ -363,7 +374,7 @@ export default function RoleFormContent() {
             </Field>
           )}
         />
-        <Separator />
+        <Separator className="text-muted" />
         <Controller
           control={control}
           name="role.status"
@@ -372,7 +383,7 @@ export default function RoleFormContent() {
               <FieldContent>
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium">{__('Enable Status', 'yay-wholesale-b2b')}</span>
-                  <Switch size="sm" checked={field.value} onCheckedChange={field.onChange} />
+                  <Switch size="sm" checked={field.value} onCheckedChange={field.onChange} disabled={isDefaultRole} />
                 </div>
               </FieldContent>
               {error && (

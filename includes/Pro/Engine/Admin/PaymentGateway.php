@@ -39,32 +39,33 @@ class PaymentGateway {
         $assign_to_all      = 'enable-all' === $settings_from_role['enabled'];
 
         foreach ( $settings as &$setting ) {
-            $shipping_roles  = $setting['enable_by_role'];
-            $already_setting = in_array( $slug, $shipping_roles['selected_roles'], true ) || 'enabled' === $shipping_roles['wholesalers'];
+            $payment_roles   = $setting['enable_by_role'];
+            $already_setting = in_array( $slug, $payment_roles['selected_roles'], true ) || 'enabled' === $payment_roles['wholesalers'];
             $need_to_remove  = ! in_array( $setting['method_id'], $settings_from_role['selected_methods'], true );
             $need_to_add     = in_array( $setting['method_id'], $settings_from_role['selected_methods'], true );
 
             // ADD
             if ( ( $assign_to_all || $need_to_add ) && ! $already_setting ) {
                 // Add role
-                $shipping_roles['selected_roles'] = array_merge( $shipping_roles['selected_roles'], [ $slug ] );
+                $payment_roles['selected_roles'] = array_merge( $payment_roles['selected_roles'], [ $slug ] );
 
                 // Update other settings
-                if ( 'disabled' === $shipping_roles['wholesalers'] ) {
-                    $shipping_roles['wholesalers'] = 'enabled-selected-roles';
-                } elseif ( count( $shipping_roles['wholesalers'] ) === count( $roles ) ) {
-                    $shipping_roles['wholesalers']    = 'enabled';
-                    $shipping_roles['selected_roles'] = [];
+                if ( 'disabled' === $payment_roles['wholesalers'] ) {
+                    $payment_roles['wholesalers'] = 'enabled-selected-roles';
+                } elseif ( count( $payment_roles['selected_roles'] ) === count( $roles ) ) {
+                    $payment_roles['wholesalers']    = 'enabled';
+                    $payment_roles['selected_roles'] = [];
                 }
+                $setting['enable_by_role'] = $payment_roles;
                 continue;
             }
 
             // Remove
             if ( $already_setting && $need_to_remove ) {
-                switch ( $shipping_roles['wholesalers'] ) {
-                    case 'enable':
-                        $shipping_roles['wholesalers']    = 'enabled-selected-roles';
-                        $shipping_roles['selected_roles'] = array_column(
+                switch ( $payment_roles['wholesalers'] ) {
+                    case 'enabled':
+                        $payment_roles['wholesalers']    = 'enabled-selected-roles';
+                        $payment_roles['selected_roles'] = array_column(
                             array_filter(
                                 $roles,
                                 fn( $role ) => $role['slug'] !== $slug
@@ -73,12 +74,12 @@ class PaymentGateway {
                         );
                         break;
                     case 'enabled-selected-roles':
-                        $shipping_roles['selected_roles'] = array_values(
-                            array_diff( $shipping_roles['selected_roles'], [ $slug ] )
+                        $payment_roles['selected_roles'] = array_values(
+                            array_diff( $payment_roles['selected_roles'], [ $slug ] )
                         );
 
-                        if ( count( $shipping_roles['selected_roles'] ) < 1 ) {
-                            $shipping_roles['wholesalers'] = 'disabled';
+                        if ( count( $payment_roles['selected_roles'] ) < 1 ) {
+                            $payment_roles['wholesalers'] = 'disabled';
                         }
 
                         break;
@@ -86,7 +87,7 @@ class PaymentGateway {
                     default:
                         break;
                 }//end switch
-                continue;
+                $setting['enable_by_role'] = $payment_roles;
             }//end if
         }//end foreach
 

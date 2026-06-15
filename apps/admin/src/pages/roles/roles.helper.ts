@@ -7,6 +7,11 @@ export function isDefaultRole(role: Role) {
   return defaultRoleSlug === role.slug;
 }
 
+export function isDefaultRoleSlug(roleSlug: string) {
+  const defaultRoleSlug = window.yayWholesaleB2BAdmin.settings.general.default_role;
+  return roleSlug.length > 0 && defaultRoleSlug === roleSlug;
+}
+
 export function makeDefaultEditRole(role: Role, settings: Settings) {
   const defaultValues: RoleFormValues = {
     role: {
@@ -18,6 +23,7 @@ export function makeDefaultEditRole(role: Role, settings: Settings) {
       applyToSalePrice: role.applyToSalePrice,
       status: role.status,
     },
+    slug: role.slug,
   };
 
   //Payment Methods
