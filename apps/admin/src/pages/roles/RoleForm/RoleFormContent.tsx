@@ -21,6 +21,7 @@ import { Segmented, SegmentedItem } from '@/components/ui/segmented';
 import { Separator } from '@/components/ui/separator';
 import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
+import UpgradeToUnlockPaymentShipping from '@/pages/roles/RoleForm/UpgradeToUnlockPaymentShipping';
 import { isDefaultRoleSlug } from '@/pages/roles/roles.helper';
 
 type FormContentProps = {
@@ -159,8 +160,8 @@ export default function RoleFormContent({ slug }: FormContentProps) {
                 </FieldLabel>
                 <FieldContent>
                   <Input
-                    value={__('Upgrade to PRO to unlock this feature.', 'yay-wholesale-b2b')}
-                    // value={0}
+                    // value={__('Upgrade to PRO to unlock this feature.', 'yay-wholesale-b2b')}
+                    value={0}
                     min={0}
                     disabled
                   />
@@ -211,7 +212,8 @@ export default function RoleFormContent({ slug }: FormContentProps) {
         />
       </div>
 
-      <div className="border-border flex flex-col gap-4 rounded-md border p-5">
+      <div className="border-border relative flex flex-col gap-4 rounded-md border p-5">
+        {!isPro && <UpgradeToUnlockPaymentShipping />}
         <Controller
           control={control}
           name="paymentMethods"
@@ -222,7 +224,7 @@ export default function RoleFormContent({ slug }: FormContentProps) {
                   <FieldLabel>{__('Payment methods', 'yay-wholesale-b2b')}</FieldLabel>
                   <Segmented
                     className="w-full rounded-md"
-                    value={field.value?.enabled}
+                    value={field.value?.enabled ?? 'enable-all'}
                     onValueChange={(value) => {
                       if (value && value.length > 0) {
                         field.onChange({ ...field.value, enabled: value });
