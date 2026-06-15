@@ -87,16 +87,25 @@ class WholeSalersHelper {
         $placeholders = implode( ',', array_fill( 0, count( $user_ids ), '%d' ) );
 
         $is_hpos = OrderUtil::custom_orders_table_usage_is_enabled();
-        // Compatible with 3rd party plugins like YayCurrency
-        $extra_joins = apply_filters( 'ywhs_wholesaler_stats_extra_joins', '', $is_hpos );
-        $revenue_sql = apply_filters( 'ywhs_wholesaler_revenue_sql', $is_hpos ? 'SUM(o.total_amount)' : 'SUM(total.meta_value)', $is_hpos );
         if ( $is_hpos ) {
-            $sql = "SELECT o.customer_id,COUNT(o.id) AS completed_orders,{$revenue_sql} AS revenue FROM {$wpdb->prefix}wc_orders o INNER JOIN {$wpdb->prefix}wc_orders_meta wm ON wm.order_id = o.id AND wm.meta_key = '_ywhs_wholesale_role' AND wm.meta_value <> '' {$extra_joins} WHERE o.status = 'wc-completed' AND o.customer_id IN ($placeholders) GROUP BY o.customer_id";
+            $sql_query = "SELECT o.customer_id,COUNT(o.id) AS completed_orders,SUM(o.total_amount) AS revenue
+                FROM {$wpdb->prefix}wc_orders o
+                INNER JOIN {$wpdb->prefix}wc_orders_meta wm ON wm.order_id = o.id AND wm.meta_key = '_ywhs_wholesale_role' AND wm.meta_value <> ''
+                WHERE o.status = 'wc-completed' AND o.customer_id IN ($placeholders)
+                GROUP BY o.customer_id";
         } else {
-            $sql = "SELECT customer.meta_value AS customer_id,COUNT(p.ID) AS completed_orders,{$revenue_sql} AS revenue FROM {$wpdb->posts} p INNER JOIN {$wpdb->postmeta} customer ON customer.post_id = p.ID AND customer.meta_key = '_customer_user' INNER JOIN {$wpdb->postmeta} total ON total.post_id = p.ID AND total.meta_key = '_order_total' INNER JOIN {$wpdb->postmeta} wholesale ON wholesale.post_id = p.ID AND wholesale.meta_key = '_ywhs_wholesale_role' AND wholesale.meta_value <> '' {$extra_joins} WHERE p.post_type = 'shop_order' AND p.post_status = 'wc-completed' AND customer.meta_value IN ($placeholders) GROUP BY customer.meta_value";
+            $sql_query = "SELECT customer.meta_value AS customer_id,COUNT(p.ID) AS completed_orders,SUM(total.meta_value) AS revenue
+                FROM {$wpdb->posts} p
+                INNER JOIN {$wpdb->postmeta} customer ON customer.post_id = p.ID AND customer.meta_key = '_customer_user'
+                INNER JOIN {$wpdb->postmeta} total ON total.post_id = p.ID AND total.meta_key = '_order_total'
+                INNER JOIN {$wpdb->postmeta} wholesale ON wholesale.post_id = p.ID AND wholesale.meta_key = '_ywhs_wholesale_role' AND wholesale.meta_value <> ''
+                WHERE p.post_type = 'shop_order' AND p.post_status = 'wc-completed' AND customer.meta_value IN ($placeholders)
+                GROUP BY customer.meta_value";
         }
 
-        $rows = $wpdb->get_results( $wpdb->prepare( $sql, ...$user_ids ), ARRAY_A );
+        $sql_query = apply_filters( 'ywhs_wholesaler_stats_sql_query', $sql_query, $user_ids, $is_hpos );
+
+        $rows = $wpdb->get_results( $wpdb->prepare( $sql_query, ...$user_ids ), ARRAY_A );
 
         foreach ( $rows as $row ) {
             $stats[ (int) $row['customer_id'] ] = [
