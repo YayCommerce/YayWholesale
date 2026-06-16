@@ -1,7 +1,7 @@
 import { useId } from 'react';
 import { __ } from '@wordpress/i18n';
 
-import { useActiveRolesQuery } from '@/lib/queries/roles.queries';
+import { useActiveRolesQuery, useAllRolesQuery } from '@/lib/queries/roles.queries';
 import { EnableByRole } from '@/lib/schema/common.schema';
 import { useUncontrolled } from '@/hooks/useUncontrolled';
 import {
@@ -35,7 +35,7 @@ export function EnableByRoleCombobox({ value: controlledValue, defaultValue, onV
     onChange: onValueChange,
   });
 
-  const { data: activeRoles } = useActiveRolesQuery();
+  const { data: roles } = useAllRolesQuery();
 
   function toggleRetailer() {
     setValue({
@@ -68,7 +68,7 @@ export function EnableByRoleCombobox({ value: controlledValue, defaultValue, onV
 
   function selectWholesalerRole(roleSlug: string) {
     const nextSelectedRoles = [...value.selected_roles, roleSlug];
-    const isAllRolesSelected = activeRoles.every((role) => nextSelectedRoles.includes(role.slug));
+    const isAllRolesSelected = roles.every((role) => nextSelectedRoles.includes(role.slug));
 
     if (isAllRolesSelected) {
       setValue({
@@ -86,8 +86,13 @@ export function EnableByRoleCombobox({ value: controlledValue, defaultValue, onV
   }
 
   function unselectWholesalerRole(roleSlug: string) {
-    const nextSelectedRoles = value.selected_roles.filter((slug) => slug !== roleSlug);
-    const isAllRolesUnselected = activeRoles.every((role) => !nextSelectedRoles.includes(role.slug));
+    let valueArray = value.selected_roles;
+    if (value.wholesalers === 'enabled') {
+      valueArray = roles.map((role) => role.slug);
+    }
+
+    const nextSelectedRoles = valueArray.filter((slug) => slug !== roleSlug);
+    const isAllRolesUnselected = roles.every((role) => !nextSelectedRoles.includes(role.slug));
 
     if (isAllRolesUnselected) {
       setValue({
@@ -146,7 +151,7 @@ export function EnableByRoleCombobox({ value: controlledValue, defaultValue, onV
           {value.wholesalers === 'enabled-selected-roles' &&
             value.selected_roles.map((roleSlug) => (
               <ComboboxBadge key={roleSlug}>
-                {activeRoles.find((role) => role.slug === roleSlug)?.name}
+                {roles.find((role) => role.slug === roleSlug)?.name}
                 <ComboboxRemove onRemove={() => toogleWholesalerRole(roleSlug)} />
               </ComboboxBadge>
             ))}
@@ -155,7 +160,7 @@ export function EnableByRoleCombobox({ value: controlledValue, defaultValue, onV
       </ComboboxTrigger>
       <PopoverContent className="w-(--radix-popover-trigger-width) p-0" align="start">
         <Command>
-          {activeRoles.length > 10 && <CommandInput placeholder="Search roles" />}
+          {roles.length > 10 && <CommandInput placeholder="Search roles" />}
           <CommandList>
             <CommandEmpty>{__('No roles found', 'yay-wholesale-b2b')}</CommandEmpty>
             <CommandGroup>
@@ -178,7 +183,7 @@ export function EnableByRoleCombobox({ value: controlledValue, defaultValue, onV
             </CommandGroup>
             <CommandSeparator />
             <CommandGroup>
-              {activeRoles.map((role) => {
+              {roles.map((role) => {
                 const isSelected =
                   value.wholesalers === 'enabled' ||
                   (value.wholesalers === 'enabled-selected-roles' && value.selected_roles.includes(role.slug));

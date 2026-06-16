@@ -1,12 +1,36 @@
-import { InfoIcon } from 'lucide-react';
+import { Dot, InfoIcon } from 'lucide-react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { __ } from '@wordpress/i18n';
 
 import { Settings } from '@/lib/schema/settings.schema';
-import { Badge } from '@/components/ui/badge';
+import useIsTruncated from '@/hooks/useIsTruncated';
 import { WholeSaleToolTip } from '@/components/ui/custom/WholeSaleToolTip';
 import { EnableByRoleCombobox } from '@/components/ui/enable-role-picker/EnableByRoleCombobox';
 import { TableCell, TableRow } from '@/components/ui/table';
+
+const ShippingZone = ({ method }: { method: (typeof wooShippingMethods)[0] }) => {
+  const zoneText = method.zone_id ? method.zone_name : __('Rest of the World', 'yay_wholesale_b2b');
+
+  const { ref, isTruncated } = useIsTruncated(zoneText, 84 * 4);
+
+  return (
+    <span ref={ref} className="truncate">
+      {!isTruncated ? (
+        zoneText
+      ) : (
+        <>
+          <span className="relative cursor-default hover:underline">
+            {zoneText}
+            <WholeSaleToolTip
+              trigger={<span className="absolute top-0 left-0 h-6 w-84 opacity-0"></span>}
+              content={zoneText}
+            />
+          </span>
+        </>
+      )}
+    </span>
+  );
+};
 
 export function ShippingRows() {
   const { control, register } = useFormContext<Settings>();
@@ -16,7 +40,7 @@ export function ShippingRows() {
       {wooShippingMethods.map((method, index) => {
         return (
           <TableRow key={method.instance_id} className="border-divider border-b">
-            <TableCell className="w-80 px-2 pt-3.5 pb-1">
+            <TableCell className="w-80 px-2">
               <p className="text-foreground flex items-center gap-1.5 font-extrabold whitespace-pre-line">
                 {method.instance_name}
                 {method.description && (
@@ -25,12 +49,9 @@ export function ShippingRows() {
                   </span>
                 )}
               </p>
-              <p className="text-muted-foreground text-xs font-normal whitespace-pre-line">{method.method_name}</p>
-              <p className="text-muted-foreground mt-4 flex items-center gap-1.5 text-xs font-normal">
-                {__('Shipping Zone: ', 'yay_wholesale_b2b')}
-                <Badge className="" variant={method.zone_id ? 'primary-soft' : 'secondary'}>
-                  {method.zone_id ? method.zone_name : __('Rest of the World', 'yay_wholesale_b2b')}
-                </Badge>
+              <p className="text-muted-foreground flex max-w-110 items-center text-xs font-normal">
+                {method.method_name} <Dot className="text-muted-foreground-400 size-4" />{' '}
+                <ShippingZone method={method} />
               </p>
             </TableCell>
             <TableCell>
