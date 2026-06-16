@@ -20,11 +20,11 @@ export function updateRoleStatus(roleSlug: string, status: boolean) {
 }
 
 export function deleteRole(roleSlug: string) {
-  return api.delete(`roles/${roleSlug}`).json<Role[]>();
+  return api.delete(`roles/${roleSlug}`).json<{ roles: Role[]; settings: Settings }>();
 }
 
 export function bulkDeleteRoles(roleSlugs: string[]) {
-  return api.delete('roles/bulk-delete', { json: { roleSlugs } }).json<Role[]>();
+  return api.delete('roles/bulk-delete', { json: { roleSlugs } }).json<{ roles: Role[]; settings: Settings }>();
 }
 
 export function bulkUpdateRoleStatus(roleSlugs: string[], status: boolean) {

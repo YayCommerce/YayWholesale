@@ -17,6 +17,7 @@ class PaymentGateway {
         add_filter( 'ywhs_full_settings', [ $this, 'get_payment_settings' ], 10, 1 );
         add_action( 'ywhs_settings_updated', [ $this, 'update_payment_settings' ], 10, 1 );
         add_action( 'ywhs_after_admin_saved_roles', [ $this, 'update_payment_settings_from_role' ], 10, 3 );
+        add_action( 'ywhs_after_admin_removed_roles', [ $this, 'remove_role_from_payment_settings' ], 10, 2 );
     }
 
     public function get_payment_settings( array $settings ) {
@@ -78,4 +79,16 @@ class PaymentGateway {
 
         PaymentGatewayHelper::save_payment_method_settings( $settings );
     }//end update_payment_settings_from_role()
+
+    public function remove_role_from_payment_settings( array $role_slugs, array $roles ) {
+        $settings = PaymentGatewayHelper::get_payment_roles_setting();
+        foreach ( $role_slugs as $slug ) {
+            foreach ( $settings as &$setting ) {
+                $payment_roles             = $setting['enable_by_role'];
+                $setting['enable_by_role'] = PaymentGatewayHelper::handle_remove_data_from_role( $payment_roles, $slug, $roles );
+            }
+        }
+
+        PaymentGatewayHelper::save_payment_method_settings( $settings );
+    }
 }

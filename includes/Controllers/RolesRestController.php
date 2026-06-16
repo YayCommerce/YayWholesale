@@ -129,7 +129,7 @@ class RolesRestController extends BaseRestController {
         do_action( 'ywhs_after_admin_saved_roles', $slug, $payload, $roles );
 
         return [
-            'roles'    => RolesHelper::get_wholesale_roles(),
+            'roles'    => $roles,
             'settings' => SettingsHelper::get_full_settings(),
         ];
     }
@@ -162,7 +162,7 @@ class RolesRestController extends BaseRestController {
         do_action( 'ywhs_after_admin_saved_roles', $role_slug, $payload, $roles );
 
         return [
-            'roles'    => RolesHelper::get_wholesale_roles(),
+            'roles'    => $roles,
             'settings' => SettingsHelper::get_full_settings(),
         ];
     }
@@ -183,9 +183,13 @@ class RolesRestController extends BaseRestController {
         if ( $deleted_role === false ) {
             return $this->error_not_found();
         }
+        do_action( 'ywhs_after_admin_removed_roles', [ $role_slug ], $roles );
 
         RolesHelper::save_wholesale_roles( array_values( $roles ) );
-        return RolesHelper::get_wholesale_roles();
+        return [
+            'roles'    => array_values( $roles ),
+            'settings' => SettingsHelper::get_full_settings(),
+        ];
     }
 
     public function bulk_delete_roles( WP_REST_Request $request ) {
@@ -198,17 +202,23 @@ class RolesRestController extends BaseRestController {
 
         $roles              = RolesHelper::get_wholesale_roles();
         $deleted_role_count = 0;
+        $valid_slugs        = [];
 
         foreach ( $roles as $key => $role ) {
             if ( in_array( $role['slug'], $role_slugs, true ) ) {
                 ++$deleted_role_count;
                 RolesHelper::remove_wp_role_by_slug( $role['slug'] );
                 unset( $roles[ $key ] );
+                $valid_slugs[] = $role['slug'];
             }
         }
 
+        do_action( 'ywhs_after_admin_removed_roles', $valid_slugs, $roles );
         RolesHelper::save_wholesale_roles( array_values( $roles ) );
-        return RolesHelper::get_wholesale_roles();
+        return [
+            'roles'    => array_values( $roles ),
+            'settings' => SettingsHelper::get_full_settings(),
+        ];
     }
 
     public function bulk_update_role_status( WP_REST_Request $request ) {
