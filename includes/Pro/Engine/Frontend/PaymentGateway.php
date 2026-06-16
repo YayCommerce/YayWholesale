@@ -15,9 +15,6 @@ class PaymentGateway {
 
     protected function __construct() {
         add_filter( 'woocommerce_available_payment_gateways', [ $this, 'restrict_payment_methods_by_role' ], 999, 1 );
-
-        add_filter( 'ywhs_full_settings', [ $this, 'get_payment_settings' ], 10, 1 );
-        add_action( 'ywhs_settings_updated', [ $this, 'update_payment_settings' ], 10, 1 );
     }
 
     /**
@@ -45,16 +42,5 @@ class PaymentGateway {
         }
 
         return $available_gateways;
-    }
-
-    public function get_payment_settings( array $settings ) {
-        $settings['payment_roles'] = PaymentGatewayHelper::get_payment_roles_setting();
-        return $settings;
-    }
-
-    public function update_payment_settings( array $settings ) {
-        if ( isset( $settings['payment_roles'] ) ) {
-            PaymentGatewayHelper::save_payment_method_settings( $settings['payment_roles'] );
-        }
     }
 }

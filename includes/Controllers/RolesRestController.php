@@ -4,6 +4,7 @@ namespace YayWholesaleB2B\Controllers;
 use YayWholesaleB2B\Utils\SingletonTrait;
 use YayWholesaleB2B\Helpers\RolesHelper;
 use WP_REST_Request;
+use YayWholesaleB2B\Helpers\SettingsHelper;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -95,9 +96,14 @@ class RolesRestController extends BaseRestController {
     }
 
     public function create_role( WP_REST_Request $request ) {
-        $payload   = $request->get_json_params();
-        $role_name = sanitize_text_field( $payload['name'] ?? '' );
+        $payload = $request->get_json_params();
+        if ( array_key_exists( 'role', $payload ) ) {
+            $role_data = $payload['role'];
+        } else {
+            return $this->error_invalid_arguments();
+        }
 
+        $role_name = sanitize_text_field( $role_data['name'] ?? '' );
         if ( ! $role_name ) {
             return $this->error_invalid_arguments();
         }
@@ -110,7 +116,7 @@ class RolesRestController extends BaseRestController {
         }
 
         $new_role = array_merge(
-            $payload,
+            $role_data,
             [
                 'id'   => $roles ? max( array_column( $roles, 'id' ) ) + 1 : 1,
                 'slug' => $slug,
@@ -119,7 +125,13 @@ class RolesRestController extends BaseRestController {
         $roles[]  = $new_role;
 
         RolesHelper::save_wholesale_roles( $roles );
-        return RolesHelper::get_wholesale_roles();
+
+        do_action( 'ywhs_after_admin_saved_roles', $slug, $payload, $roles );
+
+        return [
+            'roles'    => RolesHelper::get_wholesale_roles(),
+            'settings' => SettingsHelper::get_full_settings(),
+        ];
     }
 
     public function update_role( WP_REST_Request $request ) {
@@ -128,9 +140,15 @@ class RolesRestController extends BaseRestController {
         $roles        = RolesHelper::get_wholesale_roles();
         $updated_role = false;
 
+        if ( array_key_exists( 'role', $payload ) ) {
+            $role_data = $payload['role'];
+        } else {
+            return $this->error_invalid_arguments();
+        }
+
         foreach ( $roles as $key => $role ) {
             if ( $role['slug'] === $role_slug ) {
-                $updated_role  = array_merge( $role, $payload );
+                $updated_role  = array_merge( $role, $role_data );
                 $roles[ $key ] = $updated_role;
             }
         }
@@ -140,7 +158,13 @@ class RolesRestController extends BaseRestController {
         }
 
         RolesHelper::save_wholesale_roles( $roles );
-        return RolesHelper::get_wholesale_roles();
+
+        do_action( 'ywhs_after_admin_saved_roles', $role_slug, $payload, $roles );
+
+        return [
+            'roles'    => RolesHelper::get_wholesale_roles(),
+            'settings' => SettingsHelper::get_full_settings(),
+        ];
     }
 
     public function delete_role( WP_REST_Request $request ) {

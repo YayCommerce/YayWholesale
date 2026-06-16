@@ -56,4 +56,76 @@ class PaymentGatewayHelper {
 
         return true;
     }
+
+    public static function get_default_setting( string $method_id ) {
+        return [
+            'method_id'      => $method_id,
+            'enable_by_role' => [
+                'retailers'      => 'enabled',
+                'wholesalers'    => 'enabled',
+                'selected_roles' => [],
+            ],
+        ];
+    }
+
+    /**
+     * Handle the data to add to the setting from the Role's payload
+     *
+     * @param array  $enable_by_role_setting The setting[enable_by_role].
+     * @param string $slug The role slug.
+     * @param array  $roles The roles list.
+     * @return array
+     */
+    public static function handle_add_data_from_role( $enable_by_role_setting, $slug, $roles ) {
+        // Add role
+        $enable_by_role_setting['selected_roles'] = array_merge( $enable_by_role_setting['selected_roles'], [ $slug ] );
+
+        // Update other settings
+        if ( 'disabled' === $enable_by_role_setting['wholesalers'] ) {
+            $enable_by_role_setting['wholesalers'] = 'enabled-selected-roles';
+        } elseif ( count( $enable_by_role_setting['selected_roles'] ) === count( $roles ) ) {
+            $enable_by_role_setting['wholesalers']    = 'enabled';
+            $enable_by_role_setting['selected_roles'] = [];
+        }
+        return $enable_by_role_setting;
+    }
+
+    /**
+     * Handle the data to remove from the setting by the Role's payload
+     *
+     * @param array  $enable_by_role_setting The setting[enable_by_role].
+     * @param string $slug The role slug.
+     * @param array  $roles The roles list.
+     * @return array
+     */
+    public static function handle_remove_data_from_role( $enable_by_role_setting, $slug, $roles ) {
+        // Remove
+        switch ( $enable_by_role_setting['wholesalers'] ) {
+            case 'enabled':
+                $enable_by_role_setting['wholesalers']    = 'enabled-selected-roles';
+                $enable_by_role_setting['selected_roles'] = array_column(
+                    array_filter(
+                        $roles,
+                        fn( $role ) => $role['slug'] !== $slug
+                    ),
+                    'slug'
+                );
+                break;
+            case 'enabled-selected-roles':
+                $enable_by_role_setting['selected_roles'] = array_values(
+                    array_diff( $enable_by_role_setting['selected_roles'], [ $slug ] )
+                );
+
+                if ( count( $enable_by_role_setting['selected_roles'] ) < 1 ) {
+                    $enable_by_role_setting['wholesalers'] = 'disabled';
+                }
+
+                break;
+            case 'disabled':
+            default:
+                break;
+        }//end switch
+
+        return $enable_by_role_setting;
+    }
 }

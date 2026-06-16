@@ -11,8 +11,8 @@ import {
   updateRole,
   updateRoleStatus,
 } from '@/lib/api/roles.api';
-import { RoleFormValues } from '@/lib/schema/roles.schema';
-import { useSettingsQuery } from './settings.queries';
+import { Role, RoleFormValues } from '@/lib/schema/roles.schema';
+import { SETTINGS_QUERIES, useSettingsQuery } from './settings.queries';
 
 /** Options */
 
@@ -72,7 +72,11 @@ export function useAddRoleMutation() {
   return useMutation({
     mutationKey: ['roles', 'add'],
     mutationFn: addRole,
-    onSuccess: (res) => queryClient.setQueryData(ROLES_QUERIES.all.queryKey, res),
+    onSuccess: (res) => {
+      queryClient.setQueryData(ROLES_QUERIES.all.queryKey, res.roles);
+      queryClient.setQueryData(SETTINGS_QUERIES.main.queryKey, res.settings);
+      window.yayWholesaleB2BAdmin.settings = res.settings;
+    },
     onError: () => queryClient.invalidateQueries({ queryKey: ROLES_QUERIES.all.queryKey }),
   });
 }
@@ -82,7 +86,11 @@ export function useUpdateRoleMutation(roleSlug: string) {
   return useMutation({
     mutationKey: ['roles', roleSlug, 'update'],
     mutationFn: (data: RoleFormValues) => updateRole(roleSlug, data),
-    onSuccess: (res) => queryClient.setQueryData(ROLES_QUERIES.all.queryKey, res),
+    onSuccess: (res) => {
+      queryClient.setQueryData(ROLES_QUERIES.all.queryKey, res.roles);
+      queryClient.setQueryData(SETTINGS_QUERIES.main.queryKey, res.settings);
+      window.yayWholesaleB2BAdmin.settings = res.settings;
+    },
     onError: () => queryClient.invalidateQueries({ queryKey: ROLES_QUERIES.all.queryKey }),
   });
 }
@@ -104,7 +112,11 @@ export function useUpdateRoleStatusMutation(roleSlug: string) {
       return { previous };
     },
 
-    onSuccess: (res) => queryClient.setQueryData(ROLES_QUERIES.all.queryKey, res),
+    onSuccess: (res) => {
+      queryClient.setQueryData(ROLES_QUERIES.all.queryKey, res.roles);
+      queryClient.setQueryData(SETTINGS_QUERIES.main.queryKey, res.settings);
+      window.yayWholesaleB2BAdmin.settings = res.settings;
+    },
     onError: (_err, _variables, context) => {
       if (context?.previous) {
         window.yayWholesaleB2BAdmin.roles = context.previous;

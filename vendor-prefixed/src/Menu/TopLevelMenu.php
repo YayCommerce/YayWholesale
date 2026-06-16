@@ -2,6 +2,7 @@
 
 namespace YayWholesaleB2BScoped\YayCommerce\AdminShell\Menu;
 
+use YayWholesaleB2BScoped\YayCommerce\AdminShell\Support\AdminContext;
 /**
  * Registers the shared YayCommerce top-level admin menu.
  *
@@ -19,7 +20,7 @@ class TopLevelMenu
     public static string $capability = 'manage_options';
     public function init() : void
     {
-        add_action('admin_menu', [$this, 'register_menu'], 9);
+        AdminContext::bind_menu([$this, 'register_menu'], 9);
     }
     /**
      * Register top-level menu. Guard ensures only the first plugin wins.
@@ -44,7 +45,9 @@ class TopLevelMenu
             self::$position
         );
         // Remove the auto-created "YayCommerce" submenu AFTER all submenus are registered.
-        add_action('admin_menu', [__CLASS__, 'remove_parent_submenu'], 999);
+        // This runs inside the firing menu hook, so the context is known — bind only
+        // to the current hook (admin_menu or network_admin_menu) rather than both.
+        add_action(AdminContext::hook(), [__CLASS__, 'remove_parent_submenu'], 999);
     }
     /**
      * WP auto-creates a submenu matching the parent slug. Remove it late

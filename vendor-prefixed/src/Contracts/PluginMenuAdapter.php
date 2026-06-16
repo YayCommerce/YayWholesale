@@ -29,7 +29,9 @@ interface PluginMenuAdapter
      */
     public function get_settings_page_callback() : ?callable;
     /**
-     * Position of the plugin submenu. Return null for WP default ordering.
+     * Ordering rank of the plugin submenu under the YayCommerce menu.
+     * Lower numbers appear first; ties keep registration order. Values may be
+     * sparse (e.g. 10, 20, 21, 40). Return null to append after positioned items.
      */
     public function get_settings_page_position() : ?int;
     /**
@@ -52,4 +54,19 @@ interface PluginMenuAdapter
      * "Go Pro" upgrade URL (for lite plugins). Return empty string to hide.
      */
     public function get_pro_url() : string;
+    /*
+     * ── Optional capability methods (NOT part of the interface contract) ──
+     *
+     * These are detected at runtime via method_exists() (see AdminContext),
+     * so adapters MAY implement them without breaking the append-only contract.
+     * Declaring them here would force every shipped adapter to implement them.
+     *
+     * Multisite Network Admin placement (defaults preserve legacy behavior):
+     *
+     *   // Submenu shows on each site's dashboard. Absent ⇒ true.
+     *   public function wants_site_menu(): bool;
+     *
+     *   // Submenu shows in the Multisite Network Admin. Absent ⇒ false.
+     *   public function wants_network_menu(): bool;
+     */
 }

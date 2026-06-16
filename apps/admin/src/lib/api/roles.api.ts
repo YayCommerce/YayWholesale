@@ -8,19 +8,15 @@ export function getAllRoles() {
 }
 
 export function addRole(data: RoleFormValues) {
-  // TODO v1.2: onMutateSuccess => update settingsCache
-  // return api.post('roles', { json: data }).json<{ roles: Role[]; settings: Settings }>();
-  return api.post('roles', { json: data }).json<Role[]>();
+  return api.post('roles', { json: data }).json<{ roles: Role[]; settings: Settings }>();
 }
 
 export function updateRole(roleSlug: string, data: RoleFormValues) {
-  // TODO v1.2: onMutateSuccess => update settingsCache
-  // return api.put(`roles/${roleSlug}`, { json: data }).json<{ roles: Role[]; settings: Settings }>();
-  return api.put(`roles/${roleSlug}`, { json: data }).json<Role[]>();
+  return api.put(`roles/${roleSlug}`, { json: data }).json<{ roles: Role[]; settings: Settings }>();
 }
 
 export function updateRoleStatus(roleSlug: string, status: boolean) {
-  return api.put(`roles/${roleSlug}`, { json: { status } }).json<Role[]>();
+  return api.put(`roles/${roleSlug}`, { json: { role: { status } } }).json<{ roles: Role[]; settings: Settings }>();
 }
 
 export function deleteRole(roleSlug: string) {
