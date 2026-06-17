@@ -105,14 +105,22 @@ class ShippingHelper {
         // Remove
         switch ( $enable_by_role_setting['wholesalers'] ) {
             case 'enabled':
-                $enable_by_role_setting['wholesalers']    = 'enabled-selected-roles';
-                $enable_by_role_setting['selected_roles'] = array_column(
+                $filtered_roles = array_column(
                     array_filter(
                         $roles,
                         fn( $role ) => $role['slug'] !== $slug
                     ),
                     'slug'
                 );
+
+                if ( count( $filtered_roles ) === count( $roles ) ) {
+                    $enable_by_role_setting['wholesalers']    = 'enabled';
+                    $enable_by_role_setting['selected_roles'] = [];
+                } else {
+                    $enable_by_role_setting['wholesalers']    = 'enabled-selected-roles';
+                    $enable_by_role_setting['selected_roles'] = $filtered_roles;
+                }
+
                 break;
             case 'enabled-selected-roles':
                 $enable_by_role_setting['selected_roles'] = array_values(
@@ -121,6 +129,11 @@ class ShippingHelper {
 
                 if ( count( $enable_by_role_setting['selected_roles'] ) < 1 ) {
                     $enable_by_role_setting['wholesalers'] = 'disabled';
+                }
+
+                if ( count( $enable_by_role_setting['selected_roles'] ) === count( $roles ) ) {
+                    $enable_by_role_setting['wholesalers']    = 'enabled';
+                    $enable_by_role_setting['selected_roles'] = [];
                 }
 
                 break;

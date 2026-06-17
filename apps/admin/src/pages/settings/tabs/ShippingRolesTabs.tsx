@@ -3,7 +3,7 @@ import { __ } from '@wordpress/i18n';
 
 import { isPro } from '@/lib/utils';
 import { WholeSaleToolTip } from '@/components/ui/custom/WholeSaleToolTip';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Table, TableBody, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { EmptyShippingMethod } from '@/pages/settings/tabs/shipping-roles/EmptyShippingMethod';
 import { ShippingRows } from '@/pages/settings/tabs/shipping-roles/ShippingRows';
 import { UpgradeToUnlockShipping } from '@/pages/settings/tabs/shipping-roles/UpgradeToUnlockShipping';
@@ -22,7 +22,7 @@ export default function ShippingRolesTab() {
         <Table>
           <TableHeader className="text-foreground bg-muted-400 h-10">
             <TableRow className="text-[14px] font-semibold">
-              <TableHead className="w-90">
+              <TableHead className="w-110">
                 <span>{__('Shipping Methods', 'yay_wholesale_b2b')}</span>
               </TableHead>
               <TableHead>

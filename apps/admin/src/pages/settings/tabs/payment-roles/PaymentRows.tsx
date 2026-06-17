@@ -1,6 +1,5 @@
 import { InfoIcon } from 'lucide-react';
 import { Controller, useFormContext } from 'react-hook-form';
-import { object } from 'zod';
 
 import { Settings } from '@/lib/schema/settings.schema';
 import { WholeSaleToolTip } from '@/components/ui/custom/WholeSaleToolTip';

@@ -1,13 +1,13 @@
 import { useMemo } from 'react';
 import { Label } from '@radix-ui/react-label';
-import { DotIcon } from 'lucide-react';
+import { Dot } from 'lucide-react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { __ } from '@wordpress/i18n';
 
 import { RoleFormValues } from '@/lib/schema/roles.schema';
 import { isPro } from '@/lib/utils';
-import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
+import { UpgradeToProBadge } from '@/components/ui/custom/upgrate-to-pro';
 import { Field, FieldContent, FieldError, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import {
@@ -21,7 +21,6 @@ import { Segmented, SegmentedItem } from '@/components/ui/segmented';
 import { Separator } from '@/components/ui/separator';
 import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
-import UpgradeToUnlockPaymentShipping from '@/pages/roles/RoleForm/UpgradeToUnlockPaymentShipping';
 import { isDefaultRoleSlug } from '@/pages/roles/roles.helper';
 
 type FormContentProps = {
@@ -126,49 +125,34 @@ export default function RoleFormContent({ slug }: FormContentProps) {
         <Controller
           control={control}
           name="role.minOrderQuantity"
-          render={({ field: { ref, ...field }, fieldState: { error, invalid } }) =>
-            isPro ? (
-              <Field>
-                <FieldLabel>{__('Min Order Quantity', 'yay-wholesale-b2b')}</FieldLabel>
-                <FieldContent>
-                  <NumberInput
-                    value={field.value}
-                    onValueChange={(value) => field.onChange(value)}
-                    min={0}
-                    step={1}
-                    placeholder={__('e.g. 10 (min number of items required per order)', 'yay-wholesale-b2b')}
-                    aria-invalid={invalid}
-                  />
-                </FieldContent>
-                {error && (
-                  <FieldError
-                    errors={[
-                      {
-                        message: error.message,
-                      },
-                    ]}
-                  />
-                )}
-              </Field>
-            ) : (
-              <Field>
-                <FieldLabel>
-                  {__('Min Order Quantity', 'yay-wholesale-b2b')}
-                  <Badge variant="warning" className="text-white">
-                    {__('Pro', 'yay-wholesale-b2b')}
-                  </Badge>
-                </FieldLabel>
-                <FieldContent>
-                  <Input
-                    // value={__('Upgrade to PRO to unlock this feature.', 'yay-wholesale-b2b')}
-                    value={0}
-                    min={0}
-                    disabled
-                  />
-                </FieldContent>
-              </Field>
-            )
-          }
+          render={({ field: { ref, ...field }, fieldState: { error, invalid } }) => (
+            <Field>
+              <FieldLabel>
+                {__('Min Order Quantity', 'yay-wholesale-b2b')}
+                {!isPro && <UpgradeToProBadge />}
+              </FieldLabel>
+              <FieldContent>
+                <NumberInput
+                  value={field.value}
+                  onValueChange={(value) => field.onChange(value)}
+                  min={0}
+                  step={1}
+                  placeholder={__('e.g. 10 (min number of items required per order)', 'yay-wholesale-b2b')}
+                  aria-invalid={invalid}
+                  disabled={!isPro}
+                />
+              </FieldContent>
+              {error && (
+                <FieldError
+                  errors={[
+                    {
+                      message: error.message,
+                    },
+                  ]}
+                />
+              )}
+            </Field>
+          )}
         />
 
         <Controller
@@ -213,32 +197,33 @@ export default function RoleFormContent({ slug }: FormContentProps) {
       </div>
 
       <div className="border-border relative flex flex-col gap-4 rounded-md border p-5">
-        {!isPro && <UpgradeToUnlockPaymentShipping />}
         <Controller
           control={control}
           name="paymentMethods"
           render={({ field: { ref, ...field }, fieldState: { error } }) => (
             <Field className="border-muted border-b pb-5">
+              <FieldLabel>
+                {__('Payment methods', 'yay-wholesale-b2b')}
+                {!isPro && <UpgradeToProBadge />}
+              </FieldLabel>
               <FieldContent className="flex flex-col gap-4">
-                <div>
-                  <FieldLabel>{__('Payment methods', 'yay-wholesale-b2b')}</FieldLabel>
-                  <Segmented
-                    className="w-full rounded-md"
-                    value={field.value?.enabled ?? 'enable-all'}
-                    onValueChange={(value) => {
-                      if (value && value.length > 0) {
-                        field.onChange({ ...field.value, enabled: value });
-                      }
-                    }}
-                  >
-                    <SegmentedItem value="enable-all" className="w-1/2 rounded-md!">
-                      {__('Enable All', 'yay-wholesale-b2b')}
-                    </SegmentedItem>
-                    <SegmentedItem value="enable-selected-methods" className="w-1/2 rounded-md!">
-                      {__('Enable Selected', 'yay-wholesale-b2b')}
-                    </SegmentedItem>
-                  </Segmented>
-                </div>
+                <Segmented
+                  className="w-full rounded-md"
+                  value={field.value?.enabled ?? 'enable-all'}
+                  onValueChange={(value) => {
+                    if (value && value.length > 0) {
+                      field.onChange({ ...field.value, enabled: value });
+                    }
+                  }}
+                  disabled={!isPro}
+                >
+                  <SegmentedItem value="enable-all" className="w-1/2 rounded-md!">
+                    {__('Enable All', 'yay-wholesale-b2b')}
+                  </SegmentedItem>
+                  <SegmentedItem value="enable-selected-methods" className="w-1/2 rounded-md!">
+                    {__('Enable Selected', 'yay-wholesale-b2b')}
+                  </SegmentedItem>
+                </Segmented>
                 {field.value?.enabled && field.value.enabled === 'enable-selected-methods' && (
                   <div className="grid grid-cols-2 gap-4">
                     {wooPaymentMethods.map((method) => (
@@ -285,26 +270,28 @@ export default function RoleFormContent({ slug }: FormContentProps) {
           name="shippingMethods"
           render={({ field: { ref, ...field }, fieldState: { error } }) => (
             <Field>
+              <FieldLabel>
+                {__('Shipping methods', 'yay-wholesale-b2b')}
+                {!isPro && <UpgradeToProBadge />}
+              </FieldLabel>
               <FieldContent className="flex flex-col gap-4">
-                <div>
-                  <FieldLabel>{__('Shipping methods', 'yay-wholesale-b2b')}</FieldLabel>
-                  <Segmented
-                    className="w-full rounded-md"
-                    value={field.value?.enabled}
-                    onValueChange={(value) => {
-                      if (value && value.length > 0) {
-                        field.onChange({ ...field.value, enabled: value });
-                      }
-                    }}
-                  >
-                    <SegmentedItem value="enable-all" className="w-1/2 rounded-md!">
-                      {__('Enable All', 'yay-wholesale-b2b')}
-                    </SegmentedItem>
-                    <SegmentedItem value="enable-selected-methods" className="w-1/2 rounded-md!">
-                      {__('Enable Selected', 'yay-wholesale-b2b')}
-                    </SegmentedItem>
-                  </Segmented>
-                </div>
+                <Segmented
+                  className="w-full rounded-md"
+                  value={field.value?.enabled ?? 'enable-all'}
+                  onValueChange={(value) => {
+                    if (value && value.length > 0) {
+                      field.onChange({ ...field.value, enabled: value });
+                    }
+                  }}
+                  disabled={!isPro}
+                >
+                  <SegmentedItem value="enable-all" className="w-1/2 rounded-md!">
+                    {__('Enable All', 'yay-wholesale-b2b')}
+                  </SegmentedItem>
+                  <SegmentedItem value="enable-selected-methods" className="w-1/2 rounded-md!">
+                    {__('Enable Selected', 'yay-wholesale-b2b')}
+                  </SegmentedItem>
+                </Segmented>
                 {field.value?.enabled && field.value.enabled === 'enable-selected-methods' && (
                   <div className="flex flex-col gap-4">
                     {wooShippingMethods.map((method) => (
@@ -329,10 +316,14 @@ export default function RoleFormContent({ slug }: FormContentProps) {
                         />
                         <Label htmlFor={method.instance_id.toString()} className="hover:cursor-pointer">
                           {method.instance_name}
-                          <div className="text-muted-foreground flex items-center text-xs">
-                            {method.method_name}
-                            <DotIcon className="text-muted-foreground-400 size-4.5" />
-                            {method.zone_id > 0 ? method.zone_name : __('Rest of the World', 'yay-wholesale-b2b')}
+                          <div className="text-muted-foreground flex text-xs">
+                            <span className="flex h-fit items-center text-nowrap">
+                              {method.method_name}
+                              <Dot className="text-muted-foreground-400 -my-1 size-4.5 min-h-4.5 min-w-4.5 shrink-0" />
+                            </span>
+                            <span className="line-clamp-2">
+                              {method.zone_id > 0 ? method.zone_name : __('Rest of the World', 'yay-wholesale-b2b')}
+                            </span>
                           </div>
                         </Label>
                       </div>

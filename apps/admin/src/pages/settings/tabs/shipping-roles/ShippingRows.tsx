@@ -1,9 +1,8 @@
-import { InfoIcon } from 'lucide-react';
+import { Dot, InfoIcon } from 'lucide-react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { __ } from '@wordpress/i18n';
 
 import { Settings } from '@/lib/schema/settings.schema';
-import { Badge } from '@/components/ui/badge';
 import { WholeSaleToolTip } from '@/components/ui/custom/WholeSaleToolTip';
 import { EnableByRoleCombobox } from '@/components/ui/enable-role-picker/EnableByRoleCombobox';
 import { TableCell, TableRow } from '@/components/ui/table';
@@ -14,9 +13,10 @@ export function ShippingRows() {
   return (
     <>
       {wooShippingMethods.map((method, index) => {
+        const zoneText = method.zone_id ? method.zone_name : __('Rest of the World', 'yay_wholesale_b2b');
         return (
           <TableRow key={method.instance_id} className="border-divider border-b">
-            <TableCell className="w-80 px-2 pt-3.5 pb-1">
+            <TableCell className="w-80 px-2">
               <p className="text-foreground flex items-center gap-1.5 font-extrabold whitespace-pre-line">
                 {method.instance_name}
                 {method.description && (
@@ -25,12 +25,11 @@ export function ShippingRows() {
                   </span>
                 )}
               </p>
-              <p className="text-muted-foreground text-xs font-normal whitespace-pre-line">{method.method_name}</p>
-              <p className="text-muted-foreground mt-4 flex items-center gap-1.5 text-xs font-normal">
-                {__('Shipping Zone: ', 'yay_wholesale_b2b')}
-                <Badge className="" variant={method.zone_id ? 'primary-soft' : 'secondary'}>
-                  {method.zone_id ? method.zone_name : __('Rest of the World', 'yay_wholesale_b2b')}
-                </Badge>
+              <p className="text-muted-foreground flex max-w-60 items-center text-xs font-normal sm:max-w-80 lg:max-w-110">
+                {method.method_name} <Dot className="text-muted-foreground-400 size-4.5 min-w-4.5" />{' '}
+                <span className="cursor-default truncate" title={zoneText}>
+                  {zoneText}
+                </span>
               </p>
             </TableCell>
             <TableCell>

@@ -5,7 +5,7 @@ import { __ } from '@wordpress/i18n';
 import { useActiveRolesQuery } from '@/lib/queries/roles.queries';
 import type { Settings } from '@/lib/schema/settings.schema';
 import { getPagesForWholesaleStore, isPro } from '@/lib/utils';
-import { Badge } from '@/components/ui/badge';
+import { UpgradeToProBadge } from '@/components/ui/custom/upgrate-to-pro';
 import { Field, FieldContent, FieldError, FieldLabel } from '@/components/ui/field';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
@@ -69,23 +69,13 @@ export default function GeneralTab() {
               <div>
                 <h2 className="flex items-center gap-2 leading-3.5 font-medium">
                   {__('Wholesale shop page', 'yay-wholesale-b2b')}
-                  {!isPro && (
-                    <Badge
-                      variant="warning"
-                      className="cursor-pointer text-white"
-                      onClick={() => {
-                        window.open('https://yaycommerce.com/yay-wholesale-b2b-for-woocommerce/');
-                      }}
-                    >
-                      {__('Pro', 'yay-wholesale-b2b')}
-                    </Badge>
-                  )}
+                  {!isPro && <UpgradeToProBadge />}
                 </h2>
                 <p className="text-muted-foreground mt-2 text-xs font-normal">
                   {__('Set your wholesale shop page for wholesaler logged in', 'yay-wholesale-b2b')}
                 </p>
               </div>
-              <Select value={String(field.value) ?? 'inherit'} onValueChange={field.onChange} disabled={!isPro}>
+              <Select value={field.value ?? 'inherit'} onValueChange={field.onChange} disabled={!isPro}>
                 <SelectTrigger className="min-w-40">
                   <SelectValue placeholder={__('Select your page', 'yay-wholesale-b2b')} />
                 </SelectTrigger>
@@ -167,17 +157,7 @@ export default function GeneralTab() {
             <div>
               <h2 className="flex items-center gap-2 leading-3.5 font-medium">
                 {__('Display prices in the shop', 'yay-wholesale-b2b')}
-                {!isPro && (
-                  <Badge
-                    variant="warning"
-                    className="cursor-pointer text-white"
-                    onClick={() => {
-                      window.open('https://yaycommerce.com/yay-wholesale-b2b-for-woocommerce/');
-                    }}
-                  >
-                    {__('Pro', 'yay-wholesale-b2b')}
-                  </Badge>
-                )}
+                {!isPro && <UpgradeToProBadge />}
               </h2>
               <p className="text-muted-foreground mt-2 text-xs font-normal">
                 {__('Display product prices including or excluding tax for wholesalers in shop', 'yay-wholesale-b2b')}

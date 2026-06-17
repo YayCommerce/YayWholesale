@@ -17,6 +17,7 @@ class ShippingMethod {
         add_filter( 'ywhs_full_settings', [ $this, 'get_shipping_settings' ], 10, 1 );
         add_action( 'ywhs_settings_updated', [ $this, 'update_shipping_settings' ], 10, 1 );
         add_action( 'ywhs_after_admin_saved_roles', [ $this, 'update_shipping_settings_from_role' ], 10, 3 );
+        add_action( 'ywhs_after_admin_removed_roles', [ $this, 'remove_role_from_shipping_settings' ], 10, 2 );
     }
 
     public function get_shipping_settings( array $settings ) {
@@ -78,4 +79,16 @@ class ShippingMethod {
 
         ShippingHelper::save_shipping_method_settings( $settings );
     }//end update_shipping_settings_from_role()
+
+    public function remove_role_from_shipping_settings( array $role_slugs, array $roles ) {
+        $settings = ShippingHelper::get_shipping_roles_setting();
+        foreach ( $role_slugs as $slug ) {
+            foreach ( $settings as &$setting ) {
+                $payment_roles             = $setting['enable_by_role'];
+                $setting['enable_by_role'] = ShippingHelper::handle_remove_data_from_role( $payment_roles, $slug, $roles );
+            }
+        }
+
+        ShippingHelper::save_shipping_method_settings( $settings );
+    }
 }

@@ -132,7 +132,11 @@ export function useDeleteRoleMutation(roleSlug: string) {
   return useMutation({
     mutationKey: ['roles', roleSlug, 'delete'],
     mutationFn: () => deleteRole(roleSlug),
-    onSuccess: (res) => queryClient.setQueryData(ROLES_QUERIES.all.queryKey, res),
+    onSuccess: (res) => {
+      queryClient.setQueryData(ROLES_QUERIES.all.queryKey, res.roles);
+      queryClient.setQueryData(SETTINGS_QUERIES.main.queryKey, res.settings);
+      window.yayWholesaleB2BAdmin.settings = res.settings;
+    },
     onError: () => queryClient.invalidateQueries({ queryKey: ROLES_QUERIES.all.queryKey }),
   });
 }
@@ -142,7 +146,11 @@ export function useBulkDeleteRolesMutation() {
   return useMutation({
     mutationKey: ['roles', 'bulk-delete'],
     mutationFn: bulkDeleteRoles,
-    onSuccess: (res) => queryClient.setQueryData(ROLES_QUERIES.all.queryKey, res),
+    onSuccess: (res) => {
+      queryClient.setQueryData(ROLES_QUERIES.all.queryKey, res.roles);
+      queryClient.setQueryData(SETTINGS_QUERIES.main.queryKey, res.settings);
+      window.yayWholesaleB2BAdmin.settings = res.settings;
+    },
     onError: () => queryClient.invalidateQueries({ queryKey: ROLES_QUERIES.all.queryKey }),
   });
 }
