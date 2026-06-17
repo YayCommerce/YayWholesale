@@ -18,6 +18,16 @@ export function makeDefaultSettings(settings: Settings, roles: Role[]): Settings
           foundSettings.enable_by_role.selected_roles = foundSettings.enable_by_role.selected_roles.filter((rs) =>
             roleSlugs.includes(rs),
           );
+
+          if (foundSettings.enable_by_role.selected_roles.length < 1) {
+            foundSettings.enable_by_role.selected_roles = [];
+            foundSettings.enable_by_role.wholesalers = 'disabled';
+          }
+
+          if (foundSettings.enable_by_role.selected_roles.length === roleSlugs.length) {
+            foundSettings.enable_by_role.selected_roles = [];
+            foundSettings.enable_by_role.wholesalers = 'enabled';
+          }
         }
 
         return foundSettings;
@@ -40,6 +50,16 @@ export function makeDefaultSettings(settings: Settings, roles: Role[]): Settings
           foundSettings.enable_by_role.selected_roles = foundSettings.enable_by_role.selected_roles.filter((rs) =>
             roleSlugs.includes(rs),
           );
+
+          if (foundSettings.enable_by_role.selected_roles.length < 1) {
+            foundSettings.enable_by_role.selected_roles = [];
+            foundSettings.enable_by_role.wholesalers = 'disabled';
+          }
+
+          if (foundSettings.enable_by_role.selected_roles.length === roleSlugs.length) {
+            foundSettings.enable_by_role.selected_roles = [];
+            foundSettings.enable_by_role.wholesalers = 'enabled';
+          }
         }
 
         return foundSettings;
