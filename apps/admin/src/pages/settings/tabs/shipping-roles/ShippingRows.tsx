@@ -3,34 +3,9 @@ import { Controller, useFormContext } from 'react-hook-form';
 import { __ } from '@wordpress/i18n';
 
 import { Settings } from '@/lib/schema/settings.schema';
-import useIsTruncated from '@/hooks/useIsTruncated';
 import { WholeSaleToolTip } from '@/components/ui/custom/WholeSaleToolTip';
 import { EnableByRoleCombobox } from '@/components/ui/enable-role-picker/EnableByRoleCombobox';
 import { TableCell, TableRow } from '@/components/ui/table';
-
-const ShippingZone = ({ method }: { method: (typeof wooShippingMethods)[0] }) => {
-  const zoneText = method.zone_id ? method.zone_name : __('Rest of the World', 'yay_wholesale_b2b');
-
-  const { ref, isTruncated } = useIsTruncated(zoneText, 84 * 4);
-
-  return (
-    <span ref={ref} className="truncate">
-      {!isTruncated ? (
-        zoneText
-      ) : (
-        <>
-          <span className="relative cursor-default hover:underline">
-            {zoneText}
-            <WholeSaleToolTip
-              trigger={<span className="absolute top-0 left-0 h-6 w-60 opacity-0 sm:w-80 lg:w-97"></span>}
-              content={zoneText}
-            />
-          </span>
-        </>
-      )}
-    </span>
-  );
-};
 
 export function ShippingRows() {
   const { control, register } = useFormContext<Settings>();
@@ -38,6 +13,7 @@ export function ShippingRows() {
   return (
     <>
       {wooShippingMethods.map((method, index) => {
+        const zoneText = method.zone_id ? method.zone_name : __('Rest of the World', 'yay_wholesale_b2b');
         return (
           <TableRow key={method.instance_id} className="border-divider border-b">
             <TableCell className="w-80 px-2">
@@ -51,7 +27,9 @@ export function ShippingRows() {
               </p>
               <p className="text-muted-foreground flex max-w-60 items-center text-xs font-normal sm:max-w-80 lg:max-w-110">
                 {method.method_name} <Dot className="text-muted-foreground-400 size-4.5 min-w-4.5" />{' '}
-                <ShippingZone method={method} />
+                <span className="cursor-default truncate" title={zoneText}>
+                  {zoneText}
+                </span>
               </p>
             </TableCell>
             <TableCell>

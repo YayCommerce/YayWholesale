@@ -129,7 +129,7 @@ class RolesRestController extends BaseRestController {
         do_action( 'ywhs_after_admin_saved_roles', $slug, $payload, $roles );
 
         return [
-            'roles'    => $roles,
+            'roles'    => RolesHelper::get_wholesale_roles(),
             'settings' => SettingsHelper::get_full_settings(),
         ];
     }
@@ -162,7 +162,7 @@ class RolesRestController extends BaseRestController {
         do_action( 'ywhs_after_admin_saved_roles', $role_slug, $payload, $roles );
 
         return [
-            'roles'    => $roles,
+            'roles'    => RolesHelper::get_wholesale_roles(),
             'settings' => SettingsHelper::get_full_settings(),
         ];
     }
@@ -187,7 +187,7 @@ class RolesRestController extends BaseRestController {
 
         RolesHelper::save_wholesale_roles( array_values( $roles ) );
         return [
-            'roles'    => array_values( $roles ),
+            'roles'    => RolesHelper::get_wholesale_roles(),
             'settings' => SettingsHelper::get_full_settings(),
         ];
     }
@@ -216,7 +216,7 @@ class RolesRestController extends BaseRestController {
         do_action( 'ywhs_after_admin_removed_roles', $valid_slugs, $roles );
         RolesHelper::save_wholesale_roles( array_values( $roles ) );
         return [
-            'roles'    => array_values( $roles ),
+            'roles'    => RolesHelper::get_wholesale_roles(),
             'settings' => SettingsHelper::get_full_settings(),
         ];
     }
@@ -241,7 +241,10 @@ class RolesRestController extends BaseRestController {
         }
 
         RolesHelper::save_wholesale_roles( $roles );
-        return RolesHelper::get_wholesale_roles();
+        return [
+            'roles'    => RolesHelper::get_wholesale_roles(),
+            'settings' => SettingsHelper::get_full_settings(),
+        ];
     }
 
     public function count_users_by_roles() {
