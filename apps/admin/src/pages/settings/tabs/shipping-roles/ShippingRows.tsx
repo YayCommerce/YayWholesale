@@ -22,7 +22,7 @@ const ShippingZone = ({ method }: { method: (typeof wooShippingMethods)[0] }) =>
           <span className="relative cursor-default hover:underline">
             {zoneText}
             <WholeSaleToolTip
-              trigger={<span className="absolute top-0 left-0 h-6 w-84 opacity-0"></span>}
+              trigger={<span className="absolute top-0 left-0 h-6 w-60 opacity-0 sm:w-80 lg:w-97"></span>}
               content={zoneText}
             />
           </span>
@@ -49,8 +49,8 @@ export function ShippingRows() {
                   </span>
                 )}
               </p>
-              <p className="text-muted-foreground flex max-w-110 items-center text-xs font-normal">
-                {method.method_name} <Dot className="text-muted-foreground-400 size-4" />{' '}
+              <p className="text-muted-foreground flex max-w-60 items-center text-xs font-normal sm:max-w-80 lg:max-w-110">
+                {method.method_name} <Dot className="text-muted-foreground-400 size-4.5 min-w-4.5" />{' '}
                 <ShippingZone method={method} />
               </p>
             </TableCell>

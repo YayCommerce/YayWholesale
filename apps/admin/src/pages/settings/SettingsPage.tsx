@@ -9,6 +9,7 @@ import { toast } from 'sonner';
 import { __ } from '@wordpress/i18n';
 
 import { getErrorMsg } from '@/lib/helpers/response.helper';
+import { useAllRolesQuery } from '@/lib/queries/roles.queries';
 import { useIsMutatingSettings, useSaveSettingsMutation, useSettingsQuery } from '@/lib/queries/settings.queries';
 import { Settings, settingsFormSchema } from '@/lib/schema/settings.schema';
 import { useRouteLeaveGuard } from '@/hooks/useRouteLeaveGuard';
@@ -36,9 +37,11 @@ export default function SettingsPage() {
   const saveMutation = useSaveSettingsMutation();
   const isMutating = useIsMutatingSettings();
 
+  const { data: roles } = useAllRolesQuery();
+
   const defaultValues = useMemo(() => {
-    return makeDefaultSettings(settings);
-  }, [settings]);
+    return makeDefaultSettings(settings, roles);
+  }, [roles, settings]);
 
   const form = useForm<Settings>({
     resolver: zodResolver(settingsFormSchema),
