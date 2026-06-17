@@ -128,6 +128,11 @@ class PaymentGatewayHelper {
                     $enable_by_role_setting['wholesalers'] = 'disabled';
                 }
 
+                if ( count( $enable_by_role_setting['selected_roles'] ) === count( $roles ) ) {
+                    $enable_by_role_setting['wholesalers']    = 'enabled';
+                    $enable_by_role_setting['selected_roles'] = [];
+                }
+
                 break;
             case 'disabled':
             default:

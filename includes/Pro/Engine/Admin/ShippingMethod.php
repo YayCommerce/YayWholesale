@@ -17,7 +17,7 @@ class ShippingMethod {
         add_filter( 'ywhs_full_settings', [ $this, 'get_shipping_settings' ], 10, 1 );
         add_action( 'ywhs_settings_updated', [ $this, 'update_shipping_settings' ], 10, 1 );
         add_action( 'ywhs_after_admin_saved_roles', [ $this, 'update_shipping_settings_from_role' ], 10, 3 );
-        add_action( 'ywhs_after_admin_removed_roles', [ $this, 'remove_role_from_payment_settings' ], 10, 2 );
+        add_action( 'ywhs_after_admin_removed_roles', [ $this, 'remove_role_from_shipping_settings' ], 10, 2 );
     }
 
     public function get_shipping_settings( array $settings ) {
