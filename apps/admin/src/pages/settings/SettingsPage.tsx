@@ -3,7 +3,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as TabsPrimitive from '@radix-ui/react-tabs';
 import { Loader2 } from 'lucide-react';
 import { createPortal } from 'react-dom';
-import { useForm, useFormContext } from 'react-hook-form';
+import { FieldErrors, useForm, useFormContext } from 'react-hook-form';
 import { useNavigate, useParams } from 'react-router';
 import { toast } from 'sonner';
 import { __ } from '@wordpress/i18n';
@@ -28,8 +28,6 @@ import ShippingRolesTab from './tabs/ShippingRolesTabs';
 
 export default function SettingsPage() {
   const { subMenu } = useParams();
-  const tabs = ['general', 'display', 'registration', 'registration-fields', 'payment-roles', 'shipping-roles'];
-  const activeTab = tabs.find((tab) => tab === subMenu) ?? tabs[0];
   const headerActionPortal = document.getElementById('yay-wholesale-b2b-header-actions');
 
   const navigate = useNavigate();
@@ -48,10 +46,6 @@ export default function SettingsPage() {
     defaultValues: defaultValues,
   });
 
-  const setActiveTab = (tab: (typeof tabs)[number]) => {
-    navigate(`/settings/${tab}`);
-  };
-
   const {
     handleSubmit,
     formState: { isDirty },
@@ -69,7 +63,11 @@ export default function SettingsPage() {
     }
   }
 
-  const onError = getFirstErrorSection();
+  const onError = (errors: FieldErrors<Settings>) => {
+    const firstErrorSection = getFirstErrorSection(errors);
+    if (!firstErrorSection) return;
+    navigate(`/settings/${firstErrorSection.replaceAll('_', '-')}`);
+  };
 
   const { showDialog, confirmLeave, cancelLeave } = useRouteLeaveGuard(isDirty, ['/settings/*']);
 
@@ -109,45 +107,50 @@ export default function SettingsPage() {
       <FormProvider {...form}>
         <form id="settings-form" onSubmit={handleSubmit(onSubmit, onError)}>
           <div className="xs:p-6 mx-auto max-w-7xl px-6 pt-8 pb-4">
-            <TabsPrimitive.Root value={activeTab} onValueChange={(value) => navigate(`/settings/${value}`)}>
+            <TabsPrimitive.Root value={subMenu} onValueChange={(value) => navigate(`/settings/${value}`)}>
               <div className="flex flex-col gap-4 sm:flex-row">
                 <div className="w-full sm:w-37.5">
                   <TabsPrimitive.List asChild>
                     <SideNavMenuList mode="tabs" className="flex w-full items-start justify-start sm:flex-col">
                       <TabsPrimitive.Trigger value="general" asChild>
                         <SideNavMenuItem>
-                          <span>General</span>
+                          <span>{__('General', 'yay-wholesale-b2b')}</span>
                           <SettingsErrorIndicator tab="general" />
                         </SideNavMenuItem>
                       </TabsPrimitive.Trigger>
                       <TabsPrimitive.Trigger value="display" asChild>
                         <SideNavMenuItem>
-                          <span>Display</span>
+                          <span>{__('Display', 'yay-wholesale-b2b')}</span>
                           <SettingsErrorIndicator tab="display" />
                         </SideNavMenuItem>
                       </TabsPrimitive.Trigger>
                       <TabsPrimitive.Trigger value="registration" asChild>
                         <SideNavMenuItem>
-                          <span>Registration</span>
+                          <span>{__('Registration', 'yay-wholesale-b2b')}</span>
                           <SettingsErrorIndicator tab="registration" />
                         </SideNavMenuItem>
                       </TabsPrimitive.Trigger>
 
                       <TabsPrimitive.Trigger value="registration-fields" asChild>
                         <SideNavMenuItem>
-                          <span>Registration Fields</span>
+                          <span>{__('Registration Fields', 'yay-wholesale-b2b')}</span>
                           <SettingsErrorIndicator tab="registration_fields" />
+                        </SideNavMenuItem>
+                      </TabsPrimitive.Trigger>
+                      <TabsPrimitive.Trigger value="emails" asChild>
+                        <SideNavMenuItem>
+                          <span>{__('Emails', 'yay-wholesale-b2b')}</span>
                         </SideNavMenuItem>
                       </TabsPrimitive.Trigger>
                       <TabsPrimitive.Trigger value="payment-roles" asChild>
                         <SideNavMenuItem>
-                          <span>Payment Roles</span>
+                          <span>{__('Payment Roles', 'yay-wholesale-b2b')}</span>
                           <SettingsErrorIndicator tab="payment_roles" />
                         </SideNavMenuItem>
                       </TabsPrimitive.Trigger>
                       <TabsPrimitive.Trigger value="shipping-roles" asChild>
                         <SideNavMenuItem>
-                          <span>Shipping Roles</span>
+                          <span>{__('Shipping Roles', 'yay-wholesale-b2b')}</span>
                           <SettingsErrorIndicator tab="shipping_roles" />
                         </SideNavMenuItem>
                       </TabsPrimitive.Trigger>
@@ -155,41 +158,26 @@ export default function SettingsPage() {
                   </TabsPrimitive.List>
                 </div>
                 <div className="bg-muted flex flex-1 flex-col">
-                  <TabsPrimitive.Content value="general" style={{ height: '100%' }}>
-                    <div className="bg-card h-full rounded-md border p-6 sm:w-full">
-                      <GeneralTab />
-                    </div>
+                  <TabsPrimitive.Content value="general" className="bg-card h-full rounded-md border p-6 sm:w-full">
+                    <GeneralTab />
                   </TabsPrimitive.Content>
-
-                  <TabsPrimitive.Content value="display" style={{ height: '100%' }}>
-                    <div className="bg-card h-full rounded-md border p-6 sm:w-full">
-                      <DisplayTab />
-                    </div>
+                  <TabsPrimitive.Content value="display" className="bg-card h-full rounded-md border p-6 sm:w-full">
+                    <DisplayTab />
                   </TabsPrimitive.Content>
-                  <TabsPrimitive.Content value="registration" style={{ height: '100%' }}>
-                    <div className="bg-card h-full rounded-md border p-6 sm:w-full">
-                      <RegistrationTab />
-                    </div>
+                  <TabsPrimitive.Content value="registration" className="bg-card h-full rounded-md border p-6 sm:w-full">
+                    <RegistrationTab />
                   </TabsPrimitive.Content>
-                  <TabsPrimitive.Content value="registration-fields" style={{ height: '100%' }}>
-                    <div className="bg-card h-full rounded-md border p-6 sm:w-full">
-                      <RegistrationFieldsTab />
-                    </div>
+                  <TabsPrimitive.Content value="registration-fields" className="bg-card h-full rounded-md border p-6 sm:w-full">
+                    <RegistrationFieldsTab />
                   </TabsPrimitive.Content>
-                  <TabsPrimitive.Content value="payment-roles" style={{ height: '100%' }}>
-                    <div className="bg-card h-full rounded-md border p-6 sm:w-full">
-                      <PaymentRolesTab />
-                    </div>
+                  <TabsPrimitive.Content value="emails" className="bg-card h-full rounded-md border p-6 sm:w-full">
+                    <EmailsTab />
                   </TabsPrimitive.Content>
-                  <TabsPrimitive.Content value="shipping-roles" style={{ height: '100%' }}>
-                    <div className="bg-card h-full rounded-md border p-6 sm:w-full">
-                      <ShippingRolesTab />
-                    </div>
+                  <TabsPrimitive.Content value="payment-roles" className="bg-card h-full rounded-md border p-6 sm:w-full">
+                    <PaymentRolesTab />
                   </TabsPrimitive.Content>
-                  <TabsPrimitive.Content value="emails" style={{ height: '100%' }}>
-                    <div className="bg-card h-full rounded-md border p-6 sm:w-full">
-                      <EmailsTab />
-                    </div>
+                  <TabsPrimitive.Content value="shipping-roles" className="bg-card h-full rounded-md border p-6 sm:w-full">
+                    <ShippingRolesTab />
                   </TabsPrimitive.Content>
                 </div>
               </div>

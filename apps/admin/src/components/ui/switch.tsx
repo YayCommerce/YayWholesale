@@ -22,7 +22,7 @@ const switchVariants = cva('', {
 const Switch = React.forwardRef<
   React.ElementRef<typeof SwitchPrimitive.Root>,
   React.ComponentPropsWithoutRef<typeof SwitchPrimitive.Root> &
-    VariantProps<typeof switchVariants> & { loading?: boolean }
+  VariantProps<typeof switchVariants> & { loading?: boolean }
 >(({ className, loading = false, size, ...props }, ref) => {
   return (
     <SwitchPrimitive.Root
@@ -31,7 +31,7 @@ const Switch = React.forwardRef<
       className={cn(
         focusVariants(),
         switchVariants({ size }),
-        'peer dark:data-[state=unchecked]:bg-input/80 transition-default inline-flex shrink-0 items-center rounded-full border-2 border-transparent shadow-xs outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50',
+        'peer dark:data-[state=unchecked]:bg-input/80 transition-default inline-flex shrink-0 items-center rounded-full border-2 border-transparent shadow-xs outline-none focus-visible:ring-[1.5px] disabled:cursor-not-allowed disabled:opacity-50',
         'data-[state=unchecked]:bg-input data-[state=unchecked]:hover:bg-input-accent',
         'data-[state=checked]:bg-primary data-[state=checked]:hover:bg-primary-accent',
         className,

@@ -2,7 +2,7 @@
 namespace YayWholesaleB2B\Helpers;
 
 use YayWholesaleB2B\Helpers\RolesHelper;
-
+use Automattic\WooCommerce\Utilities\OrderUtil;
 /**
  * WholeSalers Helper Class
  */
@@ -41,19 +41,18 @@ class WholeSalersHelper {
             [
                 'role__in' => $wholesale_slugs,
                 'number'   => $per_page,
-                'paged'    => $page,
+                'offset'   => ( $page - 1 ) * $per_page,
                 'fields'   => 'all_with_meta',
             ],
             self::build_search_args( $search )
         );
 
-        $query       = new \WP_User_Query( $query_args );
-        $users       = $query->get_results();
-        $total       = (int) $query->get_total();
-        $total_pages = max( 1, ceil( $total / $per_page ) );
-
-        $wholesalers_response = self::make_wholesaler_response( $users, $wholesale_slugs );
-
+        $query                = new \WP_User_Query( $query_args );
+        $users                = $query->get_results();
+        $total                = (int) $query->get_total();
+        $total_pages          = $total > 0 ? (int) ceil( $total / $per_page ) : 0;
+        $stats_map            = self::get_bulk_wholesaler_order_stats( wp_list_pluck( $users, 'ID' ) );
+        $wholesalers_response = self::make_wholesaler_response( $users, $wholesale_slugs, $stats_map );
         return [
             'currentPage' => $page,
             'totalPage'   => $total_pages,
@@ -63,42 +62,59 @@ class WholeSalersHelper {
     }
 
     /**
-     * Get the order stats of a wholesaler.
+     * Get the bulk order stats of wholesalers.
      *
-     * @param int $user_id The user id.
-     * @return array The order stats.
+     * @param array $user_ids The user ids.
+     * @return array The bulk order stats.
      */
-    public static function get_wholesaler_order_stats( int $user_id ): array {
+    public static function get_bulk_wholesaler_order_stats( array $user_ids ): array {
 
-        $orders = wc_get_orders(
-            [
-                'limit'      => -1,
-                'status'     => 'completed',
-                'meta_query' => [
-                    [
-                        'key'     => '_ywhs_wholesale_role',
-                        'compare' => 'EXISTS',
-                    ],
-                ],
-                'return'     => 'objects',
-            ]
-        );
-
-        $completed_orders = 0;
-        $revenue          = 0.0;
-
-        foreach ( $orders as $order ) {
-
-            if ( $order->get_user_id() === $user_id ) {
-                ++$completed_orders;
-                $revenue += (float) apply_filters( 'ywhs_revert_price_from_order', $order->get_total(), $order );
-            }
+        if ( empty( $user_ids ) ) {
+            return [];
         }
 
-        return [
-            'completed_orders' => $completed_orders,
-            'revenue'          => $revenue,
-        ];
+        global $wpdb;
+
+        $stats = [];
+
+        foreach ( $user_ids as $user_id ) {
+            $stats[ (int) $user_id ] = [
+                'completed_orders' => 0,
+                'revenue'          => 0,
+            ];
+        }
+
+        $placeholders = implode( ',', array_fill( 0, count( $user_ids ), '%d' ) );
+
+        $is_hpos = OrderUtil::custom_orders_table_usage_is_enabled();
+        if ( $is_hpos ) {
+            $sql_query = "SELECT o.customer_id,COUNT(o.id) AS completed_orders,SUM(o.total_amount) AS revenue
+                FROM {$wpdb->prefix}wc_orders o
+                INNER JOIN {$wpdb->prefix}wc_orders_meta wm ON wm.order_id = o.id AND wm.meta_key = '_ywhs_wholesale_role' AND wm.meta_value <> ''
+                WHERE o.status = 'wc-completed' AND o.customer_id IN ($placeholders)
+                GROUP BY o.customer_id";
+        } else {
+            $sql_query = "SELECT customer.meta_value AS customer_id,COUNT(p.ID) AS completed_orders,SUM(total.meta_value) AS revenue
+                FROM {$wpdb->posts} p
+                INNER JOIN {$wpdb->postmeta} customer ON customer.post_id = p.ID AND customer.meta_key = '_customer_user'
+                INNER JOIN {$wpdb->postmeta} total ON total.post_id = p.ID AND total.meta_key = '_order_total'
+                INNER JOIN {$wpdb->postmeta} wholesale ON wholesale.post_id = p.ID AND wholesale.meta_key = '_ywhs_wholesale_role' AND wholesale.meta_value <> ''
+                WHERE p.post_type = 'shop_order' AND p.post_status = 'wc-completed' AND customer.meta_value IN ($placeholders)
+                GROUP BY customer.meta_value";
+        }
+
+        $sql_query = apply_filters( 'ywhs_wholesaler_stats_sql_query', $sql_query, $user_ids, $is_hpos );
+
+        $rows = $wpdb->get_results( $wpdb->prepare( $sql_query, ...$user_ids ), ARRAY_A );
+
+        foreach ( $rows as $row ) {
+            $stats[ (int) $row['customer_id'] ] = [
+                'completed_orders' => (int) $row['completed_orders'],
+                'revenue'          => (float) $row['revenue'],
+            ];
+        }
+
+        return $stats;
     }
 
     /**
@@ -151,14 +167,19 @@ class WholeSalersHelper {
      *
      * @param array $users The users data.
      * @param array $wholesale_slugs The wholesale role slugs.
+     * @param array $stats_map The stats map.
      * @return array The cleaned wholesalers data.
      */
-    public static function make_wholesaler_response( array $users, array $wholesale_slugs ): array {
+    public static function make_wholesaler_response( array $users, array $wholesale_slugs, array $stats_map ): array {
+
         $cleaned_users = array_map(
-            function ( \WP_User $user ) use ( $wholesale_slugs ) {
-                // TODO: Optimize N+1 Query
-                $stats               = self::get_wholesaler_order_stats( (int) $user->ID );
+            static function ( \WP_User $user ) use ( $wholesale_slugs, $stats_map ) {
                 $wholesale_role_slug = current( array_intersect( $user->roles, $wholesale_slugs ) );
+
+                $stats = $stats_map[ $user->ID ] ?? [
+                    'completed_orders' => 0,
+                    'revenue'          => 0,
+                ];
 
                 return [
                     'id'                   => (int) $user->ID,
@@ -170,12 +191,13 @@ class WholeSalersHelper {
                     'email'                => $user->user_email ?? '',
 
                     'wholesaleRoleSlug'    => $wholesale_role_slug ?? '',
-                    'completedOrdersCount' => $stats['completed_orders'],
-                    'wholesaleRevenue'     => $stats['revenue'],
+                    'completedOrdersCount' => (int) $stats['completed_orders'],
+                    'wholesaleRevenue'     => (float) $stats['revenue'],
                 ];
             },
             $users
         );
+
         return array_values( $cleaned_users );
     }
 }

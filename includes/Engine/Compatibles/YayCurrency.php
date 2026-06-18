@@ -4,6 +4,7 @@ namespace YayWholesaleB2B\Engine\Compatibles;
 use YayWholesaleB2B\Utils\SingletonTrait;
 
 use Yay_Currency\Helpers\YayCurrencyHelper;
+use Yay_Currency\Helpers\Helper;
 use Yay_Currency\Helpers\SupportHelper;
 use YayWholesaleB2B\Helpers\CustomerHelper;
 use YayWholesaleB2B\Helpers\PricingHelpers\ProductPricingHelper;
@@ -33,6 +34,8 @@ class YayCurrency {
 
         $this->apply_currency = YayCurrencyHelper::detect_current_currency();
 
+        // Convert Revenue from customer (WholesalerList Page)
+        add_filter( 'ywhs_wholesaler_stats_sql_query', [ $this, 'wholesaler_stats_sql_query' ], 10, 3 );
         // YayWholesale Hooks
         add_filter( 'ywhs_after_calc_price_additional_processed', [ $this, 'convert_currency_price' ], 10, 3 );
         add_filter( 'ywhs_display_wholesale_price_additional_processed', [ $this, 'convert_currency_price' ], 10, 3 );
@@ -164,6 +167,48 @@ class YayCurrency {
 
             return $price;
         }//end if
+    }
+
+    public function stats_extra_joins( $extra_joins, $is_hpos ) {
+        global $wpdb;
+        if ( ! $is_hpos ) {
+            return $extra_joins;
+        }
+        return $extra_joins . " LEFT JOIN {$wpdb->prefix}wc_orders_meta rate ON rate.order_id = o.id AND rate.meta_key = 'yay_currency_order_rate'";
+    }
+
+    public function wholesaler_revenue_sql( $revenue_sql, $is_hpos ) {
+        if ( ! $is_hpos ) {
+            return $revenue_sql;
+        }
+        $store_currency = esc_sql( Helper::default_currency_code() );
+        return "SUM(CASE WHEN o.currency = '{$store_currency}' THEN o.total_amount ELSE o.total_amount / GREATEST(1,CAST(rate.meta_value AS DECIMAL(20,8))) END)";
+    }
+
+    public function wholesaler_stats_sql_query( $sql_query, $user_ids, $is_hpos ) {
+        global $wpdb;
+        $placeholders   = implode( ',', array_fill( 0, count( $user_ids ), '%d' ) );
+        $store_currency = esc_sql( Helper::default_currency_code() );
+        if ( $is_hpos ) {
+            $sql_query = "SELECT o.customer_id,COUNT(o.id) AS completed_orders,SUM(CASE WHEN o.currency = '{$store_currency}' THEN o.total_amount ELSE o.total_amount / GREATEST(1,CAST(rate.meta_value AS DECIMAL(20,8))) END) AS revenue
+                FROM {$wpdb->prefix}wc_orders o
+                INNER JOIN {$wpdb->prefix}wc_orders_meta wm ON wm.order_id = o.id AND wm.meta_key = '_ywhs_wholesale_role' AND wm.meta_value <> ''
+                LEFT JOIN {$wpdb->prefix}wc_orders_meta rate ON rate.order_id = o.id AND rate.meta_key = 'yay_currency_order_rate'
+                WHERE o.status = 'wc-completed' AND o.customer_id IN ($placeholders)
+                GROUP BY o.customer_id";
+        } else {
+            $sql_query = "SELECT customer.meta_value AS customer_id,COUNT(DISTINCT p.ID) AS completed_orders,SUM(CASE WHEN currency.meta_value = '{$store_currency}' THEN CAST(total.meta_value AS DECIMAL(20,8)) ELSE CAST(total.meta_value AS DECIMAL(20,8))/ GREATEST( 1,CAST(rate.meta_value AS DECIMAL(20,8)))END) AS revenue
+                FROM {$wpdb->posts} p
+                INNER JOIN {$wpdb->postmeta} customer ON customer.post_id = p.ID AND customer.meta_key = '_customer_user'
+                INNER JOIN {$wpdb->postmeta} total ON total.post_id = p.ID AND total.meta_key = '_order_total'
+                INNER JOIN {$wpdb->postmeta} wholesale ON wholesale.post_id = p.ID AND wholesale.meta_key = '_ywhs_wholesale_role' AND wholesale.meta_value <> ''
+                LEFT JOIN {$wpdb->postmeta} currency ON currency.post_id = p.ID AND currency.meta_key = '_order_currency'
+                LEFT JOIN {$wpdb->postmeta} rate ON rate.post_id = p.ID AND rate.meta_key = 'yay_currency_order_rate'
+                WHERE p.post_type = 'shop_order' AND p.post_status = 'wc-completed' AND customer.meta_value IN ($placeholders)
+                GROUP BY customer.meta_value";
+        }
+
+        return $sql_query;
     }
 
     /* Convert the final price with YayCurrency */

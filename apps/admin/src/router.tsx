@@ -67,6 +67,11 @@ export function getManagerRouter() {
             },
             {
               path: ':subMenu',
+              loader: ({ params }) => {
+                if (!params.subMenu || !settingSubMenus.includes(params.subMenu)) {
+                  return redirect('/settings/general');
+                }
+              },
               element: <SettingsPage />,
             },
           ],
@@ -79,3 +84,13 @@ export function getManagerRouter() {
     },
   ]);
 }
+
+const settingSubMenus = [
+  'general',
+  'display',
+  'registration',
+  'registration-fields',
+  'emails',
+  'payment-roles',
+  'shipping-roles',
+];

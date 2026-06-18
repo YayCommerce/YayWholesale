@@ -16,10 +16,6 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export const getPagesForWholesaleStore = () => {
-  return window.yayWholesaleB2BAdmin.valid_wholesale_store_pages;
-};
-
 export const getPaymentMethodsInfo = () => {
   return window.yayWholesaleB2BMeta.wcMeta.payment_methods_info;
 };

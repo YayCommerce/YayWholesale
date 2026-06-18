@@ -10,6 +10,7 @@ import { UpgradeToProBadge } from '@/components/ui/custom/upgrate-to-pro';
 import { Field, FieldContent, FieldError, FieldLabel } from '@/components/ui/field';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
+import { useAllPagesQuery } from '@/lib/queries/pages.queries';
 
 const isWholesaleStoreExperimental = window.yayWholesaleB2BMeta.wholesaleMeta.experimentals.wholesale_store_page;
 
@@ -17,6 +18,7 @@ export default function GeneralTab() {
   const { control } = useFormContext<Settings>();
 
   const { data: activeRoles } = useActiveRolesQuery();
+  const { data: allPages } = useAllPagesQuery();
 
   const rolesList = useMemo(() => {
     return (
@@ -27,9 +29,13 @@ export default function GeneralTab() {
     );
   }, [activeRoles]);
 
-  const validPagesforWholesaleStore = getPagesForWholesaleStore();
-
-  // const roleSlugs = useMemo(() => new Set(rolesList.map((r) => r.slug)), [rolesList]);
+  const validPagesforWholesaleStore = useMemo(() => {
+    if (!allPages) {
+      return [];
+    }
+    const excluded = window.yayWholesaleB2BAdmin.wc_page_ids;
+    return allPages.pages.flatMap((pageGroup) => pageGroup.pages).filter((page) => !excluded.includes(page.id));
+  }, [allPages]);
 
   return (
     <div className="flex flex-col gap-4">
@@ -84,7 +90,7 @@ export default function GeneralTab() {
                   <SelectItem value="inherit">{__('WooCommerce shop page', 'yay-wholesale-b2b')}</SelectItem>
                   {validPagesforWholesaleStore.map((page) => (
                     <SelectItem key={page.id} value={String(page.id)}>
-                      {page.title}
+                      {page.title.rendered}
                     </SelectItem>
                   ))}
                 </SelectContent>

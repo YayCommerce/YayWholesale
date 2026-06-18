@@ -1,5 +1,4 @@
 import { FieldErrors } from 'react-hook-form';
-import { useNavigate } from 'react-router';
 
 import { Role } from '@/lib/schema/roles.schema';
 import { Settings } from '@/lib/schema/settings.schema';
@@ -80,21 +79,15 @@ export function makeDefaultSettings(settings: Settings, roles: Role[]): Settings
   return defaultValues;
 }
 
-export function getFirstErrorSection() {
-  const navigate = useNavigate();
+const ERROR_SECTIONS = [
+  'general',
+  'display',
+  'registration',
+  'registration_fields',
+  'payment_roles',
+  'shipping_roles',
+] satisfies (keyof Settings)[];
 
-  return (errors: FieldErrors<Settings>) => {
-    const errorKeys = [
-      'general',
-      'display',
-      'registration',
-      'registration_fields',
-      'payment_roles',
-      'shipping_roles',
-    ] satisfies (keyof Settings)[];
-    const firstErrorKey = errorKeys.find((errorKey) => !!errors?.[errorKey]);
-    console.log('firstErrorKey', firstErrorKey);
-    if (!firstErrorKey) return;
-    navigate(`/settings/${firstErrorKey.replace('_', '-')}`);
-  };
+export function getFirstErrorSection(errors: FieldErrors<Settings>) {
+  return ERROR_SECTIONS.find((key) => !!errors[key]);
 }
