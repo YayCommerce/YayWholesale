@@ -32,8 +32,6 @@ class Pricing {
         add_action( 'woocommerce_before_calculate_totals', [ $this, 'before_calculate_totals' ], 103 );
 
         // add_filter( 'woocommerce_cart_item_price', [ $this, 'cart_item_price' ], 999, 2 );
-
-        add_action( 'woocommerce_checkout_order_processed', [ $this, 'ywhs_checkout_wholesale_order_handling' ], 999, 3 );
     }
 
     /**
@@ -404,27 +402,5 @@ class Pricing {
         $color = $this->settings['display']['wholesale_price_color'] ?? '#333333';
         return '<span class="yay-wholesale-label">' . esc_html( $label ) . ':</span> '
                 . '<span style="color:' . esc_attr( $color ) . '">' . $discounted_price_html . '</span>';
-    }
-
-    /**
-     * Run when order has just been placed from the checkout hook
-     *
-     * @param int       $order_id The order object.
-     * @param array     $posted_data the data object.
-     * @param \WC_Order $order The order object.
-     */
-    public function ywhs_checkout_wholesale_order_handling( $order_id, $posted_data, $order ) {
-        $customer       = get_user_by( 'ID', $order->get_customer_id() );
-        $wholesale_role = CustomerHelper::get_wholesale_role( $customer );
-        if ( ! isset( $wholesale_role ) ) {
-            return;
-        }
-
-        $wholesale_role['minOrderAmount']   = RequirementHelper::get_min_order_amount( $wholesale_role );
-        $wholesale_role['minOrderQuantity'] = RequirementHelper::get_min_order_quantity( $wholesale_role );
-
-        $is_discounted = RequirementHelper::is_order_meet_requirement( $order, $wholesale_role );
-
-        OrderPricingHelper::handle_order( $order, $wholesale_role, $is_discounted );
     }
 }

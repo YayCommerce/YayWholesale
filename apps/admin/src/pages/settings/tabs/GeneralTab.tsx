@@ -4,7 +4,8 @@ import { __ } from '@wordpress/i18n';
 
 import { useActiveRolesQuery } from '@/lib/queries/roles.queries';
 import type { Settings } from '@/lib/schema/settings.schema';
-import { getPagesForWholesaleStore, isPro } from '@/lib/utils';
+import { isPro } from '@/lib/utils';
+import { Badge } from '@/components/ui/badge';
 import { UpgradeToProBadge } from '@/components/ui/custom/upgrate-to-pro';
 import { Field, FieldContent, FieldError, FieldLabel } from '@/components/ui/field';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -75,7 +76,7 @@ export default function GeneralTab() {
                   {__('Set your wholesale shop page for wholesaler logged in', 'yay-wholesale-b2b')}
                 </p>
               </div>
-              <Select value={field.value ?? 'inherit'} onValueChange={field.onChange} disabled={!isPro}>
+              <Select value={String(field.value) || 'inherit'} onValueChange={field.onChange} disabled={!isPro}>
                 <SelectTrigger className="min-w-40">
                   <SelectValue placeholder={__('Select your page', 'yay-wholesale-b2b')} />
                 </SelectTrigger>

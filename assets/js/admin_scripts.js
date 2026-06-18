@@ -128,4 +128,29 @@
       }
     });
   }
+
+  // Order creating behavior
+  let orderCustomer = $("#customer_user").val();
+
+  $("#woocommerce-order-items").on(
+    "woocommerce_order_meta_box_add_items_ajax_data woocommerce_order_meta_box_recalculate_ajax_data woocommerce_order_meta_box_save_line_items_ajax_data",
+    (event, data) => {
+      const customer = $("#customer_user").val();
+
+      if (customer) {
+        data.ywhs_customer = customer;
+      }
+
+      return data;
+    }
+  );
+
+  $("#customer_user").on("change", (event) => {
+    customerHasChanged = $("#customer_user").val() !== orderCustomer;
+    orderCustomer = $("#customer_user").val();
+
+    if ($("#woocommerce-order-items #order_line_items tr").length > 0) {
+      $("#woocommerce-order-items button.calculate-action").trigger("click");
+    }
+  });
 })(jQuery);

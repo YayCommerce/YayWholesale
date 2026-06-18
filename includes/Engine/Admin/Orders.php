@@ -16,16 +16,25 @@ defined( 'ABSPATH' ) || exit;
 class Orders {
     use SingletonTrait;
 
-    protected $is_processing_order_calc;
+    protected bool $is_processing_order_calc;
 
     protected function __construct() {
 
         $this->is_processing_order_calc = false;
 
-        add_action( 'woocommerce_order_before_calculate_totals', [ $this, 'ywhs_before_calculate_order' ], 999, 2 );
+        // Admin update item | recalculate order
+        add_action( 'woocommerce_order_before_calculate_totals', [ $this, 'ajax_update_recalculate_in_admin_order' ], 999, 2 );
 
+        // Admin add item
+        add_filter( 'woocommerce_ajax_order_item', [ $this, 'ajax_add_item_in_admin_order' ], 999, 3 );
+
+        // When order is created then handle to update meta data
+        add_action( 'woocommerce_new_order', [ $this,'order_meta_handle_after_saved' ], 999, 2 );
+
+        // Tax disabled
         add_filter( 'woocommerce_order_is_vat_exempt', [ $this, 'ywhs_tax_enabled_handler' ], 999, 2 );
 
+        // Admin order filter + display order type field
         add_action( 'woocommerce_order_list_table_restrict_manage_orders', [ $this, 'ywhs_admin_wc_orders_wholesale_filter_html' ], 10, 1 );
 
         add_filter( 'woocommerce_order_query_args', [ $this, 'ywhs_admin_wc_orders_wholesale_filtered' ], 999, 1 );
@@ -34,59 +43,51 @@ class Orders {
 
         add_action( 'woocommerce_shop_order_list_table_custom_column', [ $this, 'ywhs_shop_order_custom_column' ], 999, 2 );
 
+        // Email
         add_action( 'woocommerce_order_status_changed', [ $this, 'ywhs_send_wholesale_order_email' ], 999, 3 );
     }
 
     /**
-     * Set the order data discounted when the admin recalculates orders or new order has just created
+     * Set the order data discounted when the admin recalculates or edit orders
      *
-     * @param bool                     $and_taxes the taxes included flag.
-     * @param WC_Order|WC_Order_Refund $order The order object.
+     * @param bool                       $and_taxes the taxes included flag.
+     * @param \WC_Order|\WC_Order_Refund $order The order object.
      */
-    public function ywhs_before_calculate_order( $and_taxes, $order ) {
-        if ( $this->is_processing_order_calc ) {
-            return;
-        }
-
-        $this->is_processing_order_calc = true;
-
-        if ( $order instanceof \WC_Order ) {
-            $customer           = get_user_by( 'ID', $order->get_customer_id() );
-            $wholesale_role     = CustomerHelper::get_wholesale_role( $customer );
-            $setting            = SettingsHelper::get_settings();
-            $is_disabled_coupon = $setting['general']['disable_coupon'] ?? false;
-            $items              = [];
-
-            if ( ! isset( $wholesale_role ) ) {
+    public function ajax_update_recalculate_in_admin_order( $and_taxes, $order ) {
+        // This is only run in admin order editor context
+        if ( check_ajax_referer( 'calc-totals', 'security', false ) || check_ajax_referer( 'order-item', 'security', false ) ) {
+            // Only handle when order is WC_Order
+            if ( ! $order instanceof \WC_Order ) {
                 return;
             }
 
-            if ( is_admin() ) {
-                // If admin is recalculating, then convert with order
-                $wholesale_role['minOrderAmount'] = apply_filters( 'ywhs_convert_price_from_order', $wholesale_role['minOrderAmount'], $order, null );
-            } else {
-                $wholesale_role['minOrderAmount'] = RequirementHelper::get_min_order_amount( $wholesale_role );
+            if ( $this->is_processing_order_calc ) {
+                return;
             }
 
-            $wholesale_role['minOrderQuantity'] = RequirementHelper::get_min_order_quantity( $wholesale_role );
+            $this->is_processing_order_calc = true;
 
-            $is_discounted = RequirementHelper::is_order_meet_requirement( $order, $wholesale_role );
+            OrderPricingHelper::update_and_recalculate_order( $order );
 
-            $this->calculate_price_of_items(
-                $order,
-                $is_discounted,
-                $is_disabled_coupon,
-                $wholesale_role,
-                $items
-            );
+            $this->is_processing_order_calc = false;
+        }
+    }
 
-            // Update meta data for filter
-            if ( isset( $_SERVER['REQUEST_METHOD'] ) && 'POST' === $_SERVER['REQUEST_METHOD'] ) {
-                OrderPricingHelper::handle_order( $order, $wholesale_role, $is_discounted );
-            }
-        }//end if
-        $this->is_processing_order_calc = false;
-    }//end ywhs_before_calculate_order()
+    /**
+     * Update the price of item when it's initially added
+     *
+     * @param \WC_Order_Item             $item The item added.
+     * @param int                        $item_id The item id.
+     * @param \WC_Order|\WC_Order_Refund $order The order object.
+     * @return \WC_Order_Item
+     */
+    public function ajax_add_item_in_admin_order( $item, $item_id, \WC_Order $order ) {
+        check_ajax_referer( 'order-item', 'security' );
+
+        OrderPricingHelper::update_and_recalculate_order( $order );
+
+        return array_first( array_filter( $order->get_items(), fn( $value ) =>  $value->get_id() === $item_id ) ) ?? $item;
+    }
 
     /**
      * Handle the status of tax exemption
@@ -120,80 +121,6 @@ class Orders {
 
         return false;
     }
-
-    /**
-     * Calculate the final price and tax of order items
-     *
-     * @param \WC_Order $order the order object.
-     * @param bool      $is_discounted the status of order that meet the discount requirement.
-     * @param bool      $is_disabled_coupon the disabled coupon setting.
-     * @param array     $wholesale_role wholesale role of owner.
-     * @param array     $items the items array to statistic items in order.
-     */
-    protected function calculate_price_of_items(
-        \WC_Order $order,
-        bool $is_discounted,
-        bool $is_disabled_coupon,
-        array $wholesale_role,
-        array &$items
-    ) {
-        $coupons         = $order->get_items( 'coupon' );
-        $extra_price_map = $order->get_meta( '_ywhs_extra_price_map' );
-
-        if ( ! is_array( $extra_price_map ) ) {
-            $extra_price_map = [];
-        }
-
-        // Handeling price and tax
-        foreach ( $order->get_items() as $item ) {
-            if ( ! $item instanceof \WC_Order_Item_Product ) {
-                continue;
-            }
-
-            $quantity = $item->get_quantity();
-            $product  = $item->get_product();
-            if ( is_admin() ) {
-                $extra    = $extra_price_map[ $item->get_id() ] ?? 0;
-                $quantity = $item->get_quantity();
-
-                if ( $is_discounted ) {
-                    $price = OrderPricingHelper::calculate_wholesale_price_from_order( $order, $extra, $product, $wholesale_role, $quantity );
-                } else {
-                    $price = apply_filters( 'ywhs_convert_price_from_order', $product->get_price( 'edit' ), $order, $product );
-                    $price = $price + $extra;
-                }
-
-                $new_price = wc_get_price_excluding_tax( $product, [ 'price' => $price ] );
-
-                $item->set_subtotal( $new_price * $quantity );
-                $item->set_total( $new_price * $quantity );
-            }//end if
-
-            $items[] = $item->get_name() . ' x ' . $quantity;
-        }//end foreach
-
-        // Update the shipping meta data
-        foreach ( $order->get_items( 'shipping' ) as $shipping ) {
-            $shipping->update_meta_data( 'Items', implode( ', ', $items ) );
-        }
-
-        if ( is_admin() ) {
-            // Recalculate the tax
-            $order->calculate_taxes();
-
-            // Re-apply coupon
-            $order->remove_order_items( 'coupon' );
-            if ( ! $is_discounted || ! $is_disabled_coupon ) {
-                foreach ( $coupons as $coupon_item ) {
-                    /** @var WC_Order_Item_Coupon $coupon_item */
-
-                    $code = $coupon_item->get_code();
-                    $order->apply_coupon( $code );
-
-                }
-            }
-        }
-    }//end calculate_price_of_items()
 
     /**
      * Add the wholesale and retail order filter to admin WC order list page
@@ -324,5 +251,28 @@ class Orders {
             $order->update_meta_data( '_ywhs_wholesale_email_trigger', ++$email_trigger );
             $order->save_meta_data();
         }
+    }
+
+    /**
+     * Run when order has just been placed from the checkout hook
+     *
+     * @param int       $order_id The order object.
+     * @param array     $posted_data the data object.
+     * @param \WC_Order $order The order object.
+     */
+    public function order_meta_handle_after_saved( $order_id, $order ) {
+        $customer       = get_user_by( 'ID', $order->get_customer_id() );
+        $wholesale_role = CustomerHelper::get_wholesale_role( $customer );
+        if ( ! isset( $wholesale_role ) ) {
+            return;
+        }
+
+        $wholesale_role['minOrderAmount']   = RequirementHelper::get_min_order_amount( $wholesale_role );
+        $wholesale_role['minOrderQuantity'] = RequirementHelper::get_min_order_quantity( $wholesale_role );
+
+        $is_discounted = RequirementHelper::is_order_meet_requirement( $order, $wholesale_role );
+
+        OrderPricingHelper::handle_order_type_meta( $order, $wholesale_role, $is_discounted );
+        OrderPricingHelper::handle_order_item_extra_price_map( $order, $wholesale_role, $is_discounted );
     }
 }
