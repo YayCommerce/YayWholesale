@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { __ } from '@wordpress/i18n';
+
 import { cn } from '@/lib/utils';
 import { HeaderMenu } from './HeaderMenu';
 
@@ -19,7 +19,7 @@ export default function Header() {
         <img
           src={`${window.yayWholesaleB2BMeta.wholesaleMeta.assetsUrl}/images/favicon.svg`}
           alt="YayWholesale"
-          className="size-12.5 "
+          className="size-12.5"
         />
       </div>
 

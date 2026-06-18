@@ -1,5 +1,3 @@
-import { __ } from '@wordpress/i18n';
-
 import RoleForm from './RoleForm';
 import RolesList from './RolesList';
 

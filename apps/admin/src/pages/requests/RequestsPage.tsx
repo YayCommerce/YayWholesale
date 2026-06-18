@@ -1,5 +1,3 @@
-import { __ } from '@wordpress/i18n';
-
 import RequestsForm from './RequestsForm';
 import RequestsList from './RequestsList';
 

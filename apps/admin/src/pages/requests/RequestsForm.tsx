@@ -1,5 +1,4 @@
 import { useMatch, useNavigate, useParams } from 'react-router';
-import { __ } from '@wordpress/i18n';
 
 import { useSingleRequestQuery } from '@/lib/queries/requests.queries';
 import { Sheet, SheetContent } from '@/components/ui/sheet';

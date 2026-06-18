@@ -2,15 +2,14 @@ import { useMemo } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { __ } from '@wordpress/i18n';
 
+import { useAllPagesQuery } from '@/lib/queries/pages.queries';
 import { useActiveRolesQuery } from '@/lib/queries/roles.queries';
 import type { Settings } from '@/lib/schema/settings.schema';
 import { isPro } from '@/lib/utils';
-import { Badge } from '@/components/ui/badge';
 import { UpgradeToProBadge } from '@/components/ui/custom/upgrate-to-pro';
 import { Field, FieldContent, FieldError, FieldLabel } from '@/components/ui/field';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
-import { useAllPagesQuery } from '@/lib/queries/pages.queries';
 
 const isWholesaleStoreExperimental = window.yayWholesaleB2BMeta.wholesaleMeta.experimentals.wholesale_store_page;
 

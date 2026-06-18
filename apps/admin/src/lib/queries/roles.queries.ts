@@ -11,7 +11,7 @@ import {
   updateRole,
   updateRoleStatus,
 } from '@/lib/api/roles.api';
-import { Role, RoleFormValues } from '@/lib/schema/roles.schema';
+import { RoleFormValues } from '@/lib/schema/roles.schema';
 import { SETTINGS_QUERIES, useSettingsQuery } from './settings.queries';
 
 /** Options */

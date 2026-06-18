@@ -1,4 +1,4 @@
-import { ComponentProps, useMemo } from 'react';
+import { ComponentProps } from 'react';
 import { NavLink } from 'react-router';
 import { __, _n, sprintf } from '@wordpress/i18n';
 
@@ -67,7 +67,7 @@ function CustomMenuItem({ className, ...props }: ComponentProps<typeof HeaderNav
   );
 }
 
-function PendingRequestCount({ className, ...props }: ComponentProps<typeof Badge>) {
+function PendingRequestCount({ className }: ComponentProps<typeof Badge>) {
   const { data: requestsCount } = useCountByStatusQuery();
 
   return (

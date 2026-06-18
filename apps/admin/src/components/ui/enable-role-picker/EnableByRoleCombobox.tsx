@@ -1,7 +1,7 @@
 import { useId } from 'react';
 import { __ } from '@wordpress/i18n';
 
-import { useActiveRolesQuery, useAllRolesQuery } from '@/lib/queries/roles.queries';
+import { useAllRolesQuery } from '@/lib/queries/roles.queries';
 import { EnableByRole } from '@/lib/schema/common.schema';
 import { useUncontrolled } from '@/hooks/useUncontrolled';
 import {

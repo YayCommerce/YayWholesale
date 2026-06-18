@@ -67,7 +67,6 @@ export function EditRequestForm({ request }: { request: Request }) {
     if (!request) {
       return phoneFields;
     }
-    const fields = request.fields;
 
     request.fields.forEach((field) => {
       if (isPhoneField(field)) {
@@ -128,7 +127,7 @@ export function EditRequestForm({ request }: { request: Request }) {
           />
         </div>
 
-        {phoneFields.map((field, index) => {
+        {phoneFields.map((field) => {
           return (
             <div className="flex flex-col gap-2">
               <Label>{field.label}</Label>
@@ -142,7 +141,7 @@ export function EditRequestForm({ request }: { request: Request }) {
           <Textarea className="h-fit min-h-25 resize-none" readOnly value={request.message} onChange={() => {}} />
         </div>
 
-        {request.fields.map((field, index) => {
+        {request.fields.map((field) => {
           const handleDataByType = () => {
             const value = field.value;
             if (value.length == 0) {

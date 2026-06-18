@@ -1,4 +1,3 @@
-import { useRef } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { __ } from '@wordpress/i18n';
 
@@ -8,7 +7,6 @@ import { CopyButton } from '@/components/ui/copy-button';
 import { WholeSaleToolTip } from '@/components/ui/custom/WholeSaleToolTip';
 import { Field, FieldContent, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
-import { Separator } from '@/components/ui/separator';
 import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 
