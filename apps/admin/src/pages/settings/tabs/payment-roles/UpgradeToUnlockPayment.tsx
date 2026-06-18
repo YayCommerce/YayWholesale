@@ -12,7 +12,7 @@ export function UpgradeToUnlockPayment() {
       <TableCell colSpan={2} className="h-24 text-center">
         <Empty className="my-5">
           <EmptyHeader>
-            <EmptyMedia variant="icon" className="h-15 w-15 rounded-full">
+            <EmptyMedia variant="icon" className="size-15  rounded-full">
               <WalletCards className="min-h-6 min-w-6" />
             </EmptyMedia>
             <EmptyTitle className="flex items-center gap-1.5 font-bold">

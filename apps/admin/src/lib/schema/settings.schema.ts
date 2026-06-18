@@ -3,6 +3,13 @@ import { __ } from '@wordpress/i18n';
 
 import { enableByRoleSchema } from './common.schema';
 
+export const registrationSettingsSchema = z.object({
+  moderate: z.boolean(),
+  wholesale_registration_page: z.string(),
+  submit_button_label: z.string(),
+  successful_registration_message: z.string(),
+});
+
 const fieldSchema = z.object({
   id: z.string(),
   label: z
@@ -20,13 +27,6 @@ const fieldSchema = z.object({
   isDefault: z.boolean(),
   isRequired: z.boolean(),
   isHidden: z.boolean(),
-});
-
-// TODO v1.1: update settings schema. move title, description to wcMeta
-
-const roleRelatedSettingSchema = z.object({
-  slug: z.string(),
-  name: z.string(),
 });
 
 const paymentMethodSettingSchema = z.object({
@@ -51,15 +51,15 @@ export const settingsFormSchema = z.object({
   }),
   display: z.object({
     price_format: z.enum(['retail-and-wholesale', 'wholesale-only', 'retail-only']),
+
+    // TODO v1.2
+    // wholesaler_price_format: z.enum(['retail-and-wholesale', 'wholesale-only']),
+    // retailer_price_format: z.enum(['retail-and-wholesale', 'retail-only']),
+
     wholesale_price_label: z.string(),
     wholesale_price_color: z.string(),
   }),
-  registration: z.object({
-    moderate: z.boolean(),
-    wholesale_registration_page: z.string(),
-    submit_button_label: z.string(),
-    successful_registration_message: z.string(),
-  }),
+  registration: registrationSettingsSchema,
   registration_fields: z.object({
     fields: z.array(fieldSchema).superRefine((fields, ctx) => {
       const existedLabels = new Set<string>();
@@ -82,4 +82,3 @@ export const settingsFormSchema = z.object({
 });
 
 export type Settings = z.infer<typeof settingsFormSchema>;
-export type RoleRelatedSetting = z.infer<typeof roleRelatedSettingSchema>;

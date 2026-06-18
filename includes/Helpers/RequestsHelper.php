@@ -20,6 +20,8 @@ class RequestsHelper {
     public const STATUS_APPROVED = 'approved';
     public const STATUS_REJECTED = 'rejected';
 
+    public const USER_META_REQUEST = 'ywhs_user_request_approved';
+
     /**
      * Insert new Wholesale request.
      *
@@ -396,21 +398,21 @@ class RequestsHelper {
      * @return void|WP_Error
      */
     public static function approve_request( int $request_id, string $role_slug ) {
-        $request = get_post( $request_id );
+        $request   = get_post( $request_id );
+        $post_meta = get_post_meta( $request_id, self::REQUEST_META_DATA, true );
+        $message   = get_post_meta( $request_id, self::REQUEST_META_MESSAGE, true );
+        $user_id   = 0;
 
         if ( $request->post_author < 1 ) {
             $display_name = get_post_meta( $request_id, self::REQUEST_META_DISPLAY_NAME, true );
-            $post_meta    = get_post_meta( $request_id, self::REQUEST_META_DATA, true );
             $email        = get_post_meta( $request_id, self::REQUEST_META_EMAIL, true );
             $password     = wp_generate_password( 12, true, true );
 
             $request_user = wp_insert_user(
                 [
-                    'user_login'   => sanitize_key( $display_name ),
+                    'user_login'   => sanitize_key( remove_accents( $display_name ) ),
                     'user_pass'    => $password,
                     'display_name' => $display_name,
-                    'first_name'   => $post_meta['First Name'] ?? '',
-                    'last_name'    => $post_meta['Last Name'] ?? '',
                     'user_email'   => $email,
                     'role'         => $role_slug,
                 ]
@@ -419,6 +421,10 @@ class RequestsHelper {
             if ( is_wp_error( $request_user ) ) {
                 return $request_user;
             }
+
+            $user_id = $request_user;
+
+            update_user_meta( $user_id, 'description', $message );
 
             $result = wp_update_post(
                 [
@@ -431,15 +437,21 @@ class RequestsHelper {
                 return $result;
             }
         } else {
-
             $user = get_user_by( 'ID', $request->post_author );
             if ( $user === false ) {
                 return new WP_Error( 'not_found', 'User not found', [ 'status' => 404 ] );
             }
 
+            $user_id = $user->ID;
+
             RolesHelper::remove_ywhs_role_from_user( $user );
             $user->add_role( $role_slug );
         }//end if
+
+        if ( $user_id > 0 ) {
+            self::update_billing_data_for_user( $user_id, $post_meta );
+            update_user_meta( $user_id, self::USER_META_REQUEST, $request_id );
+        }
 
         update_post_meta( $request_id, self::REQUEST_META_STATUS, self::STATUS_APPROVED );
         do_action( 'ywhs_account_registration_approved', $request_id );
@@ -504,5 +516,73 @@ class RequestsHelper {
         $query = new WP_Query( $args );
 
         return $query->post_count;
+    }
+
+    protected static function update_billing_data_for_user( int $user_id, array $request_data ) {
+        $customer    = new \WC_Customer( $user_id );
+        $updated_map = [];
+        foreach ( $request_data as $key => $val ) {
+            if ( 'first_name' === $val['key'] ) {
+                $customer->set_first_name( $val['value'] );
+                $customer->set_billing_first_name( $val['value'] );
+            }
+
+            if ( 'last_name' === $val['key'] ) {
+                $customer->set_last_name( $val['value'] );
+                $customer->set_billing_last_name( $val['value'] );
+            }
+
+            if ( ! $val['is_default'] ) {
+                if ( str_contains( strtolower( $key ), 'company name' ) &&
+                ! in_array( 'company', $updated_map, true ) ) {
+                    $customer->set_billing_company( $val['value'] );
+                    $updated_map[] = 'company';
+                }
+
+                if ( str_contains( strtolower( $key ), 'address' ) &&
+                ! str_contains( 'email', strtolower( $key ) ) &&
+                ! in_array( 'address', $updated_map, true ) ) {
+                    $customer->set_billing_address( $val['value'] );
+                    $updated_map[] = 'address';
+                }
+
+                if ( ( str_contains( strtolower( $key ), 'phone' ) || 'phone' === $val['type'] ) &&
+                ! in_array( 'phone', $updated_map, true ) ) {
+                    $customer->set_billing_phone( $val['value'] );
+                    $updated_map[] = 'phone';
+                }
+
+                if ( str_contains( strtolower( $key ), 'city' ) &&
+                ! in_array( 'city', $updated_map, true ) ) {
+                    $customer->set_billing_city( $val['value'] );
+                    $updated_map[] = 'city';
+                }
+            }//end if
+        }//end foreach
+
+        $customer->save();
+    }
+
+    public static function get_the_last_approved_request_id_of_user( int $user_id ) {
+        $args = [
+            'post_type'      => self::REQUEST_POST_TYPE,
+            'author'         => $user_id,
+            'posts_per_page' => 1,
+            'orderby'        => 'modified',
+            'order'          => 'DESC',
+            'fields'         => 'ids',
+            'meta_query'     => [
+                [
+                    'key'     => self::REQUEST_META_STATUS,
+                    'value'   => self::STATUS_APPROVED,
+                    'compare' => '==',
+                    'type'    => 'CHAR',
+                ],
+            ],
+        ];
+
+        $query = new WP_Query( $args );
+
+        return $query->posts[0] ?? 0;
     }
 }

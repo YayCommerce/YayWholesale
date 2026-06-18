@@ -31,14 +31,6 @@ jobs:
       - name: Install Playwright browsers
         run: pnpm test:e2e:install
 
-      - name: Cache wp-env downloads
-        uses: actions/cache@v4
-        with:
-          path: /home/runner/wp-env
-          key: wp-env-${{ hashFiles('tests/e2e/.wp-env.single.json') }}
-          restore-keys: |
-            wp-env-
-
       - name: Start wp-env
         run: pnpm env:start:single
         env:

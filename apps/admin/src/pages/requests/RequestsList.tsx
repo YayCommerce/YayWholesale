@@ -281,7 +281,7 @@ export default function RequestsList() {
                 </span>
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" sideOffset={9} className="w-fit min-w-[20px] p-1">
+            <DropdownMenuContent align="start" sideOffset={9} className="w-fit min-w-5 p-1">
               <DropdownMenuSub>
                 <DropdownMenuSubTrigger
                   className="w-35"
@@ -322,7 +322,7 @@ export default function RequestsList() {
                 <Button
                   size="icon"
                   variant="ghost"
-                  className="hover:text-destructive text-muted-foreground h-8 w-8 hover:bg-transparent hover:shadow-sm"
+                  className="hover:text-destructive text-muted-foreground size-8  hover:bg-transparent hover:shadow-sm"
                   onClick={() => setOpenDeleteDialog(true)}
                 >
                   <DeleteIcon className="size-4" />

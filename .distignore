@@ -6,6 +6,7 @@
 .gitignore
 .distignore
 .env*
+.nvmrc
 node_modules/
 
 phpcs.xml

@@ -66,7 +66,7 @@ export default function TopWholesaleCustomers({ reportQuery, startDate, endDate 
                       <div className="flex items-center gap-3">
                         <Avatar
                           className={cn(
-                            'h-8 w-8',
+                            'size-8 ',
                             reportData.topWholesalers.indexOf(data) < 3 &&
                               'border-ring ring-1 ring-[#F9BD09] ring-offset-1',
                           )}

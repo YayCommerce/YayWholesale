@@ -1,7 +1,6 @@
 import ky, { Options, ResponsePromise } from 'ky';
-import { __ } from '@wordpress/i18n';
 
-let _ky = ky.create({
+const _ky = ky.create({
   prefixUrl: window.yayWholesaleB2BMeta.wpMeta.restRoot,
   headers: {
     'X-WP-Nonce': window.yayWholesaleB2BMeta.wpMeta.restNonce,
@@ -10,6 +9,7 @@ let _ky = ky.create({
     afterResponse: [
       async (request, options, response) => {
         if (response.status === 403) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const body: any = await response.json();
 
           if (body?.code === 'rest_cookie_invalid_nonce') {

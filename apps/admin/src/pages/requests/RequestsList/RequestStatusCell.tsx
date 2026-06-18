@@ -63,7 +63,7 @@ export function RequestStatusCell({ request }: { request: Request }) {
               <RequestsStatusIcon status={request.status} />
               {request.status}
             </span>
-            <ChevronDown className="text-muted-foreground/70 mt-0.5 h-6 w-6 cursor-pointer" />
+            <ChevronDown className="text-muted-foreground/70 mt-0.5 size-6  cursor-pointer" />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent className="w-40">

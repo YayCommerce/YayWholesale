@@ -1,4 +1,4 @@
-import { Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { Outlet, useLocation, useNavigate } from 'react-router';
 
 import { Toaster } from '@/components/ui/sonner';
 import Footer from '@/components/layout/Footer';

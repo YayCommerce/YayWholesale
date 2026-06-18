@@ -8,7 +8,7 @@ export function WholesalerAvatarCell({ wholesaler }: { wholesaler: Wholesaler })
 
   return (
     <div className="flex items-center gap-3">
-      <Avatar className="h-9.5 w-9.5">
+      <Avatar className="size-9.5 ">
         <a href={userLink} target="_blank" rel="noopener noreferrer">
           <AvatarImage src={avatar} alt={name} />
           <AvatarFallback>{name.charAt(0)}</AvatarFallback>

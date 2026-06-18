@@ -52,10 +52,10 @@ const DashboardDatePicker: FC<DashboardDatePickerProps> = ({ dateRange, setDateR
               <CalendarIcon />
               {displayDateRange}
             </div>
-            <ChevronDown className="text-muted-foreground/70 h-6 w-6 cursor-pointer" />
+            <ChevronDown className="text-muted-foreground/70 size-6  cursor-pointer" />
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="h-fit w-fit px-1 sm:-translate-x-5 lg:-translate-x-6" align="start">
+        <PopoverContent className="size-fit  px-1 sm:-translate-x-5 lg:-translate-x-6" align="start">
           <Calendar
             mode="range"
             defaultMonth={previewDateRange?.from}

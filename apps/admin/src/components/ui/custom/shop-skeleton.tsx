@@ -5,7 +5,7 @@ import { cn } from '@/lib/utils';
 function ProductImageSkeleton({ className = '', ...props }) {
   return (
     <div className="relative overflow-hidden rounded-md">
-      <div className="text-muted-foreground absolute top-2.5 left-2.5 z-10 flex h-6 w-fit items-center rounded-xs bg-white px-[9px] py-[3px] text-[14px] leading-3.5 font-semibold">
+      <div className="text-muted-foreground absolute top-2.5 left-2.5 z-10 flex h-6 w-fit items-center rounded-xs bg-white px-2.25 py-0.75 text-sm/3.5  font-semibold">
         {__('Sale', 'yay-wholesale-b2b')}
       </div>
       <svg
@@ -15,7 +15,7 @@ function ProductImageSkeleton({ className = '', ...props }) {
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
         data-slot="skeleton"
-        className={cn('bg-muted h-[260px] w-[250px] text-white', className)}
+        className={cn('bg-muted h-65 w-62.5 text-white', className)}
         {...props}
       >
         <path
@@ -60,7 +60,7 @@ function AddToCartSkeleton({ className = '', width = '134', height = '34', ...pr
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       data-slot="skeleton"
-      className={cn('bg-muted h-[34px] w-[134px] rounded-[6px] text-white', className)}
+      className={cn('bg-muted h-8.5 w-33.5 rounded-[6px] text-white', className)}
       {...props}
     >
       <rect width={width} height={height} rx="6" fill="var(--bg-color)" />
