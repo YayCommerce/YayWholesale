@@ -208,7 +208,8 @@ export default function RoleFormContent({ slug }: FormContentProps) {
               </FieldLabel>
               <FieldContent className="flex flex-col gap-4">
                 <Segmented
-                  className="w-full rounded-md"
+                  shape="square"
+                  className="w-full"
                   value={field.value?.enabled ?? 'enable-all'}
                   onValueChange={(value) => {
                     if (value && value.length > 0) {
@@ -217,10 +218,10 @@ export default function RoleFormContent({ slug }: FormContentProps) {
                   }}
                   disabled={!isPro}
                 >
-                  <SegmentedItem value="enable-all" className="w-1/2 rounded-md!">
+                  <SegmentedItem value="enable-all" className="w-1/2">
                     {__('Enable All', 'yay-wholesale-b2b')}
                   </SegmentedItem>
-                  <SegmentedItem value="enable-selected-methods" className="w-1/2 rounded-md!">
+                  <SegmentedItem value="enable-selected-methods" className="w-1/2">
                     {__('Enable Selected', 'yay-wholesale-b2b')}
                   </SegmentedItem>
                 </Segmented>
@@ -276,7 +277,8 @@ export default function RoleFormContent({ slug }: FormContentProps) {
               </FieldLabel>
               <FieldContent className="flex flex-col gap-4">
                 <Segmented
-                  className="w-full rounded-md"
+                  shape="square"
+                  className="w-full"
                   value={field.value?.enabled ?? 'enable-all'}
                   onValueChange={(value) => {
                     if (value && value.length > 0) {
@@ -285,10 +287,10 @@ export default function RoleFormContent({ slug }: FormContentProps) {
                   }}
                   disabled={!isPro}
                 >
-                  <SegmentedItem value="enable-all" className="w-1/2 rounded-md!">
+                  <SegmentedItem value="enable-all" className="w-1/2">
                     {__('Enable All', 'yay-wholesale-b2b')}
                   </SegmentedItem>
-                  <SegmentedItem value="enable-selected-methods" className="w-1/2 rounded-md!">
+                  <SegmentedItem value="enable-selected-methods" className="w-1/2">
                     {__('Enable Selected', 'yay-wholesale-b2b')}
                   </SegmentedItem>
                 </Segmented>

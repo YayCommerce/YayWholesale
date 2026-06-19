@@ -43,19 +43,14 @@ const shippingMethodSettingSchema = z.object({
 export const settingsFormSchema = z.object({
   general: z.object({
     default_role: z.string(),
-    show_wholesale_price: z.boolean(),
     disable_coupon: z.boolean(),
     disable_tax: z.boolean(),
     tax_display_mode: z.enum(['inherit', 'excl', 'incl']),
     wholesale_store_page: z.string(),
   }),
   display: z.object({
-    price_format: z.enum(['retail-and-wholesale', 'wholesale-only', 'retail-only']),
-
-    // TODO v1.2
-    // wholesaler_price_format: z.enum(['retail-and-wholesale', 'wholesale-only']),
-    // retailer_price_format: z.enum(['retail-and-wholesale', 'retail-only']),
-
+    wholesaler_price_format: z.enum(['retail-and-wholesale', 'wholesale-only']),
+    retailer_price_format: z.enum(['retail-and-wholesale', 'retail-only']),
     wholesale_price_label: z.string(),
     wholesale_price_color: z.string(),
   }),

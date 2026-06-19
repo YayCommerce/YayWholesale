@@ -77,16 +77,16 @@ class SettingsHelper {
         return [
             'general'             => [
                 'default_role'         => '',
-                'show_wholesale_price' => false,
                 'disable_coupon'       => false,
                 'disable_tax'          => false,
                 'tax_display_mode'     => 'inherit',
                 'wholesale_store_page' => '',
             ],
             'display'             => [
-                'price_format'          => 'retail-and-wholesale',
-                'wholesale_price_label' => 'Wholesale price',
-                'wholesale_price_color' => '#333333',
+                'wholesale_price_label'   => 'Wholesale price',
+                'wholesale_price_color'   => '#333333',
+                'wholesaler_price_format' => 'retail-and-wholesale',
+                'retailer_price_format'   => 'retail-only',
             ],
             'registration'        => [
                 'moderate'                        => true,
