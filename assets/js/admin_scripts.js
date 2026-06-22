@@ -1,131 +1,121 @@
 (function ($) {
   ("use strict");
   $(document).ready(() => {
-    productBasedBehavioursSetting();
-    categoryBasedBehavioursSetting();
+    generalCustomPricingSetting();
+    discountTypePricingSetting();
 
     $(document).on(
-      "woocommerce_variations_loaded",
-      productBasedBehavioursSetting
-    );
-    $(document).on(
-      "woocommerce_variations_saved",
-      productBasedBehavioursSetting
+      "woocommerce_variations_loaded woocommerce_variations_saved",
+      () => {
+        generalCustomPricingSetting();
+        discountTypePricingSetting();
+      }
     );
   });
 
-  // Product-based behaviors
-  function productBasedBehavioursSetting() {
-    // Toggle the Inputs by Discount mode
-    $(".ywhs-product-based-discount-rule").each((index, el) => {
-      const select = $(el).find("select");
-      const inputs_container = $(el).siblings(
-        ".ywhs_product_based_discount_inputs"
-      );
-      if (select.val() === "custom") {
-        inputs_container.show();
-      } else {
-        inputs_container.hide();
-      }
+  // general Product-based, Category-based pricing behaviours
+  function generalCustomPricingSetting() {
+    const discountDefaultRule = $(".ywhs_cat_discount_rule_default");
+    const discountCustomRule = $(".ywhs_cat_discount_rule_custom");
 
-      select.on("change", function () {
-        if ($(this).val() === "custom") {
-          inputs_container.slideDown(300);
-        } else {
-          inputs_container.slideUp(300);
-        }
-      });
+    discountDefaultRule.each(function () {
+      const isChecked = $(this).is(":checked");
+      const discountValue = $(this)
+        .closest(".ywhs_field")
+        .siblings(".ywhs_discount_values");
+      if (isChecked) {
+        discountValue.css("display", "none");
+      } else {
+        discountValue.css("display", "flex");
+      }
     });
 
-    //Toggle the value input by Discount rule
-    $(".ywhs_product_based_rule_fixed, .ywhs_product_based_rule_rate").each(
-      function () {
-        const block = $(this);
-        const radios = block.find("input[type='radio']");
+    discountDefaultRule.on("change", function () {
+      const isChecked = $(this).is(":checked");
+      const discountValue = $(this)
+        .closest(".ywhs_field")
+        .siblings(".ywhs_discount_values");
 
-        const inputsContainer = block
-          .parent()
-          .parent()
-          .siblings(".ywhs_product_based_discount_roles");
-
-        const fixedInput = inputsContainer.find(
-          ".ywhs_product_based_discount_fixed"
-        );
-        const rateInput = inputsContainer.find(
-          ".ywhs_product_based_discount_rate"
-        );
-
-        function toggleFields() {
-          const checkedRadio = radios.filter(":checked").val();
-
-          if (checkedRadio === "fixed") {
-            fixedInput.show();
-            rateInput.hide();
-          }
-
-          if (checkedRadio === "rate") {
-            fixedInput.hide();
-            rateInput.show();
-          }
-        }
-
-        // Initial
-        toggleFields();
-
-        // On Radio checked change
-        radios.on("change", toggleFields);
+      if (isChecked) {
+        discountValue.stop(true, true).slideUp(300);
       }
-    );
+    });
 
-    $(".ywhs_product_based_discount_rate").on("change", function () {
+    discountCustomRule.on("change", function () {
+      const isChecked = $(this).is(":checked");
+      const discountValue = $(this)
+        .closest(".ywhs_field")
+        .siblings(".ywhs_discount_values");
+
+      if (isChecked) {
+        discountValue
+          .css("display", "flex")
+          .stop(true, true)
+          .hide()
+          .slideDown(300);
+      }
+    });
+
+    $(".ywhs_value_input").on("change", function () {
       const input = $(this).find("input");
       const value = parseFloat(input.val());
-      if (value > 100) {
-        // if the rate is over 100 then make it 100 for maximum rate
-        input.val(100);
+
+      if (value < 0) {
+        input.val(value * -1);
+      }
+
+      const max = parseFloat(input.attr("max") ?? "0");
+      if (max === 0.0) {
+        return;
+      }
+
+      if (value > max) {
+        input.val(max);
       } else if (value % 1 !== 0) {
-        // if the value has decimals then fix it to 2 decimals
         input.val(value.toFixed(2));
       }
     });
   }
 
-  // Category-based behaviours
-  function categoryBasedBehavioursSetting() {
-    const discountMode = $("#ywhs_category_based_discount_rule");
-    const discountRate = discountMode
-      .closest(".ywhs_category_based_discount_rule_wrapper")
-      .siblings(".ywhs_category_based_discount_rates");
-    const modeValue = discountMode.val();
-    if (modeValue === "" || modeValue === "default") {
-      discountRate.hide();
+  function discountTypePricingSetting() {
+    const switchEl = $(".ywhs_discount_type_switch");
+    if (switchEl.length < 1) {
+      return;
     }
 
-    if (modeValue === "custom") {
-      discountRate.show();
-    }
+    const handleToggle = (el) => {
+      const input = $(el)
+        .closest(".ywhs_discount_value_header")
+        .siblings(".ywhs_discount_type");
 
-    discountMode.on("change", function (e) {
-      const value = $(this).val();
-      if (value === "" || value === "default") {
-        discountRate.hide();
-      }
+      const rates = $(el)
+        .closest(".ywhs_discount_value_header")
+        .siblings(".ywhs_discount_roles_value")
+        .find(".ywhs_discount_rate_value");
 
-      if (value === "custom") {
-        discountRate.show();
+      const fixed = $(el)
+        .closest(".ywhs_discount_value_header")
+        .siblings(".ywhs_discount_roles_value")
+        .find(".ywhs_discount_fixed_value");
+
+      const checked = $(el).is(":checked");
+      if (checked) {
+        input.val("fixed");
+        rates.hide();
+        fixed.show();
+      } else {
+        input.val("rate");
+        fixed.hide();
+        rates.show();
       }
+    };
+
+    switchEl.each(function () {
+      handleToggle(this);
     });
 
-    $(".ywhs_category_based_discount_rate").on("change", function () {
-      const input = $(this).find("input");
-      const value = parseFloat(input.val());
-      if (value > 100) {
-        // if the rate is over 100 then make it 100 for maximum rate
-        input.val(100);
-      } else if (value % 1 !== 0) {
-        // if the value has decimals then fix it to 2 decimals
-        input.val(value.toFixed(2));
-      }
+    switchEl.on("change", function (e) {
+      handleToggle(this);
     });
   }
 

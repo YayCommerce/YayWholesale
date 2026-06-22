@@ -27,156 +27,259 @@
   text-overflow: ellipsis;
 }
 
-/* Custom Pricing Value table */
-.ywhs_product_based_discount_rate_table,
-.ywhs_category_based_discount_rate_table {
-  border-collapse: separate;
-  border-spacing: 0;
-  border: 1px solid #c3c4c7 !important;
-  border-radius: 4px;
-  overflow: hidden;
-  width: fit-content !important;
-  padding: 0 !important;
+/* Category-based discount */
+.ywhs_category_based_wholesale_rules_wrapper {
+  border-top: 1px solid #DDDDDD;
+  box-shadow: 0px -1px 0px 0px #FFFFFFB2;
+}
 
+.ywhs_product_based_wholesale_rules_wrapper {
+  margin: 12px;
+  width: 70%;
 
-  th,
-  td {
-    background-color: #f6f7f7;
-    border: none !important;
-    padding: 10px !important;
-    white-space: nowrap !important;
-    width: auto !important;
+  .ywhs_wholesale_rules {
+    border: 1px solid #DDD;
   }
 
-  tbody tr td,
-  tbody tr th {
-    border-top: 1px solid #c3c4c7 !important;
-  }
-
-  td+td,
-  th+th {
-    border-left: 1px solid #c3c4c7 !important;
-  }
-
-
-  .ywhs_product_based_discount_rate_role,
-  .ywhs_category_based_discount_rate_role {
-    font-weight: 500;
-    font-size: 13px;
-    max-width: 125px;
-    text-align: left;
-    text-wrap-mode: wrap;
-  }
-
-  td.ywhs_product_based_discount_rate,
-  td.ywhs_product_based_discount_fixed,
-  td.ywhs_category_based_discount_rate {
-    background-color: #ffffff;
-    gap: 5px;
-    font-size: 13px;
-    display: flex;
-    align-items: center;
-    gap: 5px;
+  label {
     margin: 0 !important;
+    width: fit-content !important;
   }
 
-  input {
-    width: 80px !important;
-    margin: 0 !important;
+  .ywhs_discount_value_header label p {
+    text-wrap-mode: nowrap;
+    width: fit-content;
   }
 }
 
-/* Fixed discount in product page */
-.ywhs_product_based_discount_title {
-  display: block;
-  margin: 0 0 0px 12px;
-}
-
-.ywhs_product_based_discount_subtitle {
-  display: block;
-  margin: 0 0 15px 12px;
-}
-
-.ywhs_product_based_discount_roles,
-.ywhs_product_based_discount_type {
-  display: flex;
-  margin: 0 0 15px 12px;
-  align-items: center;
-}
-
-.ywhs_product_based_discount_roles_title,
-.ywhs_product_based_discount_type_title {
-  width: 150px;
-}
-
-.ywhs_product_based_discount_roles {
-  display: flex;
-}
-
-.ywhs_product_based_discount_type_radios {
-  display: flex;
-  gap: 40px;
-}
-
-.ywhs_product_based_discount_type_radios label {
-  margin: 0 0 0 0 !important;
-  width: fit-content !important;
-  display: flex;
-  align-items: center;
-  gap: 5px;
-}
-
-
-.ywhs_product_based_discount_inputs {
-  display: none;
-}
-
-/* Fixed discount in product page (Variable) */
-.ywhs_variable_product_based_discount_custom_container {
+.ywhs_variable_product_based_wholesale_rules_wrapper {
   display: table;
   width: 100%;
 
-  .ywhs_product_based_discount_title {
-    display: block;
-    margin: 0 0 12px 0 !important;
-    font-size: 1.3em;
+  .ywhs_wholesale_rules {
+    border: 1px solid #DDD;
+  }
+}
+
+.ywhs_wholesale_rules {
+  margin-top: 25px;
+  border-radius: 8px;
+  background-color: #fff;
+  box-shadow: 0px 1px 1px 0px #0000000D;
+  overflow: hidden;
+  font-family: "SF Pro", sans-serif;
+
+  p, input[type="checkbox"], input[type="radio"] {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  select {
+    max-width: 100% !important;
+    width: 100% !important;
+  }
+
+  input[type="number"]::-webkit-outer-spin-button,
+  input[type="number"]::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+  }
+
+  input[type="number"] {
+      -moz-appearance: textfield;
+  }
+
+  .ywhs_header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background-color: #171719;
+    padding: 12px;
+  }
+
+  .ywhs_header > p {
     font-weight: 700;
-    color: #1d2327;
+    font-size: 14px;
+    line-height: 24px;
+    color: #fff;
   }
 
-  .ywhs_product_based_discount_subtitle {
-    display: block;
-    margin: 0 0 12px 0;
+  .ywhs_header .ywhs_separator {
+    width: 0px;
+    height: 16px;
+    border: 1px solid #FFFFFF2E;
   }
 
-
-  .ywhs_product_based_discount_rule,
-  .ywhs_product_based_discount_type {
-    margin-left: 0;
+  .ywhs_body {
+    padding: 12px 16px 16px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
   }
 
-  .ywhs_product_based_discount_roles {
-    margin-left: -26px !important;
-    padding: 0 0 1px 26px;
-    flex-wrap: wrap;
+  .ywhs_body > p {
+    font-weight: 500;
+    font-size: 16px;
+    line-height: 24px;
+    color: #070707;
+  }
+
+  .ywhs_field, .ywhs_select {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    color: #1E1E1E;
+  }
+
+  .ywhs_field > p:first-child,
+  .ywhs_select > label,
+  .ywhs_discount_value_header > p{
+    font-weight: 500;
+    font-size: 11px;
+    line-height: 16px;
+    text-transform: uppercase;
+  }
+
+  .ywhs_field_inputs_wrapper {
+    display: flex;
+    gap: 20px;
+  }
+
+  .ywhs_field_inputs_wrapper > div {
+    flex: 1;
+  }
+
+  .ywhs_radios{
+    border-radius: 2px;
+    border: 1px solid #949494;
+    margin: 0;
+  }
+
+  .ywhs_radios label {
+    display: flex;
+    align-items: center;
+    padding: 10px 12px 10px 12px;
+    gap: 8px;
+    width: 100% !important;
+  }
+
+  .ywhs_helptip {
+    font-size: 12px;
+    color: #757575;
+    line-height: 16px;
+  }
+
+  .ywhs_field_inputs_grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    row-gap: 10px;
+  }
+
+  .ywhs_discount_values {
+    display: none;
+  }
+
+  .ywhs_discount_value_header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .ywhs_discount_value_header label {
+    display: flex;
+    align-items: center;
+    gap: 12px;
   }
 }
 
-/* Category-based discount */
-.ywhs_category_based_discount_rates {
-  display: none;
-}
 
-.ywhs_category_based_discount_rate_table {
+.ywhs_discount_roles_value {
+  border-radius: 4px;
+  border: 1px solid #DDD;
+  background: #FAFAFA;
 
-  tbody tr td,
-  tbody tr th {
-    border-top: none !important;
+  .ywhs_discount_role_value_item {
+    display: flex;
+    border-bottom: 1px solid #DDD;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px;
+    gap: 20px;
   }
 
-  tr:not(:first-child) td,
-  tr:not(:first-child) th {
-    border-top: 1px solid #c3c4c7 !important;
+  .ywhs_discount_role_value_item:last-child {
+    border: none;
+  }
+
+  .ywhs_discount_role_value_item > div {
+    flex: 1;
+  }
+
+  .ywhs_value_input {
+    position: relative;
+  }
+
+  .ywhs_input_suffix {
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #3858E9;
+    font-weight: 500;
+    font-size: 13px;
+    line-height: 20px;
+  }
+
+  input {
+    width:  100% !important;
+  }
+}
+
+.ywhs_switch {
+  position: relative;
+  display: inline-block;
+  width: 32px;
+  height: 17px;
+
+  input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+
+  span {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #fff;
+    border: 1px solid #949494;
+    transition: .4s;
+    border-radius: 28px;
+  }
+
+  span:before {
+    position: absolute;
+    content: "";
+    height: 12px;
+    width: 12px;
+    left: 2px;
+    top: 1.5px;
+    background-color: #1E1E1E;
+    box-shadow: 0 4 4 0 #00000003 ;
+    transition: .4s;
+    border-radius: 8px;
+  }
+
+  input:checked + span:before {
+    transform: translateX(15px);
+  }
+
+  .switch input:focus + span {
+    box-shadow: 0 0 0 3px var(--focus-ring);
   }
 }
 
@@ -186,5 +289,25 @@
   input,
   textarea {
     background: #ffffff;
+  }
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .ywhs_category_based_wholesale_rules_wrapper {
+    .ywhs_field_inputs_grid {
+      grid-template-columns: 1fr;
+    }
+
+    .ywhs_field_inputs_wrapper {
+      flex-direction: column;
+      gap: 8px;
+    }
+  }
+}
+
+@media (max-width: 1200px) {
+  .ywhs_product_based_wholesale_rules_wrapper {
+    width: calc(100% - 24px);
   }
 }
