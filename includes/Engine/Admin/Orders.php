@@ -220,8 +220,8 @@ class Orders {
 
         $is_wholesale_order = (bool) $order->get_meta( '_ywhs_wholesale_role' );
         ?>
-        <div class="ywhs_order_type_badge <?php echo $is_wholesale_order ? 'ywhs_order_type_wholesale' : 'ywhs_order_type_retail'; ?>" >
-            <span>
+        <div class="ywhs_order_type_badge" >
+            <span class="<?php echo $is_wholesale_order ? 'ywhs_order_type_wholesale' : 'ywhs_order_type_retail'; ?>">
                 <?php
                 if ( $is_wholesale_order ) {
                     echo esc_attr_e( 'Wholesale', 'yay-wholesale-b2b' );

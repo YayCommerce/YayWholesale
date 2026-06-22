@@ -1,8 +1,11 @@
+/* #region Price display */
 .price del.yay-wholesale-price-range,
 .price ins.yay-wholesale-price-range {
   display: block;
 }
+/* #endregion */
 
+/* #region Registration Form */
 #ywhs_form_fields_container {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -97,7 +100,9 @@
   font-weight: 500;
 }
 
-/* YayWholesale Requirement Style */
+/* #endregion */
+
+/* #region Role-Cart Requirement*/
 .ywhs_requirement_section {
   border-top: 1px solid #f4f4f5;
   padding: 24px 0px;
@@ -247,3 +252,5 @@
   margin-left: 1px;
   margin-top: 1px;
 }
+
+/* #endregion */

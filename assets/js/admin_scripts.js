@@ -1,156 +1,177 @@
 (function ($) {
   ("use strict");
+
+  // #region Custom Pricing (Category-based, Product-based)
   $(document).ready(() => {
-    productBasedBehavioursSetting();
-    categoryBasedBehavioursSetting();
+    const allLoaded = checkRequiredElementsLoaded([
+      ".ywhs_wholesale_rules",
+      ".ywhs_cat_discount_rule_default",
+      ".ywhs_cat_discount_rule_custom",
+      ".ywhs_discount_type_switch",
+    ]);
+
+    if (!allLoaded) return;
+
+    generalCustomPricingSetting();
+    discountTypePricingSetting();
 
     $(document).on(
-      "woocommerce_variations_loaded",
-      productBasedBehavioursSetting
-    );
-    $(document).on(
-      "woocommerce_variations_saved",
-      productBasedBehavioursSetting
+      "woocommerce_variations_loaded woocommerce_variations_saved",
+      () => {
+        generalCustomPricingSetting();
+        discountTypePricingSetting();
+      }
     );
   });
 
-  // Product-based behaviors
-  function productBasedBehavioursSetting() {
-    // Toggle the Inputs by Discount mode
-    $(".ywhs-product-based-discount-rule").each((index, el) => {
-      const select = $(el).find("select");
-      const inputs_container = $(el).siblings(
-        ".ywhs_product_based_discount_inputs"
-      );
-      if (select.val() === "custom") {
-        inputs_container.show();
+  // general Product-based, Category-based pricing behaviours
+  function generalCustomPricingSetting() {
+    const discountDefaultRule = $(".ywhs_cat_discount_rule_default");
+    const discountCustomRule = $(".ywhs_cat_discount_rule_custom");
+
+    discountDefaultRule.each(function () {
+      const isChecked = $(this).is(":checked");
+      const discountValue = $(this)
+        .closest(".ywhs_field")
+        .siblings(".ywhs_discount_values");
+      if (isChecked) {
+        discountValue.css("display", "none");
       } else {
-        inputs_container.hide();
+        discountValue.css("display", "flex");
       }
-
-      select.on("change", function () {
-        if ($(this).val() === "custom") {
-          inputs_container.slideDown(300);
-        } else {
-          inputs_container.slideUp(300);
-        }
-      });
     });
 
-    //Toggle the value input by Discount rule
-    $(".ywhs_product_based_rule_fixed, .ywhs_product_based_rule_rate").each(
-      function () {
-        const block = $(this);
-        const radios = block.find("input[type='radio']");
+    discountDefaultRule.on("change", function () {
+      const isChecked = $(this).is(":checked");
+      const discountValue = $(this)
+        .closest(".ywhs_field")
+        .siblings(".ywhs_discount_values");
 
-        const inputsContainer = block
-          .parent()
-          .parent()
-          .siblings(".ywhs_product_based_discount_roles");
+      if (isChecked) {
+        discountValue.stop(true, true).slideUp(300);
+      }
+    });
 
-        const fixedInput = inputsContainer.find(
-          ".ywhs_product_based_discount_fixed"
-        );
-        const rateInput = inputsContainer.find(
-          ".ywhs_product_based_discount_rate"
-        );
+    discountCustomRule.on("change", function () {
+      const isChecked = $(this).is(":checked");
+      const discountValue = $(this)
+        .closest(".ywhs_field")
+        .siblings(".ywhs_discount_values");
 
-        function toggleFields() {
-          const checkedRadio = radios.filter(":checked").val();
+      if (isChecked) {
+        discountValue
+          .css("display", "flex")
+          .stop(true, true)
+          .hide()
+          .slideDown(300);
+      }
+    });
 
-          if (checkedRadio === "fixed") {
-            fixedInput.show();
-            rateInput.hide();
-          }
+    $(".ywhs_value_input").on("change", function () {
+      const input = $(this).find("input");
+      const value = parseFloat(input.val());
 
-          if (checkedRadio === "rate") {
-            fixedInput.hide();
-            rateInput.show();
-          }
+      if (value < 0) {
+        input.val(value * -1);
+      }
+
+      const max = parseFloat(input.attr("max") ?? "0");
+      if (max === 0.0) {
+        return;
+      }
+
+      if (value > max) {
+        input.val(max);
+      } else if (value % 1 !== 0) {
+        input.val(value.toFixed(2));
+      }
+    });
+  }
+
+  function discountTypePricingSetting() {
+    const switchEl = $(".ywhs_discount_type_switch");
+    if (switchEl.length < 1) {
+      return;
+    }
+
+    const handleToggle = (el) => {
+      const input = $(el)
+        .closest(".ywhs_discount_value_header")
+        .siblings(".ywhs_discount_type");
+
+      const rates = $(el)
+        .closest(".ywhs_discount_value_header")
+        .siblings(".ywhs_discount_roles_value")
+        .find(".ywhs_discount_rate_value");
+
+      const fixed = $(el)
+        .closest(".ywhs_discount_value_header")
+        .siblings(".ywhs_discount_roles_value")
+        .find(".ywhs_discount_fixed_value");
+
+      const checked = $(el).is(":checked");
+      if (checked) {
+        input.val("fixed");
+        rates.hide();
+        fixed.show();
+      } else {
+        input.val("rate");
+        fixed.hide();
+        rates.show();
+      }
+    };
+
+    switchEl.each(function () {
+      handleToggle(this);
+    });
+
+    switchEl.on("change", function (e) {
+      handleToggle(this);
+    });
+  }
+  // #endregion
+
+  // #region Order Customer in Recalculate
+  $(document).ready(() => {
+    const allLoaded = checkRequiredElementsLoaded([
+      "#customer_user",
+      "#woocommerce-order-items",
+    ]);
+
+    if (!allLoaded) return;
+    let orderCustomer = $("#customer_user").val();
+
+    $("#woocommerce-order-items").on(
+      "woocommerce_order_meta_box_add_items_ajax_data woocommerce_order_meta_box_recalculate_ajax_data woocommerce_order_meta_box_save_line_items_ajax_data",
+      (event, data) => {
+        const customer = $("#customer_user").val();
+
+        if (customer) {
+          data.ywhs_customer = customer;
         }
 
-        // Initial
-        toggleFields();
-
-        // On Radio checked change
-        radios.on("change", toggleFields);
+        return data;
       }
     );
 
-    $(".ywhs_product_based_discount_rate").on("change", function () {
-      const input = $(this).find("input");
-      const value = parseFloat(input.val());
-      if (value > 100) {
-        // if the rate is over 100 then make it 100 for maximum rate
-        input.val(100);
-      } else if (value % 1 !== 0) {
-        // if the value has decimals then fix it to 2 decimals
-        input.val(value.toFixed(2));
+    $("#customer_user").on("change", (event) => {
+      customerHasChanged = $("#customer_user").val() !== orderCustomer;
+      orderCustomer = $("#customer_user").val();
+
+      if ($("#woocommerce-order-items #order_line_items tr").length > 0) {
+        $("#woocommerce-order-items button.calculate-action").trigger("click");
       }
     });
-  }
-
-  // Category-based behaviours
-  function categoryBasedBehavioursSetting() {
-    const discountMode = $("#ywhs_category_based_discount_rule");
-    const discountRate = discountMode
-      .closest(".ywhs_category_based_discount_rule_wrapper")
-      .siblings(".ywhs_category_based_discount_rates");
-    const modeValue = discountMode.val();
-    if (modeValue === "" || modeValue === "default") {
-      discountRate.hide();
-    }
-
-    if (modeValue === "custom") {
-      discountRate.show();
-    }
-
-    discountMode.on("change", function (e) {
-      const value = $(this).val();
-      if (value === "" || value === "default") {
-        discountRate.hide();
-      }
-
-      if (value === "custom") {
-        discountRate.show();
-      }
-    });
-
-    $(".ywhs_category_based_discount_rate").on("change", function () {
-      const input = $(this).find("input");
-      const value = parseFloat(input.val());
-      if (value > 100) {
-        // if the rate is over 100 then make it 100 for maximum rate
-        input.val(100);
-      } else if (value % 1 !== 0) {
-        // if the value has decimals then fix it to 2 decimals
-        input.val(value.toFixed(2));
-      }
-    });
-  }
-
-  // Order creating behavior
-  let orderCustomer = $("#customer_user").val();
-
-  $("#woocommerce-order-items").on(
-    "woocommerce_order_meta_box_add_items_ajax_data woocommerce_order_meta_box_recalculate_ajax_data woocommerce_order_meta_box_save_line_items_ajax_data",
-    (event, data) => {
-      const customer = $("#customer_user").val();
-
-      if (customer) {
-        data.ywhs_customer = customer;
-      }
-
-      return data;
-    }
-  );
-
-  $("#customer_user").on("change", (event) => {
-    customerHasChanged = $("#customer_user").val() !== orderCustomer;
-    orderCustomer = $("#customer_user").val();
-
-    if ($("#woocommerce-order-items #order_line_items tr").length > 0) {
-      $("#woocommerce-order-items button.calculate-action").trigger("click");
-    }
   });
+  // #endregion
+
+  function checkRequiredElementsLoaded(requiredSelectors) {
+    for (let i = 0; i < requiredSelectors.length; i++) {
+      if ($(requiredSelectors[i]).length < 1) {
+        return false;
+      }
+    }
+
+    return true;
+  }
 })(jQuery);
