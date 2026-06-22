@@ -1,66 +1,36 @@
+/* #region Order List page */
 .ywhs_order_type_badge {
-  display: inline-flex;
-  line-height: 2.5em;
-  color: #454545;
-  background: #e5e5e5;
-  border-radius: 4px;
-  border-bottom: 1px solid rgba(0, 0, 0, .05);
-  margin: -.25em 0;
-  cursor: inherit !important;
-  white-space: nowrap;
-  max-width: 100%;
-}
-
-.ywhs_order_type_wholesale {
-  background: #f8dda7;
-  color: #573b00;
-}
-
-.ywhs_order_type_retail {
-  background: #c6e1c6;
-  color: #2c4700;
-}
-
-.ywhs_order_type_badge>span {
-  margin: 0 1em;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-/* Category-based discount */
-.ywhs_category_based_wholesale_rules_wrapper {
-  border-top: 1px solid #DDDDDD;
-  box-shadow: 0px -1px 0px 0px #FFFFFFB2;
-}
-
-.ywhs_product_based_wholesale_rules_wrapper {
-  margin: 12px;
-  width: 70%;
-
-  .ywhs_wholesale_rules {
-    border: 1px solid #DDD;
+  .ywhs_order_type_wholesale {
+    background: #f8dda7;
+    color: #573b00;
   }
 
-  label {
-    margin: 0 !important;
-    width: fit-content !important;
+  .ywhs_order_type_retail {
+    background: #c6e1c6;
+    color: #2c4700;
   }
 
-  .ywhs_discount_value_header label p {
-    text-wrap-mode: nowrap;
-    width: fit-content;
+  > span {
+    padding: 0 1em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: inline-flex;
+    line-height: 2.5em;
+    color: #454545;
+    background: #e5e5e5;
+    border-radius: 4px;
+    border-bottom: 1px solid rgba(0, 0, 0, .05);
+    margin: -.25em 0;
+    cursor: inherit !important;
+    white-space: nowrap;
+    max-width: 100%;
   }
 }
+/* #endregion */
 
-.ywhs_variable_product_based_wholesale_rules_wrapper {
-  display: table;
-  width: 100%;
+/* #region Custom Pricing (Product, Category) page */
 
-  .ywhs_wholesale_rules {
-    border: 1px solid #DDD;
-  }
-}
-
+/* #region General Layout for Product and Category */
 .ywhs_wholesale_rules {
   margin-top: 25px;
   border-radius: 8px;
@@ -191,51 +161,113 @@
     align-items: center;
     gap: 12px;
   }
+
+  .ywhs_discount_roles_value {
+    border-radius: 4px;
+    border: 1px solid #DDD;
+    background: #FAFAFA;
+
+    .ywhs_discount_role_value_item {
+      display: flex;
+      border-bottom: 1px solid #DDD;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px;
+      gap: 20px;
+    }
+
+    .ywhs_discount_role_value_item:last-child {
+      border: none;
+    }
+
+    .ywhs_discount_role_value_item > div {
+      flex: 1;
+    }
+
+    .ywhs_value_input {
+      position: relative;
+    }
+
+    .ywhs_input_suffix {
+      position: absolute;
+      right: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #3858E9;
+      font-weight: 500;
+      font-size: 13px;
+      line-height: 20px;
+    }
+
+    input {
+      width:  100% !important;
+    }
+  }
+}
+/* #endregion */
+
+/* #region Layout: Category page */
+.ywhs_category_based_wholesale_rules_wrapper {
+  border-top: 1px solid #DDDDDD;
+  box-shadow: 0px -1px 0px 0px #FFFFFFB2;
 }
 
+@media (max-width: 1024px) {
+  .ywhs_category_based_wholesale_rules_wrapper {
+    .ywhs_field_inputs_grid {
+      grid-template-columns: 1fr;
+    }
 
-.ywhs_discount_roles_value {
-  border-radius: 4px;
-  border: 1px solid #DDD;
-  background: #FAFAFA;
-
-  .ywhs_discount_role_value_item {
-    display: flex;
-    border-bottom: 1px solid #DDD;
-    justify-content: space-between;
-    align-items: center;
-    padding: 12px;
-    gap: 20px;
-  }
-
-  .ywhs_discount_role_value_item:last-child {
-    border: none;
-  }
-
-  .ywhs_discount_role_value_item > div {
-    flex: 1;
-  }
-
-  .ywhs_value_input {
-    position: relative;
-  }
-
-  .ywhs_input_suffix {
-    position: absolute;
-    right: 14px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: #3858E9;
-    font-weight: 500;
-    font-size: 13px;
-    line-height: 20px;
-  }
-
-  input {
-    width:  100% !important;
+    .ywhs_field_inputs_wrapper {
+      flex-direction: column;
+      gap: 8px;
+    }
   }
 }
 
+/* #endregion */
+
+/* #region Layout: Product page (single) */
+.ywhs_product_based_wholesale_rules_wrapper {
+  margin: 12px;
+  width: 70%;
+
+  .ywhs_wholesale_rules {
+    border: 1px solid #DDD;
+  }
+
+  label {
+    margin: 0 !important;
+    width: fit-content !important;
+  }
+
+  .ywhs_discount_value_header label p {
+    text-wrap-mode: nowrap;
+    width: fit-content;
+  }
+}
+
+@media (max-width: 1200px) {
+  .ywhs_product_based_wholesale_rules_wrapper {
+    width: calc(100% - 24px);
+  }
+}
+
+/* #endregion  */
+
+/* #region Layout: Product page (variable) */
+.ywhs_variable_product_based_wholesale_rules_wrapper {
+  display: table;
+  width: 100%;
+
+  .ywhs_wholesale_rules {
+    border: 1px solid #DDD;
+  }
+}
+
+/* #endregion */
+
+/* #region Custom element */
 .ywhs_switch {
   position: relative;
   display: inline-block;
@@ -283,6 +315,11 @@
   }
 }
 
+/* #endregion */
+
+/* #endregion */
+
+/* #region User page */
 /* User wholesaler information */
 #ywhs_wholesaler_user_table {
 
@@ -292,22 +329,4 @@
   }
 }
 
-/* Responsive */
-@media (max-width: 1024px) {
-  .ywhs_category_based_wholesale_rules_wrapper {
-    .ywhs_field_inputs_grid {
-      grid-template-columns: 1fr;
-    }
-
-    .ywhs_field_inputs_wrapper {
-      flex-direction: column;
-      gap: 8px;
-    }
-  }
-}
-
-@media (max-width: 1200px) {
-  .ywhs_product_based_wholesale_rules_wrapper {
-    width: calc(100% - 24px);
-  }
-}
+/* #endregion */
