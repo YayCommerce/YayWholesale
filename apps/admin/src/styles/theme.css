@@ -95,7 +95,9 @@
   --color-popover: var(--popover) /* #ffffff */;
   --color-popover-foreground: var(--popover-foreground) /* #171719 */;
 
-  --font-sans: 'Roboto', sans-serif;
+  --font-sans:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif,
+    'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
 }
 
 .yay-dark {

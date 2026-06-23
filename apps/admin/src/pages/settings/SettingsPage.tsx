@@ -3,7 +3,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as TabsPrimitive from '@radix-ui/react-tabs';
 import { Loader2 } from 'lucide-react';
 import { createPortal } from 'react-dom';
-import { FieldErrors, useForm, useFormContext } from 'react-hook-form';
+import { FieldErrors, FormProvider, useForm, useFormContext } from 'react-hook-form';
 import { useNavigate, useParams } from 'react-router';
 import { toast } from 'sonner';
 import { __ } from '@wordpress/i18n';
@@ -14,9 +14,8 @@ import { useIsMutatingSettings, useSaveSettingsMutation, useSettingsQuery } from
 import { Settings, settingsFormSchema } from '@/lib/schema/settings.schema';
 import { useRouteLeaveGuard } from '@/hooks/useRouteLeaveGuard';
 import { Button } from '@/components/ui/button';
-import { FormProvider } from '@/components/ui/form';
+import { UnsavedChangeDialog } from '@/components/ui/custom/unsaved-changed-dialog';
 import { SideNavMenuItem, SideNavMenuList } from '@/components/ui/navmenu-side';
-import { UnsavedChangeDialog } from '@/components/ui/unsaved-changed-dialog';
 import { getFirstErrorSection, makeDefaultSettings } from './settings.helper';
 import DisplayTab from './tabs/DisplayTab';
 import EmailsTab from './tabs/EmailsTab';
@@ -164,19 +163,31 @@ export default function SettingsPage() {
                   <TabsPrimitive.Content value="display" className="bg-card h-full rounded-md border p-6 sm:w-full">
                     <DisplayTab />
                   </TabsPrimitive.Content>
-                  <TabsPrimitive.Content value="registration" className="bg-card h-full rounded-md border p-6 sm:w-full">
+                  <TabsPrimitive.Content
+                    value="registration"
+                    className="bg-card h-full rounded-md border p-6 sm:w-full"
+                  >
                     <RegistrationTab />
                   </TabsPrimitive.Content>
-                  <TabsPrimitive.Content value="registration-fields" className="bg-card h-full rounded-md border p-6 sm:w-full">
+                  <TabsPrimitive.Content
+                    value="registration-fields"
+                    className="bg-card h-full rounded-md border p-6 sm:w-full"
+                  >
                     <RegistrationFieldsTab />
                   </TabsPrimitive.Content>
                   <TabsPrimitive.Content value="emails" className="bg-card h-full rounded-md border p-6 sm:w-full">
                     <EmailsTab />
                   </TabsPrimitive.Content>
-                  <TabsPrimitive.Content value="payment-roles" className="bg-card h-full rounded-md border p-6 sm:w-full">
+                  <TabsPrimitive.Content
+                    value="payment-roles"
+                    className="bg-card h-full rounded-md border p-6 sm:w-full"
+                  >
                     <PaymentRolesTab />
                   </TabsPrimitive.Content>
-                  <TabsPrimitive.Content value="shipping-roles" className="bg-card h-full rounded-md border p-6 sm:w-full">
+                  <TabsPrimitive.Content
+                    value="shipping-roles"
+                    className="bg-card h-full rounded-md border p-6 sm:w-full"
+                  >
                     <ShippingRolesTab />
                   </TabsPrimitive.Content>
                 </div>

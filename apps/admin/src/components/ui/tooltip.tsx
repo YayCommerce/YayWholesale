@@ -65,7 +65,7 @@ function HelpTip({
       <TooltipTrigger asChild>{trigger}</TooltipTrigger>
       <TooltipContent
         side={side}
-        className={cn('z-9999 text-center text-sm', undefined === content && 'hidden', className)}
+        className={cn('z-100005 text-center text-sm', undefined === content && 'hidden', className)}
       >
         {content}
       </TooltipContent>

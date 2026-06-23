@@ -82,7 +82,7 @@ function Calendar({
         week_number_header: cn('select-none w-(--cell-size)', defaultClassNames.week_number_header),
         week_number: cn('text-[0.8rem] select-none text-muted-foreground', defaultClassNames.week_number),
         day: cn(
-          'relative size-full  p-0 text-center [&:first-child[data-selected=true]_button]:rounded-l-md [&:last-child[data-selected=true]_button]:rounded-r-md group/day aspect-square select-none',
+          'relative size-full p-0 text-center [&:first-child[data-selected=true]_button]:rounded-l-md [&:last-child[data-selected=true]_button]:rounded-r-md group/day aspect-square select-none',
           defaultClassNames.day,
         ),
         range_start: cn('rounded-l-md bg-accent', defaultClassNames.range_start),

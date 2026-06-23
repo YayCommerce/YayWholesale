@@ -16,24 +16,27 @@ import {
   inputVariants,
 } from './variants/input.variants';
 
-function InputGroup({ className, size = 'medium', ...props }: React.ComponentProps<'div'> & InputGroupVariantProps) {
-  return (
-    <div
-      data-slot="input-group"
-      role="group"
-      className={cn(inputGroupVariants({ size }), focusVariants(), inputVariants({ variant: 'input' }), className)}
-      {...props}
-    />
-  );
-}
+const InputGroup = React.forwardRef<HTMLDivElement, React.ComponentProps<'div'> & InputGroupVariantProps>(
+  ({ className, size = 'medium', ...props }, ref) => {
+    return (
+      <div
+        ref={ref}
+        data-slot="input-group"
+        role="group"
+        className={cn(inputGroupVariants({ size }), focusVariants(), inputVariants({ variant: 'input' }), className)}
+        {...props}
+      />
+    );
+  },
+);
 
-function InputGroupAddon({
-  className,
-  align = 'inline-start',
-  ...props
-}: React.ComponentProps<'div'> & VariantProps<typeof inputGroupAddonVariants>) {
+const InputGroupAddon = React.forwardRef<
+  HTMLDivElement,
+  React.ComponentProps<'div'> & VariantProps<typeof inputGroupAddonVariants>
+>(({ className, align = 'inline-start', ...props }, ref) => {
   return (
     <div
+      ref={ref}
       role="group"
       data-slot="input-group-addon"
       data-align={align}
@@ -47,17 +50,15 @@ function InputGroupAddon({
       {...props}
     />
   );
-}
+});
 
-function InputGroupButton({
-  className,
-  type = 'button',
-  variant = 'ghost',
-  size = 'large',
-  ...props
-}: Omit<React.ComponentProps<typeof Button>, 'size'> & VariantProps<typeof inputGroupButtonVariants>) {
+const InputGroupButton = React.forwardRef<
+  HTMLButtonElement,
+  Omit<React.ComponentProps<typeof Button>, 'size'> & VariantProps<typeof inputGroupButtonVariants>
+>(({ className, type = 'button', variant = 'ghost', size = 'large', ...props }, ref) => {
   return (
     <Button
+      ref={ref}
       type={type}
       data-size={size}
       variant={variant}
@@ -65,7 +66,7 @@ function InputGroupButton({
       {...props}
     />
   );
-}
+});
 
 function InputGroupText({ className, ...props }: React.ComponentProps<'span'>) {
   return (
@@ -86,7 +87,7 @@ const InputGroupInput = React.forwardRef<HTMLInputElement, React.ComponentProps<
         ref={ref}
         data-slot="input-group-control"
         className={cn(
-          'flex-1 rounded-none border-0 bg-transparent shadow-none focus:outline-none focus-visible:ring-0 focus-visible:ring-offset-0 disabled:opacity-100 dark:bg-transparent',
+          'h-auto flex-1 rounded-none border-0 bg-transparent py-0 shadow-none focus:outline-none focus-visible:ring-0 focus-visible:ring-offset-0 disabled:opacity-100 dark:bg-transparent',
           className,
         )}
         {...props}
@@ -102,7 +103,7 @@ const InputGroupTextarea = React.forwardRef<HTMLTextAreaElement, React.Component
         ref={ref}
         data-slot="input-group-control"
         className={cn(
-          'flex-1 resize-none rounded-none border-0 bg-transparent py-3 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 dark:bg-transparent',
+          'flex-1 resize-none rounded-none border-0 bg-transparent py-2 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 dark:bg-transparent',
           className,
         )}
         {...props}

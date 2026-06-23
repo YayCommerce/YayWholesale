@@ -30,6 +30,7 @@ body.yay-ui {
     opacity: 1;
     background-color: #0000;
     border-radius: 0;
+    min-height: unset;
   }
 
   input:focus,
