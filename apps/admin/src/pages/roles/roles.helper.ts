@@ -68,7 +68,7 @@ export function getEditRolePaymentsField(role: Role, settings: Settings) {
       }
 
       const setting = settings.payment_roles.filter((s) => s.method_id === pm.method_id)[0] ?? false;
-      if (!setting) {
+      if (!setting || !setting.enable_by_role) {
         rolePayments.selected_methods.push(pm.method_id);
         return;
       }
@@ -106,7 +106,7 @@ export function getEditRoleShippingsField(role: Role, settings: Settings) {
       }
 
       const setting = settings.shipping_roles.filter((s) => s.instance_id === sm.instance_id)[0] ?? false;
-      if (!setting) {
+      if (!setting || !setting.enable_by_role) {
         roleShippings.selected_methods.push(sm.instance_id);
         return;
       }
