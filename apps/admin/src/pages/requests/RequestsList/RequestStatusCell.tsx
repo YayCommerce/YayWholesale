@@ -4,7 +4,8 @@ import { __, sprintf } from '@wordpress/i18n';
 import { getErrorMsg } from '@/lib/helpers/response.helper';
 import {
   useApproveRequestMutation,
-  useIsMutatingRequests,
+  useIsMutatingRequest,
+  useIsMutatingRequestsBulk,
   useRejectRequestMutation,
 } from '@/lib/queries/requests.queries';
 import { useActiveRolesQuery, useDefaultRole } from '@/lib/queries/roles.queries';
@@ -31,10 +32,11 @@ export function RequestStatusCell({ request }: { request: Request }) {
 
   const approveRequestMutation = useApproveRequestMutation(request.id);
   const rejectRequestMutation = useRejectRequestMutation(request.id);
-  const isMutating = useIsMutatingRequests();
+  const isMutatingRequest = useIsMutatingRequest(request.id);
+  const isMutatingRequestsBulk = useIsMutatingRequestsBulk();
 
   async function handleApproveRequest(roleSlug: string) {
-    if (isMutating > 0) return;
+    if (isMutatingRequest || isMutatingRequestsBulk) return;
     try {
       await approveRequestMutation.mutateAsync(roleSlug);
     } catch (error) {
@@ -43,7 +45,7 @@ export function RequestStatusCell({ request }: { request: Request }) {
   }
 
   async function handleRejectRequest() {
-    if (isMutating > 0) return;
+    if (isMutatingRequest || isMutatingRequestsBulk) return;
     try {
       await rejectRequestMutation.mutateAsync();
     } catch (error) {
@@ -63,7 +65,7 @@ export function RequestStatusCell({ request }: { request: Request }) {
               <RequestsStatusIcon status={request.status} />
               {request.status}
             </span>
-            <ChevronDown className="text-muted-foreground/70 mt-0.5 size-6  cursor-pointer" />
+            <ChevronDown className="text-muted-foreground/70 mt-0.5 size-6 cursor-pointer" />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent className="w-40">
