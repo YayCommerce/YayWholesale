@@ -67,16 +67,16 @@ export function getEditRolePaymentsField(role: Role, settings: Settings) {
         return;
       }
 
-      const setting = settings.payment_roles.filter((s) => s.method_id === pm.method_id)[0] ?? false;
-      if (!setting || !setting.enable_by_role) {
+      const paymentMethodSettings = settings.payment_roles.filter((s) => s.method_id === pm.method_id)[0] ?? false;
+      if (!paymentMethodSettings || !paymentMethodSettings.enable_by_role) {
         rolePayments.selected_methods.push(pm.method_id);
         return;
       }
 
-      if (setting.enable_by_role.wholesalers === 'disabled') return;
+      if (paymentMethodSettings.enable_by_role.wholesalers === 'disabled') return;
       if (
-        setting.enable_by_role.wholesalers === 'enabled' ||
-        setting.enable_by_role.selected_roles.includes(role.slug)
+        paymentMethodSettings.enable_by_role.wholesalers === 'enabled' ||
+        paymentMethodSettings.enable_by_role.selected_roles.includes(role.slug)
       ) {
         rolePayments.selected_methods.push(pm.method_id);
         return;
@@ -105,16 +105,17 @@ export function getEditRoleShippingsField(role: Role, settings: Settings) {
         return;
       }
 
-      const setting = settings.shipping_roles.filter((s) => s.instance_id === sm.instance_id)[0] ?? false;
-      if (!setting || !setting.enable_by_role) {
+      const shippingMethodSettings =
+        settings.shipping_roles.filter((s) => s.instance_id === sm.instance_id)[0] ?? false;
+      if (!shippingMethodSettings || !shippingMethodSettings.enable_by_role) {
         roleShippings.selected_methods.push(sm.instance_id);
         return;
       }
 
-      if (setting.enable_by_role.wholesalers === 'disabled') return;
+      if (shippingMethodSettings.enable_by_role.wholesalers === 'disabled') return;
       if (
-        setting.enable_by_role.wholesalers === 'enabled' ||
-        setting.enable_by_role.selected_roles.includes(role.slug)
+        shippingMethodSettings.enable_by_role.wholesalers === 'enabled' ||
+        shippingMethodSettings.enable_by_role.selected_roles.includes(role.slug)
       ) {
         roleShippings.selected_methods.push(sm.instance_id);
         return;
@@ -141,13 +142,13 @@ export function getAddRolePaymentsField(settings: Settings) {
       return;
     }
 
-    const setting = settings.payment_roles.filter((s) => s.method_id === pm.method_id)[0] ?? false;
-    if (!setting) {
+    const paymentMethodSettings = settings.payment_roles.filter((s) => s.method_id === pm.method_id)[0] ?? false;
+    if (!paymentMethodSettings || !paymentMethodSettings.enable_by_role) {
       rolePayments.selected_methods.push(pm.method_id);
       return;
     }
 
-    if (setting.enable_by_role.wholesalers != 'enabled') {
+    if (paymentMethodSettings.enable_by_role.wholesalers != 'enabled') {
       rolePayments.enabled = 'enable-selected-methods';
     } else {
       rolePayments.selected_methods.push(pm.method_id);
@@ -170,13 +171,13 @@ export function getAddRoleShippingsField(settings: Settings) {
       return;
     }
 
-    const setting = settings.shipping_roles.filter((s) => s.instance_id === sm.instance_id)[0] ?? false;
-    if (!setting) {
+    const shippingMethodSettings = settings.shipping_roles.filter((s) => s.instance_id === sm.instance_id)[0] ?? false;
+    if (!shippingMethodSettings || !shippingMethodSettings.enable_by_role) {
       roleShippings.selected_methods.push(sm.instance_id);
       return;
     }
 
-    if (setting.enable_by_role.wholesalers != 'enabled') {
+    if (shippingMethodSettings.enable_by_role.wholesalers != 'enabled') {
       roleShippings.enabled = 'enable-selected-methods';
     } else {
       roleShippings.selected_methods.push(sm.instance_id);

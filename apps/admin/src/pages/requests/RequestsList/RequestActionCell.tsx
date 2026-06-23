@@ -11,7 +11,7 @@ import {
   useIsMutatingRequestsBulk,
 } from '@/lib/queries/requests.queries';
 import { Request } from '@/lib/schema/requests.type';
-import { Button } from '@/components/ui/button';
+import { Button, LoadingButton } from '@/components/ui/button';
 import { WholeSaleToolTip } from '@/components/ui/custom/WholeSaleToolTip';
 import {
   Dialog,
@@ -94,9 +94,13 @@ export function RequestActionCell({ request }: { request: Request }) {
           <DialogClose asChild>
             <Button variant="outline">{__('Cancel', 'yay-wholesale-b2b')}</Button>
           </DialogClose>
-          <Button variant="destructive" disabled={deleteRequestMutation.isPending} onClick={() => onDeleteRequest}>
+          <LoadingButton
+            variant="destructive"
+            loading={deleteRequestMutation.isPending}
+            onClick={() => onDeleteRequest}
+          >
             {__('Continue', 'yay-wholesale-b2b')}
-          </Button>
+          </LoadingButton>
         </DialogFooter>
       </DialogContent>
     </Dialog>
