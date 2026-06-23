@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
 import { PencilLine } from 'lucide-react';
 import { useNavigate } from 'react-router';
 import { __ } from '@wordpress/i18n';
@@ -24,7 +23,6 @@ export function RoleActionCell({ role }: { role: Role }) {
   const { mutate: deleteRole, isPending: isDeletingRolePending } = useDeleteRoleMutation(role.slug);
   const navigate = useNavigate();
   const [openDialog, setOpenDialog] = useState(false);
-  const queryClient = useQueryClient();
 
   return (
     <Dialog open={openDialog} onOpenChange={setOpenDialog}>
@@ -36,7 +34,6 @@ export function RoleActionCell({ role }: { role: Role }) {
                 size="icon"
                 variant="ghost"
                 onClick={() => {
-                  queryClient.setQueryData(['role', role.slug], role);
                   navigate(`/roles/edit/${role.slug}`);
                 }}
                 className="hover:text-primary text-muted-foreground transition hover:bg-white hover:shadow-xs"
