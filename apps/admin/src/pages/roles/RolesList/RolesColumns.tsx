@@ -3,13 +3,12 @@ import { __ } from '@wordpress/i18n';
 
 import { parseWPCurrency } from '@/lib/helpers/format.helper';
 import { Role } from '@/lib/schema/roles.schema';
-import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { WholeSaleToolTip } from '@/components/ui/custom/WholeSaleToolTip';
 import { isDefaultRole } from '../roles.helper';
-import RoleStatusSwitch from './RoleStatusSwitch';
-import { RoleCountCell } from './RoleCountCell';
 import { RoleActionCell } from './RoleActionCell';
+import { RoleCountCell } from './RoleCountCell';
+import RoleStatusSwitch from './RoleStatusSwitch';
 
 export const roleColumns: ColumnDef<Role>[] = [
   {
@@ -76,7 +75,7 @@ export const roleColumns: ColumnDef<Role>[] = [
   {
     accessorKey: 'count',
     header: __('Count', 'yay-wholesale-b2b'),
-    cell: ({ row }) => <RoleCountCell row={row} />,
+    cell: ({ row }) => <RoleCountCell role={row.original} />,
     meta: { align: 'center' },
     size: 80,
   },
@@ -136,7 +135,7 @@ export const roleColumns: ColumnDef<Role>[] = [
   {
     id: 'actions',
     header: '',
-    cell: ({ row }) => <RoleActionCell row={row} />,
+    cell: ({ row }) => <RoleActionCell role={row.original} />,
     size: 60,
   },
 ];

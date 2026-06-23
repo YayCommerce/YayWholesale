@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { Row } from '@tanstack/react-table';
 import { PencilLine } from 'lucide-react';
 import { useNavigate } from 'react-router';
 import { __ } from '@wordpress/i18n';
@@ -21,8 +20,8 @@ import {
 import DeleteIcon from '@/components/icons/DeleteIcon';
 import { isDefaultRole } from '../roles.helper';
 
-export function RoleActionCell({ row }: { row: Row<Role> }) {
-  const { mutate: deleteRole, isPending: isDeletingRolePending } = useDeleteRoleMutation(row.original.slug);
+export function RoleActionCell({ role }: { role: Role }) {
+  const { mutate: deleteRole, isPending: isDeletingRolePending } = useDeleteRoleMutation(role.slug);
   const navigate = useNavigate();
   const [openDialog, setOpenDialog] = useState(false);
   const queryClient = useQueryClient();
@@ -37,8 +36,8 @@ export function RoleActionCell({ row }: { row: Row<Role> }) {
                 size="icon"
                 variant="ghost"
                 onClick={() => {
-                  queryClient.setQueryData(['role', row.original.slug], row.original);
-                  navigate(`/roles/edit/${row.original.slug}`);
+                  queryClient.setQueryData(['role', role.slug], role);
+                  navigate(`/roles/edit/${role.slug}`);
                 }}
                 className="hover:text-primary text-muted-foreground transition hover:bg-white hover:shadow-xs"
               >
@@ -57,7 +56,7 @@ export function RoleActionCell({ row }: { row: Row<Role> }) {
                   e.stopPropagation();
                   setOpenDialog(true);
                 }}
-                disabled={isDeletingRolePending || isDefaultRole(row.original)}
+                disabled={isDeletingRolePending || isDefaultRole(role)}
                 className="hover:text-destructive text-muted-foreground hover:bg-white hover:shadow-xs"
               >
                 <DeleteIcon className="size-4" />
