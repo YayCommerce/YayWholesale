@@ -1,7 +1,9 @@
 import { queryOptions, useIsMutating, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
-import { getSettings, postSettings, updateEmailStatus } from '@/lib/api/settings.api';
+import { getSettings, postSettings, saveSetup, skipSetup, updateEmailStatus } from '@/lib/api/settings.api';
+import { ROLES_QUERIES } from '@/lib/queries/roles.queries';
 import type { Settings } from '@/lib/schema/settings.schema';
+import { SetupWizardForm } from '@/lib/schema/wizard.schema';
 
 /** Options */
 
@@ -77,8 +79,34 @@ export function useUpdateEmailStatusMutation() {
   });
 }
 
+export function useSaveSetupWizardMutation() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationKey: ['settings', 'setup-wizard'],
+    mutationFn: async (setupWizardForm: SetupWizardForm) => saveSetup(setupWizardForm),
+    onSuccess: (res) => {
+      window.yayWholesaleB2BAdmin.settings = res.settings;
+      queryClient.setQueryData(SETTINGS_QUERIES.main.queryKey, res.settings);
+      queryClient.setQueryData(ROLES_QUERIES.all.queryKey, res.roles);
+    },
+    onError: () => queryClient.invalidateQueries({ queryKey: SETTINGS_QUERIES.main.queryKey }),
+  });
+}
+
+export function useSkipSetupWizardMutation() {
+  return useMutation({
+    mutationKey: ['settings', 'setup-wizard', 'skip'],
+    mutationFn: async () => skipSetup(),
+  });
+}
+
 /** Utils */
 
 export function useIsMutatingSettings() {
   return useIsMutating({ mutationKey: ['settings', 'main'] });
+}
+
+export function useIsMutatingSetup() {
+  return useIsMutating({ mutationKey: ['settings', 'setup-wizard'] });
 }
