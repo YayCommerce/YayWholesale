@@ -4,12 +4,19 @@ WooCommerce wholesale plugin for serving wholesale & B2B customers.
 
 ## Getting Started
 
-```bash
-# Install PHP dependencies
-composer install
+```php
+// In wp-config.php
+// development mode
+define( 'YAYWHOLESALEB2B_IS_DEVELOPMENT', true );
+// production mode
+define( 'YAYWHOLESALEB2B_IS_DEVELOPMENT', false );
+```
 
+```bash
 # Install JS dependencies
 pnpm install
+# Build Gutenberg block
+pnpm build
 ```
 
 ## Development
@@ -17,9 +24,6 @@ pnpm install
 ```bash
 # Build assets (watch mode)
 pnpm dev
-
-# Build assets (production)
-pnpm build
 ```
 
 ## Testing

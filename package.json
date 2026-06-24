@@ -4,6 +4,8 @@
   "private": true,
   "scripts": {
     "postinstall": "composer install",
+    "dev:admin": "pnpm --filter @yay-wholesale/admin-page dev",
+    "build": "pnpm --filter @yay-wholesale-blocks/* build",
     "makepot": "wp i18n make-pot . languages/yay-wholesale-b2b.pot --exclude=vendor,node_modules,apps,tests --domain=yay-wholesale-b2b",
     "release": "pnpm release:lite && pnpm release:pro",
     "release:lite": "bash ./release.sh IS_PRO=false",

@@ -20,9 +20,9 @@ import {
 import { Field, FieldContent, FieldError, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Segmented, SegmentedItem } from '@/components/ui/segmented';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
-import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import DeleteIcon from '@/components/icons/DeleteIcon';
 import EllipsisIcon from '@/components/icons/EllipsisIcon';
 
@@ -193,18 +193,17 @@ export function FieldRow({
               <Field>
                 <FieldLabel>{__('Column Width', 'yay-wholesale-b2b')}</FieldLabel>
                 <FieldContent>
-                  <ToggleGroup
-                    className="border-border h-9 w-full gap-0.75 border bg-white p-0.75"
-                    type="single"
+                  <Segmented
+                    shape="square"
                     value={field.value}
                     onValueChange={(val) => {
                       if (val) field.onChange(val);
                     }}
                     disabled={isHidden}
                   >
-                    <ToggleGroupItem value="50%">50%</ToggleGroupItem>
-                    <ToggleGroupItem value="100%">100%</ToggleGroupItem>
-                  </ToggleGroup>
+                    <SegmentedItem value="50%">50%</SegmentedItem>
+                    <SegmentedItem value="100%">100%</SegmentedItem>
+                  </Segmented>
                 </FieldContent>
               </Field>
             )}

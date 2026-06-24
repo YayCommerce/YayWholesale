@@ -9,7 +9,7 @@ import { getErrorMsg } from '@/lib/helpers/response.helper';
 import { useIsMutatingRoles, useUpdateRoleMutation } from '@/lib/queries/roles.queries';
 import { useSettingsQuery } from '@/lib/queries/settings.queries';
 import { Role, roleFormSchema, RoleFormValues } from '@/lib/schema/roles.schema';
-import { Button } from '@/components/ui/button';
+import { Button, LoadingButton } from '@/components/ui/button';
 import { SheetClose, SheetFooter, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { toast } from '@/components/ui/sonner';
 import { makeDefaultEditRole } from '@/pages/roles/roles.helper';
@@ -66,9 +66,9 @@ export default function EditRoleForm({ role }: { role: Role }) {
             <SheetClose asChild>
               <Button variant="outline">{__('Cancel', 'yay-wholesale-b2b')}</Button>
             </SheetClose>
-            <Button type="submit" form="role-form" variant="primary">
+            <LoadingButton loading={updateRoleMutation.isPending} type="submit" form="role-form" variant="primary">
               {__('Save Changes', 'yay-wholesale-b2b')}
-            </Button>
+            </LoadingButton>
           </div>
         </SheetFooter>
       </form>

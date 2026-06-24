@@ -73,26 +73,10 @@ fi
 cd "$PROJECT_PATH"
 
 #
-# 2) Build Request Form Block
+# 2) Build Request Form Block, Requirement Slot Fill, Requirement Block
 #
-cd "$PROJECT_PATH/apps/blocks/request-form-block"
-echo "Running Request Form Block JS Build..."
-pnpm build
-cd "$PROJECT_PATH"
-
-#
-# 3) Build Requirement Slot Fill
-#
-cd "$PROJECT_PATH/apps/blocks/requirement-slot-fill"
-echo "Running Reqirement Slot Fill JS Build..."
-pnpm build
-cd "$PROJECT_PATH"
-
-# 4) Build Requirement Block
-#
-cd "$PROJECT_PATH/apps/blocks/requirement-block"
-echo "Running Requirement Block JS Build..."
-pnpm build
+echo "Build Request Form Block, Requirement Slot Fill, Requirement Block..."
+pnpm --filter @yay-wholesale-blocks/* build
 cd "$PROJECT_PATH"
 
 #

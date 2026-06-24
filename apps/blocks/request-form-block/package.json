@@ -1,5 +1,5 @@
 {
-	"name": "request-form-block",
+	"name": "@yay-wholesale-blocks/request-form-block",
 	"version": "0.1.0",
 	"description": "Example block scaffolded with Create Block tool.",
 	"author": "The WordPress Contributors",

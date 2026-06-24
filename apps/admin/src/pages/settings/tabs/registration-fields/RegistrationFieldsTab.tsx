@@ -1,4 +1,4 @@
-import { closestCenter, DndContext, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
+import { closestCenter, DndContext, DragEndEvent, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { Plus } from 'lucide-react';
 import { useFieldArray, useFormContext } from 'react-hook-form';
@@ -20,7 +20,7 @@ export default function RegistrationFieldsTab() {
 
   const sensors = useSensors(useSensor(PointerSensor));
 
-  const handleDragEnd = (event: any) => {
+  const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
     if (active.id !== over?.id) {
       const oldIndex = fields.findIndex((f) => f.id === active.id);

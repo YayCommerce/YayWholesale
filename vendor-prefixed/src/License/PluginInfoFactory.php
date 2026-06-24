@@ -6,11 +6,10 @@ use YayWholesaleB2BScoped\YayCommerce\AdminShell\License\Contracts\LicenseConfig
 use YayWholesaleB2BScoped\YayCommerce\AdminShell\Registry\PluginLicenseInfo;
 /**
  * Builds a PluginLicenseInfo data object from a LicenseHandler's current state.
- * @internal
  */
 class PluginInfoFactory
 {
-    public static function from_adapter(LicenseConfigAdapter $adapter) : PluginLicenseInfo
+    public static function from_adapter(LicenseConfigAdapter $adapter): PluginLicenseInfo
     {
         $license = new License($adapter);
         $raw_info = $license->get_license_info();
