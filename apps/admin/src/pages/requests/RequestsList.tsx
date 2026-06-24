@@ -103,11 +103,11 @@ export default function RequestsList() {
   const bulkApproveMutation = useBulkApproveRequestMutation();
   const bulkRejectMutation = useBulkRejectRequestMutation();
   const bulkDeleteMutation = useBulkDeleteRequestMutation();
-  const isMutating = useIsMutatingRequests();
+  const isMutatingRequests = useIsMutatingRequests();
 
   async function handleBulkApprove(roleSlug: string) {
     const requestIds = table.getSelectedRowModel().rows.map((row) => row.original.id);
-    if (requestIds.length === 0 || isMutating > 0) return;
+    if (requestIds.length === 0 || isMutatingRequests) return;
 
     try {
       await bulkApproveMutation.mutateAsync({
@@ -123,7 +123,7 @@ export default function RequestsList() {
 
   async function handleBulkReject() {
     const requestIds = table.getSelectedRowModel().rows.map((row) => row.original.id);
-    if (requestIds.length === 0 || isMutating > 0) return;
+    if (requestIds.length === 0 || isMutatingRequests) return;
 
     try {
       await bulkRejectMutation.mutateAsync(requestIds);
@@ -136,7 +136,7 @@ export default function RequestsList() {
 
   async function handleBulkDelete() {
     const requestIds = table.getSelectedRowModel().rows.map((row) => row.original.id);
-    if (requestIds.length === 0 || isMutating > 0) return;
+    if (requestIds.length === 0 || isMutatingRequests) return;
 
     try {
       await bulkDeleteMutation.mutateAsync(requestIds);
@@ -322,7 +322,7 @@ export default function RequestsList() {
                 <Button
                   size="icon"
                   variant="ghost"
-                  className="hover:text-destructive text-muted-foreground size-8  hover:bg-transparent hover:shadow-sm"
+                  className="hover:text-destructive text-muted-foreground size-8 hover:bg-transparent hover:shadow-sm"
                   onClick={() => setOpenDeleteDialog(true)}
                 >
                   <DeleteIcon className="size-4" />

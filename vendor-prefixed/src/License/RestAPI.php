@@ -4,13 +4,12 @@ namespace YayWholesaleB2BScoped\YayCommerce\AdminShell\License;
 
 use YayWholesaleB2BScoped\YayCommerce\AdminShell\License\Contracts\LicenseConfigAdapter;
 use YayWholesaleB2BScoped\YayCommerce\AdminShell\Support\Slug;
-\defined('ABSPATH') || exit;
+defined('ABSPATH') || exit;
 /**
  * Per-plugin REST routes for license management.
  *
  * REST namespace: {slug}/v1 (derived from adapter slug).
  * Ported from YayMail Pro RestAPI.php — CorePlugin::get() replaced with adapter.
- * @internal
  */
 class RestAPI
 {
@@ -20,14 +19,14 @@ class RestAPI
         $this->adapter = $adapter;
         add_action('rest_api_init', [$this, 'init_rest_api']);
     }
-    public function init_rest_api() : void
+    public function init_rest_api(): void
     {
         $namespace = Slug::to_var_name($this->adapter->get_plugin_slug()) . '/v1';
         register_rest_route($namespace, '/license/activate', ['methods' => [\WP_REST_Server::CREATABLE], 'callback' => [$this, 'activate_license'], 'permission_callback' => [$this, 'permission_callback']]);
         register_rest_route($namespace, '/license/update', ['methods' => [\WP_REST_Server::CREATABLE], 'callback' => [$this, 'update_license'], 'permission_callback' => [$this, 'permission_callback']]);
         register_rest_route($namespace, '/license/delete', ['methods' => [\WP_REST_Server::CREATABLE], 'callback' => [$this, 'remove_license'], 'permission_callback' => [$this, 'permission_callback']]);
     }
-    public function activate_license(\WP_REST_Request $request_data) : \WP_REST_Response
+    public function activate_license(\WP_REST_Request $request_data): \WP_REST_Response
     {
         $nonce = $request_data->get_header('x_wp_nonce');
         if (!wp_verify_nonce($nonce, 'wp_rest')) {
@@ -39,15 +38,15 @@ class RestAPI
         $return = ['success' => $activate_response['success'], 'name' => $this->adapter->get_plugin_name(), 'slug' => $this->adapter->get_plugin_slug()];
         if ($activate_response['success']) {
             $_plugin = ['slug' => $this->adapter->get_plugin_slug(), 'name' => $this->adapter->get_plugin_name()];
-            \ob_start();
+            ob_start();
             include __DIR__ . '/../../views/license-card.php';
-            $return['html'] = \ob_get_clean();
+            $return['html'] = ob_get_clean();
         } else {
             $return['message'] = LicenseAPI::get_error_message($activate_response['message'] ?? '');
         }
         return new \WP_REST_Response($return);
     }
-    public function update_license(\WP_REST_Request $request_data) : \WP_REST_Response
+    public function update_license(\WP_REST_Request $request_data): \WP_REST_Response
     {
         $nonce = $request_data->get_header('x_wp_nonce');
         if (!wp_verify_nonce($nonce, 'wp_rest')) {
@@ -58,17 +57,17 @@ class RestAPI
         $return = ['success' => $update_response['success'], 'name' => $this->adapter->get_plugin_name(), 'slug' => $this->adapter->get_plugin_slug()];
         $_plugin = ['slug' => $this->adapter->get_plugin_slug(), 'name' => $this->adapter->get_plugin_name()];
         if ($update_response['success'] || !empty($update_response['is_server_error'])) {
-            \ob_start();
+            ob_start();
             include __DIR__ . '/../../views/license-card.php';
-            $return['html'] = \ob_get_clean();
+            $return['html'] = ob_get_clean();
         } else {
-            \ob_start();
+            ob_start();
             include __DIR__ . '/../../views/license-activate-card.php';
-            $return['html'] = \ob_get_clean();
+            $return['html'] = ob_get_clean();
         }
         return new \WP_REST_Response($return);
     }
-    public function remove_license(\WP_REST_Request $request_data) : \WP_REST_Response
+    public function remove_license(\WP_REST_Request $request_data): \WP_REST_Response
     {
         $nonce = $request_data->get_header('x_wp_nonce');
         if (!wp_verify_nonce($nonce, 'wp_rest')) {
@@ -78,13 +77,13 @@ class RestAPI
         $license->remove();
         $return = ['success' => \true, 'name' => $this->adapter->get_plugin_name(), 'slug' => $this->adapter->get_plugin_slug()];
         $_plugin = $return;
-        \ob_start();
+        ob_start();
         include __DIR__ . '/../../views/license-activate-card.php';
-        $return['html'] = \ob_get_clean();
+        $return['html'] = ob_get_clean();
         return new \WP_REST_Response($return);
     }
-    public function permission_callback() : bool
+    public function permission_callback(): bool
     {
-        return \current_user_can($this->adapter->get_capability());
+        return current_user_can($this->adapter->get_capability());
     }
 }

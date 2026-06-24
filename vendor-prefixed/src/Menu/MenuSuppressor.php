@@ -17,7 +17,6 @@ use YayWholesaleB2BScoped\YayCommerce\AdminShell\Support\AdminContext;
  *
  * Fallback path: if strategy (a) causes problems in Phase 02 pilot,
  * disable this suppressor and coexist with legacy menus (strategy b).
- * @internal
  */
 class MenuSuppressor
 {
@@ -41,14 +40,14 @@ class MenuSuppressor
      * Register hooks. Runs on admin_menu / network_admin_menu priority 5
      * (before standard priority 10).
      */
-    public function init() : void
+    public function init(): void
     {
         AdminContext::bind_menu([$this, 'suppress_legacy_menus'], 5);
     }
     /**
      * Remove any legacy top-level menus from the slug list.
      */
-    public function suppress_legacy_menus() : void
+    public function suppress_legacy_menus(): void
     {
         foreach ($this->slugs_to_suppress as $slug) {
             remove_menu_page($slug);
@@ -59,7 +58,7 @@ class MenuSuppressor
      *
      * @return string[]
      */
-    public function get_slugs() : array
+    public function get_slugs(): array
     {
         return $this->slugs_to_suppress;
     }

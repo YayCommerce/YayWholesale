@@ -7,7 +7,6 @@ namespace YayWholesaleB2BScoped\YayCommerce\AdminShell\Registry;
  *
  * APPEND-ONLY — existing public properties must never be renamed or removed.
  * New properties may be added in MINOR versions; removing/renaming requires MAJOR bump.
- * @internal
  */
 final class PluginLicenseInfo
 {
@@ -46,13 +45,13 @@ final class PluginLicenseInfo
      * Return array representation suitable for passing to JS/REST.
      * Redacts license_key to first 8 chars + asterisks.
      */
-    public function toArray() : array
+    public function toArray(): array
     {
         $key_display = '';
         if (!empty($this->license_key)) {
-            $visible = \substr($this->license_key, 0, 8);
-            $hidden_len = \max(0, \strlen($this->license_key) - 8);
-            $key_display = $visible . \str_repeat('*', \min($hidden_len, 20));
+            $visible = substr($this->license_key, 0, 8);
+            $hidden_len = max(0, strlen($this->license_key) - 8);
+            $key_display = $visible . str_repeat('*', min($hidden_len, 20));
         }
         return [
             'slug' => $this->slug,

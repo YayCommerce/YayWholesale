@@ -8,7 +8,7 @@ import { getErrorMsg } from '@/lib/helpers/response.helper';
 import { useAddRoleMutation, useIsMutatingRoles } from '@/lib/queries/roles.queries';
 import { useSettingsQuery } from '@/lib/queries/settings.queries';
 import { roleFormSchema, RoleFormValues } from '@/lib/schema/roles.schema';
-import { Button } from '@/components/ui/button';
+import { Button, LoadingButton } from '@/components/ui/button';
 import { SheetClose, SheetFooter, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { toast } from '@/components/ui/sonner';
 import { makeDefaultAddRole } from '@/pages/roles/roles.helper';
@@ -61,9 +61,9 @@ export default function AddRoleForm() {
             <SheetClose asChild>
               <Button variant="outline">{__('Cancel', 'yay-wholesale-b2b')}</Button>
             </SheetClose>
-            <Button type="submit" form="role-form" variant="primary">
+            <LoadingButton loading={addRoleMutation.isPending} type="submit" form="role-form" variant="primary">
               {__('Add Role', 'yay-wholesale-b2b')}
-            </Button>
+            </LoadingButton>
           </div>
         </SheetFooter>
       </form>

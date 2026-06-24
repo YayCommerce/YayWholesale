@@ -50,15 +50,14 @@ const badgeVariants = cva(
   },
 );
 
-interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement>, VariantProps<typeof badgeVariants> {
+interface BadgeProps extends React.ButtonHTMLAttributes<HTMLButtonElement>, VariantProps<typeof badgeVariants> {
   asChild?: boolean;
 }
 
 const Badge = React.forwardRef<HTMLSpanElement, BadgeProps>(
-  ({ className, variant, asChild = false, ...props }: BadgeProps, ref) => {
+  ({ className, variant, asChild = false, ...props }, ref) => {
     const Comp = asChild ? Slot : 'span';
-
-    return <Comp data-slot="badge" className={cn(badgeVariants({ variant }), className)} {...props} ref={ref} />;
+    return <Comp data-slot="badge" className={cn(badgeVariants({ variant, className }))} {...props} ref={ref} />;
   },
 );
 

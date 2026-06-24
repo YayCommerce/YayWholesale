@@ -358,7 +358,7 @@ export default function RoleFormContent({ slug }: FormContentProps) {
                   <span className="text-sm font-medium">
                     {__('Apply wholesale discounts to sale prices', 'yay-wholesale-b2b')}
                   </span>
-                  <Switch size="sm" checked={field.value} onCheckedChange={field.onChange} />
+                  <Switch ref={ref} size="sm" checked={field.value} onCheckedChange={field.onChange} />
                 </div>
               </FieldContent>
               {error && (
@@ -373,7 +373,7 @@ export default function RoleFormContent({ slug }: FormContentProps) {
             </Field>
           )}
         />
-        <Separator className="text-muted" />
+        <Separator />
         <Controller
           control={control}
           name="role.status"
@@ -382,7 +382,13 @@ export default function RoleFormContent({ slug }: FormContentProps) {
               <FieldContent>
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium">{__('Enable Status', 'yay-wholesale-b2b')}</span>
-                  <Switch size="sm" checked={field.value} onCheckedChange={field.onChange} disabled={isDefaultRole} />
+                  <Switch
+                    size="sm"
+                    checked={field.value}
+                    onCheckedChange={field.onChange}
+                    disabled={isDefaultRole}
+                    ref={ref}
+                  />
                 </div>
               </FieldContent>
               {error && (

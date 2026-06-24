@@ -1,18 +1,17 @@
-import { useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router';
 
-import { cacheRequest } from '@/lib/queries/requests.queries';
+import { useCacheRequest } from '@/lib/queries/requests.queries';
 import { Request } from '@/lib/schema/requests.type';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 export function RequestAvatarCell({ request }: { request: Request }) {
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
+  const { cacheRequest } = useCacheRequest();
   const { avatar, name, id, email } = request;
 
   return (
     <div className="flex items-center gap-3">
-      <Avatar className="size-9.5 ">
+      <Avatar className="size-9.5">
         <AvatarImage src={avatar} alt={name} />
         <AvatarFallback>{name.charAt(0)}</AvatarFallback>
       </Avatar>
@@ -20,7 +19,7 @@ export function RequestAvatarCell({ request }: { request: Request }) {
         <p
           className="cursor-pointer leading-none font-medium hover:underline"
           onClick={() => {
-            cacheRequest(queryClient, request);
+            cacheRequest(request);
             navigate(`/requests/edit/${id}`);
           }}
         >

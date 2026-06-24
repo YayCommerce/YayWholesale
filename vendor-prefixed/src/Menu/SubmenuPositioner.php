@@ -17,13 +17,12 @@ use YayWholesaleB2BScoped\YayCommerce\AdminShell\Support\AdminContext;
  * so a single authority orders ALL submenus — including those registered by
  * older co-installed copies. Positions are read from a shared cross-scope map
  * populated by AdminShell::register_plugin().
- * @internal
  */
 class SubmenuPositioner
 {
     const PARENT = 'yaycommerce';
     const POSITION_KEY = 'yaycommerce_admin_shell_submenu_positions';
-    public function init() : void
+    public function init(): void
     {
         // Priority 9999: run after every plugin (<=10) and TopLevelMenu's parent
         // submenu cleanup (999) have finished, so the array is complete.
@@ -35,10 +34,10 @@ class SubmenuPositioner
      * Lower position first; ties and unknown/null positions keep their existing
      * order and sort after positioned items.
      */
-    public function reorder() : void
+    public function reorder(): void
     {
         global $submenu;
-        if (empty($submenu[self::PARENT]) || !\is_array($submenu[self::PARENT])) {
+        if (empty($submenu[self::PARENT]) || !is_array($submenu[self::PARENT])) {
             return;
         }
         $positions = $GLOBALS[self::POSITION_KEY] ?? [];
@@ -49,7 +48,7 @@ class SubmenuPositioner
             $slug = $item[2] ?? '';
             $decorated[] = ['item' => $item, 'index' => $index, 'position' => $positions[$slug] ?? null];
         }
-        \usort($decorated, function ($a, $b) {
+        usort($decorated, function ($a, $b) {
             $pa = $a['position'];
             $pb = $b['position'];
             if (null === $pa && null === $pb) {
@@ -69,6 +68,6 @@ class SubmenuPositioner
             return $pa <=> $pb;
         });
         // Re-index to sequential keys; WP renders the submenu in array order.
-        $submenu[self::PARENT] = \array_values(\array_column($decorated, 'item'));
+        $submenu[self::PARENT] = array_values(array_column($decorated, 'item'));
     }
 }

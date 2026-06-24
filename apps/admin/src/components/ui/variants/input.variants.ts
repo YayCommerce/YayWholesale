@@ -6,12 +6,6 @@ export const inputVariants = cva('border-input transition-default', {
       input:
         'focus-visible:ring-ring has-[[data-slot=input-group-control]:focus-visible]:ring-ring hover:border-muted-foreground focus-visible:hover:border-input has-[[data-slot=input-group-control]:focus-visible]:hover:border-input',
       picker: 'cursor-pointer shadow-xs hover:bg-muted-400 focus-visible:bg-muted-400 focus-visible:ring-ring',
-
-      /* Shadcn variants: override ring-offset */
-      'input-shadcn':
-        'focus-visible:ring-offset-0 focus-visible:ring-[1.5px] hover:border-ring-shadcn focus-visible:border-ring-shadcn focus-visible:ring-ring-shadcn/50',
-      'picker-shadcn':
-        'focus-visible:ring-offset-0 focus-visible:ring-[1.5px] hover:bg-accent hover:border-ring-shadcn focus-visible:border-ring-shadcn focus-visible:ring-ring-shadcn/50',
     },
   },
   defaultVariants: {
@@ -23,7 +17,8 @@ export type InputVariantProps = VariantProps<typeof inputVariants>;
 
 export const inputGroupVariants = cva(
   [
-    'group/input-group border hover:border-muted-foreground border-input dark:bg-input/30 shadow-xs relative flex w-full items-center outline-none transition-default duration-300 min-w-0 has-[>textarea]:h-auto data-[disabled=true]:opacity-70 data-[disabled=true]:pointer-events-none data-[disabled=true]:cursor-not-allowed has-[>[data-align=block-end]]:h-auto has-[>[data-align=block-end]]:flex-col has-[>[data-align=block-start]]:h-auto has-[>[data-align=block-start]]:flex-col focus-visible:group-hover:border-border',
+    'group/input-group border hover:border-muted-foreground border-input dark:bg-input/30 shadow-xs relative flex w-full items-center outline-none transition-default duration-300 min-w-0 has-[>textarea]:h-auto has-[>[data-align=block-end]]:h-auto has-[>[data-align=block-end]]:flex-col has-[>[data-align=block-start]]:h-auto has-[>[data-align=block-start]]:flex-col focus-visible:group-hover:border-border',
+    'has-[[data-slot=input-group-control]:disabled]:pointer-events-none has-[[data-slot=input-group-control]:disabled]:cursor-not-allowed has-[[data-slot=input-group-control]:disabled]:opacity-50',
     'has-[>[data-align=inline-start]]:[&>input]:pl-2 has-[>[data-align=inline-end]]:[&>input]:pr-2',
   ],
   {

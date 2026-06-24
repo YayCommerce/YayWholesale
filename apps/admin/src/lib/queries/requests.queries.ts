@@ -1,6 +1,5 @@
 import {
   keepPreviousData,
-  QueryClient,
   queryOptions,
   useIsMutating,
   useMutation,
@@ -64,6 +63,7 @@ export function useCountByStatusQuery() {
 
 export function useApproveRequestMutation(requestId: number) {
   const queryClient = useQueryClient();
+  const { cacheRequest } = useCacheRequest();
   return useMutation({
     mutationKey: ['requests', requestId, 'approve'],
     mutationFn: (roleSlug: string) => approveRequest(requestId, roleSlug),
@@ -71,7 +71,7 @@ export function useApproveRequestMutation(requestId: number) {
       queryClient.invalidateQueries({ queryKey: REQUESTS_QUERIES.all });
       queryClient.invalidateQueries({ queryKey: ROLES_QUERIES.userCountByRole.queryKey });
       queryClient.invalidateQueries({ queryKey: WHOLESALERS_QUERIES.all });
-      cacheRequest(queryClient, updatedRequest);
+      cacheRequest(updatedRequest);
     },
     onError: () => queryClient.invalidateQueries({ queryKey: REQUESTS_QUERIES.all }),
   });
@@ -94,12 +94,13 @@ export function useBulkApproveRequestMutation() {
 
 export function useRejectRequestMutation(requestId: number) {
   const queryClient = useQueryClient();
+  const { cacheRequest } = useCacheRequest();
   return useMutation({
     mutationKey: ['requests', requestId, 'reject'],
     mutationFn: () => rejectRequest(requestId),
     onSuccess: (updatedRequest) => {
       queryClient.invalidateQueries({ queryKey: REQUESTS_QUERIES.all });
-      cacheRequest(queryClient, updatedRequest);
+      cacheRequest(updatedRequest);
     },
     onError: () => queryClient.invalidateQueries({ queryKey: REQUESTS_QUERIES.all }),
   });
@@ -138,15 +139,23 @@ export function useBulkDeleteRequestMutation() {
 /** Utils */
 
 export function useIsMutatingRequests() {
-  return useIsMutating({ mutationKey: ['requests'] });
+  return useIsMutating({ mutationKey: ['requests'] }) > 0;
+}
+
+export function useIsMutatingRequestsBulk() {
+  return useIsMutating({ mutationKey: ['requests', 'bulk'] }) > 0;
 }
 
 export function useIsMutatingRequest(requestId: number) {
-  const isMutatingBulk = useIsMutating({ mutationKey: ['requests', 'bulk'] });
-  const isMutatingSingle = useIsMutating({ mutationKey: ['requests', requestId] });
-  return isMutatingBulk + isMutatingSingle;
+  return useIsMutating({ mutationKey: ['requests', requestId] }) > 0;
 }
 
-export function cacheRequest(queryClient: QueryClient, request: Request) {
-  queryClient.setQueryData(REQUESTS_QUERIES.single(request.id).queryKey, request);
+export function useCacheRequest() {
+  const queryClient = useQueryClient();
+
+  function cacheRequest(request: Request) {
+    queryClient.setQueryData(REQUESTS_QUERIES.single(request.id).queryKey, request);
+  }
+
+  return { cacheRequest };
 }

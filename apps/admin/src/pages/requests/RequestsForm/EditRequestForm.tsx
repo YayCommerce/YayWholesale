@@ -12,7 +12,7 @@ import {
 } from '@/lib/queries/requests.queries';
 import { useActiveRolesQuery, useDefaultRole } from '@/lib/queries/roles.queries';
 import { Request, RequestField } from '@/lib/schema/requests.type';
-import { Button } from '@/components/ui/button';
+import { Button, LoadingButton } from '@/components/ui/button';
 import { ButtonGroup } from '@/components/ui/button-group';
 import { WholeSaleToolTip } from '@/components/ui/custom/WholeSaleToolTip';
 import {
@@ -37,10 +37,10 @@ export function EditRequestForm({ request }: { request: Request }) {
 
   const updateStatusMutation = useApproveRequestMutation(request.id);
   const rejectStatusMutation = useRejectRequestMutation(request.id);
-  const isMutating = useIsMutatingRequest(request.id);
+  const isMutatingRequest = useIsMutatingRequest(request.id);
 
   async function handleApproveRequest(roleSlug: string) {
-    if (isMutating > 0) return;
+    if (isMutatingRequest) return;
     try {
       await updateStatusMutation.mutateAsync(roleSlug);
       toast.success(__('Request approved successfully', 'yay-wholesale-b2b'));
@@ -51,7 +51,7 @@ export function EditRequestForm({ request }: { request: Request }) {
   }
 
   async function handleRejectRequest() {
-    if (isMutating > 0) return;
+    if (isMutatingRequest) return;
     try {
       await rejectStatusMutation.mutateAsync();
       toast.success(__('Request rejected successfully', 'yay-wholesale-b2b'));
@@ -188,10 +188,11 @@ export function EditRequestForm({ request }: { request: Request }) {
             </Button>
 
             <ButtonGroup>
-              <Button
+              <LoadingButton
                 variant="outline"
                 className="w-fit"
-                disabled={request.status === 'rejected' || updateStatusMutation.isPending}
+                loading={updateStatusMutation.isPending}
+                disabled={request.status === 'rejected'}
                 onClick={() => {
                   if (!defaultRole) return;
                   handleApproveRequest(defaultRole.slug);
@@ -199,10 +200,10 @@ export function EditRequestForm({ request }: { request: Request }) {
               >
                 <RequestsStatusIcon status="approved" className="text-foreground" />
                 {__('Approve', 'yay-wholesale-b2b')}
-              </Button>
+              </LoadingButton>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="outline" disabled={updateStatusMutation.isPending}>
+                  <Button variant="outline">
                     <Ellipsis />
                   </Button>
                 </DropdownMenuTrigger>
