@@ -5,6 +5,7 @@ use YayWholesaleB2B\Utils\SingletonTrait;
 use WP_REST_Request;
 use YayWholesaleB2B\Helpers\RolesHelper;
 use YayWholesaleB2B\Helpers\SettingsHelper;
+use YayWholesaleB2B\Helpers\SetupWizardHelper;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -13,8 +14,6 @@ defined( 'ABSPATH' ) || exit;
  */
 class SetupWizardRestController extends BaseRestController {
     use SingletonTrait;
-
-    const WIZARD_COMPLETED = 'ywhs_setup_wizard_completed';
 
     protected function __construct() {
         $this->init_hooks();
@@ -47,7 +46,7 @@ class SetupWizardRestController extends BaseRestController {
     }
 
     public function mark_completed_wizard( WP_REST_Request $request ) {
-        update_option( self::WIZARD_COMPLETED, true );
+        SetupWizardHelper::mark_setup_wizard_completed();
         return true;
     }
 
@@ -81,7 +80,7 @@ class SetupWizardRestController extends BaseRestController {
 
         SettingsHelper::update_settings( $setting );
 
-        update_option( self::WIZARD_COMPLETED, true );
+        SetupWizardHelper::mark_setup_wizard_completed();
 
         return [
             'roles'    => RolesHelper::get_wholesale_roles(),

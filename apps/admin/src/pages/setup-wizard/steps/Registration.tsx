@@ -2,22 +2,25 @@ import { Loader2 } from 'lucide-react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { __ } from '@wordpress/i18n';
 
-import { useIsMutatingSetup } from '@/lib/queries/settings.queries';
+import { useIsMutatingSetup } from '@/lib/queries/wizard.queries';
 import { SetupWizardForm } from '@/lib/schema/wizard.schema';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
+import { SingleSetupStepProps } from '@/pages/setup-wizard/steps.type';
 
-type RegistrationProps = {
-  setStep: (step: number) => void;
-};
-
-export default function Registration({ setStep }: RegistrationProps) {
+export default function Registration({ setStep }: SingleSetupStepProps) {
   const { control } = useFormContext<SetupWizardForm>();
   const isMutatingSetup = useIsMutatingSetup();
 
   return (
     <div className="flex items-center justify-center pt-30">
+      <div>
+        <span className="text-3xl font-bold">{__('Configure your wholesale role', 'yay-wholesale-b2b')}</span>
+        <span className="text-muted-foreground text-base/6.5">
+          {__('Create rules and discounts for your first wholesale customer group', 'yay-wholesale-b2b')}
+        </span>
+      </div>
       <Card className="w-120 p-0 shadow-sm">
         <div className="border-b px-6 py-4">
           <p className="text-sm font-semibold">{__('Registration settings', 'yay-wholesale-b2b')}</p>

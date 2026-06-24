@@ -4,6 +4,7 @@ namespace YayWholesaleB2B\Engine;
 use YayWholesaleB2B\Helpers\MigrationHelper;
 use YayWholesaleB2B\Helpers\RolesHelper;
 use YayWholesaleB2B\Helpers\SettingsHelper;
+use YayWholesaleB2B\Helpers\SetupWizardHelper;
 
 /**
  * Activate and deactive method of the plugin and relates.
@@ -34,15 +35,24 @@ class ActDeact {
         $setting         = SettingsHelper::get_settings();
         $wholesale_roles = RolesHelper::get_wholesale_roles();
         $role_slugs      = array_column( $wholesale_roles, 'slug' );
+        $completedSetup  = SetupWizardHelper::is_setup_wizard_completed();
+        $default_slug    = '';
 
         if ( count( $role_slugs ) === 0 ) {
-            $default_slug                       = RolesHelper::generate_default_role();
+            $default_slug = RolesHelper::generate_default_role();
+        } elseif ( empty( $setting['general']['default_role'] ) ) {
+            $default_slug = $role_slugs[0];
+        }//end if
+
+        if ( ! empty( $default_slug ) ) {
+            $completedSetup                     = false;
             $setting['general']['default_role'] = $default_slug;
             update_option( 'yaywholesaleb2b_settings', $setting );
-        } elseif ( empty( $setting['general']['default_role'] ) ) {
-            $setting['general']['default_role'] = $role_slugs[0];
-            update_option( 'yaywholesaleb2b_settings', $setting );
-        }//end if
+        }
+
+        if ( ! $completedSetup ) {
+            SetupWizardHelper::init_setup_wizard();
+        }
     }
 
     public static function deactivate() {

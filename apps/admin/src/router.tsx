@@ -21,6 +21,11 @@ export function getManagerRouter() {
       path: '/',
       element: <AppLayout />,
       errorElement: <ErrorPage />,
+      loader: async () => {
+        if (!window.yayWholesaleB2BAdmin.setupWizardCompleted) {
+          return redirect('/setup-wizard');
+        }
+      },
       children: [
         {
           index: true,

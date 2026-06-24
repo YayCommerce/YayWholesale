@@ -1,35 +1,40 @@
 import { __ } from '@wordpress/i18n';
 
-import { Button } from '@/components/ui/button';
+import { Button, LoadingButton } from '@/components/ui/button';
+import { SingleSetupStepProps } from '@/pages/setup-wizard/steps.type';
 
-type WelcomeProps = {
-  setStep: (step: number) => void;
-};
-
-export default function Welcome({ setStep }: WelcomeProps) {
+export default function Welcome({ setStep, skip, isPendingSkip }: SingleSetupStepProps) {
   return (
-    <div className="flex flex-col items-center justify-center gap-7 pt-30">
-      <div className="border-border h-full rounded-2xl bg-[#FFF5DB] px-0.75 pt-0.75">
+    <div className="flex flex-col items-center justify-center gap-6">
+      <div className="border-border flex size-17.5 items-center justify-center rounded-full bg-[#F2FAFF]">
         <img
-          src={`${window.yayWholesaleB2BMeta.wholesaleMeta.assetsUrl}/images/favicon.svg`}
+          src={`${window.yayWholesaleB2BMeta.wholesaleMeta.assetsUrl}/images/waving_hand.svg`}
           alt="YayWholesale"
-          className="size-30"
+          className="size-10"
         />
       </div>
-      <h3 className="text-2xl font-bold">{__('Welcome to Yay Wholesale B2B')}</h3>
-      <p className="text-muted-foreground w-120 text-center text-lg">
-        {__(
-          'The easiest way to manage wholesale pricing, customer tiers, minimum order quantities / amount, and B2B features for your WooCommerce store.',
-          'yay-wholesale-b2b',
-        )}
-      </p>
-      <div className="mt-4 flex flex-col gap-4">
-        <Button size="lg" className="w-60" onClick={() => setStep(1)}>
+      <div className="flex w-172.5 flex-col items-center gap-6">
+        <h3 className="text-3xl font-bold">{__('Start selling wholesale in minutes')}</h3>
+        <p className="text-muted-foreground text-center text-base/6.5">
+          {__(
+            'The easiest way to manage wholesale pricing, customer tiers, minimum order quantities / amount, and B2B features for your WooCommerce store.',
+            'yay-wholesale-b2b',
+          )}
+        </p>
+      </div>
+      <div className="flex flex-col gap-3">
+        <Button size="lg" className="w-79" onClick={() => setStep(1)}>
           {__('Get started', 'yay-wholesale')}
         </Button>
-        <Button size="lg" className="text-muted-foreground w-60 font-normal" variant="ghost">
-          {__('Skip for now', 'yay-wholesale')}
-        </Button>
+        <LoadingButton
+          size="lg"
+          className="text-muted-foreground hover:text-foreground w-79 font-semibold"
+          variant="ghost"
+          loading={isPendingSkip}
+          onClick={skip}
+        >
+          {__('Skip for Now', 'yay-wholesale')}
+        </LoadingButton>
       </div>
     </div>
   );
