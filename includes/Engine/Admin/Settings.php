@@ -109,7 +109,7 @@ class Settings {
         if ( get_transient( SetupWizardHelper::SETUP_WIZARD_REDIRECT_TRANSIENT ) ) {
             // After plugin activation, redirect to setup wizard if not completed
             delete_transient( SetupWizardHelper::SETUP_WIZARD_REDIRECT_TRANSIENT );
-            if ( SetupWizardHelper::is_setup_wizard_fresh() ) {
+            if ( 'fresh' === SetupWizardHelper::get_setup_wizard_status() ) {
                 SetupWizardHelper::redirect_to_setup_wizard();
                 return;
             }

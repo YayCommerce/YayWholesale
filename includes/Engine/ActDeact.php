@@ -58,26 +58,26 @@ class ActDeact {
     protected static function single_activate() {
         MigrationHelper::migrate_data();
 
-        $setting             = SettingsHelper::get_settings();
-        $wholesale_roles     = RolesHelper::get_wholesale_roles();
-        $role_slugs          = array_column( $wholesale_roles, 'slug' );
-        $setup_wizard_option = SetupWizardHelper::get_setup_wizard_option();
-        $default_slug        = '';
+        $setting         = SettingsHelper::get_settings();
+        $wholesale_roles = RolesHelper::get_wholesale_roles();
 
-        if ( count( $role_slugs ) === 0 ) {
-            $default_slug                  = RolesHelper::generate_default_role();
-            $setup_wizard_option['status'] = 'fresh';
-            // fresh
-        } elseif ( empty( $setting['general']['default_role'] ) ) {
-            $default_slug = $role_slugs[0];
-        }//end if
-
-        if ( ! empty( $default_slug ) ) {
+        if ( count( $wholesale_roles ) === 0 ) {
+            $default_slug = RolesHelper::generate_default_role();
+            SetupWizardHelper::save_setup_wizard_status( 'fresh' );
             $setting['general']['default_role'] = $default_slug;
-            update_option( 'yaywholesaleb2b_settings', $setting );
+            SettingsHelper::update_settings( $setting );
+        } elseif ( empty( $setting['general']['default_role'] ) ) {
+            $active_roles = RolesHelper::get_active_wholesale_roles();
+            if ( empty( $active_roles ) ) {
+                $default_slug = array_first( $wholesale_roles )['slug'];
+            } else {
+                $default_slug = array_first( $active_roles )['slug'];
+            }
+            $setting['general']['default_role'] = $default_slug;
+            SettingsHelper::update_settings( $setting );
         }
 
-        if ( 'fresh' === $setup_wizard_option['status'] ) {
+        if ( 'fresh' === SetupWizardHelper::get_setup_wizard_status() ) {
             SetupWizardHelper::init_setup_wizard();
         }
     }
