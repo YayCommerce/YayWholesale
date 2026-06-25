@@ -15,7 +15,7 @@ export function PaymentRows() {
         return (
           <TableRow key={method.method_id} className="border-divider border-b">
             <TableCell className="w-80 px-2 py-3.5">
-              <p className="text-foreground flex items-center gap-1.5 font-extrabold whitespace-pre-line">
+              <p className="text-foreground flex items-center gap-1.5 font-bold whitespace-pre-line">
                 {method.method_title}
                 {method.description && (
                   <span>

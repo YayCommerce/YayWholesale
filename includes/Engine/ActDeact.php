@@ -4,6 +4,7 @@ namespace YayWholesaleB2B\Engine;
 use YayWholesaleB2B\Helpers\MigrationHelper;
 use YayWholesaleB2B\Helpers\RolesHelper;
 use YayWholesaleB2B\Helpers\SettingsHelper;
+use YayWholesaleB2B\Helpers\SetupWizardHelper;
 
 /**
  * Activate and deactive method of the plugin and relates.
@@ -22,33 +23,62 @@ class ActDeact {
         }
     }
 
-    public static function activate() {
+    public static function activate( bool $network_wide ) {
 
         if ( ! function_exists( 'WC' ) ) {
             return;
         }
 
-        // TODO: if activate network
-        MigrationHelper::migrate_data();
+        if ( function_exists( 'is_multisite' ) && is_multisite() ) {
+            if ( $network_wide ) {
+                // Get all blog ids
+                /** @var array<\WP_Site> $blogs */
+                $blogs = get_sites();
 
-        $setting         = SettingsHelper::get_settings();
-        $wholesale_roles = RolesHelper::get_wholesale_roles();
-        $role_slugs      = array_column( $wholesale_roles, 'slug' );
+                foreach ( $blogs as $blog ) {
+                    switch_to_blog( (int) $blog->blog_id );
+                    self::single_activate();
+                    restore_current_blog();
+                }
 
-        if ( count( $role_slugs ) === 0 ) {
-            $default_slug                       = RolesHelper::generate_default_role();
-            $setting['general']['default_role'] = $default_slug;
-            update_option( 'yaywholesaleb2b_settings', $setting );
-        } elseif ( empty( $setting['general']['default_role'] ) ) {
-            $setting['general']['default_role'] = $role_slugs[0];
-            update_option( 'yaywholesaleb2b_settings', $setting );
-        }//end if
+                return;
+            }
+        }
+
+        self::single_activate();
     }
 
     public static function deactivate() {
 
         if ( ! function_exists( 'WC' ) ) {
             return;
+        }
+    }
+
+    protected static function single_activate() {
+        MigrationHelper::migrate_data();
+
+        $setting         = SettingsHelper::get_settings();
+        $wholesale_roles = RolesHelper::get_wholesale_roles();
+
+        if ( count( $wholesale_roles ) === 0 ) {
+            $default_slug = RolesHelper::generate_default_role();
+            SetupWizardHelper::save_setup_wizard_status( 'fresh' );
+            $setting['general']['default_role'] = $default_slug;
+            SettingsHelper::update_settings( $setting );
+        } elseif ( empty( $setting['general']['default_role'] ) ) {
+            $active_roles = RolesHelper::get_active_wholesale_roles();
+            if ( empty( $active_roles ) ) {
+                $default_slug = array_first( $wholesale_roles )['slug'];
+            } else {
+                $default_slug = array_first( $active_roles )['slug'];
+            }
+            $setting['general']['default_role'] = $default_slug;
+            SettingsHelper::update_settings( $setting );
+        }
+
+        if ( 'fresh' === SetupWizardHelper::get_setup_wizard_status() ) {
+            SetupWizardHelper::init_setup_wizard();
         }
     }
 }

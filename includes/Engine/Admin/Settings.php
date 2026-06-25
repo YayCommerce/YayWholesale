@@ -5,6 +5,7 @@ use YayWholesaleB2B\Utils\SingletonTrait;
 use YayWholesaleB2B\Helpers\LocalizeHelper;
 use YayWholesaleB2B\Engine\Register\ScriptName;
 use YayWholesaleB2B\Helpers\RequestsHelper;
+use YayWholesaleB2B\Helpers\SetupWizardHelper;
 use YayWholesaleB2B\Utils\Utils;
 
 defined( 'ABSPATH' ) || exit;
@@ -26,6 +27,8 @@ class Settings {
         add_action( 'admin_enqueue_scripts', [ $this, 'admin_enqueue_admin_styles' ] );
 
         add_action( 'admin_enqueue_scripts', [ $this, 'admin_enqueue_general_admin_behaviors' ] );
+
+        add_action( 'current_screen', [ $this, 'admin_redirect_to_setup_wizard' ] );
     }
 
     public function admin_body_class( string $classes ): string {
@@ -100,5 +103,16 @@ class Settings {
 
     public function admin_enqueue_general_admin_behaviors() {
         wp_enqueue_script( 'yay-wholesale-general-admin-behaviors', YAYWHOLESALEB2B_PLUGIN_URL . 'assets/js/admin_scripts.js', [ 'jquery' ], YAYWHOLESALEB2B_VERSION, true );
+    }
+
+    public function admin_redirect_to_setup_wizard( \WP_Screen $current_screen ) {
+        if ( get_transient( SetupWizardHelper::SETUP_WIZARD_REDIRECT_TRANSIENT ) ) {
+            // After plugin activation, redirect to setup wizard if not completed
+            delete_transient( SetupWizardHelper::SETUP_WIZARD_REDIRECT_TRANSIENT );
+            if ( 'fresh' === SetupWizardHelper::get_setup_wizard_status() ) {
+                SetupWizardHelper::redirect_to_setup_wizard();
+                return;
+            }
+        }
     }
 }

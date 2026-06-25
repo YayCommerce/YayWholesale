@@ -74,4 +74,7 @@ export type AdminData = {
     url: string;
   }[];
   wc_page_ids: number[];
+  setup_wizard: {
+    status: 'fresh' | 'skipped' | 'completed';
+  };
 };

@@ -4,7 +4,6 @@ namespace YayWholesaleB2B\Helpers;
 use YayWholesaleB2B\Controllers\BaseRestController;
 use YayWholesaleB2B\Helpers\SettingsHelper;
 use YayWholesaleB2B\Helpers\RolesHelper;
-use YayWholesaleB2B\Helpers\SupportHelper;
 
 /**
  * Get Localize value
@@ -20,6 +19,7 @@ class LocalizeHelper {
             'settings'         => $settings,
             'wholesale_emails' => SettingsHelper::get_email_templates(),
             'roles'            => RolesHelper::handle_roles_data( $roles, $settings ),
+            'setup_wizard'     => [ 'status' => SetupWizardHelper::get_setup_wizard_status() ],
             'wc_page_ids'      => array_values(
                 array_filter(
                     array_map(

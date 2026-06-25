@@ -5,6 +5,7 @@ use YayWholesaleB2B\Controllers\ReportsRestController;
 use YayWholesaleB2B\Controllers\RequestRestController;
 use YayWholesaleB2B\Controllers\RolesRestController;
 use YayWholesaleB2B\Controllers\SettingsRestController;
+use YayWholesaleB2B\Controllers\SetupWizardRestController;
 use YayWholesaleB2B\Controllers\WholeSalersController;
 use YayWholesaleB2B\Utils\SingletonTrait;
 
@@ -29,5 +30,6 @@ class RestAPI {
         RequestRestController::get_instance();
         WholeSalersController::get_instance();
         ReportsRestController::get_instance();
+        SetupWizardRestController::get_instance();
     }
 }

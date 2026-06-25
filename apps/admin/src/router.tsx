@@ -2,6 +2,7 @@ import { createHashRouter, redirect } from 'react-router';
 
 import DashboardPage from '@/pages/dashboard/DashboardPage';
 import RolesPage from '@/pages/roles/RolesPage';
+import { SetupWizardPage } from '@/pages/setup-wizard/SetupWizardPage';
 import WholesalersPage from '@/pages/wholesalers/WholesalersPage';
 import AppLayout from './AppLayout';
 import NotFoundPage from './pages/404';
@@ -12,9 +13,19 @@ import SettingsPage from './pages/settings/SettingsPage';
 export function getManagerRouter() {
   return createHashRouter([
     {
+      path: '/setup-wizard',
+      element: <SetupWizardPage />,
+      errorElement: <ErrorPage />,
+    },
+    {
       path: '/',
       element: <AppLayout />,
       errorElement: <ErrorPage />,
+      loader: async () => {
+        if (window.yayWholesaleB2BAdmin.setup_wizard.status === 'fresh') {
+          return redirect('/setup-wizard');
+        }
+      },
       children: [
         {
           index: true,
