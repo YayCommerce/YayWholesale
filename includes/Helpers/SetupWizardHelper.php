@@ -10,6 +10,8 @@ class SetupWizardHelper {
     const SETUP_WIZARD_SLUG               = 'yay_wholesale_b2b#/setup-wizard';
 
     /**
+     * Get the setup wizard status
+     *
      * @return 'fresh'|'skipped'|'completed'
      */
     public static function get_setup_wizard_status() {
@@ -17,6 +19,7 @@ class SetupWizardHelper {
     }
 
     /**
+     * Save Setup wizard status
      *
      * @param 'fresh'|'skipped'|'completed' $status .
      */

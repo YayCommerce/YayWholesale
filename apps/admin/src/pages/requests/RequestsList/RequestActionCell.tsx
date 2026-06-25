@@ -30,14 +30,14 @@ export function RequestActionCell({ request }: { request: Request }) {
   const { cacheRequest } = useCacheRequest();
   const [openDialog, setOpenDialog] = useState(false);
 
-  const deleteRequestMutation = useDeleteRequestMutation(request.id);
+  const { mutateAsync: deleteRequestMutate, isPending: isDeletePending } = useDeleteRequestMutation(request.id);
   const isMutatingRequest = useIsMutatingRequest(request.id);
   const isMutatingRequestsBulk = useIsMutatingRequestsBulk();
 
   async function onDeleteRequest() {
     if (isMutatingRequest || isMutatingRequestsBulk) return;
     try {
-      await deleteRequestMutation.mutateAsync();
+      await deleteRequestMutate();
       setOpenDialog(false);
     } catch (error) {
       toast.error(await getErrorMsg(error));
@@ -67,14 +67,18 @@ export function RequestActionCell({ request }: { request: Request }) {
 
           <WholeSaleToolTip
             trigger={
-              <Button
+              <LoadingButton
+                loading={isDeletePending}
                 size="icon"
                 variant="ghost"
                 className="hover:text-destructive text-muted-foreground m-0 size-8 hover:bg-white hover:shadow-xs"
-                onClick={() => setOpenDialog(true)}
+                onClick={() => {
+                  if (isDeletePending) return;
+                  setOpenDialog(true);
+                }}
               >
                 <DeleteIcon className="size-4" />
-              </Button>
+              </LoadingButton>
             }
             content={<span>{__('Delete request', 'yay-wholesale-b2b')}</span>}
           />
@@ -94,11 +98,7 @@ export function RequestActionCell({ request }: { request: Request }) {
           <DialogClose asChild>
             <Button variant="outline">{__('Cancel', 'yay-wholesale-b2b')}</Button>
           </DialogClose>
-          <LoadingButton
-            variant="destructive"
-            loading={deleteRequestMutation.isPending}
-            onClick={() => onDeleteRequest}
-          >
+          <LoadingButton variant="destructive" loading={isDeletePending} onClick={onDeleteRequest}>
             {__('Continue', 'yay-wholesale-b2b')}
           </LoadingButton>
         </DialogFooter>

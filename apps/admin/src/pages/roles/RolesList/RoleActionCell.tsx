@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import { PencilLine } from 'lucide-react';
 import { useNavigate } from 'react-router';
+import { toast } from 'sonner';
 import { __ } from '@wordpress/i18n';
 
-import { useDeleteRoleMutation } from '@/lib/queries/roles.queries';
+import { getErrorMsg } from '@/lib/helpers/response.helper';
+import { useDeleteRoleMutation, useIsMutatingRole, useIsMutatingRolesBulk } from '@/lib/queries/roles.queries';
 import { Role } from '@/lib/schema/roles.schema';
-import { Button } from '@/components/ui/button';
+import { Button, LoadingButton } from '@/components/ui/button';
 import { WholeSaleToolTip } from '@/components/ui/custom/WholeSaleToolTip';
 import {
   Dialog,
@@ -20,9 +22,21 @@ import DeleteIcon from '@/components/icons/DeleteIcon';
 import { isDefaultRole } from '../roles.helper';
 
 export function RoleActionCell({ role }: { role: Role }) {
-  const { mutate: deleteRole, isPending: isDeletingRolePending } = useDeleteRoleMutation(role.slug);
+  const { mutateAsync: deleteRole, isPending: isDeletingRolePending } = useDeleteRoleMutation(role.slug);
   const navigate = useNavigate();
   const [openDialog, setOpenDialog] = useState(false);
+  const isMutatingRole = useIsMutatingRole(role.slug);
+  const isMutatingRolesBulk = useIsMutatingRolesBulk();
+
+  async function onRoleDelete() {
+    if (isMutatingRole || isMutatingRolesBulk) return;
+    try {
+      await deleteRole();
+      setOpenDialog(false);
+    } catch (error) {
+      toast.error(await getErrorMsg(error));
+    }
+  }
 
   return (
     <Dialog open={openDialog} onOpenChange={setOpenDialog}>
@@ -46,18 +60,20 @@ export function RoleActionCell({ role }: { role: Role }) {
 
           <WholeSaleToolTip
             trigger={
-              <Button
+              <LoadingButton
                 size="icon"
                 variant="ghost"
                 onClick={(e) => {
                   e.stopPropagation();
+                  if (isDeletingRolePending) return;
                   setOpenDialog(true);
                 }}
-                disabled={isDeletingRolePending || isDefaultRole(role)}
+                disabled={isDefaultRole(role)}
+                loading={isDeletingRolePending}
                 className="hover:text-destructive text-muted-foreground hover:bg-white hover:shadow-xs"
               >
                 <DeleteIcon className="size-4" />
-              </Button>
+              </LoadingButton>
             }
             content={<span>{__('Delete role', 'yay-wholesale-b2b')}</span>}
           />
@@ -77,15 +93,9 @@ export function RoleActionCell({ role }: { role: Role }) {
           <DialogClose asChild>
             <Button variant="outline">{__('Cancel', 'yay-wholesale-b2b')}</Button>
           </DialogClose>
-          <Button
-            variant="destructive"
-            onClick={() => {
-              deleteRole();
-              setOpenDialog(false);
-            }}
-          >
+          <LoadingButton variant="destructive" loading={isDeletingRolePending} onClick={onRoleDelete}>
             {__('Continue', 'yay-wholesale-b2b')}
-          </Button>
+          </LoadingButton>
         </DialogFooter>
       </DialogContent>
     </Dialog>

@@ -144,7 +144,7 @@ export function useDeleteRoleMutation(roleSlug: string) {
 export function useBulkDeleteRolesMutation() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationKey: ['roles', 'bulk-delete'],
+    mutationKey: ['roles', 'bulk', 'delete'],
     mutationFn: bulkDeleteRoles,
     onSuccess: (res) => {
       queryClient.setQueryData(ROLES_QUERIES.all.queryKey, res.roles);
@@ -158,7 +158,7 @@ export function useBulkDeleteRolesMutation() {
 export function useBulkUpdateRoleStatusMutation() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationKey: ['roles', 'bulk-update-status'],
+    mutationKey: ['roles', 'bulk', 'update-status'],
     mutationFn: ({ roleSlugs, status }: { roleSlugs: string[]; status: boolean }) =>
       bulkUpdateRoleStatus(roleSlugs, status),
     onSuccess: (res) => queryClient.setQueryData(ROLES_QUERIES.all.queryKey, res),
@@ -170,6 +170,14 @@ export function useBulkUpdateRoleStatusMutation() {
 
 export function useIsMutatingRoles() {
   return useIsMutating({ mutationKey: ['roles'] });
+}
+
+export function useIsMutatingRole(roleSlug: string) {
+  return useIsMutating({ mutationKey: ['role', roleSlug] });
+}
+
+export function useIsMutatingRolesBulk() {
+  return useIsMutating({ mutationKey: ['role', 'bulk'] });
 }
 
 export function useDefaultRole() {

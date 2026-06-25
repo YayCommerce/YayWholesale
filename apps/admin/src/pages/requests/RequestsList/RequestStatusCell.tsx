@@ -1,4 +1,4 @@
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown, Loader2 } from 'lucide-react';
 import { __, sprintf } from '@wordpress/i18n';
 
 import { getErrorMsg } from '@/lib/helpers/response.helper';
@@ -73,7 +73,12 @@ export function RequestStatusCell({ request }: { request: Request }) {
             <DropdownMenuSub>
               <DropdownMenuSubTrigger>
                 <DropdownMenuItem className="p-0">
-                  <RequestsStatusIcon status="approved" /> {__('Approved', 'yay-wholesale-b2b')}
+                  {approveRequestMutation.isPending ? (
+                    <Loader2 className="text-muted-foreground size-4.5 animate-spin" />
+                  ) : (
+                    <RequestsStatusIcon status="approved" />
+                  )}
+                  {__('Approved', 'yay-wholesale-b2b')}
                 </DropdownMenuItem>
               </DropdownMenuSubTrigger>
               <DropdownMenuPortal>
@@ -98,7 +103,12 @@ export function RequestStatusCell({ request }: { request: Request }) {
             </DropdownMenuSub>
 
             <DropdownMenuItem onClick={() => handleRejectRequest()}>
-              <RequestsStatusIcon status="rejected" /> {__('Rejected', 'yay-wholesale-b2b')}
+              {rejectRequestMutation.isPending ? (
+                <Loader2 className="text-muted-foreground size-4.5 animate-spin" />
+              ) : (
+                <RequestsStatusIcon status="rejected" />
+              )}{' '}
+              {__('Rejected', 'yay-wholesale-b2b')}
             </DropdownMenuItem>
           </DropdownMenuGroup>
         </DropdownMenuContent>

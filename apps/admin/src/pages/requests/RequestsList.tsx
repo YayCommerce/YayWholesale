@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { flexRender, getCoreRowModel, PaginationState, useReactTable } from '@tanstack/react-table';
 import clsx from 'clsx';
-import { ChevronsUpDown, Loader2, Search } from 'lucide-react';
+import { ChevronsUpDown, Search } from 'lucide-react';
 import { useDebounce } from 'rooks';
 import { __, _n, sprintf } from '@wordpress/i18n';
 
@@ -19,7 +19,7 @@ import { RequestFilter } from '@/lib/schema/requests.type';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { BulkActionBox } from '@/components/ui/bulk-actions';
-import { Button } from '@/components/ui/button';
+import { Button, LoadingButton } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { WholeSaleToolTip } from '@/components/ui/custom/WholeSaleToolTip';
 import {
@@ -346,10 +346,13 @@ export default function RequestsList() {
                 <DialogClose asChild>
                   <Button variant="outline">{__('Cancel', 'yay-wholesale-b2b')}</Button>
                 </DialogClose>
-                <Button variant="destructive" onClick={() => handleBulkDelete()}>
-                  {bulkDeleteMutation.isPending && <Loader2 className="size-3.5 animate-spin" />}
+                <LoadingButton
+                  loading={bulkDeleteMutation.isPending}
+                  variant="destructive"
+                  onClick={() => handleBulkDelete()}
+                >
                   {__('Delete', 'yay-wholesale-b2b')}
-                </Button>
+                </LoadingButton>
               </DialogFooter>
             </DialogContent>
           </Dialog>

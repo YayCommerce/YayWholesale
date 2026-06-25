@@ -241,10 +241,7 @@ class RolesRestController extends BaseRestController {
         }
 
         RolesHelper::save_wholesale_roles( $roles );
-        return [
-            'roles'    => RolesHelper::get_wholesale_roles(),
-            'settings' => SettingsHelper::get_full_settings(),
-        ];
+        return RolesHelper::get_wholesale_roles();
     }
 
     public function count_users_by_roles() {
