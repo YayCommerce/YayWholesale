@@ -46,7 +46,7 @@ class SetupWizardRestController extends BaseRestController {
     }
 
     public function mark_completed_wizard( WP_REST_Request $request ) {
-        SetupWizardHelper::mark_setup_wizard_completed();
+        SetupWizardHelper::mark_setup_wizard_status( SetupWizardHelper::SETUP_SKIPPED_STATUS );
         return true;
     }
 
@@ -80,7 +80,7 @@ class SetupWizardRestController extends BaseRestController {
 
         SettingsHelper::update_settings( $setting );
 
-        SetupWizardHelper::mark_setup_wizard_completed();
+        SetupWizardHelper::mark_setup_wizard_status( SetupWizardHelper::SETUP_COMPLETED_STATUS );
 
         return [
             'roles'    => RolesHelper::get_wholesale_roles(),

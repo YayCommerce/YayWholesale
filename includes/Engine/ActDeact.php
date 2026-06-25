@@ -23,42 +23,62 @@ class ActDeact {
         }
     }
 
-    public static function activate() {
+    public static function activate( bool $network_wide ) {
 
         if ( ! function_exists( 'WC' ) ) {
             return;
         }
 
-        // TODO: if activate network
-        MigrationHelper::migrate_data();
+        if ( function_exists( 'is_multisite' ) && is_multisite() ) {
+            if ( $network_wide ) {
+                // Get all blog ids
+                /** @var array<\WP_Site> $blogs */
+                $blogs = get_sites();
 
-        $setting         = SettingsHelper::get_settings();
-        $wholesale_roles = RolesHelper::get_wholesale_roles();
-        $role_slugs      = array_column( $wholesale_roles, 'slug' );
-        $completedSetup  = SetupWizardHelper::is_setup_wizard_completed();
-        $default_slug    = '';
+                foreach ( $blogs as $blog ) {
+                    switch_to_blog( (int) $blog->blog_id );
+                    self::single_activate();
+                    restore_current_blog();
+                }
 
-        if ( count( $role_slugs ) === 0 ) {
-            $default_slug = RolesHelper::generate_default_role();
-        } elseif ( empty( $setting['general']['default_role'] ) ) {
-            $default_slug = $role_slugs[0];
-        }//end if
-
-        if ( ! empty( $default_slug ) ) {
-            $completedSetup                     = false;
-            $setting['general']['default_role'] = $default_slug;
-            update_option( 'yaywholesaleb2b_settings', $setting );
+                return;
+            }
         }
 
-        if ( ! $completedSetup ) {
-            SetupWizardHelper::init_setup_wizard();
-        }
+        self::single_activate();
     }
 
     public static function deactivate() {
 
         if ( ! function_exists( 'WC' ) ) {
             return;
+        }
+    }
+
+    protected static function single_activate() {
+        MigrationHelper::migrate_data();
+
+        $setting             = SettingsHelper::get_settings();
+        $wholesale_roles     = RolesHelper::get_wholesale_roles();
+        $role_slugs          = array_column( $wholesale_roles, 'slug' );
+        $setup_wizard_option = SetupWizardHelper::get_setup_wizard_option();
+        $default_slug        = '';
+
+        if ( count( $role_slugs ) === 0 ) {
+            $default_slug                  = RolesHelper::generate_default_role();
+            $setup_wizard_option['status'] = 'fresh';
+            // fresh
+        } elseif ( empty( $setting['general']['default_role'] ) ) {
+            $default_slug = $role_slugs[0];
+        }//end if
+
+        if ( ! empty( $default_slug ) ) {
+            $setting['general']['default_role'] = $default_slug;
+            update_option( 'yaywholesaleb2b_settings', $setting );
+        }
+
+        if ( 'fresh' === $setup_wizard_option['status'] ) {
+            SetupWizardHelper::init_setup_wizard();
         }
     }
 }

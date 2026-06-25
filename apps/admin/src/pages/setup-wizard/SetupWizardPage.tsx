@@ -36,7 +36,7 @@ const steps = [
   __('3. Ready To Go', 'yay-wholesale-b2b'),
 ];
 
-const { plugin_version } = window.yayWholesaleB2BAdmin;
+const { version } = window.yayWholesaleB2BMeta.wholesaleMeta;
 
 export function SetupWizardPage() {
   const [step, setStep] = useState(0);
@@ -71,7 +71,7 @@ export function SetupWizardPage() {
       toast.error(await getErrorMsg(error));
     } finally {
       setStep(steps.length - 1);
-      window.yayWholesaleB2BAdmin.setup_wizard_completed = true;
+      window.yayWholesaleB2BAdmin.setup_wizard.status = 'completed';
     }
   };
 
@@ -92,7 +92,7 @@ export function SetupWizardPage() {
       console.warn('Skip failed:', error);
       toast.error(__('An Unexpected error occured', 'yay-wholesale-b2b'));
     } finally {
-      window.yayWholesaleB2BAdmin.setup_wizard_completed = true;
+      window.yayWholesaleB2BAdmin.setup_wizard.status = 'skipped';
     }
   };
 
@@ -112,7 +112,7 @@ export function SetupWizardPage() {
   return (
     <div className="relative flex h-svh w-full grow justify-center rounded-lg px-4 2xl:mx-auto">
       <div className="text-muted-foreground absolute top-5 right-10 flex items-center gap-4">
-        <span>{sprintf(__('Version %s', 'yay-wholesale-b2b'), plugin_version)}</span>
+        <span>{sprintf(__('Version %s', 'yay-wholesale-b2b'), version)}</span>
         <Separator orientation="vertical" className="h-4.5! w-px bg-[#E4E4E7]" />
         <Button variant="outline" size="icon-sm" className="rounded-full border-none" onClick={skipBtnHandle}>
           <X />

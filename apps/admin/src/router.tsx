@@ -16,18 +16,13 @@ export function getManagerRouter() {
       path: '/setup-wizard',
       element: <SetupWizardPage />,
       errorElement: <ErrorPage />,
-      loader: async () => {
-        if (window.yayWholesaleB2BAdmin.setup_wizard_completed) {
-          return redirect('/');
-        }
-      },
     },
     {
       path: '/',
       element: <AppLayout />,
       errorElement: <ErrorPage />,
       loader: async () => {
-        if (!window.yayWholesaleB2BAdmin.setup_wizard_completed) {
+        if (window.yayWholesaleB2BAdmin.setup_wizard.status === 'fresh') {
           return redirect('/setup-wizard');
         }
       },
