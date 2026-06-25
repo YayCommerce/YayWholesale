@@ -5,8 +5,8 @@ namespace YayWholesaleB2B\Helpers;
  * Wholesale Setup Wizard Helpers
  */
 class SetupWizardHelper {
-    const SETUP_WIZARD_COMPLETED          = 'ywhs_setup_wizard_completed';
-    const SETUP_WIZARD_REDIRECT_TRANSIENT = 'ywhs_setup_wizard_need_redirect';
+    const SETUP_WIZARD_COMPLETED          = 'yaywholesaleb2b_setup_wizard_completed';
+    const SETUP_WIZARD_REDIRECT_TRANSIENT = 'yaywholesaleb2b_setup_wizard_need_redirect';
     const SETUP_WIZARD_SLUG               = 'yay_wholesale_b2b#/setup-wizard';
 
     public static function is_setup_wizard_completed() {
@@ -14,11 +14,7 @@ class SetupWizardHelper {
     }
 
     public static function mark_setup_wizard_completed() {
-        if ( null !== ( get_option( self::SETUP_WIZARD_COMPLETED, null ) ) ) {
-            add_option( self::SETUP_WIZARD_COMPLETED, true );
-        } else {
-            update_option( self::SETUP_WIZARD_COMPLETED, true );
-        }
+        update_option( self::SETUP_WIZARD_COMPLETED, true );
     }
 
     public static function init_setup_wizard() {

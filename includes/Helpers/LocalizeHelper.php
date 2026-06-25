@@ -17,11 +17,12 @@ class LocalizeHelper {
         $settings   = SettingsHelper::get_full_settings();
         $roles      = RolesHelper::get_wholesale_roles();
         $admin_data = [
-            'settings'             => $settings,
-            'wholesale_emails'     => SettingsHelper::get_email_templates(),
-            'roles'                => RolesHelper::handle_roles_data( $roles, $settings ),
-            'setupWizardCompleted' => SetupWizardHelper::is_setup_wizard_completed(),
-            'wc_page_ids'          => array_values(
+            'settings'               => $settings,
+            'wholesale_emails'       => SettingsHelper::get_email_templates(),
+            'roles'                  => RolesHelper::handle_roles_data( $roles, $settings ),
+            'setup_wizard_completed' => SetupWizardHelper::is_setup_wizard_completed(),
+            'plugin_version'         => YAYWHOLESALEB2B_VERSION,
+            'wc_page_ids'            => array_values(
                 array_filter(
                     array_map(
                         'intval',

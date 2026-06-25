@@ -17,7 +17,7 @@ export function ShippingRows() {
         return (
           <TableRow key={method.instance_id} className="border-divider border-b">
             <TableCell className="w-80 px-2">
-              <p className="text-foreground flex items-center gap-1.5 font-extrabold whitespace-pre-line">
+              <p className="text-foreground flex items-center gap-1.5 font-bold whitespace-pre-line">
                 {method.instance_name}
                 {method.description && (
                   <span>

@@ -4,17 +4,13 @@ import { X } from 'lucide-react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router';
 import { toast } from 'sonner';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 
 import { skipSetup } from '@/lib/api/wizard.api';
 import { getErrorMsg } from '@/lib/helpers/response.helper';
 import { useDefaultRole } from '@/lib/queries/roles.queries';
 import { useSettingsQuery } from '@/lib/queries/settings.queries';
-import {
-  useIsMutatingSetup,
-  useSaveSetupWizardMutation,
-  // useSkipSetupWizardMutation,
-} from '@/lib/queries/wizard.queries';
+import { useIsMutatingSetup, useSaveSetupWizardMutation } from '@/lib/queries/wizard.queries';
 import { setupRegistration, setupRoleSchema, SetupWizardForm, setupWizardFormSchema } from '@/lib/schema/wizard.schema';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -30,15 +26,17 @@ import {
 import { Separator } from '@/components/ui/separator';
 import { Toaster } from '@/components/ui/sonner';
 import SetupStepsDisplay from '@/pages/setup-wizard/SetupStepsDisplay';
-import Registration from '@/pages/setup-wizard/steps/Registration';
+import ReadyToGo from '@/pages/setup-wizard/steps/ReadyToGo';
 import RoleSetup from '@/pages/setup-wizard/steps/RoleSetup';
 import Welcome from '@/pages/setup-wizard/steps/Welcome';
 
 const steps = [
-  __('1. Welcome to YayWholesale', 'yay-wholesale-b2b'),
+  __('1. Welcome to Yay Wholesale B2B', 'yay-wholesale-b2b'),
   __('2. Setup First Role', 'yay-wholesale-b2b'),
   __('3. Ready To Go', 'yay-wholesale-b2b'),
 ];
+
+const { plugin_version } = window.yayWholesaleB2BAdmin;
 
 export function SetupWizardPage() {
   const [step, setStep] = useState(0);
@@ -48,7 +46,6 @@ export function SetupWizardPage() {
   const role = useDefaultRole();
   const { data: settings } = useSettingsQuery();
   const saveMutation = useSaveSetupWizardMutation();
-  // const skipMutation = useSkipSetupWizardMutation();
   const isMutatingSetup = useIsMutatingSetup();
 
   const defaultFormData = useMemo<SetupWizardForm>(
@@ -74,6 +71,7 @@ export function SetupWizardPage() {
       toast.error(await getErrorMsg(error));
     } finally {
       setStep(steps.length - 1);
+      window.yayWholesaleB2BAdmin.setup_wizard_completed = true;
     }
   };
 
@@ -93,6 +91,8 @@ export function SetupWizardPage() {
     } catch (error) {
       console.warn('Skip failed:', error);
       toast.error(__('An Unexpected error occured', 'yay-wholesale-b2b'));
+    } finally {
+      window.yayWholesaleB2BAdmin.setup_wizard_completed = true;
     }
   };
 
@@ -112,7 +112,7 @@ export function SetupWizardPage() {
   return (
     <div className="relative flex h-svh w-full grow justify-center rounded-lg px-4 2xl:mx-auto">
       <div className="text-muted-foreground absolute top-5 right-10 flex items-center gap-4">
-        <span>Version 1.0.3</span>
+        <span>{sprintf(__('Version %s', 'yay-wholesale-b2b'), plugin_version)}</span>
         <Separator orientation="vertical" className="h-4.5! w-px bg-[#E4E4E7]" />
         <Button variant="outline" size="icon-sm" className="rounded-full border-none" onClick={skipBtnHandle}>
           <X />
@@ -126,7 +126,7 @@ export function SetupWizardPage() {
               alt="YayWholesale"
               className="size-15"
             />
-            <span className="font-[Clash_Display_Variable] text-3xl font-semibold">Yay Wholesale B2B</span>
+            <span className="text-3xl font-bold">Yay Wholesale B2B</span>
           </div>
           <span className="text-lg text-[#5A6D80]">
             {__('Sell to retail and wholesale customers from one Woocommerce store.', 'yay-wholesale-b2b')}
@@ -139,8 +139,15 @@ export function SetupWizardPage() {
             <form onSubmit={form.handleSubmit(onSubmit, (err) => console.log(err))}>
               <div className="flex items-center justify-center">
                 {step === 0 && <Welcome setStep={updateStep} skip={skipBtnHandle} isPendingSkip={isPendingSkip} />}
-                {step === 1 && <RoleSetup setStep={updateStep} skip={skipBtnHandle} isPendingSkip={isPendingSkip} />}
-                {step === 2 && <Registration setStep={updateStep} skip={skipBtnHandle} isPendingSkip={isPendingSkip} />}
+                {step === 1 && (
+                  <RoleSetup
+                    setStep={updateStep}
+                    skip={skipBtnHandle}
+                    isPendingSkip={isPendingSkip}
+                    isPendingSave={saveMutation.isPending}
+                  />
+                )}
+                {step === 2 && <ReadyToGo />}
               </div>
             </form>
           </FormProvider>
@@ -151,10 +158,7 @@ export function SetupWizardPage() {
           <DialogHeader className="bw:border-b-0">
             <DialogTitle>{__('Are you sure you want to skip the setup wizard ?', 'yay-wholesale-b2b')}</DialogTitle>
             <DialogDescription>
-              {__(
-                'This will skip the setup wizard and use default settings. You can always run this again later.',
-                'yay-wholesale-b2b',
-              )}
+              {__('This will skip the setup wizard and use default settings.', 'yay-wholesale-b2b')}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>

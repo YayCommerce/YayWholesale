@@ -10,6 +10,7 @@
 
   #wpbody-content {
     anchor-name: --yay-ui-anchor;
+    padding: 0;
   }
 
   @supports (anchor-name: --yay-ui-anchor) {
@@ -23,3 +24,5 @@
     }
   }
 }
+
+

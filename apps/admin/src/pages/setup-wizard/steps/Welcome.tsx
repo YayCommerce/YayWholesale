@@ -1,7 +1,12 @@
 import { __ } from '@wordpress/i18n';
 
 import { Button, LoadingButton } from '@/components/ui/button';
-import { SingleSetupStepProps } from '@/pages/setup-wizard/steps.type';
+
+export type SingleSetupStepProps = {
+  setStep: (step: number) => void;
+  skip: () => void;
+  isPendingSkip: boolean;
+};
 
 export default function Welcome({ setStep, skip, isPendingSkip }: SingleSetupStepProps) {
   return (

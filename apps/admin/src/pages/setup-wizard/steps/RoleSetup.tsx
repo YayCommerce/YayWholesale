@@ -1,18 +1,22 @@
 import { Controller, useFormContext } from 'react-hook-form';
 import { __ } from '@wordpress/i18n';
 
-import { useIsMutatingSetup } from '@/lib/queries/wizard.queries';
 import { SetupWizardForm } from '@/lib/schema/wizard.schema';
 import { Button, LoadingButton } from '@/components/ui/button';
 import { Field, FieldContent, FieldError, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { NumberInput } from '@/components/ui/number-input';
 import { Switch } from '@/components/ui/switch';
-import { SingleSetupStepProps } from '@/pages/setup-wizard/steps.type';
 
-export default function RoleSetup({ setStep, skip, isPendingSkip }: SingleSetupStepProps) {
+export type SingleSetupStepProps = {
+  setStep: (step: number) => void;
+  skip: () => void;
+  isPendingSkip: boolean;
+  isPendingSave: boolean;
+};
+
+export default function RoleSetup({ setStep, skip, isPendingSkip, isPendingSave }: SingleSetupStepProps) {
   const { control } = useFormContext<SetupWizardForm>();
-  const isMutatingSetup = useIsMutatingSetup();
 
   return (
     <div className="flex w-full flex-col items-center justify-center gap-10">
@@ -120,12 +124,11 @@ export default function RoleSetup({ setStep, skip, isPendingSkip }: SingleSetupS
             {__('Skip for Now', 'yay-wholesale')}
           </LoadingButton>
 
-          <LoadingButton size="lg" loading={isMutatingSetup > 0} type="submit">
+          <LoadingButton size="lg" loading={isPendingSave} type="submit">
             {__('Next', 'yay-wholesale')}
           </LoadingButton>
         </div>
       </div>
-      {/* </div> */}
     </div>
   );
 }
