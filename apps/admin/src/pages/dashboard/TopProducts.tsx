@@ -11,7 +11,7 @@ export default function TopProducts(props: { reportQuery: ReturnType<typeof useR
   const { data: reportData, isFetching, isLoading } = props.reportQuery;
 
   return (
-    <Card className="p-4 md:p-5 2xl:p-6">
+    <Card className="overflow-hidden p-4 md:p-5 2xl:p-6">
       <CardContent className="flex min-h-0 flex-1 flex-col">
         {/* Header */}
         <div className="mb-4 flex items-center justify-between">
@@ -65,7 +65,7 @@ export default function TopProducts(props: { reportQuery: ReturnType<typeof useR
                       <div className="flex items-center gap-3">
                         <div
                           className={cn(
-                            'size-8  overflow-hidden rounded-md',
+                            'size-8 overflow-hidden rounded-md',
                             reportData.topProducts.indexOf(data) < 3 &&
                               'border-ring ring-1 ring-[#F9BD09] ring-offset-1',
                           )}
@@ -77,7 +77,7 @@ export default function TopProducts(props: { reportQuery: ReturnType<typeof useR
                                 : `${window.yayWholesaleB2BMeta.wholesaleMeta.assetsUrl}/images/favicon.svg`
                             }
                             alt={data.name}
-                            className="size-full  object-cover"
+                            className="size-full object-cover"
                           />
                         </div>
                         <div className="flex w-full flex-1 items-center gap-1 md:w-15 md:flex-wrap lg:w-40 lg:flex-nowrap">

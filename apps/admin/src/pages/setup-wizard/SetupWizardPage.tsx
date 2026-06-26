@@ -118,22 +118,21 @@ export function SetupWizardPage() {
           <X />
         </Button>
       </div>
-      <div className="mt-30 flex flex-col gap-12.5">
-        <div className="flex flex-col items-center justify-center gap-6">
-          <div className="flex items-center gap-4">
+      <div className="mt-20 flex flex-col gap-12.5 lg:mt-30">
+        <div className="flex flex-col items-center justify-center gap-4">
+          <div>
             <img
-              src={`${window.yayWholesaleB2BMeta.wholesaleMeta.assetsUrl}/images/favicon.svg`}
+              src={`${window.yayWholesaleB2BMeta.wholesaleMeta.assetsUrl}/images/yaywholesale_logo.svg`}
               alt="YayWholesale"
-              className="size-15"
+              width="100%"
             />
-            <span className="text-3xl font-bold">Yay Wholesale B2B</span>
           </div>
-          <span className="text-lg text-[#5A6D80]">
+          <span className="text-center text-lg text-[#5A6D80]">
             {__('Sell to retail and wholesale customers from one Woocommerce store.', 'yay-wholesale-b2b')}
           </span>
         </div>
 
-        <Card className="flex w-2xl gap-10 rounded-[20px] border-none lg:w-215 lg:p-10">
+        <Card className="flex w-full gap-10 rounded-[20px] border-none lg:w-215 lg:p-10">
           <SetupStepsDisplay step={step} stepTitles={steps} />
           <FormProvider {...form}>
             <form onSubmit={form.handleSubmit(onSubmit, (err) => console.log(err))}>

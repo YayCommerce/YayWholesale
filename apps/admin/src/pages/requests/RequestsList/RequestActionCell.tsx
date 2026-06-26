@@ -56,7 +56,7 @@ export function RequestActionCell({ request }: { request: Request }) {
                 className="hover:text-primary text-muted-foreground size-8 hover:bg-white hover:shadow-xs"
                 onClick={() => {
                   cacheRequest(request);
-                  navigate(`/request/edit/${request.id}`);
+                  navigate(`/requests/edit/${request.id}`);
                 }}
               >
                 <SettingsIcon className="size-4" />
@@ -67,14 +67,18 @@ export function RequestActionCell({ request }: { request: Request }) {
 
           <WholeSaleToolTip
             trigger={
-              <Button
+              <LoadingButton
+                loading={deleteRequestMutation.isPending}
                 size="icon"
                 variant="ghost"
                 className="hover:text-destructive text-muted-foreground m-0 size-8 hover:bg-white hover:shadow-xs"
-                onClick={() => setOpenDialog(true)}
+                onClick={() => {
+                  if (deleteRequestMutation.isPending) return;
+                  setOpenDialog(true);
+                }}
               >
                 <DeleteIcon className="size-4" />
-              </Button>
+              </LoadingButton>
             }
             content={<span>{__('Delete request', 'yay-wholesale-b2b')}</span>}
           />
@@ -94,11 +98,7 @@ export function RequestActionCell({ request }: { request: Request }) {
           <DialogClose asChild>
             <Button variant="outline">{__('Cancel', 'yay-wholesale-b2b')}</Button>
           </DialogClose>
-          <LoadingButton
-            variant="destructive"
-            loading={deleteRequestMutation.isPending}
-            onClick={() => onDeleteRequest}
-          >
+          <LoadingButton variant="destructive" loading={deleteRequestMutation.isPending} onClick={onDeleteRequest}>
             {__('Continue', 'yay-wholesale-b2b')}
           </LoadingButton>
         </DialogFooter>

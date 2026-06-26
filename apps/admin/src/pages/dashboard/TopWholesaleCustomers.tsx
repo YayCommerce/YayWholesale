@@ -19,7 +19,7 @@ export default function TopWholesaleCustomers({ reportQuery, startDate, endDate 
   const { data: reportData, isFetching, isLoading } = reportQuery;
 
   return (
-    <Card className="p-4 md:p-5 2xl:p-6">
+    <Card className="overflow-hidden p-4 md:p-5 2xl:p-6">
       <CardContent className="flex min-h-0 flex-1 flex-col">
         {/* Header */}
         <div className="mb-4 flex items-center justify-between">
@@ -66,7 +66,7 @@ export default function TopWholesaleCustomers({ reportQuery, startDate, endDate 
                       <div className="flex items-center gap-3">
                         <Avatar
                           className={cn(
-                            'size-8 ',
+                            'size-8',
                             reportData.topWholesalers.indexOf(data) < 3 &&
                               'border-ring ring-1 ring-[#F9BD09] ring-offset-1',
                           )}

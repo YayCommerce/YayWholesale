@@ -65,7 +65,7 @@ class RolesHelper {
     /**
      * Generate default wholesale role config.
      *
-     * @return array|null
+     * @return string
      */
     public static function generate_default_role() {
         $default_slug      = 'ywhs_default_role';

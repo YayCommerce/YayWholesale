@@ -1,7 +1,6 @@
 import { useEffect, useMemo } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as TabsPrimitive from '@radix-ui/react-tabs';
-import { Loader2 } from 'lucide-react';
 import { createPortal } from 'react-dom';
 import { FieldErrors, FormProvider, useForm, useFormContext } from 'react-hook-form';
 import { useNavigate, useParams } from 'react-router';
@@ -13,7 +12,7 @@ import { useAllRolesQuery } from '@/lib/queries/roles.queries';
 import { useIsMutatingSettings, useSaveSettingsMutation, useSettingsQuery } from '@/lib/queries/settings.queries';
 import { Settings, settingsFormSchema } from '@/lib/schema/settings.schema';
 import { useRouteLeaveGuard } from '@/hooks/useRouteLeaveGuard';
-import { Button } from '@/components/ui/button';
+import { LoadingButton } from '@/components/ui/button';
 import { UnsavedChangeDialog } from '@/components/ui/custom/unsaved-changed-dialog';
 import { SideNavMenuItem, SideNavMenuList } from '@/components/ui/navmenu-side';
 import { getFirstErrorSection, makeDefaultSettings } from './settings.helper';
@@ -84,7 +83,8 @@ export default function SettingsPage() {
     <>
       {headerActionPortal &&
         createPortal(
-          <Button
+          <LoadingButton
+            loading={saveMutation.isPending}
             type="submit"
             form="settings-form"
             className="relative ms-4"
@@ -95,12 +95,7 @@ export default function SettingsPage() {
               <span className="max-sm:hidden">{__('Save Changes', 'yay-wholesale-b2b')}</span>
               <span className="sm:hidden">{__('Save', 'yay-wholesale-b2b')}</span>
             </span>
-            {saveMutation.isPending && (
-              <span className="absolute top-1/2 left-1/2 -translate-1/2 transition-opacity group-data-[submitting=false]:opacity-0">
-                <Loader2 className="text-primary-foreground animate-spin stroke-3" />
-              </span>
-            )}
-          </Button>,
+          </LoadingButton>,
           headerActionPortal,
         )}
       <FormProvider {...form}>
@@ -156,7 +151,7 @@ export default function SettingsPage() {
                     </SideNavMenuList>
                   </TabsPrimitive.List>
                 </div>
-                <div className="bg-muted flex flex-1 flex-col">
+                <div className="bg-muted flex flex-1 flex-col overflow-hidden">
                   <TabsPrimitive.Content value="general" className="bg-card h-full rounded-md border p-6 sm:w-full">
                     <GeneralTab />
                   </TabsPrimitive.Content>

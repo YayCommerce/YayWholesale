@@ -18,7 +18,7 @@ export default function Welcome({ setStep, skip, isPendingSkip }: SingleSetupSte
           className="size-10"
         />
       </div>
-      <div className="flex w-172.5 flex-col items-center gap-6">
+      <div className="flex w-full flex-col items-center gap-6">
         <h3 className="text-3xl font-bold">{__('Start selling wholesale in minutes')}</h3>
         <p className="text-muted-foreground text-center text-base/6.5">
           {__(

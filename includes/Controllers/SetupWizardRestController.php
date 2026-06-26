@@ -38,14 +38,14 @@ class SetupWizardRestController extends BaseRestController {
             [
                 [
                     'methods'             => 'POST',
-                    'callback'            => [ $this, 'mark_completed_wizard' ],
+                    'callback'            => [ $this, 'skip_setup_wizard' ],
                     'permission_callback' => [ $this, 'can_manage_settings' ],
                 ],
             ]
         );
     }
 
-    public function mark_completed_wizard( WP_REST_Request $request ) {
+    public function skip_setup_wizard( WP_REST_Request $request ) {
         SetupWizardHelper::save_setup_wizard_status( 'skipped' );
         return true;
     }

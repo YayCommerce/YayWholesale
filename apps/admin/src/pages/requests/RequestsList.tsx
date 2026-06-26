@@ -12,6 +12,7 @@ import {
   useBulkRejectRequestMutation,
   useCountByStatusQuery,
   useIsMutatingRequests,
+  useIsMutatingRequestsBulk,
   useRequestsQuery,
 } from '@/lib/queries/requests.queries';
 import { useActiveRolesQuery, useDefaultRole } from '@/lib/queries/roles.queries';
@@ -19,7 +20,7 @@ import { RequestFilter } from '@/lib/schema/requests.type';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { BulkActionBox } from '@/components/ui/bulk-actions';
-import { Button } from '@/components/ui/button';
+import { Button, LoadingButton } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { WholeSaleToolTip } from '@/components/ui/custom/WholeSaleToolTip';
 import {
@@ -290,7 +291,11 @@ export default function RequestsList() {
                     handleBulkApprove(defaultRole.slug);
                   }}
                 >
-                  <RequestsStatusIcon status="approved" className="mt-0.5" />
+                  {bulkApproveMutation.isPending ? (
+                    <Loader2 className="text-muted-foreground size-4.5 animate-spin" />
+                  ) : (
+                    <RequestsStatusIcon status="approved" className="mt-0.5" />
+                  )}
                   {__('Approve', 'yay-wholesale-b2b')}
                 </DropdownMenuSubTrigger>
                 <DropdownMenuSubContent>
@@ -310,7 +315,11 @@ export default function RequestsList() {
               </DropdownMenuSub>
 
               <DropdownMenuItem className="w-35" onClick={() => handleBulkReject()}>
-                <RequestsStatusIcon status="rejected" />
+                {bulkRejectMutation.isPending ? (
+                  <Loader2 className="text-muted-foreground size-4.5 animate-spin" />
+                ) : (
+                  <RequestsStatusIcon status="rejected" />
+                )}
                 {__('Reject', 'yay-wholesale-b2b')}
               </DropdownMenuItem>
             </DropdownMenuContent>
@@ -346,10 +355,13 @@ export default function RequestsList() {
                 <DialogClose asChild>
                   <Button variant="outline">{__('Cancel', 'yay-wholesale-b2b')}</Button>
                 </DialogClose>
-                <Button variant="destructive" onClick={() => handleBulkDelete()}>
-                  {bulkDeleteMutation.isPending && <Loader2 className="size-3.5 animate-spin" />}
+                <LoadingButton
+                  loading={bulkDeleteMutation.isPending}
+                  variant="destructive"
+                  onClick={() => handleBulkDelete()}
+                >
                   {__('Delete', 'yay-wholesale-b2b')}
-                </Button>
+                </LoadingButton>
               </DialogFooter>
             </DialogContent>
           </Dialog>
