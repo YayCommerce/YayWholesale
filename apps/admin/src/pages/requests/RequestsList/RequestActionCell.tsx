@@ -30,14 +30,14 @@ export function RequestActionCell({ request }: { request: Request }) {
   const { cacheRequest } = useCacheRequest();
   const [openDialog, setOpenDialog] = useState(false);
 
-  const { mutateAsync: deleteRequestMutate, isPending: isDeletePending } = useDeleteRequestMutation(request.id);
+  const deleteRequestMutation = useDeleteRequestMutation(request.id);
   const isMutatingRequest = useIsMutatingRequest(request.id);
   const isMutatingRequestsBulk = useIsMutatingRequestsBulk();
 
   async function onDeleteRequest() {
     if (isMutatingRequest || isMutatingRequestsBulk) return;
     try {
-      await deleteRequestMutate();
+      await deleteRequestMutation.mutateAsync();
       setOpenDialog(false);
     } catch (error) {
       toast.error(await getErrorMsg(error));
@@ -68,12 +68,12 @@ export function RequestActionCell({ request }: { request: Request }) {
           <WholeSaleToolTip
             trigger={
               <LoadingButton
-                loading={isDeletePending}
+                loading={deleteRequestMutation.isPending}
                 size="icon"
                 variant="ghost"
                 className="hover:text-destructive text-muted-foreground m-0 size-8 hover:bg-white hover:shadow-xs"
                 onClick={() => {
-                  if (isDeletePending) return;
+                  if (deleteRequestMutation.isPending) return;
                   setOpenDialog(true);
                 }}
               >
@@ -98,7 +98,7 @@ export function RequestActionCell({ request }: { request: Request }) {
           <DialogClose asChild>
             <Button variant="outline">{__('Cancel', 'yay-wholesale-b2b')}</Button>
           </DialogClose>
-          <LoadingButton variant="destructive" loading={isDeletePending} onClick={onDeleteRequest}>
+          <LoadingButton variant="destructive" loading={deleteRequestMutation.isPending} onClick={onDeleteRequest}>
             {__('Continue', 'yay-wholesale-b2b')}
           </LoadingButton>
         </DialogFooter>

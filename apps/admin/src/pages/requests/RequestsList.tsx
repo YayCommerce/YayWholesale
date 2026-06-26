@@ -105,13 +105,10 @@ export default function RequestsList() {
   const bulkRejectMutation = useBulkRejectRequestMutation();
   const bulkDeleteMutation = useBulkDeleteRequestMutation();
   const isMutatingRequests = useIsMutatingRequests();
-  const isMutatingRequestsBulk = useIsMutatingRequestsBulk();
 
   async function handleBulkApprove(roleSlug: string) {
-    if (isMutatingRequests || isMutatingRequestsBulk) return;
-
     const requestIds = table.getSelectedRowModel().rows.map((row) => row.original.id);
-    if (requestIds.length === 0) return;
+    if (requestIds.length === 0 || isMutatingRequests) return;
 
     try {
       await bulkApproveMutation.mutateAsync({
@@ -126,10 +123,8 @@ export default function RequestsList() {
   }
 
   async function handleBulkReject() {
-    if (isMutatingRequests || isMutatingRequestsBulk) return;
-
     const requestIds = table.getSelectedRowModel().rows.map((row) => row.original.id);
-    if (requestIds.length === 0) return;
+    if (requestIds.length === 0 || isMutatingRequests) return;
 
     try {
       await bulkRejectMutation.mutateAsync(requestIds);

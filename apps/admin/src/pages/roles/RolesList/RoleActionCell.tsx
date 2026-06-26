@@ -22,7 +22,7 @@ import DeleteIcon from '@/components/icons/DeleteIcon';
 import { isDefaultRole } from '../roles.helper';
 
 export function RoleActionCell({ role }: { role: Role }) {
-  const { mutateAsync: deleteRole, isPending: isDeletingRolePending } = useDeleteRoleMutation(role.slug);
+  const deleteRoleMutation = useDeleteRoleMutation(role.slug);
   const navigate = useNavigate();
   const [openDialog, setOpenDialog] = useState(false);
   const isMutatingRole = useIsMutatingRole(role.slug);
@@ -31,7 +31,7 @@ export function RoleActionCell({ role }: { role: Role }) {
   async function onRoleDelete() {
     if (isMutatingRole || isMutatingRolesBulk) return;
     try {
-      await deleteRole();
+      await deleteRoleMutation.mutateAsync();
       setOpenDialog(false);
     } catch (error) {
       toast.error(await getErrorMsg(error));
@@ -65,11 +65,11 @@ export function RoleActionCell({ role }: { role: Role }) {
                 variant="ghost"
                 onClick={(e) => {
                   e.stopPropagation();
-                  if (isDeletingRolePending) return;
+                  if (deleteRoleMutation.isPending) return;
                   setOpenDialog(true);
                 }}
                 disabled={isDefaultRole(role)}
-                loading={isDeletingRolePending}
+                loading={deleteRoleMutation.isPending}
                 className="hover:text-destructive text-muted-foreground hover:bg-white hover:shadow-xs"
               >
                 <DeleteIcon className="size-4" />
@@ -93,7 +93,7 @@ export function RoleActionCell({ role }: { role: Role }) {
           <DialogClose asChild>
             <Button variant="outline">{__('Cancel', 'yay-wholesale-b2b')}</Button>
           </DialogClose>
-          <LoadingButton variant="destructive" loading={isDeletingRolePending} onClick={onRoleDelete}>
+          <LoadingButton variant="destructive" loading={deleteRoleMutation.isPending} onClick={onRoleDelete}>
             {__('Continue', 'yay-wholesale-b2b')}
           </LoadingButton>
         </DialogFooter>

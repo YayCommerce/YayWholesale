@@ -35,14 +35,14 @@ export function EditRequestForm({ request }: { request: Request }) {
   const { data: activeRoles } = useActiveRolesQuery();
   const defaultRole = useDefaultRole();
 
-  const updateStatusMutation = useApproveRequestMutation(request.id);
+  const approveStatusMutation = useApproveRequestMutation(request.id);
   const rejectStatusMutation = useRejectRequestMutation(request.id);
   const isMutatingRequest = useIsMutatingRequest(request.id);
 
   async function handleApproveRequest(roleSlug: string) {
     if (isMutatingRequest) return;
     try {
-      await updateStatusMutation.mutateAsync(roleSlug);
+      await approveStatusMutation.mutateAsync(roleSlug);
       toast.success(__('Request approved successfully', 'yay-wholesale-b2b'));
       navigate('/requests');
     } catch (error) {
@@ -185,7 +185,7 @@ export function EditRequestForm({ request }: { request: Request }) {
             <LoadingButton
               loading={rejectStatusMutation.isPending}
               variant="destructive-soft"
-              className="hover:bg-destructive/10 w-fit gap-2"
+              className="hover:bg-destructive/10 w-fit"
               disabled={request.status === 'rejected'}
               onClick={handleRejectRequest}
             >
@@ -196,8 +196,8 @@ export function EditRequestForm({ request }: { request: Request }) {
             <ButtonGroup>
               <LoadingButton
                 variant="outline"
-                className="w-fit gap-2"
-                loading={updateStatusMutation.isPending}
+                className="w-fit"
+                loading={approveStatusMutation.isPending}
                 onClick={() => {
                   if (!defaultRole) return;
                   handleApproveRequest(defaultRole.slug);
