@@ -19,7 +19,7 @@ const commonFieldSchema = z.object({
       __('Label can only contain letters, numbers, spaces, and common symbols (-, _, &, :, /.).', 'yay-wholesale-b2b'),
     ),
 
-  systemField: z.enum(systemFields).optional(),
+  // systemField: z.enum(systemFields).optional(),
   columnWidth: z.enum(['50%', '100%']),
   isRequired: z.boolean(),
   isHidden: z.boolean(),
@@ -34,7 +34,7 @@ const textFieldSchema = z.object({
 const choiceFieldSchema = z.object({
   ...commonFieldSchema.shape,
   type: z.enum(choiceFieldTypes),
-  choices: z.string().min(1, __('Add choices for the field', 'yay-wholesale-b2b')),
+  choices: z.array(z.string()).nonempty(__('Add choices for the field', 'yay-wholesale-b2b')),
 });
 
 const attachmentFieldSchema = z.object({
@@ -43,25 +43,13 @@ const attachmentFieldSchema = z.object({
   allowedExtensions: z.array(z.string()),
 });
 
-const fieldSchema = z.discriminatedUnion('type', [textFieldSchema, choiceFieldSchema, attachmentFieldSchema]);
+const fieldSchema = z.discriminatedUnion('type', [
+  textFieldSchema,
+  choiceFieldSchema,
+  //  attachmentFieldSchema
+]);
 
-export const fieldsSchema = z.array(fieldSchema).superRefine((fields, ctx) => {
-  // 1. Check that each systemField is unique
-  const systemFieldsUsed = new Set<string>();
-  fields.forEach((field, index) => {
-    if (field.systemField) {
-      if (systemFieldsUsed.has(field.systemField)) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: __('System field must be unique', 'yay-wholesale-b2b'),
-          path: [index, 'systemField'],
-        });
-      } else {
-        systemFieldsUsed.add(field.systemField);
-      }
-    }
-  });
-});
+export const fieldsSchema = z.array(fieldSchema);
 
 export { textFieldTypes, choiceFieldTypes, attachmentFieldTypes };
 
