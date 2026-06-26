@@ -56,7 +56,7 @@ export function RequestActionCell({ request }: { request: Request }) {
                 className="hover:text-primary text-muted-foreground size-8 hover:bg-white hover:shadow-xs"
                 onClick={() => {
                   cacheRequest(request);
-                  navigate(`/request/edit/${request.id}`);
+                  navigate(`/requests/edit/${request.id}`);
                 }}
               >
                 <SettingsIcon className="size-4" />

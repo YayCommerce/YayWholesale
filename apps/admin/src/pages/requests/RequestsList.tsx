@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { flexRender, getCoreRowModel, PaginationState, useReactTable } from '@tanstack/react-table';
 import clsx from 'clsx';
-import { ChevronsUpDown, Search } from 'lucide-react';
+import { ChevronsUpDown, Loader2, Search } from 'lucide-react';
 import { useDebounce } from 'rooks';
 import { __, _n, sprintf } from '@wordpress/i18n';
 
@@ -12,6 +12,7 @@ import {
   useBulkRejectRequestMutation,
   useCountByStatusQuery,
   useIsMutatingRequests,
+  useIsMutatingRequestsBulk,
   useRequestsQuery,
 } from '@/lib/queries/requests.queries';
 import { useActiveRolesQuery, useDefaultRole } from '@/lib/queries/roles.queries';
@@ -104,10 +105,13 @@ export default function RequestsList() {
   const bulkRejectMutation = useBulkRejectRequestMutation();
   const bulkDeleteMutation = useBulkDeleteRequestMutation();
   const isMutatingRequests = useIsMutatingRequests();
+  const isMutatingRequestsBulk = useIsMutatingRequestsBulk();
 
   async function handleBulkApprove(roleSlug: string) {
+    if (isMutatingRequests || isMutatingRequestsBulk) return;
+
     const requestIds = table.getSelectedRowModel().rows.map((row) => row.original.id);
-    if (requestIds.length === 0 || isMutatingRequests) return;
+    if (requestIds.length === 0) return;
 
     try {
       await bulkApproveMutation.mutateAsync({
@@ -122,8 +126,10 @@ export default function RequestsList() {
   }
 
   async function handleBulkReject() {
+    if (isMutatingRequests || isMutatingRequestsBulk) return;
+
     const requestIds = table.getSelectedRowModel().rows.map((row) => row.original.id);
-    if (requestIds.length === 0 || isMutatingRequests) return;
+    if (requestIds.length === 0) return;
 
     try {
       await bulkRejectMutation.mutateAsync(requestIds);
@@ -290,7 +296,11 @@ export default function RequestsList() {
                     handleBulkApprove(defaultRole.slug);
                   }}
                 >
-                  <RequestsStatusIcon status="approved" className="mt-0.5" />
+                  {bulkApproveMutation.isPending ? (
+                    <Loader2 className="text-muted-foreground size-4.5 animate-spin" />
+                  ) : (
+                    <RequestsStatusIcon status="approved" className="mt-0.5" />
+                  )}
                   {__('Approve', 'yay-wholesale-b2b')}
                 </DropdownMenuSubTrigger>
                 <DropdownMenuSubContent>
@@ -310,7 +320,11 @@ export default function RequestsList() {
               </DropdownMenuSub>
 
               <DropdownMenuItem className="w-35" onClick={() => handleBulkReject()}>
-                <RequestsStatusIcon status="rejected" />
+                {bulkRejectMutation.isPending ? (
+                  <Loader2 className="text-muted-foreground size-4.5 animate-spin" />
+                ) : (
+                  <RequestsStatusIcon status="rejected" />
+                )}
                 {__('Reject', 'yay-wholesale-b2b')}
               </DropdownMenuItem>
             </DropdownMenuContent>

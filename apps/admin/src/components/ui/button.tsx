@@ -109,7 +109,7 @@ function LoadingButton({
         data-slot="loading-text"
         data-size={size}
         data-loading={loading ? 'true' : 'false'}
-        className="transition-opacity data-[loading=true]:opacity-0"
+        className="flex items-center gap-[inherit] transition-opacity data-[loading=true]:opacity-0"
       >
         {children}
       </span>

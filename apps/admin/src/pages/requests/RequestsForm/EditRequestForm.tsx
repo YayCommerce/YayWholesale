@@ -182,17 +182,22 @@ export function EditRequestForm({ request }: { request: Request }) {
       <SheetFooter className="p-0">
         <div className="border-divider flex justify-end gap-2 border-t bg-white p-5">
           <div className="flex gap-2">
-            <Button variant="destructive-soft" className="hover:bg-destructive/10 w-fit" onClick={handleRejectRequest}>
+            <LoadingButton
+              loading={rejectStatusMutation.isPending}
+              variant="destructive-soft"
+              className="hover:bg-destructive/10 w-fit gap-2"
+              disabled={request.status === 'rejected'}
+              onClick={handleRejectRequest}
+            >
               <RequestsStatusIcon status="rejected" />
               {__('Reject', 'yay-wholesale-b2b')}
-            </Button>
+            </LoadingButton>
 
             <ButtonGroup>
               <LoadingButton
                 variant="outline"
-                className="w-fit"
+                className="w-fit gap-2"
                 loading={updateStatusMutation.isPending}
-                disabled={request.status === 'rejected'}
                 onClick={() => {
                   if (!defaultRole) return;
                   handleApproveRequest(defaultRole.slug);
