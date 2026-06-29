@@ -1,92 +1,32 @@
-import { useRef, useState } from 'react';
 import { Plus } from 'lucide-react';
-import { useFieldArray, useFormContext } from 'react-hook-form';
 import { __ } from '@wordpress/i18n';
 
-import type { Settings } from '@/lib/schema/settings.schema';
 import { Button } from '@/components/ui/button';
 import { DeleteFieldDialog } from './DeleteFieldDialog';
-import { FieldEditorForm } from './FieldEditorForm';
-import type { EditorState } from './FieldEditorForm/field-editor-types';
-import { createDefaultField, type RegistrationField } from './registration-fields.helpers';
+import { FieldForm } from './FieldForm';
 import { RegistrationFieldsList } from './RegistrationFieldsList';
 import { RegistrationFieldsPreview } from './RegistrationFieldsPreview';
+import { useRegistrationFields } from './useRegistrationFields';
 
 export default function RegistrationFieldsTab() {
-  const { control, getValues } = useFormContext<Settings>();
-  const [editorState, setEditorState] = useState<EditorState | null>(null);
-  const [sheetOpen, setSheetOpen] = useState(false);
-  const [previewDraft, setPreviewDraft] = useState<RegistrationField | null>(null);
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const restoreOnCloseRef = useRef(true);
-
-  const { fields, append, remove, move, update } = useFieldArray({
-    control,
-    name: 'registration_fields.fields',
-  });
-
-  const openAddDialog = () => {
-    const field = createDefaultField(fields.length);
-    setPreviewDraft(field);
-    setEditorState({
-      mode: 'add',
-      field,
-    });
-    setSheetOpen(true);
-  };
-
-  const openEditDialog = (index: number) => {
-    const field = getValues(`registration_fields.fields.${index}`);
-    setEditorState({
-      mode: 'edit',
-      index,
-      field: { ...field },
-    });
-    setSheetOpen(true);
-  };
-
-  const handleSave = (field: RegistrationField) => {
-    if (editorState?.mode === 'add') {
-      append(field);
-      return;
-    }
-
-    if (editorState?.mode === 'edit') {
-      update(editorState.index, field);
-    }
-  };
-
-  const handleRequestDelete = () => {
-    if (editorState?.mode !== 'edit') return;
-    setDeleteDialogOpen(true);
-  };
-
-  const handleConfirmDelete = () => {
-    if (editorState?.mode !== 'edit') return;
-    remove(editorState.index);
-    setDeleteDialogOpen(false);
-    restoreOnCloseRef.current = false;
-    handleSheetOpenChange(false);
-  };
-
-  const handleBeforeClose = (restoreSnapshot: boolean) => {
-    restoreOnCloseRef.current = restoreSnapshot;
-  };
-
-  const handleSheetOpenChange = (open: boolean) => {
-    setSheetOpen(open);
-    if (!open) {
-      if (restoreOnCloseRef.current && editorState?.mode === 'edit') {
-        update(editorState.index, editorState.field);
-      }
-      setEditorState(null);
-      setPreviewDraft(null);
-      restoreOnCloseRef.current = true;
-    }
-  };
-
-  const previewOverride =
-    editorState?.mode === 'add' && previewDraft ? { mode: 'add' as const, field: previewDraft } : null;
+  const {
+    fields,
+    previewFields,
+    submitLabel,
+    fieldEditor,
+    sheetOpen,
+    deleteDialogOpen,
+    openAddDialog,
+    openEditDialog,
+    handleSave,
+    handleRequestDelete,
+    handleConfirmDelete,
+    handleBeforeClose,
+    handleSheetOpenChange,
+    setDeleteDialogOpen,
+    move,
+    onDraftChange,
+  } = useRegistrationFields();
 
   return (
     <div className="flex flex-col gap-6">
@@ -106,18 +46,18 @@ export default function RegistrationFieldsTab() {
           </div>
 
           <div className="border-divider xl:sticky xl:top-4 xl:self-start xl:border-l xl:pl-6">
-            <RegistrationFieldsPreview previewOverride={previewOverride} />
+            <RegistrationFieldsPreview fields={previewFields} submitLabel={submitLabel} />
           </div>
         </div>
       </div>
 
-      <FieldEditorForm
+      <FieldForm
         open={sheetOpen}
         onOpenChange={handleSheetOpenChange}
         onBeforeClose={handleBeforeClose}
-        editorState={editorState}
+        fieldEditor={fieldEditor}
         onSave={handleSave}
-        onDraftChange={editorState?.mode === 'add' ? setPreviewDraft : undefined}
+        onDraftChange={onDraftChange}
         onRequestDelete={handleRequestDelete}
       />
 

@@ -1,91 +1,18 @@
-import { useMemo } from 'react';
-import { useFormContext, useWatch } from 'react-hook-form';
 import { __ } from '@wordpress/i18n';
 
-import type { Settings } from '@/lib/schema/settings.schema';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Textarea } from '@/components/ui/textarea';
-import type { RegistrationField } from './registration-fields.helpers';
+import type { RegistrationField } from './registration-fields-types';
+import { PreviewFieldInput } from './RegistrationFieldsPreview/PreviewFieldInput';
+import { PreviewFieldLabel } from './RegistrationFieldsPreview/PreviewFieldLabel';
 
-type PreviewOverride = { mode: 'add'; field: RegistrationField };
-
-function PreviewFieldLabel({ field }: { field: RegistrationField }) {
-  return (
-    <Label className="text-foreground gap-0 text-[13px] font-medium">
-      {field.label}
-      {field.isRequired && <span className="text-destructive ms-0.5">*</span>}
-    </Label>
-  );
+export interface RegistrationFieldsPreviewProps {
+  fields: RegistrationField[];
+  submitLabel?: string;
 }
 
-function PreviewFieldInput({ field }: { field: RegistrationField }) {
-  switch (field.type) {
-    case 'textarea':
-      return <Textarea placeholder={field.placeholder} className="min-h-20 resize-none" />;
-    case 'select':
-      return (
-        <Select>
-          <SelectTrigger className="w-full">
-            <SelectValue placeholder={field.placeholder || __('Select an option', 'yay-wholesale-b2b')} />
-          </SelectTrigger>
-          <SelectContent>
-            {(field.choices ?? []).map((choice) => (
-              <SelectItem key={choice} value={choice}>
-                {choice}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      );
-    case 'radio':
-      return (
-        <RadioGroup defaultValue={field.choices?.[0]} className="flex gap-4">
-          {(field.choices ?? []).map((choice) => (
-            <div key={choice} className="flex items-center gap-2">
-              <RadioGroupItem value={choice} id={`${field.id}-${choice}`} />
-              <Label htmlFor={`${field.id}-${choice}`} className="text-sm font-normal">
-                {choice}
-              </Label>
-            </div>
-          ))}
-        </RadioGroup>
-      );
-    case 'checkbox':
-      return (
-        <div className="flex flex-wrap gap-4">
-          {(field.choices ?? []).map((choice, choiceIndex) => (
-            <div key={choice} className="flex items-center gap-2">
-              <Checkbox id={`${field.id}-${choice}`} defaultChecked={choiceIndex === 0} />
-              <Label htmlFor={`${field.id}-${choice}`} className="text-sm font-normal">
-                {choice}
-              </Label>
-            </div>
-          ))}
-        </div>
-      );
-    default:
-      return <Input type={field.type === 'phone' ? 'tel' : field.type} placeholder={field.placeholder} />;
-  }
-}
-
-export function RegistrationFieldsPreview({ previewOverride }: { previewOverride?: PreviewOverride | null }) {
-  const { control } = useFormContext<Settings>();
-  const fields = useWatch({ control, name: 'registration_fields.fields' }) ?? [];
-  const submitLabel = useWatch({ control, name: 'registration.submit_button_label' });
-
-  const displayFields = useMemo(() => {
-    if (!previewOverride) return fields;
-    return [...fields, previewOverride.field];
-  }, [fields, previewOverride]);
-
-  const visibleFields = useMemo(() => displayFields.filter((field) => !field.isHidden), [displayFields]);
-
+export function RegistrationFieldsPreview({ fields, submitLabel }: RegistrationFieldsPreviewProps) {
+  const visibleFields = fields.filter((field) => !field.isHidden);
   return (
     <div className="flex min-w-0 flex-col gap-4">
       <div className="flex min-h-9 items-center gap-4">
@@ -115,7 +42,7 @@ export function RegistrationFieldsPreview({ previewOverride }: { previewOverride
           )}
 
           <Button type="button" className="mt-auto w-full">
-            {submitLabel || __('Submit', 'yay-wholesale-b2b')}
+            {submitLabel || __('Register now', 'yay-wholesale-b2b')}
           </Button>
         </div>
       </div>

@@ -7,9 +7,9 @@ import type { Settings } from '@/lib/schema/settings.schema';
 import { registrationFieldSchema } from '@/lib/schema/settings.schema';
 import { Button } from '@/components/ui/button';
 import { SheetClose, SheetFooter, SheetHeader, SheetTitle } from '@/components/ui/sheet';
-import { normalizeFieldForType, type RegistrationField } from '../registration-fields.helpers';
-import type { FieldErrors } from './field-editor-types';
-import FieldEditorFields from './FieldEditorFields';
+import type { FieldEditorErrors, RegistrationField } from '../registration-fields-types';
+import { normalizeFieldForType } from '../registration-fields.helpers';
+import FieldFormContent from './FieldFormContent';
 
 interface EditFieldFormProps {
   fieldIndex: number;
@@ -29,7 +29,7 @@ export default function EditFieldForm({
   onRequestDelete,
 }: EditFieldFormProps) {
   const { control, getValues, setValue } = useFormContext<Settings>();
-  const [errors, setErrors] = useState<FieldErrors>({});
+  const [errors, setErrors] = useState<FieldEditorErrors>({});
 
   const fieldPath = `registration_fields.fields.${fieldIndex}` as const;
   const field = useWatch({ control, name: fieldPath });
@@ -63,7 +63,7 @@ export default function EditFieldForm({
   const handleSave = () => {
     const result = registrationFieldSchema.safeParse(getValues(fieldPath));
     if (!result.success) {
-      const nextErrors: FieldErrors = {};
+      const nextErrors: FieldEditorErrors = {};
       result.error.issues.forEach((issue) => {
         const key = issue.path[0];
         if (typeof key === 'string') {
@@ -92,7 +92,7 @@ export default function EditFieldForm({
       </SheetHeader>
 
       <div className="flex flex-1 flex-col gap-5 overflow-y-auto p-5">
-        <FieldEditorFields field={field} errors={errors} onUpdate={updateField} onTypeChange={handleTypeChange} />
+        <FieldFormContent field={field} errors={errors} onUpdate={updateField} onTypeChange={handleTypeChange} />
       </div>
 
       <SheetFooter className="shrink-0 border-t px-5 py-4">

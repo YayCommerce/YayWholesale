@@ -1,9 +1,7 @@
 import { v4 as uuidv4 } from 'uuid';
 import { __ } from '@wordpress/i18n';
 
-import type { Settings } from '@/lib/schema/settings.schema';
-
-export type RegistrationField = Settings['registration_fields']['fields'][number];
+import type { RegistrationField } from './registration-fields-types';
 
 export const CHOICE_FIELD_TYPES = ['radio', 'select', 'checkbox'] as const;
 export type ChoiceFieldType = (typeof CHOICE_FIELD_TYPES)[number];

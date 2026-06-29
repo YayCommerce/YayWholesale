@@ -1,34 +1,33 @@
 import { Sheet, SheetContent } from '@/components/ui/sheet';
-import { RegistrationField } from '../registration-fields.helpers';
-import AddFieldForm from './AddFieldForm';
-import EditFieldForm from './EditFieldForm';
-import type { EditorState } from './field-editor-types';
+import AddFieldForm from './FieldForm/AddFieldForm';
+import EditFieldForm from './FieldForm/EditFieldForm';
+import type { FieldEditorState, RegistrationField } from './registration-fields-types';
 
-interface FieldEditorFormProps {
+interface FieldFormProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onBeforeClose: (restoreSnapshot: boolean) => void;
-  editorState: EditorState | null;
+  fieldEditor: FieldEditorState | null;
   onSave: (field: RegistrationField) => void;
   onDraftChange?: (field: RegistrationField) => void;
   onRequestDelete?: () => void;
 }
 
-export function FieldEditorForm({
+export function FieldForm({
   open,
   onOpenChange,
   onBeforeClose,
-  editorState,
+  fieldEditor,
   onSave,
   onDraftChange,
   onRequestDelete,
-}: FieldEditorFormProps) {
+}: FieldFormProps) {
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent hasMargin>
-        {editorState?.mode === 'add' && (
+        {fieldEditor?.mode === 'add' && (
           <AddFieldForm
-            initialField={editorState.field}
+            initialField={fieldEditor.field}
             open={open}
             onSave={onSave}
             onBeforeClose={onBeforeClose}
@@ -36,9 +35,9 @@ export function FieldEditorForm({
             onDraftChange={onDraftChange}
           />
         )}
-        {editorState?.mode === 'edit' && (
+        {fieldEditor?.mode === 'edit' && (
           <EditFieldForm
-            fieldIndex={editorState.index}
+            fieldIndex={fieldEditor.index}
             open={open}
             onSave={onSave}
             onBeforeClose={onBeforeClose}

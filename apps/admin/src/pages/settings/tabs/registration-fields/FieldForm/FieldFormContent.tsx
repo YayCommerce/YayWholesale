@@ -7,23 +7,17 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Separator } from '@/components/ui/separator';
 import { Switch } from '@/components/ui/switch';
 import { TagsInput } from '@/components/ui/tags-input';
-import {
-  FIELD_TYPE_OPTIONS,
-  fieldTypeHasPlaceholder,
-  isChoiceFieldType,
-  type RegistrationField,
-} from '../registration-fields.helpers';
+import type { FieldEditorErrors, RegistrationField } from '../registration-fields-types';
+import { FIELD_TYPE_OPTIONS, fieldTypeHasPlaceholder, isChoiceFieldType } from '../registration-fields.helpers';
 
-export type FieldErrors = Partial<Record<keyof RegistrationField, string>>;
-
-interface FieldEditorFieldsProps {
+interface FieldFormContentProps {
   field: RegistrationField;
-  errors: FieldErrors;
+  errors: FieldEditorErrors;
   onUpdate: <K extends keyof RegistrationField>(key: K, value: RegistrationField[K]) => void;
   onTypeChange: (type: RegistrationField['type']) => void;
 }
 
-export default function FieldEditorFields({ field, errors, onUpdate, onTypeChange }: FieldEditorFieldsProps) {
+export default function FieldFormContent({ field, errors, onUpdate, onTypeChange }: FieldFormContentProps) {
   const showPlaceholder = fieldTypeHasPlaceholder(field.type);
   const showChoices = isChoiceFieldType(field.type);
 

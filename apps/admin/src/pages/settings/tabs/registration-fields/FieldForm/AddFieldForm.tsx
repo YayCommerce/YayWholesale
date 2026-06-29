@@ -4,9 +4,9 @@ import { __ } from '@wordpress/i18n';
 import { registrationFieldSchema } from '@/lib/schema/settings.schema';
 import { Button } from '@/components/ui/button';
 import { SheetClose, SheetFooter, SheetHeader, SheetTitle } from '@/components/ui/sheet';
-import { normalizeFieldForType, type RegistrationField } from '../registration-fields.helpers';
-import type { FieldErrors } from './field-editor-types';
-import FieldEditorFields from './FieldEditorFields';
+import type { FieldEditorErrors, RegistrationField } from '../registration-fields-types';
+import { normalizeFieldForType } from '../registration-fields.helpers';
+import FieldFormContent from './FieldFormContent';
 
 interface AddFieldFormProps {
   initialField: RegistrationField;
@@ -26,7 +26,7 @@ export default function AddFieldForm({
   onDraftChange,
 }: AddFieldFormProps) {
   const [draft, setDraft] = useState<RegistrationField>(initialField);
-  const [errors, setErrors] = useState<FieldErrors>({});
+  const [errors, setErrors] = useState<FieldEditorErrors>({});
 
   useEffect(() => {
     if (open) {
@@ -62,7 +62,7 @@ export default function AddFieldForm({
   const handleSave = () => {
     const result = registrationFieldSchema.safeParse(draft);
     if (!result.success) {
-      const nextErrors: FieldErrors = {};
+      const nextErrors: FieldEditorErrors = {};
       result.error.issues.forEach((issue) => {
         const key = issue.path[0];
         if (typeof key === 'string') {
@@ -87,7 +87,7 @@ export default function AddFieldForm({
       </SheetHeader>
 
       <div className="flex flex-1 flex-col gap-5 overflow-y-auto p-5">
-        <FieldEditorFields field={draft} errors={errors} onUpdate={updateDraft} onTypeChange={handleTypeChange} />
+        <FieldFormContent field={draft} errors={errors} onUpdate={updateDraft} onTypeChange={handleTypeChange} />
       </div>
 
       <SheetFooter className="shrink-0 border-t px-5 py-4">
