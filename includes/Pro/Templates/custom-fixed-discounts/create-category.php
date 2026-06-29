@@ -30,13 +30,13 @@ $custom_discounts_nonce = wp_create_nonce( 'ywhs-category-based-discount-nonce' 
                 <div class="ywhs_field_inputs_wrapper">
                     <div class="wc-radios ywhs_radios">
                         <label>
-                            <input class='ywhs_cat_discount_rule_default' name="yay-wholesale-b2b[discount-rule]" value="default" type="radio" class="select short" checked>
+                            <input class='ywhs_discount_rule_default' name="yay-wholesale-b2b[discount-rule]" value="default" type="radio" class="select short" checked>
                             <?php esc_html_e( 'Default', 'yay-wholesale-b2b' ); ?>
                         </label>
                     </div>
                     <div class="wc-radios ywhs_radios">
                         <label>
-                            <input class='ywhs_cat_discount_rule_custom' name="yay-wholesale-b2b[discount-rule]" value="custom" type="radio" class="select short">
+                            <input class='ywhs_discount_rule_custom' name="yay-wholesale-b2b[discount-rule]" value="custom" type="radio" class="select short">
                             <?php esc_html_e( 'Custom', 'yay-wholesale-b2b' ); ?>
                         </label>
                     </div>

@@ -31,14 +31,14 @@ $product_based_discounts = get_post_meta( $variation->ID, 'yaywholesaleb2b_produ
                 <div class="ywhs_field_inputs_wrapper">
                     <div class="wc-radios ywhs_radios">
                         <label>
-                            <input class='ywhs_cat_discount_rule_default' name="yay-wholesale-b2b[discount-rule-<?php echo ( esc_html( $index ) ); ?>]" value="default" type="radio"
+                            <input class='ywhs_discount_rule_default' name="yay-wholesale-b2b[discount-rule-<?php echo ( esc_html( $index ) ); ?>]" value="default" type="radio"
                                 <?php echo ( esc_attr( ! isset( $product_based_discounts['discount_rule'] ) || $product_based_discounts['discount_rule'] === 'default' ? 'checked' : '' ) ); ?>>
                             <?php esc_html_e( 'Default', 'yay-wholesale-b2b' ); ?>
                         </label>
                     </div>
                     <div class="wc-radios ywhs_radios">
                         <label>
-                            <input class='ywhs_cat_discount_rule_custom' name="yay-wholesale-b2b[discount-rule-<?php echo ( esc_html( $index ) ); ?>]" value="custom" type="radio"
+                            <input class='ywhs_discount_rule_custom' name="yay-wholesale-b2b[discount-rule-<?php echo ( esc_html( $index ) ); ?>]" value="custom" type="radio"
                                 <?php echo ( esc_attr( isset( $product_based_discounts['discount_rule'] ) && $product_based_discounts['discount_rule'] === 'custom' ? 'checked' : '' ) ); ?>>
                             <?php esc_html_e( 'Custom', 'yay-wholesale-b2b' ); ?>
                         </label>

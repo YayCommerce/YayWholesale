@@ -146,4 +146,13 @@ class ProductPricingHelper {
 
         return false;
     }
+
+    public static function get_default_settings() {
+        return [
+            'discount_rule'  => 'default',
+            'discount_type'  => 'fixed',
+            'discount_fixed' => [],
+            'discount_rates' => [],
+        ];
+    }
 }

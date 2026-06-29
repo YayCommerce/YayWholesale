@@ -11,7 +11,7 @@ defined( 'ABSPATH' ) || exit;
 /**
  * Category Based Pricing Engine.
  */
-class CategoryBasedPricing {
+class CategoryBasedRule {
 
     use SingletonTrait;
 
