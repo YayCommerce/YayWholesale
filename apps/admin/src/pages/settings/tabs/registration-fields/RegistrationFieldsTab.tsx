@@ -1,34 +1,20 @@
 import { useRef, useState } from 'react';
-import { closestCenter, DndContext, DragEndEvent, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
-import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { Plus } from 'lucide-react';
 import { useFieldArray, useFormContext } from 'react-hook-form';
 import { __ } from '@wordpress/i18n';
 
 import type { Settings } from '@/lib/schema/settings.schema';
 import { Button } from '@/components/ui/button';
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
-import { FieldCard } from './FieldCard';
+import { DeleteFieldDialog } from './DeleteFieldDialog';
 import { FieldEditorForm } from './FieldEditorForm';
+import type { EditorState } from './FieldEditorForm/field-editor-types';
 import { createDefaultField, type RegistrationField } from './registration-fields.helpers';
+import { RegistrationFieldsList } from './RegistrationFieldsList';
 import { RegistrationFieldsPreview } from './RegistrationFieldsPreview';
-
-type EditorState =
-  | { mode: 'add'; field: RegistrationField }
-  | { mode: 'edit'; index: number; field: RegistrationField }
-  | null;
 
 export default function RegistrationFieldsTab() {
   const { control, getValues } = useFormContext<Settings>();
-  const [editorState, setEditorState] = useState<EditorState>(null);
+  const [editorState, setEditorState] = useState<EditorState | null>(null);
   const [sheetOpen, setSheetOpen] = useState(false);
   const [previewDraft, setPreviewDraft] = useState<RegistrationField | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -38,17 +24,6 @@ export default function RegistrationFieldsTab() {
     control,
     name: 'registration_fields.fields',
   });
-
-  const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 6 } }));
-
-  const handleDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event;
-    if (active.id !== over?.id) {
-      const oldIndex = fields.findIndex((f) => f.id === active.id);
-      const newIndex = fields.findIndex((f) => f.id === over?.id);
-      move(oldIndex, newIndex);
-    }
-  };
 
   const openAddDialog = () => {
     const field = createDefaultField(fields.length);
@@ -127,16 +102,7 @@ export default function RegistrationFieldsTab() {
                 <span>{__('Add New Field', 'yay-wholesale-b2b')}</span>
               </Button>
             </div>
-
-            <div className="flex flex-col gap-3">
-              <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-                <SortableContext items={fields.map((f) => f.id)} strategy={verticalListSortingStrategy}>
-                  {fields.map((field, index) => (
-                    <FieldCard key={field.id} fieldId={field.id} index={index} onEdit={openEditDialog} />
-                  ))}
-                </SortableContext>
-              </DndContext>
-            </div>
+            <RegistrationFieldsList fields={fields} onEdit={openEditDialog} onMove={move} />
           </div>
 
           <div className="border-divider xl:sticky xl:top-4 xl:self-start xl:border-l xl:pl-6">
@@ -144,6 +110,7 @@ export default function RegistrationFieldsTab() {
           </div>
         </div>
       </div>
+
       <FieldEditorForm
         open={sheetOpen}
         onOpenChange={handleSheetOpenChange}
@@ -154,27 +121,11 @@ export default function RegistrationFieldsTab() {
         onRequestDelete={handleRequestDelete}
       />
 
-      <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <DialogContent className="bw:max-w-md">
-          <DialogHeader className="bw:border-b-0">
-            <DialogTitle>{__('Are you sure you want to delete this field?', 'yay-wholesale-b2b')}</DialogTitle>
-            <DialogDescription>
-              {__(
-                'This action cannot be undone. This field will be permanently removed from the registration form.',
-                'yay-wholesale-b2b',
-              )}
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <DialogClose asChild>
-              <Button variant="outline">{__('Cancel', 'yay-wholesale-b2b')}</Button>
-            </DialogClose>
-            <Button variant="destructive" onClick={handleConfirmDelete}>
-              {__('Delete', 'yay-wholesale-b2b')}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <DeleteFieldDialog
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        onConfirmDelete={handleConfirmDelete}
+      />
     </div>
   );
 }

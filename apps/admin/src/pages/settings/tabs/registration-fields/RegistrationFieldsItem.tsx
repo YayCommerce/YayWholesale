@@ -8,13 +8,13 @@ import type { Settings } from '@/lib/schema/settings.schema';
 import { cn } from '@/lib/utils';
 import { Switch } from '@/components/ui/switch';
 
-type FieldCardProps = {
+type RegistrationFieldsItemProps = {
   fieldId: string;
   index: number;
   onEdit: (index: number) => void;
 };
 
-export function FieldCard({ fieldId, index, onEdit }: FieldCardProps) {
+export function RegistrationFieldsItem({ fieldId, index, onEdit }: RegistrationFieldsItemProps) {
   const { control, getValues, setValue } = useFormContext<Settings>();
   const fieldPath = `registration_fields.fields.${index}` as const;
   const field = useWatch({ control, name: fieldPath });

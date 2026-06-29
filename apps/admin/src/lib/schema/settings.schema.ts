@@ -20,7 +20,10 @@ const fieldSchema = z
       .min(1, __('Fill in the field label', 'yay-wholesale-b2b'))
       .regex(
         /^[\p{L}0-9 _\-&:/]+$/u,
-        __('Label can only contain letters, numbers, spaces, and common symbols (-, _, &, :, /.).', 'yay-wholesale-b2b'),
+        __(
+          'Label can only contain letters, numbers, spaces, and common symbols (-, _, &, :, /.).',
+          'yay-wholesale-b2b',
+        ),
       ),
     inputName: z.string(),
     type: z.enum(['text', 'email', 'number', 'phone', 'date', 'textarea', 'select', ...choiceFieldTypes]),

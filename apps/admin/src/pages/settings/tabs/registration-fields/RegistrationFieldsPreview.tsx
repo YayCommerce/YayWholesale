@@ -27,10 +27,10 @@ function PreviewFieldLabel({ field }: { field: RegistrationField }) {
 function PreviewFieldInput({ field }: { field: RegistrationField }) {
   switch (field.type) {
     case 'textarea':
-      return <Textarea placeholder={field.placeholder} disabled className="min-h-20 resize-none" />;
+      return <Textarea placeholder={field.placeholder} className="min-h-20 resize-none" />;
     case 'select':
       return (
-        <Select disabled>
+        <Select>
           <SelectTrigger className="w-full">
             <SelectValue placeholder={field.placeholder || __('Select an option', 'yay-wholesale-b2b')} />
           </SelectTrigger>
@@ -45,7 +45,7 @@ function PreviewFieldInput({ field }: { field: RegistrationField }) {
       );
     case 'radio':
       return (
-        <RadioGroup defaultValue={field.choices?.[0]} disabled className="flex gap-4">
+        <RadioGroup defaultValue={field.choices?.[0]} className="flex gap-4">
           {(field.choices ?? []).map((choice) => (
             <div key={choice} className="flex items-center gap-2">
               <RadioGroupItem value={choice} id={`${field.id}-${choice}`} />
@@ -61,7 +61,7 @@ function PreviewFieldInput({ field }: { field: RegistrationField }) {
         <div className="flex flex-wrap gap-4">
           {(field.choices ?? []).map((choice, choiceIndex) => (
             <div key={choice} className="flex items-center gap-2">
-              <Checkbox id={`${field.id}-${choice}`} defaultChecked={choiceIndex === 0} disabled />
+              <Checkbox id={`${field.id}-${choice}`} defaultChecked={choiceIndex === 0} />
               <Label htmlFor={`${field.id}-${choice}`} className="text-sm font-normal">
                 {choice}
               </Label>
@@ -70,7 +70,7 @@ function PreviewFieldInput({ field }: { field: RegistrationField }) {
         </div>
       );
     default:
-      return <Input type={field.type === 'phone' ? 'tel' : field.type} placeholder={field.placeholder} disabled />;
+      return <Input type={field.type === 'phone' ? 'tel' : field.type} placeholder={field.placeholder} />;
   }
 }
 
