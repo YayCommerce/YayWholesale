@@ -22,14 +22,17 @@ import {
   type RegistrationField,
 } from './registration-fields.helpers';
 
+type EditorState =
+  | { mode: 'add'; field: RegistrationField }
+  | { mode: 'edit'; index: number; field: RegistrationField };
+
 type FieldErrors = Partial<Record<keyof RegistrationField, string>>;
 
 type FieldEditorFormProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  mode: 'add' | 'edit';
-  fieldIndex?: number;
-  initialField: RegistrationField;
+  onBeforeClose: (restoreSnapshot: boolean) => void;
+  editorState: EditorState | null;
   onSave: (field: RegistrationField) => void;
   onDraftChange?: (field: RegistrationField) => void;
   onRequestDelete?: () => void;
@@ -148,15 +151,56 @@ function FieldEditorFields({ field, errors, onUpdate, onTypeChange }: FieldEdito
   );
 }
 
-function AddFieldEditorForm({
-  open,
-  onOpenChange,
-  mode,
+type FieldEditorFooterProps = {
+  mode: 'add' | 'edit';
+  onCancel: () => void;
+  onSave: () => void;
+  onRequestDelete?: () => void;
+};
+
+function FieldEditorFooter({ mode, onCancel, onSave, onRequestDelete }: FieldEditorFooterProps) {
+  return (
+    <SheetFooter className="shrink-0 border-t px-5 py-4">
+      <div className="flex w-full items-center justify-between gap-3">
+        {mode === 'edit' && onRequestDelete ? (
+          <Button type="button" variant="outline" size="icon" onClick={onRequestDelete} className="shrink-0">
+            <Trash className="size-4" />
+          </Button>
+        ) : (
+          <span className="hidden sm:block" />
+        )}
+        <div className="ms-auto flex gap-4">
+          <Button type="button" variant="outline" onClick={onCancel}>
+            {__('Cancel', 'yay-wholesale-b2b')}
+          </Button>
+          <Button type="button" onClick={onSave}>
+            {mode === 'add' ? __('Create New', 'yay-wholesale-b2b') : __('Apply', 'yay-wholesale-b2b')}
+          </Button>
+        </div>
+      </div>
+    </SheetFooter>
+  );
+}
+
+type AddFieldEditorContentProps = {
+  initialField: RegistrationField;
+  open: boolean;
+  onCancel: () => void;
+  onSave: (field: RegistrationField) => void;
+  onBeforeClose: (restoreSnapshot: boolean) => void;
+  onOpenChange: (open: boolean) => void;
+  onDraftChange?: (field: RegistrationField) => void;
+};
+
+function AddFieldEditorContent({
   initialField,
+  open,
+  onCancel,
   onSave,
+  onBeforeClose,
+  onOpenChange,
   onDraftChange,
-  onRequestDelete,
-}: FieldEditorFormProps) {
+}: AddFieldEditorContentProps) {
   const [draft, setDraft] = useState<RegistrationField>(initialField);
   const [errors, setErrors] = useState<FieldErrors>({});
 
@@ -206,55 +250,46 @@ function AddFieldEditorForm({
     }
 
     onSave(result.data);
+    onBeforeClose(false);
     onOpenChange(false);
   };
 
   return (
-    <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent hasMargin>
-        <SheetHeader>
-          <div className="flex items-start justify-between">
-            <SheetTitle>
-              {mode === 'add' ? __('Create New Field', 'yay-wholesale-b2b') : __('Edit Field', 'yay-wholesale-b2b')}
-            </SheetTitle>
-          </div>
-        </SheetHeader>
-
-        <div className="flex flex-1 flex-col gap-5 overflow-y-auto p-5">
-          <FieldEditorFields field={draft} errors={errors} onUpdate={updateDraft} onTypeChange={handleTypeChange} />
+    <>
+      <SheetHeader>
+        <div className="flex items-start justify-between">
+          <SheetTitle>{__('Create New Field', 'yay-wholesale-b2b')}</SheetTitle>
         </div>
+      </SheetHeader>
 
-        <SheetFooter className="shrink-0 border-t px-5 py-4">
-          <div className="flex w-full items-center justify-between gap-3">
-            {mode === 'edit' && onRequestDelete ? (
-              <Button type="button" variant="outline" size="icon" onClick={onRequestDelete} className="shrink-0">
-                <Trash className="size-4" />
-              </Button>
-            ) : (
-              <span className="hidden sm:block" />
-            )}
-            <div className="ms-auto flex gap-4">
-              <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-                {__('Cancel', 'yay-wholesale-b2b')}
-              </Button>
-              <Button type="button" onClick={handleSave}>
-                {mode === 'add' ? __('Create New', 'yay-wholesale-b2b') : __('Apply', 'yay-wholesale-b2b')}
-              </Button>
-            </div>
-          </div>
-        </SheetFooter>
-      </SheetContent>
-    </Sheet>
+      <div className="flex flex-1 flex-col gap-5 overflow-y-auto p-5">
+        <FieldEditorFields field={draft} errors={errors} onUpdate={updateDraft} onTypeChange={handleTypeChange} />
+      </div>
+
+      <FieldEditorFooter mode="add" onCancel={onCancel} onSave={handleSave} />
+    </>
   );
 }
 
-function EditFieldEditorForm({
-  open,
-  onOpenChange,
+type EditFieldEditorContentProps = {
+  fieldIndex: number;
+  open: boolean;
+  onCancel: () => void;
+  onSave: (field: RegistrationField) => void;
+  onBeforeClose: (restoreSnapshot: boolean) => void;
+  onOpenChange: (open: boolean) => void;
+  onRequestDelete?: () => void;
+};
+
+function EditFieldEditorContent({
   fieldIndex,
+  open,
+  onCancel,
   onSave,
+  onBeforeClose,
+  onOpenChange,
   onRequestDelete,
-}: Omit<FieldEditorFormProps, 'mode' | 'initialField' | 'onDraftChange'> & { fieldIndex: number }) {
+}: EditFieldEditorContentProps) {
   const { control, getValues, setValue } = useFormContext<Settings>();
   const [errors, setErrors] = useState<FieldErrors>({});
 
@@ -302,6 +337,7 @@ function EditFieldEditorForm({
     }
 
     onSave(result.data);
+    onBeforeClose(false);
     onOpenChange(false);
   };
 
@@ -310,46 +346,62 @@ function EditFieldEditorForm({
   }
 
   return (
-    <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent hasMargin>
-        <SheetHeader>
-          <div className="flex items-start justify-between">
-            <SheetTitle>{__('Edit Field', 'yay-wholesale-b2b')}</SheetTitle>
-          </div>
-        </SheetHeader>
-
-        <div className="flex flex-1 flex-col gap-5 overflow-y-auto p-5">
-          <FieldEditorFields field={field} errors={errors} onUpdate={updateField} onTypeChange={handleTypeChange} />
+    <>
+      <SheetHeader>
+        <div className="flex items-start justify-between">
+          <SheetTitle>{__('Edit Field', 'yay-wholesale-b2b')}</SheetTitle>
         </div>
+      </SheetHeader>
 
-        <SheetFooter className="shrink-0 border-t px-5 py-4">
-          <div className="flex w-full items-center justify-between gap-3">
-            {onRequestDelete ? (
-              <Button type="button" variant="outline" size="icon" onClick={onRequestDelete} className="shrink-0">
-                <Trash className="size-4" />
-              </Button>
-            ) : (
-              <span className="hidden sm:block" />
-            )}
-            <div className="ms-auto flex gap-4">
-              <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-                {__('Cancel', 'yay-wholesale-b2b')}
-              </Button>
-              <Button type="button" onClick={handleSave}>
-                {__('Apply', 'yay-wholesale-b2b')}
-              </Button>
-            </div>
-          </div>
-        </SheetFooter>
-      </SheetContent>
-    </Sheet>
+      <div className="flex flex-1 flex-col gap-5 overflow-y-auto p-5">
+        <FieldEditorFields field={field} errors={errors} onUpdate={updateField} onTypeChange={handleTypeChange} />
+      </div>
+
+      <FieldEditorFooter mode="edit" onCancel={onCancel} onSave={handleSave} onRequestDelete={onRequestDelete} />
+    </>
   );
 }
 
-export function FieldEditorForm(props: FieldEditorFormProps) {
-  if (props.mode === 'edit' && props.fieldIndex !== undefined) {
-    return <EditFieldEditorForm {...props} fieldIndex={props.fieldIndex} />;
-  }
+export function FieldEditorForm({
+  open,
+  onOpenChange,
+  onBeforeClose,
+  editorState,
+  onSave,
+  onDraftChange,
+  onRequestDelete,
+}: FieldEditorFormProps) {
+  const handleCancel = () => {
+    onBeforeClose(true);
+    onOpenChange(false);
+  };
 
-  return <AddFieldEditorForm {...props} />;
+  return (
+    <Sheet open={open} onOpenChange={onOpenChange}>
+      <SheetContent hasMargin>
+        {editorState?.mode === 'add' && (
+          <AddFieldEditorContent
+            initialField={editorState.field}
+            open={open}
+            onCancel={handleCancel}
+            onSave={onSave}
+            onBeforeClose={onBeforeClose}
+            onOpenChange={onOpenChange}
+            onDraftChange={onDraftChange}
+          />
+        )}
+        {editorState?.mode === 'edit' && (
+          <EditFieldEditorContent
+            fieldIndex={editorState.index}
+            open={open}
+            onCancel={handleCancel}
+            onSave={onSave}
+            onBeforeClose={onBeforeClose}
+            onOpenChange={onOpenChange}
+            onRequestDelete={onRequestDelete}
+          />
+        )}
+      </SheetContent>
+    </Sheet>
+  );
 }

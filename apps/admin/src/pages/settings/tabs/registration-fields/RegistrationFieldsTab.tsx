@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { closestCenter, DndContext, DragEndEvent, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { Plus } from 'lucide-react';
@@ -29,8 +29,10 @@ type EditorState =
 export default function RegistrationFieldsTab() {
   const { control, getValues } = useFormContext<Settings>();
   const [editorState, setEditorState] = useState<EditorState>(null);
+  const [sheetOpen, setSheetOpen] = useState(false);
   const [previewDraft, setPreviewDraft] = useState<RegistrationField | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const restoreOnCloseRef = useRef(true);
 
   const { fields, append, remove, move, update } = useFieldArray({
     control,
@@ -55,6 +57,7 @@ export default function RegistrationFieldsTab() {
       mode: 'add',
       field,
     });
+    setSheetOpen(true);
   };
 
   const openEditDialog = (index: number) => {
@@ -64,6 +67,7 @@ export default function RegistrationFieldsTab() {
       index,
       field: { ...field },
     });
+    setSheetOpen(true);
   };
 
   const handleSave = (field: RegistrationField) => {
@@ -86,8 +90,24 @@ export default function RegistrationFieldsTab() {
     if (editorState?.mode !== 'edit') return;
     remove(editorState.index);
     setDeleteDialogOpen(false);
-    setEditorState(null);
-    setPreviewDraft(null);
+    restoreOnCloseRef.current = false;
+    handleSheetOpenChange(false);
+  };
+
+  const handleBeforeClose = (restoreSnapshot: boolean) => {
+    restoreOnCloseRef.current = restoreSnapshot;
+  };
+
+  const handleSheetOpenChange = (open: boolean) => {
+    setSheetOpen(open);
+    if (!open) {
+      if (restoreOnCloseRef.current && editorState?.mode === 'edit') {
+        update(editorState.index, editorState.field);
+      }
+      setEditorState(null);
+      setPreviewDraft(null);
+      restoreOnCloseRef.current = true;
+    }
   };
 
   const previewOverride =
@@ -124,26 +144,15 @@ export default function RegistrationFieldsTab() {
           </div>
         </div>
       </div>
-      {editorState && (
-        <FieldEditorForm
-          open={!!editorState}
-          onOpenChange={(open) => {
-            if (!open) {
-              if (editorState.mode === 'edit') {
-                update(editorState.index, editorState.field);
-              }
-              setEditorState(null);
-              setPreviewDraft(null);
-            }
-          }}
-          mode={editorState.mode}
-          fieldIndex={editorState.mode === 'edit' ? editorState.index : undefined}
-          initialField={editorState.field}
-          onSave={handleSave}
-          onDraftChange={editorState.mode === 'add' ? setPreviewDraft : undefined}
-          onRequestDelete={handleRequestDelete}
-        />
-      )}
+      <FieldEditorForm
+        open={sheetOpen}
+        onOpenChange={handleSheetOpenChange}
+        onBeforeClose={handleBeforeClose}
+        editorState={editorState}
+        onSave={handleSave}
+        onDraftChange={editorState?.mode === 'add' ? setPreviewDraft : undefined}
+        onRequestDelete={handleRequestDelete}
+      />
 
       <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <DialogContent className="bw:max-w-md">
