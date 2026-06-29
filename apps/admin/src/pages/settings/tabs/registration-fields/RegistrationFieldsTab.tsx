@@ -7,6 +7,15 @@ import { __ } from '@wordpress/i18n';
 
 import type { Settings } from '@/lib/schema/settings.schema';
 import { Button } from '@/components/ui/button';
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { FieldCard } from './FieldCard';
 import { FieldEditorForm } from './FieldEditorForm';
 import { createDefaultField, type RegistrationField } from './registration-fields.helpers';
@@ -21,6 +30,7 @@ export default function RegistrationFieldsTab() {
   const { control, getValues } = useFormContext<Settings>();
   const [editorState, setEditorState] = useState<EditorState>(null);
   const [previewDraft, setPreviewDraft] = useState<RegistrationField | null>(null);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
   const { fields, append, remove, move, update } = useFieldArray({
     control,
@@ -49,12 +59,10 @@ export default function RegistrationFieldsTab() {
 
   const openEditDialog = (index: number) => {
     const field = getValues(`registration_fields.fields.${index}`);
-    const draft = { ...field };
-    setPreviewDraft(draft);
     setEditorState({
       mode: 'edit',
       index,
-      field: draft,
+      field: { ...field },
     });
   };
 
@@ -69,21 +77,21 @@ export default function RegistrationFieldsTab() {
     }
   };
 
-  const handleDelete = () => {
+  const handleRequestDelete = () => {
     if (editorState?.mode !== 'edit') return;
-    if (window.confirm(__('Are you sure you want to delete this field?', 'yay-wholesale-b2b'))) {
-      remove(editorState.index);
-      setEditorState(null);
-      setPreviewDraft(null);
-    }
+    setDeleteDialogOpen(true);
+  };
+
+  const handleConfirmDelete = () => {
+    if (editorState?.mode !== 'edit') return;
+    remove(editorState.index);
+    setDeleteDialogOpen(false);
+    setEditorState(null);
+    setPreviewDraft(null);
   };
 
   const previewOverride =
-    editorState && previewDraft
-      ? editorState.mode === 'add'
-        ? { mode: 'add' as const, field: previewDraft }
-        : { mode: 'edit' as const, index: editorState.index, field: previewDraft }
-      : null;
+    editorState?.mode === 'add' && previewDraft ? { mode: 'add' as const, field: previewDraft } : null;
 
   return (
     <div className="flex flex-col gap-6">
@@ -104,7 +112,7 @@ export default function RegistrationFieldsTab() {
               <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
                 <SortableContext items={fields.map((f) => f.id)} strategy={verticalListSortingStrategy}>
                   {fields.map((field, index) => (
-                    <FieldCard key={field.id} field={field} index={index} onEdit={openEditDialog} />
+                    <FieldCard key={field.id} fieldId={field.id} index={index} onEdit={openEditDialog} />
                   ))}
                 </SortableContext>
               </DndContext>
@@ -121,17 +129,43 @@ export default function RegistrationFieldsTab() {
           open={!!editorState}
           onOpenChange={(open) => {
             if (!open) {
+              if (editorState.mode === 'edit') {
+                update(editorState.index, editorState.field);
+              }
               setEditorState(null);
               setPreviewDraft(null);
             }
           }}
           mode={editorState.mode}
+          fieldIndex={editorState.mode === 'edit' ? editorState.index : undefined}
           initialField={editorState.field}
           onSave={handleSave}
-          onDraftChange={setPreviewDraft}
-          onDelete={handleDelete}
+          onDraftChange={editorState.mode === 'add' ? setPreviewDraft : undefined}
+          onRequestDelete={handleRequestDelete}
         />
       )}
+
+      <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <DialogContent className="bw:max-w-md">
+          <DialogHeader className="bw:border-b-0">
+            <DialogTitle>{__('Are you sure you want to delete this field?', 'yay-wholesale-b2b')}</DialogTitle>
+            <DialogDescription>
+              {__(
+                'This action cannot be undone. This field will be permanently removed from the registration form.',
+                'yay-wholesale-b2b',
+              )}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button variant="outline">{__('Cancel', 'yay-wholesale-b2b')}</Button>
+            </DialogClose>
+            <Button variant="destructive" onClick={handleConfirmDelete}>
+              {__('Delete', 'yay-wholesale-b2b')}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

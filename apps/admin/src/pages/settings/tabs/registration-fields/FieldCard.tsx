@@ -1,31 +1,34 @@
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { GripVertical } from 'lucide-react';
-import { Controller, useFormContext } from 'react-hook-form';
+import { useFormContext, useWatch } from 'react-hook-form';
 import { __ } from '@wordpress/i18n';
 
 import type { Settings } from '@/lib/schema/settings.schema';
 import { cn } from '@/lib/utils';
 import { Switch } from '@/components/ui/switch';
-import type { RegistrationField } from './registration-fields.helpers';
 
 type FieldCardProps = {
-  field: RegistrationField;
+  fieldId: string;
   index: number;
   onEdit: (index: number) => void;
 };
 
-export function FieldCard({ field, index, onEdit }: FieldCardProps) {
-  const { control } = useFormContext<Settings>();
+export function FieldCard({ fieldId, index, onEdit }: FieldCardProps) {
+  const { control, getValues, setValue } = useFormContext<Settings>();
+  const fieldPath = `registration_fields.fields.${index}` as const;
+  const field = useWatch({ control, name: fieldPath });
 
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
-    id: field.id,
+    id: fieldId,
   });
 
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
   };
+
+  const isHidden = field?.isHidden ?? false;
 
   return (
     <div
@@ -47,25 +50,22 @@ export function FieldCard({ field, index, onEdit }: FieldCardProps) {
       </div>
 
       <div className="flex w-full flex-1 items-center gap-2 text-left">
-        <span className={cn('truncate text-sm font-medium', field.isHidden && 'text-muted-foreground line-through')}>
-          {field.label || __('Untitled field', 'yay-wholesale-b2b')}
+        <span className={cn('truncate text-sm font-medium', isHidden && 'text-muted-foreground line-through')}>
+          {field?.label || __('Untitled field', 'yay-wholesale-b2b')}
         </span>
       </div>
 
-      <Controller
-        control={control}
-        name={`registration_fields.fields.${index}.isHidden`}
-        render={({ field: hiddenField }) => (
-          <div onPointerDown={(e) => e.stopPropagation()} onClick={(e) => e.stopPropagation()}>
-            <Switch
-              size="sm"
-              checked={!hiddenField.value}
-              onCheckedChange={(checked) => hiddenField.onChange(!checked)}
-              aria-label={__('Enabled status', 'yay-wholesale-b2b')}
-            />
-          </div>
-        )}
-      />
+      <div onPointerDown={(e) => e.stopPropagation()} onClick={(e) => e.stopPropagation()}>
+        <Switch
+          size="sm"
+          checked={!isHidden}
+          onCheckedChange={(checked) => {
+            const current = getValues(fieldPath);
+            setValue(fieldPath, { ...current, isHidden: !checked }, { shouldDirty: true });
+          }}
+          aria-label={__('Enabled status', 'yay-wholesale-b2b')}
+        />
+      </div>
     </div>
   );
 }

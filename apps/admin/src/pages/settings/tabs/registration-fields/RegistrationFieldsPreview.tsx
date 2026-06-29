@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { useFormContext } from 'react-hook-form';
+import { useFormContext, useWatch } from 'react-hook-form';
 import { __ } from '@wordpress/i18n';
 
 import type { Settings } from '@/lib/schema/settings.schema';
@@ -13,9 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@/components/ui/textarea';
 import type { RegistrationField } from './registration-fields.helpers';
 
-type PreviewOverride =
-  | { mode: 'add'; field: RegistrationField }
-  | { mode: 'edit'; index: number; field: RegistrationField };
+type PreviewOverride = { mode: 'add'; field: RegistrationField };
 
 function PreviewFieldLabel({ field }: { field: RegistrationField }) {
   return (
@@ -77,18 +75,13 @@ function PreviewFieldInput({ field }: { field: RegistrationField }) {
 }
 
 export function RegistrationFieldsPreview({ previewOverride }: { previewOverride?: PreviewOverride | null }) {
-  const { watch } = useFormContext<Settings>();
-  const fields = watch('registration_fields.fields');
-  const submitLabel = watch('registration.submit_button_label');
+  const { control } = useFormContext<Settings>();
+  const fields = useWatch({ control, name: 'registration_fields.fields' }) ?? [];
+  const submitLabel = useWatch({ control, name: 'registration.submit_button_label' });
 
   const displayFields = useMemo(() => {
     if (!previewOverride) return fields;
-
-    if (previewOverride.mode === 'add') {
-      return [...fields, previewOverride.field];
-    }
-
-    return fields.map((field, index) => (index === previewOverride.index ? previewOverride.field : field));
+    return [...fields, previewOverride.field];
   }, [fields, previewOverride]);
 
   const visibleFields = useMemo(() => displayFields.filter((field) => !field.isHidden), [displayFields]);
