@@ -1,5 +1,5 @@
 import { Textarea } from '@/components/ui/textarea';
-import type { RegistrationField } from '../../registration-fields.helpers';
+import type { RegistrationField } from '../../registration-fields-types';
 
 interface TextareaInputPreviewProps {
   field: RegistrationField;

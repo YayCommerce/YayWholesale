@@ -1,7 +1,7 @@
 import { __ } from '@wordpress/i18n';
 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import type { RegistrationField } from '../../registration-fields.helpers';
+import type { RegistrationField } from '../../registration-fields-types';
 
 interface SelectInputPreviewProps {
   field: RegistrationField;

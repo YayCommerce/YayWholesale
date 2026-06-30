@@ -1,5 +1,5 @@
 import { Label } from '@/components/ui/label';
-import type { RegistrationField } from '../registration-fields.helpers';
+import type { RegistrationField } from '../registration-fields-types';
 
 interface PreviewFieldLabelProps {
   field: RegistrationField;

@@ -29,7 +29,7 @@ export default function FieldFormContent({ field, errors, onUpdate, onTypeChange
           <Input
             value={field.label}
             onChange={(e) => onUpdate('label', e.target.value)}
-            placeholder={__('Business Name', 'yay-wholesale-b2b')}
+            placeholder={__('Enter a field label', 'yay-wholesale-b2b')}
             aria-invalid={!!errors.label}
           />
         </FieldContent>
@@ -64,7 +64,7 @@ export default function FieldFormContent({ field, errors, onUpdate, onTypeChange
               placeholder={
                 field.type === 'checkbox'
                   ? __('Please select multiple items', 'yay-wholesale-b2b')
-                  : __('Business name', 'yay-wholesale-b2b')
+                  : __('Enter a placeholder', 'yay-wholesale-b2b')
               }
             />
           </FieldContent>

@@ -1,6 +1,6 @@
 import type { ComponentType } from 'react';
 
-import type { RegistrationField } from '../registration-fields.helpers';
+import type { RegistrationField } from '../registration-fields-types';
 import { CheckboxInputPreview } from './preview-inputs/CheckboxInputPreview';
 import { RadioInputPreview } from './preview-inputs/RadioInputPreview';
 import { SelectInputPreview } from './preview-inputs/SelectInputPreview';
@@ -11,9 +11,7 @@ interface PreviewFieldInputProps {
   field: RegistrationField;
 }
 
-const PREVIEW_INPUT_BY_TYPE: Partial<
-  Record<RegistrationField['type'], ComponentType<{ field: RegistrationField }>>
-> = {
+const PREVIEW_INPUT_BY_TYPE: Partial<Record<RegistrationField['type'], ComponentType<{ field: RegistrationField }>>> = {
   textarea: TextareaInputPreview,
   select: SelectInputPreview,
   radio: RadioInputPreview,

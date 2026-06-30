@@ -1,6 +1,6 @@
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
-import type { RegistrationField } from '../../registration-fields.helpers';
+import type { RegistrationField } from '../../registration-fields-types';
 
 interface CheckboxInputPreviewProps {
   field: RegistrationField;
