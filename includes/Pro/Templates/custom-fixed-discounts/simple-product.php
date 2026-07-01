@@ -17,10 +17,7 @@ if ( empty( $product_based_discounts ) ) {
     $product_based_discounts = ProductPricingHelper::get_default_settings();
 }
 
-$product_based_access = get_post_meta( $product_id, ProductAccessHelper::PRODUCT_BASED_ACCESS_KEY, true );
-if ( empty( $product_based_access ) ) {
-    $product_based_access = ProductAccessHelper::get_default_settings();
-}
+$product_based_access = ProductAccessHelper::get_product_based_access_restriction( $product_id );
 ?>
 <div class="form-field ywhs_product_based_wholesale_rules_wrapper">
     <div class="ywhs_wholesale_rules">
@@ -45,14 +42,14 @@ if ( empty( $product_based_access ) ) {
                     <div class="wc-radios ywhs_radios">
                         <label>
                             <input class='ywhs_discount_rule_default' name="yay-wholesale-b2b[discount-rule]" value="default" type="radio"
-                                <?php echo ( esc_attr( ! isset( $product_based_discounts['discount_rule'] ) || $product_based_discounts['discount_rule'] === 'default' ? 'checked' : '' ) ); ?>>
+                                <?php echo ( esc_attr( $product_based_discounts['discount_rule'] === 'default' ? 'checked' : '' ) ); ?>>
                             <?php esc_html_e( 'Default', 'yay-wholesale-b2b' ); ?>
                         </label>
                     </div>
                     <div class="wc-radios ywhs_radios">
                         <label>
                             <input class='ywhs_discount_rule_custom' name="yay-wholesale-b2b[discount-rule]" value="custom" type="radio"
-                                <?php echo ( esc_attr( isset( $product_based_discounts['discount_rule'] ) && $product_based_discounts['discount_rule'] === 'custom' ? 'checked' : '' ) ); ?>>
+                                <?php echo ( esc_attr( $product_based_discounts['discount_rule'] === 'custom' ? 'checked' : '' ) ); ?>>
                             <?php esc_html_e( 'Custom', 'yay-wholesale-b2b' ); ?>
                         </label>
                     </div>
@@ -61,7 +58,7 @@ if ( empty( $product_based_access ) ) {
             </div>
 
             <div class="ywhs_field ywhs_discount_values">
-                <input type="hidden" name="yay-wholesale-b2b[discount-type]" class="ywhs_discount_type" value="<?php echo ( esc_attr( isset( $product_based_discounts['discount_type'] ) ? $product_based_discounts['discount_type'] : 'fixed' ) ); ?>" />
+                <input type="hidden" name="yay-wholesale-b2b[discount-type]" class="ywhs_discount_type" value="<?php echo ( esc_attr( $product_based_discounts['discount_type'] ?? 'fixed' ) ); ?>" />
                 <div class="ywhs_discount_value_header">
                     <p><?php esc_html_e( 'Discount Value', 'yay-wholesale-b2b' ); ?></p>
                     <label>
@@ -69,7 +66,7 @@ if ( empty( $product_based_access ) ) {
                         <div class="ywhs_switch">
                             <input type="checkbox"
                                 class="ywhs_discount_type_switch"
-                                <?php echo ( esc_attr( isset( $product_based_discounts['discount_type'] ) && $product_based_discounts['discount_type'] === 'fixed' ? 'checked' : '' ) ); ?> />
+                                <?php echo ( esc_attr( $product_based_discounts['discount_type'] === 'fixed' ? 'checked' : '' ) ); ?> />
                             <span></span>
                         </div>
                         <p><?php esc_html_e( 'Fixed amount', 'yay-wholesale-b2b' ); ?></p>

@@ -2,11 +2,16 @@
 
 namespace YayWholesaleB2B\Pro\Helpers\AccessHelpers;
 
+use YayWholesaleB2B\Helpers\CustomerHelper;
+
 /**
  * Product Based Access Helper
  */
 class ProductAccessHelper {
-    public const PRODUCT_BASED_ACCESS_KEY = 'yaywholesaleb2b_product_based_access';
+    const ACCESS_RULE           = 'yaywholesaleb2b_access_rule';
+    const ACCESS_RETAILERS      = 'yaywholesaleb2b_access_retailers';
+    const ACCESS_WHOLESALERS    = 'yaywholesaleb2b_access_wholesalers';
+    const ACCESS_SELECTED_ROLES = 'yaywholesaleb2b-access_selected-roles';
 
     /**
      * Convert the data to save from the post data sent
@@ -77,7 +82,55 @@ class ProductAccessHelper {
      * @param array $data The setting.
      */
     public static function save_product_based_access_restriction( int $product_id, $data ) {
-        update_post_meta( $product_id, self::PRODUCT_BASED_ACCESS_KEY, $data );
+        update_post_meta( $product_id, self::ACCESS_RULE, $data['rule'] );
+        update_post_meta( $product_id, self::ACCESS_RETAILERS, $data['retailers'] );
+        update_post_meta( $product_id, self::ACCESS_WHOLESALERS, $data['wholesalers'] );
+        update_post_meta( $product_id, self::ACCESS_SELECTED_ROLES, implode( ', ', $data['selected_roles'] ) );
+    }
+
+    public static function get_product_based_access_restriction( int $product_id ) {
+        $rule = get_post_meta( $product_id, self::ACCESS_RULE, true );
+        if ( ! empty( $rule ) ) {
+            $selected_roles = explode( ', ', get_post_meta( $product_id, self::ACCESS_SELECTED_ROLES, true ) );
+            $retailers      = get_post_meta( $product_id, self::ACCESS_RETAILERS, true );
+            $wholesalers    = get_post_meta( $product_id, self::ACCESS_WHOLESALERS, true );
+            return [
+                'rule'           => $rule,
+                'retailers'      => $retailers,
+                'wholesalers'    => $wholesalers,
+                'selected_roles' => $selected_roles,
+            ];
+        } else {
+            return self::get_default_settings();
+        }
+    }
+
+    public static function is_accessible_to_product( bool $access, int $product_id ) {
+        $access_data = self::get_product_based_access_restriction( $product_id );
+        if ( empty( $access_data ) || 'visible-all' === $access_data['rule'] ) {
+            return $access;
+        }
+
+        $wholesale_role = CustomerHelper::get_current_user_wholesale_role();
+        if ( $wholesale_role !== null ) {
+            if ( 'disabled' === $access_data['wholesalers'] ) {
+                return false;
+            }
+
+            if ( 'enabled' === $access_data['wholesalers'] || in_array( $wholesale_role['slug'], $access_data['selected_roles'], true ) ) {
+                return $access;
+            }
+        } else {
+            if ( 'disabled' === $access_data['retailers'] ) {
+                return false;
+            }
+
+            if ( 'enabled' === $access_data['retailers'] ) {
+                return $access;
+            }
+        }
+
+        return false;
     }
 
     public static function get_default_settings() {
@@ -87,5 +140,109 @@ class ProductAccessHelper {
             'wholesalers'    => 'enabled',
             'selected_roles' => [],
         ];
+    }
+
+    public static function get_blocked_product_ids( $wholesale_role = null ) {
+        $args = [
+            'post_type'              => [ 'product', 'product_variation' ],
+            'posts_per_page'         => -1,
+            'update_post_meta_cache' => true,
+            'fields'                 => 'ids',
+            'meta_query'             => [
+                'relation' => 'AND',
+                [
+                    'key'     => self::ACCESS_RULE,
+                    'value'   => 'visible-specific-roles',
+                    'compare' => '=',
+                    'type'    => 'CHAR',
+                ],
+            ],
+        ];
+
+        if ( ! isset( $wholesale_role ) ) {
+            $args['meta_query'][] = [
+                'key'     => self::ACCESS_RETAILERS,
+                'value'   => 'disabled',
+                'compare' => '=',
+                'type'    => 'CHAR',
+            ];
+        } else {
+            $args['meta_query'][] =
+            [
+                'relation' => 'OR',
+                [
+                    'key'     => self::ACCESS_WHOLESALERS,
+                    'value'   => 'disabled',
+                    'compare' => '=',
+                    'type'    => 'CHAR',
+                ],
+                [
+                    'key'     => self::ACCESS_SELECTED_ROLES,
+                    'value'   => $wholesale_role['slug'],
+                    'compare' => 'NOT LIKE',
+                    'type'    => 'CHAR',
+                ],
+            ];
+        }//end if
+
+        $query = new \WP_Query( $args );
+        return $query->posts;
+    }
+
+    public static function get_blocked_product_with_children_ids( $general_blocked_product_ids ) {
+        // $products = wc_get_products(
+        // [
+        // 'type'  => [ 'variable', 'grouped' ],
+        // 'limit' => -1,
+        // ]
+        // );
+
+        // $variation_map = [];
+        // foreach ( $products as $product ) {
+        // $variation_map[ $product->get_id() ] = 0;
+        // foreach ( $product->get_children() as $children_id ) {
+        // if ( ! in_array( $children_id, $general_blocked_product_ids, true ) ) {
+        // $variation_map[ $product->get_id() ] += 1;
+        // }
+        // }
+        // }
+
+        global $wpdb;
+
+        $sql = "SELECT p.post_parent as parent_id, p.ID as product_id, pm.meta_value as children_id
+        FROM {$wpdb->posts} p
+        LEFT JOIN {$wpdb->postmeta} pm ON  p.id = pm.post_id and pm.meta_key='_children'
+        WHERE p.post_type = 'product_variation' OR pm.meta_value IS NOT NULL
+        ";
+
+        $rows          = $wpdb->get_results( $sql, ARRAY_A );
+        $variation_map = [];
+        foreach ( $rows as $row ) {
+            if ( ! empty( intval( $row['parent_id'] ) ) ) {
+                // In this case: this row is a variable product, main product id is parent_id, children variation are product_id (post_type = "product_variation")
+
+                if ( ! array_key_exists( $row['parent_id'], $variation_map ) ) {
+                    $variation_map[ $row['parent_id'] ] = 0;
+                }
+
+                if ( ! in_array( intval( $row['product_id'] ), $general_blocked_product_ids, true ) ) {
+                    $variation_map[ $row['parent_id'] ] += 1;
+                }
+            } elseif ( ! empty( $row['children_id'] ) ) {
+                // In this case: this row is a grouped product, main product id is product_id, children products are children_id (pm.meta_key='_children' and pm.meta_value IS NOT NULL)
+                if ( ! array_key_exists( $row['product_id'], $variation_map ) ) {
+                    $variation_map[ $row['product_id'] ] = 0;
+                }
+                $children_ids = maybe_unserialize( $row['children_id'] );
+                if ( is_array( $children_ids ) ) {
+                    foreach ( $children_ids as $children_id ) {
+                        if ( ! in_array( $children_id, $general_blocked_product_ids, true ) ) {
+                            $variation_map[ $row['product_id'] ] += 1;
+                        }
+                    }
+                }
+            }//end if
+        }//end foreach
+        return array_keys( array_filter( $variation_map, fn( $value ) =>  $value < 1 ) );
     }
 }

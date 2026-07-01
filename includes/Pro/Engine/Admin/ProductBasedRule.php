@@ -107,6 +107,7 @@ class ProductBasedRule {
         check_ajax_referer( 'save-variations', 'security' );
         $wholesale_roles      = RolesHelper::get_wholesale_roles();
         $custom_discount_data = ProductPricingHelper::handle_product_based_discount_data_from_post( $wholesale_roles, $post_data, $index );
+        $custom_access_data   = ProductAccessHelper::handle_product_based_access_restriction_from_post( $wholesale_roles, $post_data, $index );
 
         if ( ! $custom_discount_data ) {
             return false;
@@ -115,6 +116,7 @@ class ProductBasedRule {
         do_action( 'ywhs_before_saved_variable_product_based_discount', $custom_discount_data, $variation_id );
 
         ProductPricingHelper::save_product_based_discount( $variation_id, $custom_discount_data );
+        ProductAccessHelper::save_product_based_access_restriction( $variation_id, $custom_access_data );
 
         do_action( 'ywhs_after_saved_variable_product_based_discount', $custom_discount_data, $variation_id );
     }

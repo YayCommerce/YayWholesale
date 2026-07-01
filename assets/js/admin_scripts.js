@@ -3,25 +3,26 @@
 
   // #region Custom Pricing (Category-based, Product-based)
   $(document).ready(() => {
-    const allLoaded = checkRequiredElementsLoaded([
-      ".ywhs_wholesale_rules",
-      ".ywhs_discount_rule_default",
-      ".ywhs_discount_rule_custom",
-      ".ywhs_discount_type_switch",
-    ]);
+    const handler = () => {
+      const allLoaded = checkRequiredElementsLoaded([
+        ".ywhs_wholesale_rules",
+        ".ywhs_discount_rule_default",
+        ".ywhs_discount_rule_custom",
+        ".ywhs_discount_type_switch",
+      ]);
 
-    if (!allLoaded) return;
+      if (!allLoaded) return;
 
-    generalCustomPricingSetting();
-    discountTypePricingSetting();
+      generalCustomPricingSetting();
+      discountTypePricingSetting();
+    };
 
     $(document).on(
       "woocommerce_variations_loaded woocommerce_variations_saved",
-      () => {
-        generalCustomPricingSetting();
-        discountTypePricingSetting();
-      }
+      handler
     );
+
+    handler();
   });
 
   // general Product-based, Category-based pricing behaviours
@@ -167,8 +168,27 @@
 
   // #region Access rule (Category-based, Product-based)
   $(document).ready(() => {
-    enableByRoleAccessRuleSetting();
-    selectedWholesalerRoleAccessRuleSetting();
+    const handler = () => {
+      const allLoaded = checkRequiredElementsLoaded([
+        ".ywhs_access_rule_all",
+        ".ywhs_access_rule_specific",
+        ".ywhs_access_enable_by_role",
+        ".ywhs_access_rule_wholesaler",
+        ".ywhs_access_selected_roles",
+      ]);
+
+      if (!allLoaded) return;
+
+      enableByRoleAccessRuleSetting();
+      selectedWholesalerRoleAccessRuleSetting();
+    };
+
+    $(document).on(
+      "woocommerce_variations_loaded woocommerce_variations_saved",
+      handler
+    );
+
+    handler();
   });
   // #region Enabled By Role toggle
   function enableByRoleAccessRuleSetting() {
