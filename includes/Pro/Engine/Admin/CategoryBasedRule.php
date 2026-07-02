@@ -3,6 +3,7 @@
 namespace YayWholesaleB2B\Pro\Engine\Admin;
 
 use YayWholesaleB2B\Helpers\RolesHelper;
+use YayWholesaleB2B\Pro\Helpers\AccessHelpers\CategoryAccessHelper;
 use YayWholesaleB2B\Pro\Helpers\PricingHelpers\CategoryPricingHelper;
 use YayWholesaleB2B\Utils\SingletonTrait;
 
@@ -60,6 +61,7 @@ class CategoryBasedRule {
 
         $wholesale_roles      = RolesHelper::get_wholesale_roles();
         $custom_discount_data = CategoryPricingHelper::handle_category_based_discount_data_from_post( $wholesale_roles, $post_data );
+        $custom_access_data   = CategoryAccessHelper::handle_category_based_access_restriction_from_post( $wholesale_roles, $post_data );
 
         if ( empty( $custom_discount_data ) ) {
             return false;
@@ -68,6 +70,7 @@ class CategoryBasedRule {
         do_action( 'ywhs_before_saved_category_based_discount', $custom_discount_data, $term_id );
 
         CategoryPricingHelper::save_category_based_discount( $term_id, $custom_discount_data );
+        CategoryAccessHelper::save_category_based_access_restriction( $term_id, $custom_access_data );
 
         do_action( 'ywhs_after_saved_category_based_discount', $custom_discount_data, $term_id );
     }

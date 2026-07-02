@@ -30,7 +30,7 @@ $product_based_access = ProductAccessHelper::get_product_based_access_restrictio
             </svg>
 
             <div class="ywhs_separator"></div>
-            <p>Yay Wholesale B2B</span>
+            <p>Yay Wholesale B2B</p>
         </div>
 
         <div class="ywhs_body">
@@ -144,10 +144,9 @@ $product_based_access = ProductAccessHelper::get_product_based_access_restrictio
                         <div class="ywhs_select">
                             <label for="ywhs_access_rule_retailer"><?php esc_html_e( 'Retailer', 'yay-wholesale-b2b' ); ?></label>
                             <select
-                                class="ywhs_access_rule_retailer"
                                 id="ywhs_access_rule_retailer"
                                 name="yay-wholesale-b2b[access-retailers]"
-                                class="ywhs_select">
+                                class="ywhs_select ywhs_access_rule_retailer">
                                 <option value="disabled" <?php echo ( esc_attr( $product_based_access['retailers'] === 'disabled' ? 'selected' : '' ) ); ?>><?php esc_html_e( 'Disabled', 'yay-wholesale-b2b' ); ?></option>
                                 <option value="enabled" <?php echo ( esc_attr( $product_based_access['retailers'] === 'enabled' ? 'selected' : '' ) ); ?>><?php esc_html_e( 'Enabled', 'yay-wholesale-b2b' ); ?></option>
                             </select>
@@ -155,10 +154,9 @@ $product_based_access = ProductAccessHelper::get_product_based_access_restrictio
                         <div class="ywhs_select">
                             <label for="ywhs_access_rule_wholesaler"><?php esc_html_e( 'Wholesaler', 'yay-wholesale-b2b' ); ?></label>
                             <select
-                                class="ywhs_access_rule_wholesaler"
                                 id="ywhs_access_rule_wholesaler"
                                 name="yay-wholesale-b2b[access-wholesalers]"
-                                class="ywhs_select"
+                                class="ywhs_select ywhs_access_rule_wholesaler"
                                 value="<?php echo ( esc_attr( $product_based_access['wholesalers'] ?? 'enabled' ) ); ?>">
                                 <option value="disabled" <?php echo ( esc_attr( $product_based_access['wholesalers'] === 'disabled' ? 'selected' : '' ) ); ?>><?php esc_html_e( 'Disabled', 'yay-wholesale-b2b' ); ?></option>
                                 <option value="enabled" <?php echo ( esc_attr( $product_based_access['wholesalers'] === 'enabled' ? 'selected' : '' ) ); ?>><?php esc_html_e( 'Enabled', 'yay-wholesale-b2b' ); ?></option>
@@ -178,7 +176,7 @@ $product_based_access = ProductAccessHelper::get_product_based_access_restrictio
                                         name="yay-wholesale-b2b[access-selected-roles][<?php echo ( esc_html( $wholesale_role['slug'] ) ); ?>]"
                                         type="checkbox"
                                         <?php echo ( esc_attr( 'enabled' === $product_based_access['wholesalers'] || in_array( $wholesale_role['slug'], $product_based_access['selected_roles'], true ) ? 'checked' : '' ) ); ?>
-                                        >
+                                        />
                                     <?php echo ( esc_html( $wholesale_role['name'] ) ); ?>
                                 </label>
                             </div>

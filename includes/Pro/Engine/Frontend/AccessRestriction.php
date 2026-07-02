@@ -3,6 +3,7 @@ namespace YayWholesaleB2B\Pro\Engine\Frontend;
 
 use Override;
 use YayWholesaleB2B\Helpers\CustomerHelper;
+use YayWholesaleB2B\Pro\Helpers\AccessHelpers\CategoryAccessHelper;
 use YayWholesaleB2B\Pro\Helpers\AccessHelpers\ProductAccessHelper;
 use YayWholesaleB2B\Utils\SingletonTrait;
 
@@ -16,9 +17,7 @@ class AccessRestriction {
 
     public function __construct() {
         // -----Product-----
-        // Visibility: Legacy: [products] shortcode
-        add_filter( 'woocommerce_product_is_visible', [ $this, 'restrict_product_access_in_legacy_catalog' ], 10, 2 );
-        // Visibility: Block-based
+        // Visibility
         add_filter( 'pre_get_posts', [ $this, 'restrict_product_access_in_block_catalog' ], 999, 2 );
         // Purchasable
         add_filter( 'woocommerce_is_purchasable', [ $this, 'restrict_product_purchasable' ], 10, 2 );
@@ -28,17 +27,9 @@ class AccessRestriction {
         add_filter( 'woocommerce_variation_is_visible', [ $this, 'restrict_variation_visibility' ], 10, 2 );
         // Purchasable
         add_filter( 'woocommerce_variation_is_purchasable', [ $this, 'restrict_variation_purchasable' ], 10, 2 );
-    }
 
-    /**
-     * Hide the product in catalog page, only working on [products] shortcode page
-     *
-     * @param bool $visible  If the product is visible.
-     * @param int  $product_id The product ID.
-     * @return bool
-     */
-    public function restrict_product_access_in_legacy_catalog( $visible, $product_id ) {
-        return ProductAccessHelper::is_accessible_to_product( $visible, $product_id );
+        // -----Category-----
+        add_filter( 'get_terms', [ $this, 'restrict_category_visibility' ], 10, 2 );
     }
 
     /**
@@ -49,7 +40,10 @@ class AccessRestriction {
      * @return bool
      */
     public function restrict_product_purchasable( $purchasable, $product ) {
-        return ProductAccessHelper::is_accessible_to_product( $purchasable, $product->get_id() );
+        $wholesale_role         = CustomerHelper::get_current_user_wholesale_role();
+        $accessible_by_product  = ProductAccessHelper::is_accessible_product( $purchasable, $product->get_id(), $wholesale_role );
+        $accessible_by_category = CategoryAccessHelper::is_accessible_product_by_categories( $product, $wholesale_role );
+        return $accessible_by_product && $accessible_by_category;
     }
 
     /**
@@ -60,7 +54,8 @@ class AccessRestriction {
      * @return bool
      */
     public function restrict_variation_visibility( $visible, $variation_id ) {
-        return ProductAccessHelper::is_accessible_to_product( $visible, $variation_id );
+        $wholesale_role = CustomerHelper::get_current_user_wholesale_role();
+        return ProductAccessHelper::is_accessible_product( $visible, $variation_id, $wholesale_role );
     }
 
     /**
@@ -71,11 +66,15 @@ class AccessRestriction {
      * @return bool
      */
     public function restrict_variation_purchasable( $purchasable, $variation ) {
-        return ProductAccessHelper::is_accessible_to_product( $purchasable, $variation->get_id() );
+        $wholesale_role         = CustomerHelper::get_current_user_wholesale_role();
+        $parent_product         = wc_get_product( $variation->get_parent_id() );
+        $accessible_by_product  = ProductAccessHelper::is_accessible_product( $purchasable, $variation->get_id(), $wholesale_role );
+        $accessible_by_category = CategoryAccessHelper::is_accessible_product_by_categories( $parent_product, $wholesale_role );
+        return $accessible_by_product && $accessible_by_category;
     }
 
     /**
-     * Hide the product in catalog page (Block based)
+     * Hide the product in catalog page
      *
      * @param \WP_Query $query  the products query.
      * @return \WP_Query
@@ -106,8 +105,46 @@ class AccessRestriction {
 
         $query->set( 'post__not_in', array_merge( (array) $query->get( 'post__not_in' ), $hidden_ids ) );
 
+        $tax_query     = (array) $query->get( 'tax_query' );
+        $visible_terms = get_terms(
+            [
+                'taxonomy' => 'product_cat',
+            ]
+        );
+
+        $tax_query[] = [
+            'taxonomy' => 'product_cat',
+            'field'    => 'slug',
+            'terms'    => array_column( $visible_terms, 'slug' ),
+            'operator' => 'IN',
+        ];
+
+        $query->set( 'tax_query', $tax_query );
         add_filter( 'pre_get_posts', [ $this, 'restrict_product_access_in_block_catalog' ], 10, 2 );
 
         return $query;
+    }
+
+    /**
+     * Hidden the category in catalog page
+     *
+     * @param array $terms  The unfiltered terms.
+     * @param array $taxonomies The taxonomies.
+     * @return array
+     */
+    public function restrict_category_visibility( array $terms, array $taxonomies ) {
+
+        if ( ! is_shop() && ! is_product_category() ) {
+            return $terms;
+        }
+
+        if ( ! in_array( 'product_cat', $taxonomies, true ) ) {
+            return $terms;
+        }
+
+        $wholesale_role = CustomerHelper::get_current_user_wholesale_role();
+        $terms          = CategoryAccessHelper::filter_accessible_categories( $terms, $wholesale_role );
+
+        return $terms;
     }
 }

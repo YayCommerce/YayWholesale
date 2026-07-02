@@ -8,7 +8,6 @@
         ".ywhs_wholesale_rules",
         ".ywhs_discount_rule_default",
         ".ywhs_discount_rule_custom",
-        ".ywhs_discount_type_switch",
       ]);
 
       if (!allLoaded) return;

@@ -105,13 +105,12 @@ class ProductAccessHelper {
         }
     }
 
-    public static function is_accessible_to_product( bool $access, int $product_id ) {
+    public static function is_accessible_product( bool $access, int $product_id, array $wholesale_role ) {
         $access_data = self::get_product_based_access_restriction( $product_id );
         if ( empty( $access_data ) || 'visible-all' === $access_data['rule'] ) {
             return $access;
         }
 
-        $wholesale_role = CustomerHelper::get_current_user_wholesale_role();
         if ( $wholesale_role !== null ) {
             if ( 'disabled' === $access_data['wholesalers'] ) {
                 return false;
