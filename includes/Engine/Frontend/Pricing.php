@@ -27,7 +27,7 @@ class Pricing {
 
         add_filter( 'woocommerce_get_variation_prices_hash', [ $this, 'ywhs_variation_prices_hash' ], 99, 1 );
 
-        add_filter( 'woocommerce_get_price_html', [ $this, 'ywhs_display_wholesale_price_html' ], 999, 2 );
+        add_filter( 'woocommerce_get_price_html', [ $this, 'ywhs_display_wholesale_price_html' ], 100, 2 );
 
         add_action( 'woocommerce_before_calculate_totals', [ $this, 'before_calculate_totals' ], 103 );
 

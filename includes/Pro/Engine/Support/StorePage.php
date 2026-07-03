@@ -45,6 +45,8 @@ class StorePage {
         // Hide Menu
         add_filter( 'wp_get_nav_menu_items', [ $this, 'handler_menu' ], 10, 1 );
         add_filter( 'wp_list_pages_excludes', [ $this, 'handler_list_pages' ] );
+
+        add_filter( 'ywhs_shop_page_id', [ $this, 'get_shop_page_id' ] );
     }
 
     /**
@@ -1001,5 +1003,22 @@ class StorePage {
         }
 
         return array_values( $menu_items );
+    }
+
+    /**
+     * Get the shop page id currently use
+     *
+     * @see \WC_Query woocommerce/includes/class-wc-query.php
+     *
+     * @param int $page_id Page ID.
+     * @return bool
+     */
+    public function get_shop_page_id( $page_id ) {
+        $settings = SettingsHelper::get_settings();
+        if ( SupportHelper::is_using_wc_shop_page( $settings ) || CustomerHelper::is_current_wholesale_customer() ) {
+            return $page_id;
+        } else {
+            return $settings['general']['wholesale_store_page'];
+        }
     }
 }

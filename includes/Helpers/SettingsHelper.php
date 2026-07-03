@@ -80,6 +80,7 @@ class SettingsHelper {
                 'disable_coupon'       => false,
                 'disable_tax'          => false,
                 'tax_display_mode'     => 'inherit',
+                'guest_access_rule'    => 'no-restriction',
                 'wholesale_store_page' => '',
             ],
             'display'             => [
