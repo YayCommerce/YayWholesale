@@ -4,6 +4,7 @@ namespace YayWholesaleB2B\Pro\Engine\Frontend;
 use Override;
 use YayWholesaleB2B\Helpers\CustomerHelper;
 use YayWholesaleB2B\Pro\Helpers\AccessHelpers\CategoryAccessHelper;
+use YayWholesaleB2B\Pro\Helpers\AccessHelpers\GuestAccessHelper;
 use YayWholesaleB2B\Pro\Helpers\AccessHelpers\ProductAccessHelper;
 use YayWholesaleB2B\Utils\SingletonTrait;
 
@@ -30,6 +31,10 @@ class AccessRestriction {
 
         // -----Category-----
         add_filter( 'get_terms', [ $this, 'restrict_category_visibility' ], 10, 2 );
+
+        // -----Guest----
+        add_action( 'woocommerce_get_price_html', [ $this, 'price_display_for_guest' ], 101, 1 );
+        add_action( 'template_redirect', [ $this, 'redirect_guests_to_login_on_shop' ], 100 );
     }
 
     /**
@@ -43,7 +48,8 @@ class AccessRestriction {
         $wholesale_role         = CustomerHelper::get_current_user_wholesale_role();
         $accessible_by_product  = ProductAccessHelper::is_accessible_product( $purchasable, $product->get_id(), $wholesale_role );
         $accessible_by_category = CategoryAccessHelper::is_accessible_product_by_categories( $product, $wholesale_role );
-        return $accessible_by_product && $accessible_by_category;
+        $accessible_by_guest    = is_user_logged_in() || GuestAccessHelper::get_guest_access_rule() === 'no-restriction';
+        return $accessible_by_product && $accessible_by_category && $accessible_by_guest;
     }
 
     /**
@@ -146,5 +152,45 @@ class AccessRestriction {
         $terms          = CategoryAccessHelper::filter_accessible_categories( $terms, $wholesale_role );
 
         return $terms;
+    }
+
+    /**
+     * Display the "Login to view prices" for guest
+     *
+     * @param string $price_html The price HTML.
+     * @return string The displayed HTML.
+     */
+    public function price_display_for_guest( string $price_html ) {
+        if ( is_user_logged_in() ) {
+            return $price_html;
+        }
+
+        $rule = GuestAccessHelper::get_guest_access_rule();
+
+        if ( 'hidden-prices' === $rule ) {
+            return "<div><a style='cursor:pointer' href='" . wc_get_page_permalink( 'myaccount' ) . "' >" . __( 'Log in to view prices', 'yay-wholesale-b2b' ) . '</a></div>';
+        }
+
+        return $price_html;
+    }
+
+    /**
+     * Redirect to login page when guest access to shop page
+     */
+    public function redirect_guests_to_login_on_shop() {
+        if ( is_user_logged_in() || is_page( [ 'my-account', 'login' ] ) || is_admin() ) {
+            return;
+        }
+        $rule = GuestAccessHelper::get_guest_access_rule();
+        if ( 'hidden-entire-shop' === $rule ) {
+            if ( is_shop() || is_product_category() || is_product_tag() || is_product() ) {
+                $login_url = wc_get_page_permalink( 'myaccount' );
+
+                $redirect_back = add_query_arg( 'redirect_to', rawurlencode( get_permalink() ), $login_url );
+
+                wp_safe_redirect( $redirect_back );
+                exit;
+            }
+        }
     }
 }

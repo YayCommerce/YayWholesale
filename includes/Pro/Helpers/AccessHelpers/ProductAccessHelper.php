@@ -105,7 +105,15 @@ class ProductAccessHelper {
         }
     }
 
-    public static function is_accessible_product( bool $access, int $product_id, array $wholesale_role ) {
+    /**
+     * Check if product is accessible
+     *
+     * @param bool       $access the default access flag.
+     * @param int        $product_id the id of product.
+     * @param array|null $wholesale_role The user wholesale role.
+     * @return bool
+     */
+    public static function is_accessible_product( $access, $product_id, $wholesale_role ) {
         $access_data = self::get_product_based_access_restriction( $product_id );
         if ( empty( $access_data ) || 'visible-all' === $access_data['rule'] ) {
             return $access;
@@ -188,24 +196,7 @@ class ProductAccessHelper {
         return $query->posts;
     }
 
-    public static function get_blocked_product_with_children_ids( $general_blocked_product_ids ) {
-        // $products = wc_get_products(
-        // [
-        // 'type'  => [ 'variable', 'grouped' ],
-        // 'limit' => -1,
-        // ]
-        // );
-
-        // $variation_map = [];
-        // foreach ( $products as $product ) {
-        // $variation_map[ $product->get_id() ] = 0;
-        // foreach ( $product->get_children() as $children_id ) {
-        // if ( ! in_array( $children_id, $general_blocked_product_ids, true ) ) {
-        // $variation_map[ $product->get_id() ] += 1;
-        // }
-        // }
-        // }
-
+    public static function get_blocked_product_with_children_ids( array $general_blocked_product_ids ) {
         global $wpdb;
 
         $sql = "SELECT p.post_parent as parent_id, p.ID as product_id, pm.meta_value as children_id

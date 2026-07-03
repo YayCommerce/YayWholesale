@@ -85,7 +85,12 @@ class CategoryAccessHelper {
         return empty( $data ) ? self::get_default_settings() : $data;
     }
 
-    public static function is_accessible_category( int $term_id, array $wholesale_role ) {
+    /**
+     *
+     * @param int        $term_id .
+     * @param array|null $wholesale_role .
+     */
+    public static function is_accessible_category( $term_id, $wholesale_role ) {
         $access_data = self::get_category_based_access_restriction( $term_id );
         if ( empty( $access_data ) || 'visible-all' === $access_data['rule'] ) {
             return true;
@@ -112,14 +117,26 @@ class CategoryAccessHelper {
         return false;
     }
 
-    public static function is_accessible_product_by_categories( \WC_Product $product, array $wholesale_role ) {
+    /**
+     * Check if product have any category visible
+     *
+     * @param \WC_Product $product the product.
+     * @param array|null  $wholesale_role The user wholesale role.
+     */
+    public static function is_accessible_product_by_categories( $product, $wholesale_role ) {
         $product_categories = wp_get_post_terms( $product->get_id(), 'product_cat' );
 
         $filtered_product_categories = self::filter_accessible_categories( $product_categories, $wholesale_role );
         return ! empty( $filtered_product_categories );
     }
 
-    public static function filter_accessible_categories( array $categories, array $wholesale_role ) {
+    /**
+     * Filter the accessible categories from the initial categories
+     *
+     * @param array      $categories the initial categories.
+     * @param array|null $wholesale_role the user wholesale role.
+     */
+    public static function filter_accessible_categories( $categories, $wholesale_role ) {
         $blocked_ids = [];
         foreach ( $categories as $cat ) {
             if ( $cat->taxonomy === 'product_cat' ) {

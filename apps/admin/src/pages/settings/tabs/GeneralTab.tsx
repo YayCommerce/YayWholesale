@@ -6,6 +6,7 @@ import { useAllPagesQuery } from '@/lib/queries/pages.queries';
 import { useActiveRolesQuery } from '@/lib/queries/roles.queries';
 import type { Settings } from '@/lib/schema/settings.schema';
 import { isPro } from '@/lib/utils';
+import { SelectDescribedItem } from '@/components/ui/custom/select-described-item';
 import { UpgradeToProBadge } from '@/components/ui/custom/upgrate-to-pro';
 import { Field, FieldContent, FieldError, FieldLabel } from '@/components/ui/field';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -129,6 +130,52 @@ export default function GeneralTab() {
               </p>
             </div>
             <Switch checked={field.value} onCheckedChange={field.onChange} />
+          </div>
+        )}
+      />
+
+      <Controller
+        control={control}
+        name="general.guest_access_rule"
+        render={({ field }) => (
+          <div className="flex flex-col justify-between gap-3">
+            <h2 className="leading-3.5 font-medium">
+              {__('Guest Access Rule', 'yay-wholesale-b2b')}
+              {!isPro && <UpgradeToProBadge />}
+            </h2>
+
+            <Select
+              value={field.value ? field.value : 'no-restriction'}
+              onValueChange={field.onChange}
+              disabled={!isPro}
+            >
+              <SelectTrigger className="min-w-full">
+                <SelectValue placeholder={__('Select the guest restriction rule', 'yay-wholesale-b2b')} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectDescribedItem
+                  value="no-restriction"
+                  label={__('No Restriction', 'yay-wholesale-b2b')}
+                  description={__('Guest is treated as Retailer Customers.', 'yay-wholesale-b2b')}
+                />
+                <SelectDescribedItem
+                  value="hidden-prices"
+                  label={__('Hidden Prices', 'yay-wholesale-b2b')}
+                  description={__(
+                    'Guest cannot see product prices, instead sees "Log in to view price".',
+                    'yay-wholesale-b2b',
+                  )}
+                />
+                <SelectDescribedItem
+                  value="hidden-entire-shop"
+                  label={__('Hidden Entire Shop', 'yay-wholesale-b2b')}
+                  description={__(
+                    "Guest get redirected to login page (and can't view any products/categories).",
+                    'yay-wholesale-b2b',
+                  )}
+                />
+              </SelectContent>
+            </Select>
           </div>
         )}
       />
