@@ -6,10 +6,16 @@ import { useAllPagesQuery } from '@/lib/queries/pages.queries';
 import { useActiveRolesQuery } from '@/lib/queries/roles.queries';
 import type { Settings } from '@/lib/schema/settings.schema';
 import { isPro } from '@/lib/utils';
-import { SelectDescribedItem } from '@/components/ui/custom/select-described-item';
 import { UpgradeToProBadge } from '@/components/ui/custom/upgrate-to-pro';
 import { Field, FieldContent, FieldError, FieldLabel } from '@/components/ui/field';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  DescribedSelectItem,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 
 const isWholesaleStoreExperimental = window.yayWholesaleB2BMeta.wholesaleMeta.experimentals.wholesale_store_page;
@@ -153,12 +159,12 @@ export default function GeneralTab() {
                 <SelectValue placeholder={__('Select the guest restriction rule', 'yay-wholesale-b2b')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectDescribedItem
+                <DescribedSelectItem
                   value="no-restriction"
                   label={__('No Restriction', 'yay-wholesale-b2b')}
                   description={__('Guest is treated as Retailer Customers.', 'yay-wholesale-b2b')}
                 />
-                <SelectDescribedItem
+                <DescribedSelectItem
                   value="hidden-prices"
                   label={__('Hidden Prices', 'yay-wholesale-b2b')}
                   description={__(
@@ -166,7 +172,7 @@ export default function GeneralTab() {
                     'yay-wholesale-b2b',
                   )}
                 />
-                <SelectDescribedItem
+                <DescribedSelectItem
                   value="hidden-entire-shop"
                   label={__('Hidden Entire Shop', 'yay-wholesale-b2b')}
                   description={__(

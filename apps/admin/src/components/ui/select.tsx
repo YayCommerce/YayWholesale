@@ -101,7 +101,7 @@ const SelectItem = React.forwardRef<
       ref={ref}
       data-slot="select-item"
       className={cn(
-        "focus:bg-accent focus:text-accent-foreground data-[state=checked]:text-primary [&_svg:not([class*='text-'])]:text-primary hover:bg-accent relative flex w-full cursor-default items-center gap-2 rounded-sm py-1.5 pr-8 pl-2 text-sm outline-hidden select-none data-disabled:pointer-events-none data-disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 *:[span]:last:flex *:[span]:last:items-center *:[span]:last:gap-2",
+        "focus:bg-accent focus:text-accent-foreground data-[state=checked]:text-primary [&_svg:not([class*='text-'])]:text-primary hover:bg-accent relative flex w-full cursor-default items-center rounded-sm py-1.5 pr-8 pl-2 text-sm outline-hidden select-none data-disabled:pointer-events-none data-disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
         className,
       )}
       {...props}
@@ -111,10 +111,41 @@ const SelectItem = React.forwardRef<
           <CheckIcon className="size-3.5 stroke-[2.5px]" />
         </SelectPrimitive.ItemIndicator>
       </span>
-      <SelectPrimitive.ItemText>{children}</SelectPrimitive.ItemText>
+      <SelectPrimitive.ItemText className="flex items-center gap-x-2">{children}</SelectPrimitive.ItemText>
     </SelectPrimitive.Item>
   );
 });
+
+type DescribedSelectItemProps = Omit<React.ComponentPropsWithoutRef<typeof SelectPrimitive.Item>, 'children'> & {
+  label: React.ReactNode;
+  description: React.ReactNode;
+};
+
+const DescribedSelectItem = React.forwardRef<React.ElementRef<typeof SelectPrimitive.Item>, DescribedSelectItemProps>(
+  ({ description, className, label, ...props }, ref) => {
+    return (
+      <SelectPrimitive.Item
+        ref={ref}
+        data-slot="select-item"
+        className={cn(
+          "focus:bg-accent focus:text-accent-foreground data-[state=checked]:text-primary [&_svg:not([class*='text-'])]:text-primary hover:bg-accent relative flex w-full cursor-default flex-col justify-center gap-y-0.5 rounded-sm py-1.5 pr-8 pl-2 text-sm outline-hidden select-none data-disabled:pointer-events-none data-disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+          className,
+        )}
+        {...props}
+      >
+        <span className="absolute top-2.5 right-2 flex size-3.5 items-center justify-center">
+          <SelectPrimitive.ItemIndicator>
+            <CheckIcon className="size-3.5 stroke-[2.5px]" />
+          </SelectPrimitive.ItemIndicator>
+        </span>
+        <SelectPrimitive.ItemText className="flex items-center gap-x-2 text-base/6 font-semibold">
+          {label}
+        </SelectPrimitive.ItemText>
+        <span className="text-muted-foreground text-xs font-normal">{description}</span>
+      </SelectPrimitive.Item>
+    );
+  },
+);
 
 function SelectSeparator({ className, ...props }: React.ComponentProps<typeof SelectPrimitive.Separator>) {
   return (
@@ -164,4 +195,5 @@ export {
   SelectSeparator,
   SelectTrigger,
   SelectValue,
+  DescribedSelectItem,
 };
