@@ -20,8 +20,12 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "23"
           cache: "pnpm"
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.4"
 
       - name: Install dependencies
         run: pnpm install

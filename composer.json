@@ -2,6 +2,7 @@
   "name": "yaycommerce/yay-wholesale-b2b",
   "type": "wordpress-plugin",
   "require": {
+    "php": ">=8.2",
     "yaycommerce/admin-shell": "^2.5"
   },
   "repositories": {
