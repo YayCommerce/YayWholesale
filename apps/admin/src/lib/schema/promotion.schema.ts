@@ -1,18 +1,30 @@
 import { z } from 'zod';
+import { __ } from '@wordpress/i18n';
 
-export const promotionRulesSchema = z.object({
-  enableAutoPromotion: z.boolean(),
-  enablePromotionFromRetailers: z.boolean(),
+import { enableByRoleSchema } from './common.schema';
 
-  roleRanking: z.array(z.string()), // RoleSlug[]
-  rolePromotionCondition: z.record(
-    z.string(), // RoleSlug
-    z.object({
-      enableStatus: z.boolean(),
-      minTotalSpending: z.number(),
-      inDuration: z.enum(['no-limit', '1-month', '3-months', '6-months', '1-year']),
-    }),
-  ),
+const promotionRuleSchema = z.object({
+  title: z.string(),
+  enableStatus: z.boolean(),
+
+  fromRoles: enableByRoleSchema,
+  newRole: z.tuple([
+    z.enum(['retailers', 'wholesalers']),
+    z.string().optional(), // Wholsesale RoleSlug
+  ]),
+
+  condition: z.enum([
+    'total-spend-at-least', // >=
+    'last-year-spend-at-least', // >=
+    'last-year-spend-less-than', // <
+    'last-month-spend-at-least', // >=
+    'last-month-spend-less-than', // <
+  ]),
+  conditionAmount: z.number().positive(__('Amount must be a positive number', 'yay-wholesale-b2b')),
 });
 
-export type PromotionRules = z.infer<typeof promotionRulesSchema>;
+export const promotionSettingsSchema = z.object({
+  promotionRules: z.array(promotionRuleSchema),
+});
+
+export type PromotionSettings = z.infer<typeof promotionSettingsSchema>;
