@@ -1,18 +1,22 @@
+import { useMemo } from 'react';
+import { useFormContext, useWatch } from 'react-hook-form';
 import { __ } from '@wordpress/i18n';
 
+import { Settings } from '@/lib/schema/settings.schema';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import type { RegistrationField } from './registration-fields-types';
-import { PreviewFieldInput } from './RegistrationFieldsPreview/PreviewFieldInput';
-import { PreviewFieldLabel } from './RegistrationFieldsPreview/PreviewFieldLabel';
+import { Label } from '@/components/ui/label';
+import { PreviewFieldInput } from './PreviewFieldInput';
 
-export interface RegistrationFieldsPreviewProps {
-  fields: RegistrationField[];
-  submitLabel?: string;
-}
+export function RegistrationFieldsPreview() {
+  const { control } = useFormContext<Settings>();
+  const fields = useWatch({ control, name: 'registration_fields.fields' });
+  const submitLabel = useWatch({ control, name: 'registration.submit_button_label' });
 
-export function RegistrationFieldsPreview({ fields, submitLabel }: RegistrationFieldsPreviewProps) {
-  const visibleFields = fields.filter((field) => !field.isHidden);
+  const visibleFields = useMemo(() => {
+    return fields.filter((field) => !field.isHidden);
+  }, [fields]);
+
   return (
     <div className="flex min-w-0 flex-col gap-4">
       <div className="flex min-h-9 items-center gap-4">
@@ -29,12 +33,15 @@ export function RegistrationFieldsPreview({ fields, submitLabel }: RegistrationF
             </p>
           ) : (
             <div className="grid grid-cols-2 gap-6">
-              {visibleFields.map((field) => (
+              {visibleFields.map((field, index) => (
                 <div
-                  key={field.id}
+                  key={index}
                   className={cn('flex flex-col gap-2', field.columnWidth === '100%' ? 'col-span-2' : 'col-span-1')}
                 >
-                  <PreviewFieldLabel field={field} />
+                  <Label className="text-foreground gap-0 text-[13px] font-medium">
+                    {field.label}
+                    {field.isRequired && <span className="text-destructive ms-0.5">*</span>}
+                  </Label>
                   <PreviewFieldInput field={field} />
                 </div>
               ))}

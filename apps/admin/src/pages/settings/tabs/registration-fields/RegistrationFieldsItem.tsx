@@ -1,45 +1,41 @@
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { GripVertical } from 'lucide-react';
-import { useFormContext, useWatch } from 'react-hook-form';
 import { __ } from '@wordpress/i18n';
 
-import type { Settings } from '@/lib/schema/settings.schema';
+import type { Field } from '@/lib/schema/settingsRegistration.schema';
 import { cn } from '@/lib/utils';
 import { Switch } from '@/components/ui/switch';
 
-type RegistrationFieldsItemProps = {
-  fieldId: string;
+interface RegistrationFieldsItemProps {
   index: number;
-  onEdit: (index: number) => void;
-};
+  field: Field;
+  fieldId: string; // use for dnd-kit
+  onCheckedChange: (index: number, checked: boolean) => void;
+  onClick: (index: number) => void;
+}
 
-export function RegistrationFieldsItem({ fieldId, index, onEdit }: RegistrationFieldsItemProps) {
-  const { control, getValues, setValue } = useFormContext<Settings>();
-  const fieldPath = `registration_fields.fields.${index}` as const;
-  const field = useWatch({ control, name: fieldPath });
-
+export function RegistrationFieldsItem({
+  index,
+  field,
+  fieldId,
+  onCheckedChange,
+  onClick,
+}: RegistrationFieldsItemProps) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: fieldId,
   });
 
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-  };
-
-  const isHidden = field?.isHidden ?? false;
-
   return (
     <div
       ref={setNodeRef}
-      style={style}
+      style={{ transform: CSS.Transform.toString(transform), transition }} // for dnd-kit
       className={cn(
         'group bg-background flex items-center gap-4 rounded-md border py-2.5 pr-5 pl-4 transition-shadow',
         isDragging && 'z-10 opacity-60 shadow-md',
         !isDragging && 'hover:shadow-xs',
       )}
-      onClick={() => onEdit(index)}
+      onClick={() => onClick(index)}
     >
       <div
         {...attributes}
@@ -50,18 +46,17 @@ export function RegistrationFieldsItem({ fieldId, index, onEdit }: RegistrationF
       </div>
 
       <div className="flex w-full flex-1 items-center gap-2 text-left">
-        <span className={cn('truncate text-sm font-medium', isHidden && 'text-muted-foreground line-through')}>
-          {field?.label || __('Untitled field', 'yay-wholesale-b2b')}
+        <span className={cn('truncate text-sm font-medium', field.isHidden && 'text-muted-foreground line-through')}>
+          {field.label}
         </span>
       </div>
 
       <div onPointerDown={(e) => e.stopPropagation()} onClick={(e) => e.stopPropagation()}>
         <Switch
           size="sm"
-          checked={!isHidden}
+          checked={!field.isHidden}
           onCheckedChange={(checked) => {
-            const current = getValues(fieldPath);
-            setValue(fieldPath, { ...current, isHidden: !checked }, { shouldDirty: true });
+            onCheckedChange(index, checked);
           }}
           aria-label={__('Enabled status', 'yay-wholesale-b2b')}
         />

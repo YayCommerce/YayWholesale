@@ -37,24 +37,26 @@ const choiceFieldSchema = z.object({
   choices: z.array(z.string()).nonempty(__('Add choices for the field', 'yay-wholesale-b2b')),
 });
 
+// const fileExtension = z.enum(['image', 'pdf', 'doc']);
 const attachmentFieldSchema = z.object({
   ...commonFieldSchema.shape,
   type: z.enum(attachmentFieldTypes),
   allowedExtensions: z.array(z.string()),
+  // maxFileSize: z.number().optional(),
 });
 
-const fieldSchema = z.discriminatedUnion('type', [
+export const fieldSchema = z.discriminatedUnion('type', [
   textFieldSchema,
   choiceFieldSchema,
   //  attachmentFieldSchema
 ]);
-
-export const fieldsSchema = z.array(fieldSchema);
 
 export { textFieldTypes, choiceFieldTypes, attachmentFieldTypes };
 
 export type TextField = z.infer<typeof textFieldSchema>;
 export type ChoiceField = z.infer<typeof choiceFieldSchema>;
 export type AttachmentField = z.infer<typeof attachmentFieldSchema>;
-
 export type Field = z.infer<typeof fieldSchema>;
+export type FieldType = Field['type'] | ChoiceField['type'] | AttachmentField['type'];
+
+export type FieldFormValues = z.infer<typeof fieldSchema>;
