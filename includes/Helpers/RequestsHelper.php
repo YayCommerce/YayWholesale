@@ -69,7 +69,7 @@ class RequestsHelper {
             if ( array_key_exists( $key, $body_params ) ) {
                 $request_data[ $gsetting['label'] ] = [
                     'type'       => $gsetting['type'],
-                    'is_default' => $gsetting['isDefault'],
+                    'is_default' => isset( $gsetting['isDefault'] ) ? $gsetting['isDefault'] : false,
                     'key'        => $key,
                 ];
 

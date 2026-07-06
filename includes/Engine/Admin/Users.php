@@ -17,6 +17,9 @@ class Users {
 
         add_action( 'show_user_profile', [ $this, 'add_custom_user_fields' ], 99 );
         add_action( 'edit_user_profile', [ $this, 'add_custom_user_fields' ], 99 );
+
+        add_action( 'personal_options_update', [ $this, 'save_custom_user_fields' ] );
+        add_action( 'edit_user_profile_update', [ $this, 'save_custom_user_fields' ] );
     }
 
     public function editable_roles( $roles ) {
@@ -49,5 +52,86 @@ class Users {
 
     public function add_custom_user_fields( \WP_User $user ) {
         require YAYWHOLESALEB2B_PLUGIN_DIR . 'includes/Templates/user/edit-user.php';
+    }
+
+    /**
+     * Save editable wholesaler registration fields from the user profile form.
+     *
+     * @param int $user_id User ID being updated.
+     */
+    public function save_custom_user_fields( int $user_id ): void {
+        if ( ! current_user_can( 'edit_user', $user_id ) ) {
+            return;
+        }
+
+        $approved_request_id = get_user_meta( $user_id, RequestsHelper::USER_META_REQUEST, true );
+        if ( empty( $approved_request_id ) ) {
+            $approved_request_id = RequestsHelper::get_the_last_approved_request_id_of_user( $user_id );
+        }
+
+        if ( empty( $approved_request_id ) ) {
+            return;
+        }
+
+        $request_data = get_post_meta( $approved_request_id, RequestsHelper::REQUEST_META_DATA, true );
+        if ( ! is_array( $request_data ) ) {
+            return;
+        }
+
+        $editable_types = [ 'text', 'email', 'phone', 'number', 'date', 'textarea' ];
+        $updated        = false;
+
+        foreach ( $request_data as $label => &$field ) {
+            if ( ! is_array( $field ) || empty( $field['key'] ) || empty( $field['type'] ) ) {
+                continue;
+            }
+
+            if ( ! in_array( $field['type'], $editable_types, true ) ) {
+                continue;
+            }
+
+            $field_key = $field['key'];
+            if ( ! isset( $_POST[ $field_key ] ) ) {
+                continue;
+            }
+
+            $field['value'] = $this->sanitize_request_field_value( $field['type'], wp_unslash( $_POST[ $field_key ] ) );
+            $updated        = true;
+        }
+        unset( $field );
+
+        if ( $updated ) {
+            update_post_meta( $approved_request_id, RequestsHelper::REQUEST_META_DATA, $request_data );
+        }
+    }
+
+    /**
+     * Sanitize a registration field value by type.
+     *
+     * @param string $type  Field type.
+     * @param mixed  $value Raw submitted value.
+     * @return string
+     */
+    private function sanitize_request_field_value( string $type, $value ): string {
+        if ( ! is_scalar( $value ) ) {
+            return '';
+        }
+
+        switch ( $type ) {
+            case 'email':
+                return sanitize_email( (string) $value );
+            case 'textarea':
+                return sanitize_textarea_field( (string) $value );
+            case 'number':
+                return is_numeric( $value ) ? (string) $value : sanitize_text_field( (string) $value );
+            case 'date':
+                $sanitized = sanitize_text_field( (string) $value );
+                if ( ! empty( $sanitized ) && ! preg_match( '/^\d{4}-\d{2}-\d{2}$/', $sanitized ) ) {
+                    return '';
+                }
+                return $sanitized;
+            default:
+                return sanitize_text_field( (string) $value );
+        }
     }
 }
