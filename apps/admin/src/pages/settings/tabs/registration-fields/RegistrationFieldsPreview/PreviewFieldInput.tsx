@@ -64,6 +64,20 @@ export function PreviewFieldInput({ field }: PreviewFieldInputProps) {
       );
     case 'number':
       return <NumberInput placeholder={field.placeholder} />;
+    case 'attachment':
+      return (
+        <div className="relative flex flex-col items-start gap-1">
+          <div className="flex items-center gap-1">
+            <input
+              className="file:border-border file:bg-muted-400 hover:file:bg-muted file:rounded-xs file:border file:px-1.5 file:py-px file:text-sm file:font-medium"
+              type="file"
+            />
+          </div>
+          <p className="text-muted-foreground pl-2 text-sm">
+            {__('Allowed extensions:', 'yay-wholesale-b2b')} {field.allowedExtensions?.join(', ')}
+          </p>
+        </div>
+      );
     default:
       return <Input type={field.type === 'phone' ? 'tel' : field.type} placeholder={field.placeholder} />;
   }

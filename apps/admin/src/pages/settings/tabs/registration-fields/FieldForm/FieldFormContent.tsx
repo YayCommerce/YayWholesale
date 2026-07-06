@@ -4,11 +4,14 @@ import { __ } from '@wordpress/i18n';
 import { FieldFormValues, FieldType } from '@/lib/schema/settingsRegistration.schema';
 import { Field, FieldContent, FieldError, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
+import { NumberInputChevrons, NumberInputInput, NumberInputRoot, NumberInputUnit } from '@/components/ui/number-input';
 import { Segmented, SegmentedItem } from '@/components/ui/segmented';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
 import { Switch } from '@/components/ui/switch';
 import { TagsInput } from '@/components/ui/tags-input';
+import { FIELD_DEFAULTS, hasAllowedExtensions, hasChoices, hasPlaceholder } from '../registration-fields.helper';
+import { FileExtensionsCombobox } from './FileExtensionsCombobox';
 
 const FIELD_TYPE_OPTIONS: { value: FieldType; label: string }[] = [
   { value: 'text', label: __('Input', 'yay-wholesale-b2b') },
@@ -24,10 +27,15 @@ const FIELD_TYPE_OPTIONS: { value: FieldType; label: string }[] = [
 ];
 
 export default function FieldFormContent() {
-  const { control } = useFormContext<FieldFormValues>();
+  const { control, getValues, reset } = useFormContext<FieldFormValues>();
   const type = useWatch({ control, name: 'type' });
-  const isChoiceType = ['radio', 'select', 'checkbox'].includes(type);
-
+  const handleTypeChange = (type: FieldType) => {
+    reset({
+      ...getValues(),
+      type,
+      ...FIELD_DEFAULTS[type],
+    });
+  };
   return (
     <>
       <Controller
@@ -55,11 +63,11 @@ export default function FieldFormContent() {
       <Controller
         control={control}
         name="type"
-        render={({ field: { ref, ...field }, fieldState: { error, invalid } }) => (
+        render={({ field, fieldState: { error, invalid } }) => (
           <Field>
             <FieldLabel>{__('Type', 'yay-wholesale-b2b')}</FieldLabel>
             <FieldContent>
-              <Select {...field} onValueChange={(value) => field.onChange(value)} aria-invalid={invalid}>
+              <Select {...field} onValueChange={(value) => handleTypeChange(value as FieldType)} aria-invalid={invalid}>
                 <SelectTrigger className="hover:bg-accent w-full">
                   <SelectValue />
                 </SelectTrigger>
@@ -85,7 +93,7 @@ export default function FieldFormContent() {
         )}
       />
 
-      {!isChoiceType && (
+      {hasPlaceholder(type) && (
         <Controller
           control={control}
           name="placeholder"
@@ -109,18 +117,17 @@ export default function FieldFormContent() {
         />
       )}
 
-      {isChoiceType && (
+      {hasChoices(type) && (
         <Controller
           control={control}
           name="choices"
-          render={({ field: { ref, ...field }, fieldState: { error, invalid } }) => (
+          render={({ field, fieldState: { error, invalid } }) => (
             <Field>
               <FieldLabel>{__('Add options', 'yay-wholesale-b2b')}</FieldLabel>
               <FieldContent>
                 <TagsInput
-                  {...ref}
-                  value={field.value ?? []}
-                  onValueChange={(choices) => field.onChange(choices as string[])}
+                  value={field.value}
+                  onValueChange={(choices) => field.onChange(choices)}
                   placeholder={__('Add option and press Enter', 'yay-wholesale-b2b')}
                   aria-invalid={invalid}
                 />
@@ -137,6 +144,71 @@ export default function FieldFormContent() {
             </Field>
           )}
         />
+      )}
+
+      {hasAllowedExtensions(type) && (
+        <>
+          <Controller
+            control={control}
+            name="allowedExtensions"
+            render={({ field, fieldState: { error, invalid } }) => (
+              <Field>
+                <FieldLabel>{__('Allowed extensions', 'yay-wholesale-b2b')}</FieldLabel>
+                <FieldContent>
+                  <FileExtensionsCombobox
+                    value={field.value}
+                    onValueChange={(extensions) => field.onChange(extensions)}
+                    aria-invalid={invalid}
+                    className="w-full"
+                  />
+                </FieldContent>
+                {error && (
+                  <FieldError
+                    errors={[
+                      {
+                        message: error.message,
+                      },
+                    ]}
+                  />
+                )}
+              </Field>
+            )}
+          />
+          <Controller
+            control={control}
+            name="maxFileSize"
+            render={({ field, fieldState: { error, invalid } }) => (
+              <Field>
+                <FieldLabel>{__('Max file size', 'yay-wholesale-b2b')}</FieldLabel>
+                <FieldContent>
+                  <NumberInputRoot
+                    value={field.value}
+                    onValueChange={(value) => field.onChange(value)}
+                    step={1}
+                    min={1}
+                    max={100}
+                    aria-invalid={invalid}
+                  >
+                    <NumberInputInput />
+                    <div className="absolute inset-y-0 inset-e-0 flex">
+                      <NumberInputChevrons hasUnit />
+                      <NumberInputUnit unit="MB" />
+                    </div>
+                  </NumberInputRoot>
+                </FieldContent>
+                {error && (
+                  <FieldError
+                    errors={[
+                      {
+                        message: error.message,
+                      },
+                    ]}
+                  />
+                )}
+              </Field>
+            )}
+          />
+        </>
       )}
 
       <Controller

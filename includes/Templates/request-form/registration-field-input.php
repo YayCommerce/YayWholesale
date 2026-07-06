@@ -81,6 +81,40 @@ elseif ( 'checkbox' === $field_type ) :
         <?php endforeach; ?>
     </div>
     <?php
+elseif ( 'attachment' === $field_type ) :
+    $allowed_extensions = $field['allowedExtensions'] ?? [];
+    $max_file_size      = $field['maxFileSize'] ?? 1;
+    $extensions_label   = implode( ', ', $allowed_extensions );
+    ?>
+    <div
+        class="ywhs_registration_form_attachment"
+        data-max-file-size="<?php echo esc_attr( $max_file_size ); ?>"
+        data-allowed-extensions="<?php echo esc_attr( wp_json_encode( $allowed_extensions ) ); ?>"
+    >
+        <input
+            class="ywhs_registration_form_file_input"
+            type="file"
+            id="<?php echo esc_attr( $field_id ); ?>"
+            name="<?php echo esc_attr( $input_name ); ?>"
+            <?php echo esc_attr( $required_attr ); ?>
+        />
+        
+        <?php if ( ! empty( $extensions_label ) ) : ?>
+            <p class="ywhs_registration_form_file_hint">
+                <?php
+                echo esc_html(
+                    sprintf(
+                        /* translators: %s: comma-separated list of allowed file extensions */
+                        __( 'Allowed extensions: %s', 'yay-wholesale-b2b' ),
+                        $extensions_label
+                    )
+                );
+                ?>
+            </p>
+        <?php endif; ?>
+        <span class="ywhs_registration_form_field_error" role="alert" hidden></span>
+    </div>
+    <?php
 else :
     $input_type = 'phone' === $field_type ? 'tel' : $field_type;
     ?>
@@ -91,7 +125,7 @@ else :
         placeholder="<?php echo esc_attr( $placeholder ); ?>"
         name="<?php echo esc_attr( $input_name ); ?>"
         <?php echo esc_attr( $required_attr ); ?>
-        <?php echo 'email_address' === $input_name && $is_autofill ? 'readonly' : ''; ?>
+        <?php echo 'email_address' === $input_name && $email_autofill ? 'readonly' : ''; ?>
         <?php if ( 'email_address' === $input_name ) : ?>
             value="<?php echo esc_attr( trim( $email_autofill ) ); ?>"
         <?php elseif ( 'first_name' === $input_name ) : ?>

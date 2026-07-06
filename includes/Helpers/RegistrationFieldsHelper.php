@@ -87,6 +87,69 @@ class RegistrationFieldsHelper {
     }
 
     /**
+     * Check whether the registration fields include an attachment field.
+     *
+     * @param array $fields Registration fields configuration.
+     * @return bool
+     */
+    public static function has_attachment_fields( array $fields ): bool {
+        foreach ( $fields as $field ) {
+            if ( ! empty( $field['isHidden'] ) ) {
+                continue;
+            }
+
+            if ( 'attachment' === ( $field['type'] ?? '' ) ) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Upload attachment fields from REST request.
+     *
+     * @param \WP_REST_Request $request
+     * @return array<string, string>|\WP_Error
+     */
+    public static function upload_attachment_fields( \WP_REST_Request $request ) {
+        $uploaded_files = [];
+        $files          = $request->get_file_params();
+
+        if ( empty( $files ) ) {
+            return $uploaded_files;
+        }
+
+        require_once ABSPATH . 'wp-admin/includes/file.php';
+
+        foreach ( $files as $field_name => $file ) {
+
+            if ( empty( $file['tmp_name'] ) || UPLOAD_ERR_OK !== $file['error'] ) {
+                continue;
+            }
+
+            $result = wp_handle_upload(
+                $file,
+                [
+                    'test_form' => false,
+                ]
+            );
+
+            if ( isset( $result['error'] ) ) {
+                return new \WP_Error(
+                    'upload_failed',
+                    $result['error'],
+                    [ 'status' => 400 ]
+                );
+            }
+
+            $uploaded_files[ $field_name ] = $result['url'];
+        }//end foreach
+
+        return $uploaded_files;
+    }
+
+    /**
      * Render the complete request form.
      */
     public static function render_form(): void {

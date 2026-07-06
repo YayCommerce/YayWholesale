@@ -277,6 +277,40 @@
   transform: translate(-50%, -60%) rotate(-45deg);
 }
 
+.ywhs_registration_form_attachment {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+}
+
+.ywhs_registration_form_attachment_controls {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.ywhs_registration_form_file_name {
+  padding-left: 8px;
+  font-size: 14px;
+  color: var(--ywhs-muted-foreground);
+}
+
+.ywhs_registration_form_file_hint {
+  margin: 0;
+  padding-left: 8px;
+  font-size: 14px;
+  color: var(--ywhs-muted-foreground);
+}
+
+.ywhs_registration_form_field_error {
+  margin: 0;
+  padding-left: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ywhs-destructive);
+}
+
 .ywhs_registration_form_submit {
   display: inline-flex;
   align-items: center;

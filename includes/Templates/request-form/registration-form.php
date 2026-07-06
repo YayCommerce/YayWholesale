@@ -3,6 +3,7 @@
 defined( 'ABSPATH' ) || exit;
 
 use YayWholesaleB2B\Helpers\RegistrationFieldsHelper;
+use YayWholesaleB2B\Helpers\SettingsHelper;
 
 ?>
 
@@ -37,7 +38,13 @@ use YayWholesaleB2B\Helpers\RegistrationFieldsHelper;
     </div>
 </div>
 
-<form id="ywhs_request_form">
+<?php
+$settings              = SettingsHelper::get_settings();
+$registration_fields   = $settings['registration_fields']['fields'] ?? [];
+$has_attachment_fields = RegistrationFieldsHelper::has_attachment_fields( $registration_fields );
+$form_enctype          = $has_attachment_fields ? 'multipart/form-data' : 'application/x-www-form-urlencoded';
+?>
+<form id="ywhs_request_form" enctype="<?php echo esc_attr( $form_enctype ); ?>">
     <?php RegistrationFieldsHelper::render_form_fields(); ?>
 </form>
 

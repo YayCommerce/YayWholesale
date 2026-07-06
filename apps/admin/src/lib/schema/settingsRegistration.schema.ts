@@ -1,8 +1,6 @@
 import { z } from 'zod';
 import { __ } from '@wordpress/i18n';
 
-// TODD v1.2: add to settings, more field types, more system fields
-
 const textFieldTypes = ['text', 'email', 'number', 'phone', 'date', 'textarea'] as const;
 const choiceFieldTypes = ['radio', 'select', 'checkbox'] as const;
 const attachmentFieldTypes = ['attachment'] as const;
@@ -37,19 +35,19 @@ const choiceFieldSchema = z.object({
   choices: z.array(z.string()).nonempty(__('Add choices for the field', 'yay-wholesale-b2b')),
 });
 
-// const fileExtension = z.enum(['image', 'pdf', 'doc']);
+const fileExtension = z.enum(['jpg', 'jpeg', 'png', 'gif', 'txt', 'pdf', 'doc', 'docx', 'zip']);
+
 const attachmentFieldSchema = z.object({
   ...commonFieldSchema.shape,
   type: z.enum(attachmentFieldTypes),
-  allowedExtensions: z.array(z.string()),
-  // maxFileSize: z.number().optional(),
+  allowedExtensions: z.array(fileExtension).nonempty(__('Add at least one allowed extension', 'yay-wholesale-b2b')),
+  maxFileSize: z
+    .number()
+    .min(1, __('Max file size must be greater than 0', 'yay-wholesale-b2b'))
+    .max(100, __('Max file size must be less than 100', 'yay-wholesale-b2b')),
 });
 
-export const fieldSchema = z.discriminatedUnion('type', [
-  textFieldSchema,
-  choiceFieldSchema,
-  //  attachmentFieldSchema
-]);
+export const fieldSchema = z.discriminatedUnion('type', [textFieldSchema, choiceFieldSchema, attachmentFieldSchema]);
 
 export { textFieldTypes, choiceFieldTypes, attachmentFieldTypes };
 
