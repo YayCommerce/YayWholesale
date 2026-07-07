@@ -15,11 +15,13 @@ class Users {
         // Filter editable roles
         add_filter( 'editable_roles', [ $this, 'editable_roles' ], 10, 1 );
 
+        // Add editable wholesaler registration fields to the user profile form.
         add_action( 'show_user_profile', [ $this, 'add_custom_user_fields' ], 99 );
         add_action( 'edit_user_profile', [ $this, 'add_custom_user_fields' ], 99 );
 
-        add_action( 'personal_options_update', [ $this, 'save_custom_user_fields' ] );
-        add_action( 'edit_user_profile_update', [ $this, 'save_custom_user_fields' ] );
+        // Save editable wholesaler registration fields from the user profile form.
+        add_action( 'personal_options_update', [ $this, 'save_custom_user_fields' ], 20 );
+        add_action( 'edit_user_profile_update', [ $this, 'save_custom_user_fields' ], 20 );
     }
 
     public function editable_roles( $roles ) {
@@ -51,6 +53,7 @@ class Users {
     }
 
     public function add_custom_user_fields( \WP_User $user ) {
+        wp_nonce_field( 'yay-wholesale-edit-user-fields', 'yay_wholesale_user_fields_nonce' );
         require YAYWHOLESALEB2B_PLUGIN_DIR . 'includes/Templates/user/edit-user.php';
     }
 
@@ -61,6 +64,10 @@ class Users {
      */
     public function save_custom_user_fields( int $user_id ): void {
         if ( ! current_user_can( 'edit_user', $user_id ) ) {
+            return;
+        }
+
+        if ( ! isset( $_POST['yay_wholesale_user_fields_nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['yay_wholesale_user_fields_nonce'] ) ), 'yay-wholesale-edit-user-fields' ) ) {
             return;
         }
 
@@ -95,13 +102,15 @@ class Users {
                 continue;
             }
 
-            $field['value'] = $this->sanitize_request_field_value( $field['type'], wp_unslash( $_POST[ $field_key ] ) );
+            $field['value'] = $this->sanitize_request_field_value( $field['type'], sanitize_text_field( wp_unslash( $_POST[ $field_key ] ) ) );
             $updated        = true;
         }
         unset( $field );
 
         if ( $updated ) {
             update_post_meta( $approved_request_id, RequestsHelper::REQUEST_META_DATA, $request_data );
+            // Apply billing field mappings on approval.
+            RequestsHelper::apply_billing_field_mappings_on_approval( $user_id, $request_data );
         }
     }
 

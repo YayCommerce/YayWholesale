@@ -7,6 +7,24 @@ const attachmentFieldTypes = ['attachment'] as const;
 
 const systemFields = ['firstname', 'lastname', 'email', 'company', 'vatId'] as const;
 
+export const billingMappingValues = [
+  '',
+  'none',
+  'billing_first_name',
+  'billing_last_name',
+  'billing_company',
+  'billing_country_state',
+  'billing_country',
+  'billing_state',
+  'billing_address_1',
+  'billing_address_2',
+  'billing_city',
+  'billing_postcode',
+  'billing_phone',
+  'billing_vat',
+  'custom',
+] as const;
+
 const commonFieldSchema = z.object({
   inputName: z.string(), // computed from label, unique across all fields. Before sending to API, we will generate the input name from the label
   label: z
@@ -21,6 +39,9 @@ const commonFieldSchema = z.object({
   columnWidth: z.enum(['50%', '100%']),
   isRequired: z.boolean(),
   isHidden: z.boolean(),
+
+  billingMapping: z.enum(billingMappingValues),
+  customBillingMetaKey: z.string(),
 });
 
 const textFieldSchema = z.object({
@@ -47,7 +68,17 @@ const attachmentFieldSchema = z.object({
     .max(100, __('Max file size must be less than 100', 'yay-wholesale-b2b')),
 });
 
-export const fieldSchema = z.discriminatedUnion('type', [textFieldSchema, choiceFieldSchema, attachmentFieldSchema]);
+const baseFieldSchema = z.discriminatedUnion('type', [textFieldSchema, choiceFieldSchema, attachmentFieldSchema]);
+
+export const fieldSchema = baseFieldSchema.superRefine((field, ctx) => {
+  if (field.billingMapping === 'custom' && !field.customBillingMetaKey.trim()) {
+    ctx.addIssue({
+      code: 'custom',
+      path: ['customBillingMetaKey'],
+      message: __('Enter a user meta key', 'yay-wholesale-b2b'),
+    });
+  }
+});
 
 export { textFieldTypes, choiceFieldTypes, attachmentFieldTypes };
 

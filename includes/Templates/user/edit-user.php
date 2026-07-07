@@ -6,13 +6,16 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-$approved_request_id = get_user_meta( $user->ID, RequestsHelper::USER_META_REQUEST, true );
+/** @var \WP_User $user */
+$user_id = $user->ID;
+
+$approved_request_id = get_user_meta( $user_id, RequestsHelper::USER_META_REQUEST, true );
 if ( empty( $approved_request_id ) ) {
-    $approved_request_id = RequestsHelper::get_the_last_approved_request_id_of_user( $user->ID );
+    $approved_request_id = RequestsHelper::get_the_last_approved_request_id_of_user( $user_id );
     if ( empty( $approved_request_id ) ) {
         return;
     }
-    update_user_meta( $user->ID, RequestsHelper::USER_META_REQUEST, $approved_request_id );
+    update_user_meta( $user_id, RequestsHelper::USER_META_REQUEST, $approved_request_id );
 }
 
 $data                = get_post_meta( $approved_request_id, RequestsHelper::REQUEST_META_DATA, true );

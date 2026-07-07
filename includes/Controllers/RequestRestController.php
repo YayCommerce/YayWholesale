@@ -181,6 +181,11 @@ class RequestRestController extends BaseRestController {
             RolesHelper::remove_ywhs_role_from_user( $current_user );
             $current_user->add_role( $default_role['slug'] );
 
+            $post_meta = get_post_meta( $new_request_id, RequestsHelper::REQUEST_META_DATA, true );
+            if ( is_array( $post_meta ) ) {
+                RequestsHelper::apply_billing_field_mappings_on_approval( $current_user_id, $post_meta );
+            }
+
             do_action( 'ywhs_account_registration_submitted', $new_request_id );
             do_action( 'ywhs_account_registration_approved', $new_request_id );
             return [ 'message' => __( 'Your request has been submitted and approved. ', 'yay-wholesale-b2b' ) ];

@@ -13,7 +13,7 @@ import { TagsInput } from '@/components/ui/tags-input';
 import { FIELD_DEFAULTS, hasAllowedExtensions, hasChoices, hasPlaceholder } from '../registration-fields.helper';
 import { FileExtensionsCombobox } from './FileExtensionsCombobox';
 
-const FIELD_TYPE_OPTIONS: { value: FieldType; label: string }[] = [
+const FIELD_TYPE_OPTIONS: { value: string; label: string }[] = [
   { value: 'text', label: __('Input', 'yay-wholesale-b2b') },
   { value: 'email', label: __('Email', 'yay-wholesale-b2b') },
   { value: 'number', label: __('Number', 'yay-wholesale-b2b') },
@@ -26,36 +26,50 @@ const FIELD_TYPE_OPTIONS: { value: FieldType; label: string }[] = [
   { value: 'attachment', label: __('Attachment', 'yay-wholesale-b2b') },
 ];
 
+const BILLING_MAPPING_OPTIONS: { value: string; label: string }[] = [
+  { value: 'none', label: __('None', 'yay-wholesale-b2b') },
+  { value: 'billing_first_name', label: __('Billing First Name', 'yay-wholesale-b2b') },
+  { value: 'billing_last_name', label: __('Billing Last Name', 'yay-wholesale-b2b') },
+  { value: 'billing_company', label: __('Billing Company', 'yay-wholesale-b2b') },
+  {
+    value: 'billing_country_state',
+    label: __('Billing Country + State (Recommended)', 'yay-wholesale-b2b'),
+  },
+  { value: 'billing_country', label: __('Billing Country / Region', 'yay-wholesale-b2b') },
+  { value: 'billing_state', label: __('Billing State / County', 'yay-wholesale-b2b') },
+  { value: 'billing_address_1', label: __('Billing Street Address', 'yay-wholesale-b2b') },
+  { value: 'billing_address_2', label: __('Billing Address Line 2', 'yay-wholesale-b2b') },
+  { value: 'billing_city', label: __('Billing Town / City', 'yay-wholesale-b2b') },
+  { value: 'billing_postcode', label: __('Billing Postcode / ZIP', 'yay-wholesale-b2b') },
+  { value: 'billing_phone', label: __('Billing Phone Number', 'yay-wholesale-b2b') },
+  { value: 'billing_vat', label: __('Billing VAT ID', 'yay-wholesale-b2b') },
+  { value: 'custom', label: __('Custom User Meta Key Mapping', 'yay-wholesale-b2b') },
+];
+
 export default function FieldFormContent() {
   const { control, getValues, reset } = useFormContext<FieldFormValues>();
   const type = useWatch({ control, name: 'type' });
-  const handleTypeChange = (type: FieldType) => {
+  const billingMapping = useWatch({ control, name: 'billingMapping' });
+  const handleTypeChange = (nextType: FieldType) => {
     reset({
       ...getValues(),
-      type,
-      ...FIELD_DEFAULTS[type],
-    });
+      type: nextType,
+      ...FIELD_DEFAULTS[nextType],
+    } as FieldFormValues);
   };
+
   return (
     <>
       <Controller
         control={control}
         name="label"
-        render={({ field: { ref, ...field }, fieldState: { error, invalid } }) => (
+        render={({ field: { ...field }, fieldState: { error, invalid } }) => (
           <Field>
             <FieldLabel>{__('Label', 'yay-wholesale-b2b')}</FieldLabel>
             <FieldContent>
               <Input {...field} placeholder={__('Enter a field label', 'yay-wholesale-b2b')} aria-invalid={invalid} />
             </FieldContent>
-            {error && (
-              <FieldError
-                errors={[
-                  {
-                    message: error.message,
-                  },
-                ]}
-              />
-            )}
+            {error && <FieldError errors={[{ message: error.message }]} />}
           </Field>
         )}
       />
@@ -67,7 +81,11 @@ export default function FieldFormContent() {
           <Field>
             <FieldLabel>{__('Type', 'yay-wholesale-b2b')}</FieldLabel>
             <FieldContent>
-              <Select {...field} onValueChange={(value) => handleTypeChange(value as FieldType)} aria-invalid={invalid}>
+              <Select
+                value={field.value}
+                onValueChange={(value) => handleTypeChange(value as FieldType)}
+                aria-invalid={invalid}
+              >
                 <SelectTrigger className="hover:bg-accent w-full">
                   <SelectValue />
                 </SelectTrigger>
@@ -80,15 +98,7 @@ export default function FieldFormContent() {
                 </SelectContent>
               </Select>
             </FieldContent>
-            {error && (
-              <FieldError
-                errors={[
-                  {
-                    message: error.message,
-                  },
-                ]}
-              />
-            )}
+            {error && <FieldError errors={[{ message: error.message }]} />}
           </Field>
         )}
       />
@@ -97,21 +107,13 @@ export default function FieldFormContent() {
         <Controller
           control={control}
           name="placeholder"
-          render={({ field: { ref, ...field }, fieldState: { error, invalid } }) => (
+          render={({ field: { ...field }, fieldState: { error, invalid } }) => (
             <Field>
               <FieldLabel>{__('Placeholder', 'yay-wholesale-b2b')}</FieldLabel>
               <FieldContent>
                 <Input {...field} placeholder={__('Enter a placeholder', 'yay-wholesale-b2b')} aria-invalid={invalid} />
               </FieldContent>
-              {error && (
-                <FieldError
-                  errors={[
-                    {
-                      message: error.message,
-                    },
-                  ]}
-                />
-              )}
+              {error && <FieldError errors={[{ message: error.message }]} />}
             </Field>
           )}
         />
@@ -127,20 +129,12 @@ export default function FieldFormContent() {
               <FieldContent>
                 <TagsInput
                   value={field.value}
-                  onValueChange={(choices) => field.onChange(choices)}
+                  onValueChange={field.onChange}
                   placeholder={__('Add option and press Enter', 'yay-wholesale-b2b')}
                   aria-invalid={invalid}
                 />
               </FieldContent>
-              {error && (
-                <FieldError
-                  errors={[
-                    {
-                      message: error.message,
-                    },
-                  ]}
-                />
-              )}
+              {error && <FieldError errors={[{ message: error.message }]} />}
             </Field>
           )}
         />
@@ -162,15 +156,7 @@ export default function FieldFormContent() {
                     className="w-full"
                   />
                 </FieldContent>
-                {error && (
-                  <FieldError
-                    errors={[
-                      {
-                        message: error.message,
-                      },
-                    ]}
-                  />
-                )}
+                {error && <FieldError errors={[{ message: error.message }]} />}
               </Field>
             )}
           />
@@ -196,15 +182,7 @@ export default function FieldFormContent() {
                     </div>
                   </NumberInputRoot>
                 </FieldContent>
-                {error && (
-                  <FieldError
-                    errors={[
-                      {
-                        message: error.message,
-                      },
-                    ]}
-                  />
-                )}
+                {error && <FieldError errors={[{ message: error.message }]} />}
               </Field>
             )}
           />
@@ -213,8 +191,53 @@ export default function FieldFormContent() {
 
       <Controller
         control={control}
+        name="billingMapping"
+        render={({ field, fieldState: { error, invalid } }) => (
+          <Field>
+            <FieldLabel>{__('WooCommerce Billing Field Connection', 'yay-wholesale-b2b')}</FieldLabel>
+            <FieldContent>
+              <Select
+                value={field.value || 'none'}
+                onValueChange={(value) => field.onChange(value || 'none')}
+                aria-invalid={invalid}
+              >
+                <SelectTrigger className="hover:bg-accent w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {BILLING_MAPPING_OPTIONS.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </FieldContent>
+            {error && <FieldError errors={[{ message: error.message }]} />}
+          </Field>
+        )}
+      />
+
+      {billingMapping === 'custom' && (
+        <Controller
+          control={control}
+          name="customBillingMetaKey"
+          render={({ field: { ...field }, fieldState: { error, invalid } }) => (
+            <Field>
+              <FieldLabel>{__('User Meta Key', 'yay-wholesale-b2b')}</FieldLabel>
+              <FieldContent>
+                <Input {...field} placeholder={__('Enter user meta key', 'yay-wholesale-b2b')} aria-invalid={invalid} />
+              </FieldContent>
+              {error && <FieldError errors={[{ message: error.message }]} />}
+            </Field>
+          )}
+        />
+      )}
+
+      <Controller
+        control={control}
         name="columnWidth"
-        render={({ field: { ref, ...field }, fieldState: { error, invalid } }) => (
+        render={({ field: { ...field }, fieldState: { error, invalid } }) => (
           <Field>
             <FieldLabel>{__('Column width', 'yay-wholesale-b2b')}</FieldLabel>
             <FieldContent>
@@ -222,7 +245,7 @@ export default function FieldFormContent() {
                 className="w-full"
                 shape="square"
                 value={field.value}
-                onValueChange={(value) => field.onChange(value as FieldFormValues['columnWidth'])}
+                onValueChange={field.onChange}
                 aria-invalid={invalid}
               >
                 <SegmentedItem value="50%" className="flex-1">
@@ -233,15 +256,7 @@ export default function FieldFormContent() {
                 </SegmentedItem>
               </Segmented>
             </FieldContent>
-            {error && (
-              <FieldError
-                errors={[
-                  {
-                    message: error.message,
-                  },
-                ]}
-              />
-            )}
+            {error && <FieldError errors={[{ message: error.message }]} />}
           </Field>
         )}
       />
