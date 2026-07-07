@@ -77,7 +77,7 @@ class ProductBasedRule {
         do_action( 'ywhs_before_saved_product_based_discount', $custom_discount_data, $post_id, $product_type );
 
         // Discount
-        ProductPricingHelper::save_product_based_discount( $post_id, $custom_discount_data );
+        ProductPricingHelper::save_product_based_discount_setting( $post_id, $custom_discount_data );
         // Access Restriction
         ProductAccessHelper::save_product_based_access_restriction( $post_id, $custom_access_data );
 
@@ -115,7 +115,7 @@ class ProductBasedRule {
 
         do_action( 'ywhs_before_saved_variable_product_based_discount', $custom_discount_data, $variation_id );
 
-        ProductPricingHelper::save_product_based_discount( $variation_id, $custom_discount_data );
+        ProductPricingHelper::save_product_based_discount_setting( $variation_id, $custom_discount_data );
         ProductAccessHelper::save_product_based_access_restriction( $variation_id, $custom_access_data );
 
         do_action( 'ywhs_after_saved_variable_product_based_discount', $custom_discount_data, $variation_id );

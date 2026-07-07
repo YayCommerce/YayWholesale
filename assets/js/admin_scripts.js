@@ -89,44 +89,53 @@
   }
 
   function discountTypePricingSetting() {
-    const switchEl = $(".ywhs_discount_type_switch");
-    if (switchEl.length < 1) {
-      return;
-    }
+    const switcherTrigger = $(".ywhs_discount_type_trigger");
+    if (switcherTrigger.length < 1) return;
+    const allSwitchers = $(".ywhs_discount_type_switcher");
 
-    const handleToggle = (el) => {
-      const input = $(el)
-        .closest(".ywhs_discount_value_header")
-        .siblings(".ywhs_discount_type");
-
-      const rates = $(el)
-        .closest(".ywhs_discount_value_header")
-        .siblings(".ywhs_discount_roles_value")
-        .find(".ywhs_discount_rate_value");
-
-      const fixed = $(el)
-        .closest(".ywhs_discount_value_header")
-        .siblings(".ywhs_discount_roles_value")
-        .find(".ywhs_discount_fixed_value");
-
-      const checked = $(el).is(":checked");
-      if (checked) {
-        input.val("fixed");
-        rates.hide();
-        fixed.show();
+    switcherTrigger.on("click", function (e) {
+      const switcher = $(this).siblings(".ywhs_discount_type_switcher");
+      if (switcher.css("display") === "none") {
+        allSwitchers.hide();
+        switcher.show();
       } else {
-        input.val("rate");
-        fixed.hide();
-        rates.show();
+        switcher.hide();
       }
-    };
-
-    switchEl.each(function () {
-      handleToggle(this);
     });
 
-    switchEl.on("change", function (e) {
-      handleToggle(this);
+    $(document).on("click", function (e) {
+      if (
+        !allSwitchers.is(e.target) &&
+        allSwitchers.has(e.target).length === 0 &&
+        !switcherTrigger.is(e.target) &&
+        switcherTrigger.has(e.target).length === 0
+      ) {
+        allSwitchers.hide();
+      }
+    });
+
+    $(".ywhs_discount_type_rate").on("click", function () {
+      const switcher = $(this).closest(".ywhs_discount_type_switcher");
+      const input = switcher.siblings(".ywhs_discount_value");
+      const trigger = switcher.siblings(".ywhs_discount_type_trigger");
+      const typeInput = switcher.siblings(".ywhs_discount_type");
+
+      input.val(input.data("rate"));
+      trigger.text("%");
+      typeInput.val("rate");
+      switcher.hide();
+    });
+
+    $(".ywhs_discount_type_fixed").on("click", function () {
+      const switcher = $(this).closest(".ywhs_discount_type_switcher");
+      const valueInput = switcher.siblings(".ywhs_discount_value");
+      const trigger = switcher.siblings(".ywhs_discount_type_trigger");
+      const typeInput = switcher.siblings(".ywhs_discount_type");
+
+      valueInput.val(valueInput.data("fixed"));
+      trigger.text($(this).data("currency-symbol"));
+      typeInput.val("fixed");
+      switcher.hide();
     });
   }
   // #endregion

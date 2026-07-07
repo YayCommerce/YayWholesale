@@ -77,8 +77,18 @@ class ProductPricingHelper {
      * @param int   $product_id The product id.
      * @param array $data The setting.
      */
-    public static function save_product_based_discount( int $product_id, $data ) {
+    public static function save_product_based_discount_setting( int $product_id, $data ) {
         update_post_meta( $product_id, self::PRODUCT_BASED_DISCOUNT_KEY, $data );
+    }
+
+    /**
+     * Get product-based setting for product / variation
+     *
+     * @param int $product_id The product id.
+     */
+    public static function get_product_based_discount_setting( int $product_id ) {
+        $setting = get_post_meta( $product_id, self::PRODUCT_BASED_DISCOUNT_KEY, true );
+        return array_replace_recursive( $setting, self::get_default_settings() );
     }
 
     /**
@@ -149,10 +159,14 @@ class ProductPricingHelper {
 
     public static function get_default_settings() {
         return [
-            'discount_rule'  => 'default',
-            'discount_type'  => 'fixed',
-            'discount_fixed' => [],
-            'discount_rates' => [],
+            'discount_rule'    => 'default',
+            'discount_type'    => 'by_role',
+            'discount_by_role' => [
+                'wholesaler' => [],
+            ],
+            'discount_tiered'  => [
+                'wholesaler' => [],
+            ],
         ];
     }
 }

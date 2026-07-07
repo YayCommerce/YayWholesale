@@ -6,7 +6,6 @@ use YayWholesaleB2B\Helpers\LocalizeHelper;
 use YayWholesaleB2B\Engine\Register\ScriptName;
 use YayWholesaleB2B\Helpers\RequestsHelper;
 use YayWholesaleB2B\Helpers\SetupWizardHelper;
-use YayWholesaleB2B\Utils\Utils;
 
 defined( 'ABSPATH' ) || exit;
 /**
