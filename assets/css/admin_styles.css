@@ -44,7 +44,7 @@
     padding: 0 !important;
   }
 
-  select {
+  select, label{
     max-width: 100% !important;
     width: 100% !important;
   }
@@ -130,7 +130,6 @@
     align-items: center;
     padding: 10px 12px 10px 12px;
     gap: 8px;
-    width: 100% !important;
   }
 
   .ywhs_helptip {
@@ -139,11 +138,29 @@
     line-height: 16px;
   }
 
-  .ywhs_field_inputs_grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
-    row-gap: 10px;
+  .ywhs_field_inputs_list {
+    display: flex;
+    flex-direction: column;
+    padding: 16px;
+    gap: 16px;
+    border: 1px solid #949494;
+    box-shadow: 0px 1px 2px 0px #0000000D;
+
+    div {
+      border-bottom: 1px solid #F0F0F0;
+      padding-bottom: 16px;
+    }
+
+    label {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    div:last-child {
+      border: none;
+      padding: 0;
+    }
   }
 
   .ywhs_discount_values, .ywhs_access_enable_by_role{
@@ -164,6 +181,13 @@
     align-items: center;
     gap: 12px;
   }
+}
+/* #endregion */
+
+/* #region Layout: Category page */
+.ywhs_category_based_wholesale_rules_wrapper {
+  border-top: 1px solid #DDDDDD;
+  box-shadow: 0px -1px 0px 0px #FFFFFFB2;
 
   .ywhs_discount_roles_value {
     border-radius: 4px;
@@ -173,6 +197,7 @@
     input {
       position: relative;
       z-index: 1;
+      width:  100% !important;
     }
 
     .ywhs_discount_role_value_item {
@@ -206,18 +231,7 @@
       line-height: 20px;
       z-index: 2;
     }
-
-    input {
-      width:  100% !important;
-    }
   }
-}
-/* #endregion */
-
-/* #region Layout: Category page */
-.ywhs_category_based_wholesale_rules_wrapper {
-  border-top: 1px solid #DDDDDD;
-  box-shadow: 0px -1px 0px 0px #FFFFFFB2;
 }
 
 @media (max-width: 1024px) {
@@ -246,12 +260,115 @@
 
   label {
     margin: 0 !important;
-    width: fit-content !important;
   }
+
 
   .ywhs_discount_value_header label p {
     text-wrap-mode: nowrap;
     width: fit-content;
+  }
+
+  .ywhs_discount_roles_value {
+    border-collapse: collapse;
+    border: 1px solid #949494;
+    font-size: 12px;
+    line-height: 20px;
+
+    th, td {
+      border: 1px solid #949494;
+    }
+
+    th {
+      padding: 16px;
+      text-transform: uppercase;
+      background: #FAFAFA;
+      text-align: left;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 10px 16px;
+    }
+
+    .ywhs_discount_role_cell { width: 209px; }
+    .ywhs_tier_base_price_cell { width: 127px; }
+    .ywhs_volume_tier_cell { width: 336px; }
+
+    td:first-child {
+      padding: 20px 16px;
+      font-size: 13px;
+    }
+
+    input {
+      position: relative;
+      z-index: 1;
+      width:  100% !important;
+    }
+
+    .ywhs_value_input {
+      position: relative;
+      height: 40px;
+    }
+
+    .ywhs_input_suffix {
+      position: absolute;
+      right: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-weight: 500;
+      font-size: 13px;
+      line-height: 20px;
+      z-index: 2;
+    }
+
+    .ywhs_tier_volume_container {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .ywhs_tier_volume {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      align-items: center;
+
+      > div {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      > div > span {
+        font-weight: 400;
+        color: #757575;
+      }
+
+      input {
+        width: 95px !important;
+      }
+    }
+
+    .ywhs_add_tier_volume{
+      color: #3858E9;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      gap: 4px;
+      border-radius: 2px;
+      margin-top: 8px;
+      width: fit-content;
+      padding: 0px 4px;
+    }
+
+    .ywhs_add_tier_volume:hover{
+      background: #fafafa;
+    }
+
+    .ywhs_fixed_rate_type {
+      display: none;
+    }
   }
 
   .ywhs_discount_type_trigger {
@@ -308,7 +425,7 @@
   }
 }
 
-@media (max-width: 1200px) {
+@media (max-width: 1500px) {
   .ywhs_product_based_wholesale_rules_wrapper {
     width: calc(100% - 24px);
   }
