@@ -4,22 +4,26 @@ import { Trash } from 'lucide-react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { __ } from '@wordpress/i18n';
 
-import { FieldFormValues, fieldSchema } from '@/lib/schema/settingsRegistration.schema';
+import { createFieldFormSchema, FieldFormValues } from '@/lib/schema/settingsRegistration.schema';
 import { Button } from '@/components/ui/button';
 import { SheetClose, SheetFooter, SheetHeader, SheetTitle } from '@/components/ui/sheet';
+import { toFieldFormValues } from '../registration-fields.helper';
 import { DeleteFieldDialog } from './DeleteFieldDialog';
 import FieldFormContent from './FieldFormContent';
 
 interface EditFieldFormProps {
   field: FieldFormValues;
+  editingIndex: number;
+  siblingFields: FieldFormValues[];
   onSave: (data: FieldFormValues) => void;
   onDelete: () => void;
 }
 
-export default function EditFieldForm({ field, onSave, onDelete }: EditFieldFormProps) {
+export default function EditFieldForm({ field, editingIndex, siblingFields, onSave, onDelete }: EditFieldFormProps) {
   const form = useForm<FieldFormValues>({
-    resolver: zodResolver(fieldSchema),
-    defaultValues: field,
+    resolver: zodResolver(createFieldFormSchema(siblingFields, editingIndex)),
+    mode: 'onChange',
+    defaultValues: toFieldFormValues(field),
   });
 
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -29,8 +33,8 @@ export default function EditFieldForm({ field, onSave, onDelete }: EditFieldForm
   };
 
   useEffect(() => {
-    form.reset(field);
-  }, [field]);
+    form.reset(toFieldFormValues(field));
+  }, [field, form]);
 
   return (
     <FormProvider {...form}>

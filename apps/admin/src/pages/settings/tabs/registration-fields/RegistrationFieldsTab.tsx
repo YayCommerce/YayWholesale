@@ -115,8 +115,16 @@ export default function RegistrationFieldsTab() {
         }}
       >
         <SheetContent hasMargin>
-          {isAdding && <AddFieldForm onSave={handleAddSave} />}
-          {isEditing && <EditFieldForm field={fields[editingIndex!]} onSave={handleEditSave} onDelete={handleDelete} />}
+          {isAdding && <AddFieldForm siblingFields={fields} onSave={handleAddSave} />}
+          {isEditing && (
+            <EditFieldForm
+              field={fields[editingIndex!]}
+              editingIndex={editingIndex!}
+              siblingFields={fields}
+              onSave={handleEditSave}
+              onDelete={handleDelete}
+            />
+          )}
         </SheetContent>
       </Sheet>
       {/* Field Form */}

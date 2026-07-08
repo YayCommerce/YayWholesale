@@ -3,18 +3,21 @@ import { FormProvider, useForm } from 'react-hook-form';
 import { v4 as uuidv4 } from 'uuid';
 import { __ } from '@wordpress/i18n';
 
-import { FieldFormValues, fieldSchema } from '@/lib/schema/settingsRegistration.schema';
+import { createFieldFormSchema, FieldFormValues } from '@/lib/schema/settingsRegistration.schema';
 import { Button } from '@/components/ui/button';
 import { SheetClose, SheetFooter, SheetHeader, SheetTitle } from '@/components/ui/sheet';
+import { EMPTY_FORM_VALUES } from '../registration-fields.helper';
 import FieldFormContent from './FieldFormContent';
 
 interface AddFieldFormProps {
+  siblingFields: FieldFormValues[];
   onSave: (data: FieldFormValues) => void;
 }
 
 const makeDefaultField = (): FieldFormValues => {
   const uuid = uuidv4();
   return {
+    ...EMPTY_FORM_VALUES,
     label: '',
     inputName: `custom_field_${uuid}`,
     type: 'text',
@@ -27,9 +30,9 @@ const makeDefaultField = (): FieldFormValues => {
   };
 };
 
-export default function AddFieldForm({ onSave }: AddFieldFormProps) {
+export default function AddFieldForm({ siblingFields, onSave }: AddFieldFormProps) {
   const form = useForm<FieldFormValues>({
-    resolver: zodResolver(fieldSchema),
+    resolver: zodResolver(createFieldFormSchema(siblingFields)),
     mode: 'onChange',
     defaultValues: makeDefaultField(),
   });

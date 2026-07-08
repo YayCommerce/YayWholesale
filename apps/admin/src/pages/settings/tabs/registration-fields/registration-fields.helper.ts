@@ -1,6 +1,7 @@
 import {
   attachmentFieldTypes,
   choiceFieldTypes,
+  FieldFormValues,
   FieldType,
   textFieldTypes,
 } from '@/lib/schema/settingsRegistration.schema';
@@ -21,36 +22,16 @@ export function hasAllowedExtensions(type: FieldType) {
   return isFieldType(type, attachmentFieldTypes);
 }
 
-export const FIELD_DEFAULTS = {
-  text: {
-    placeholder: '',
-  },
-  email: {
-    placeholder: '',
-  },
-  number: {
-    placeholder: '',
-  },
-  phone: {
-    placeholder: '',
-  },
-  date: {
-    placeholder: '',
-  },
-  textarea: {
-    placeholder: '',
-  },
-  select: {
-    choices: [],
-  },
-  radio: {
-    choices: [],
-  },
-  checkbox: {
-    choices: [],
-  },
-  attachment: {
-    allowedExtensions: ['jpg', 'jpeg', 'png'],
-    maxFileSize: 1,
-  },
-};
+export const EMPTY_FORM_VALUES = {
+  placeholder: '',
+  choices: [],
+  allowedExtensions: ['jpg', 'jpeg', 'png'],
+  maxFileSize: 1,
+} as const;
+
+export function toFieldFormValues(field: FieldFormValues): FieldFormValues {
+  return {
+    ...EMPTY_FORM_VALUES,
+    ...field,
+  };
+}

@@ -82,6 +82,77 @@ export const fieldSchema = baseFieldSchema.superRefine((field, ctx) => {
 
 export { textFieldTypes, choiceFieldTypes, attachmentFieldTypes };
 
+/**
+ * Checks for duplicate WooCommerce billing field and custom meta key usage
+ * across all registration fields. Adds appropriate Zod issues if duplicates are detected.
+ */
+export const registrationFieldsArraySchema = z.array(fieldSchema).superRefine((fields, ctx) => {
+  const IGNORED_BILLING_MAPPINGS = new Set(['', 'none', 'custom']);
+
+  // Stores the first occurrence (index) for built-in billing mapping
+  const billingMappingToIndex = new Map<string, number>();
+  // Stores the first occurrence (index) for custom meta key
+  const customMetaKeyToIndex = new Map<string, number>();
+
+  fields.forEach((field, idx) => {
+    // Check for duplicated WooCommerce billing field mapping
+    if (!IGNORED_BILLING_MAPPINGS.has(field.billingMapping)) {
+      const existingIdx = billingMappingToIndex.get(field.billingMapping);
+      if (existingIdx !== undefined) {
+        const message = __(
+          'This billing field is already connected to another registration field.',
+          'yay-wholesale-b2b',
+        );
+        ctx.addIssue({ code: 'custom', path: [existingIdx, 'billingMapping'], message });
+        ctx.addIssue({ code: 'custom', path: [idx, 'billingMapping'], message });
+      } else {
+        billingMappingToIndex.set(field.billingMapping, idx);
+      }
+    }
+
+    // Check for duplicated custom user meta key
+    if (field.billingMapping === 'custom') {
+      const trimmedMetaKey = field.customBillingMetaKey.trim();
+      if (trimmedMetaKey) {
+        const existingIdx = customMetaKeyToIndex.get(trimmedMetaKey);
+        if (existingIdx !== undefined) {
+          const message = __('This user meta key is already used by another registration field.', 'yay-wholesale-b2b');
+          ctx.addIssue({ code: 'custom', path: [existingIdx, 'customBillingMetaKey'], message });
+          ctx.addIssue({ code: 'custom', path: [idx, 'customBillingMetaKey'], message });
+        } else {
+          customMetaKeyToIndex.set(trimmedMetaKey, idx);
+        }
+      }
+    }
+  });
+});
+
+export function createFieldFormSchema(siblingFields: FieldFormValues[], editingIndex?: number) {
+  return fieldSchema.superRefine((field, ctx) => {
+    // Construct a hypothetical array of all fields with this field added/edited
+    const allFields =
+      editingIndex !== undefined
+        ? siblingFields.map((f, i) => (i === editingIndex ? field : f))
+        : [...siblingFields, field];
+
+    const targetIndex = editingIndex ?? allFields.length - 1;
+    const validation = registrationFieldsArraySchema.safeParse(allFields);
+
+    if (!validation.success) {
+      validation.error.issues.forEach((issue) => {
+        const [issueIdx, ...restPath] = issue.path;
+        if (Number(issueIdx) === targetIndex && restPath.length > 0) {
+          ctx.addIssue({
+            code: 'custom',
+            path: restPath,
+            message: issue.message,
+          });
+        }
+      });
+    }
+  });
+}
+
 export type TextField = z.infer<typeof textFieldSchema>;
 export type ChoiceField = z.infer<typeof choiceFieldSchema>;
 export type AttachmentField = z.infer<typeof attachmentFieldSchema>;

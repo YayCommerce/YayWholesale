@@ -1,7 +1,7 @@
 import { Controller, useFormContext, useWatch } from 'react-hook-form';
 import { __ } from '@wordpress/i18n';
 
-import { FieldFormValues, FieldType } from '@/lib/schema/settingsRegistration.schema';
+import { FieldFormValues } from '@/lib/schema/settingsRegistration.schema';
 import { Field, FieldContent, FieldError, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { NumberInputChevrons, NumberInputInput, NumberInputRoot, NumberInputUnit } from '@/components/ui/number-input';
@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Separator } from '@/components/ui/separator';
 import { Switch } from '@/components/ui/switch';
 import { TagsInput } from '@/components/ui/tags-input';
-import { FIELD_DEFAULTS, hasAllowedExtensions, hasChoices, hasPlaceholder } from '../registration-fields.helper';
+import { hasAllowedExtensions, hasChoices, hasPlaceholder } from '../registration-fields.helper';
 import { FileExtensionsCombobox } from './FileExtensionsCombobox';
 
 const FIELD_TYPE_OPTIONS: { value: string; label: string }[] = [
@@ -47,16 +47,9 @@ const BILLING_MAPPING_OPTIONS: { value: string; label: string }[] = [
 ];
 
 export default function FieldFormContent() {
-  const { control, getValues, reset } = useFormContext<FieldFormValues>();
+  const { control } = useFormContext<FieldFormValues>();
   const type = useWatch({ control, name: 'type' });
   const billingMapping = useWatch({ control, name: 'billingMapping' });
-  const handleTypeChange = (nextType: FieldType) => {
-    reset({
-      ...getValues(),
-      type: nextType,
-      ...FIELD_DEFAULTS[nextType],
-    } as FieldFormValues);
-  };
 
   return (
     <>
@@ -81,12 +74,8 @@ export default function FieldFormContent() {
           <Field>
             <FieldLabel>{__('Type', 'yay-wholesale-b2b')}</FieldLabel>
             <FieldContent>
-              <Select
-                value={field.value}
-                onValueChange={(value) => handleTypeChange(value as FieldType)}
-                aria-invalid={invalid}
-              >
-                <SelectTrigger className="hover:bg-accent w-full">
+              <Select value={field.value} onValueChange={field.onChange}>
+                <SelectTrigger className="hover:bg-accent w-full" aria-invalid={invalid}>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -201,7 +190,7 @@ export default function FieldFormContent() {
                 onValueChange={(value) => field.onChange(value || 'none')}
                 aria-invalid={invalid}
               >
-                <SelectTrigger className="hover:bg-accent w-full">
+                <SelectTrigger className="hover:bg-accent w-full" aria-invalid={invalid}>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
