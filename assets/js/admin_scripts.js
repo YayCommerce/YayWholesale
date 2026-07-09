@@ -1,6 +1,8 @@
 (function ($) {
   ("use strict");
 
+  const { __ } = window.wp.i18n;
+
   // #region Custom Pricing (Category-based, Product-based)
   $(document).ready(() => {
     const handler = () => {
@@ -67,8 +69,8 @@
       }
     });
 
-    $(".ywhs_value_input").on("change", function () {
-      const input = $(this).find("input");
+    $(".ywhs_wholesale_rules input").on("change", function () {
+      const input = $(this);
       const value = parseFloat(input.val());
 
       if (value < 0) {
@@ -121,6 +123,7 @@
       const typeInput = switcher.siblings(".ywhs_discount_type");
 
       input.val(input.data("rate"));
+      input.attr("max", 100);
       trigger.text("%");
       typeInput.val("rate");
       switcher.hide();
@@ -133,6 +136,7 @@
       const typeInput = switcher.siblings(".ywhs_discount_type");
 
       valueInput.val(valueInput.data("fixed"));
+      valueInput.removeAttr("max");
       trigger.text($(this).data("currency-symbol"));
       typeInput.val("fixed");
       switcher.hide();
@@ -358,7 +362,14 @@
 
     addTierButton.on("click", function () {
       const tierContainer = $(this).siblings(".ywhs_tier_volume_container");
-      tierContainer.append(newTier(tierContainer.length, "hello", "$"));
+      const tierVolumes = tierContainer.find(".ywhs_tier_volume");
+      const roleSlug = $(this).data("role");
+      const currency = $(this).data("currency");
+      const variationIndex = parseInt($(this).data("variation") ?? "-1");
+      const suffix = variationIndex >= 0 ? "-" + variationIndex : "";
+      tierContainer.append(
+        newTier(tierVolumes.length, roleSlug, currency, suffix)
+      );
     });
 
     $(".ywhs_tier_volume_container").on(
@@ -370,27 +381,27 @@
     );
   }
 
-  function newTier(index, roleSlug, currency) {
+  function newTier(index, roleSlug, currency, suffix) {
     return `
     <div class="ywhs_tier_volume" data-index="${index}">
       <div class="ywhs_tier_from_quantity">
-          <span>From</span>
+          <span>${__("From", "yay-wholesale-b2b")}</span>
           <input
               type="number"
               id="ywhs_product_tier_from_quantity_${roleSlug}"
-              name="yay-wholesale-b2b[tier-from-quantity][${roleSlug}][${index}]"
+              name="yay-wholesale-b2b[tier-from-quantity${suffix}][${roleSlug}][${index}]"
               value=0
               step="0.01"
               min="0"
               max="100">
       </div>
       <div class="ywhs_tier_price">
-          <span>Price</span>
+          <span>${__("Price", "yay-wholesale-b2b")}</span>
           <div class="ywhs_value_input">
               <input
                   type="number"
                   id="ywhs_product_tier_base_price_${roleSlug}"
-                  name="yay-wholesale-b2b[tier-base-price][${roleSlug}][${index}]"
+                  name="yay-wholesale-b2b[tier-price${suffix}][${roleSlug}][${index}]"
                   value=0
                   step="0.01"
                   min="0"
@@ -402,7 +413,7 @@
           </div>
           <div class="ywhs_tier_volume_delete">
               <svg width="11" height="12" viewBox="0 0 11 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path fill-rule="evenodd" clip-rule="evenodd" d="M5.5 1.12514C5.13433 1.12504 4.77761 1.23319 4.47901 1.43469C4.18041 1.6362 3.95461 1.92115 3.83271 2.25028H7.16729C7.04529 1.92121 6.81947 1.63632 6.52089 1.43483C6.22231 1.23334 5.86565 1.12514 5.5 1.12514ZM5.5 0C4.8208 8.81952e-06 4.16244 0.223974 3.63629 0.634014C3.11014 1.04405 2.74849 1.615 2.6125 2.25028H0V3.37542H0.997857L1.64057 10.124C1.6894 10.6367 1.93725 11.1134 2.33545 11.4605C2.73365 11.8076 3.25341 12.0001 3.79264 12H7.20814C7.74711 11.9999 8.26658 11.8075 8.66459 11.4605C9.06261 11.1136 9.31043 10.6372 9.35943 10.1248L10.0021 3.37542H11V2.25028H8.3875C8.25151 1.615 7.88986 1.04405 7.36371 0.634014C6.83756 0.223974 6.1792 8.81952e-06 5.5 0ZM8.81886 3.37542H2.18114L2.81443 10.022C2.83659 10.2551 2.94924 10.4718 3.13024 10.6296C3.31124 10.7874 3.54752 10.8749 3.79264 10.8749H7.20814C7.45327 10.8749 7.68954 10.7874 7.87055 10.6296C8.05155 10.4718 8.1642 10.2551 8.18636 10.022L8.81886 3.37542Z" fill="#757575" />
+                  <path fill-rule="evenodd" clip-rule="evenodd" d="M5.5 1.12514C5.13433 1.12504 4.77761 1.23319 4.47901 1.43469C4.18041 1.6362 3.95461 1.92115 3.83271 2.25028H7.16729C7.04529 1.92121 6.81947 1.63632 6.52089 1.43483C6.22231 1.23334 5.86565 1.12514 5.5 1.12514ZM5.5 0C4.8208 8.81952e-06 4.16244 0.223974 3.63629 0.634014C3.11014 1.04405 2.74849 1.615 2.6125 2.25028H0V3.37542H0.997857L1.64057 10.124C1.6894 10.6367 1.93725 11.1134 2.33545 11.4605C2.73365 11.8076 3.25341 12.0001 3.79264 12H7.20814C7.74711 11.9999 8.26658 11.8075 8.66459 11.4605C9.06261 11.1136 9.31043 10.6372 9.35943 10.1248L10.0021 3.37542H11V2.25028H8.3875C8.25151 1.615 7.88986 1.04405 7.36371 0.634014C6.83756 0.223974 6.1792 8.81952e-06 5.5 0ZM8.81886 3.37542H2.18114L2.81443 10.022C2.83659 10.2551 2.94924 10.4718 3.13024 10.6296C3.31124 10.7874 3.54752 10.8749 3.79264 10.8749H7.20814C7.45327 10.8749 7.68954 10.7874 7.87055 10.6296C8.05155 10.4718 8.1642 10.2551 8.18636 10.022L8.81886 3.37542Z" fill="currentColor" />
               </svg>
           </div>
       </div>

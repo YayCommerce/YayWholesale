@@ -82,74 +82,117 @@ $category_based_access   = CategoryAccessHelper::get_category_based_access_restr
                     </div>
 
                     <div class="ywhs_field">
-                        <p><?php esc_html_e( 'Access Rule', 'yay-wholesale-b2b' ); ?></p>
-                        <div class="ywhs_field_inputs_wrapper">
-                            <div class="wc-radios ywhs_radios">
-                                <label>
-                                    <input
-                                        name="yay-wholesale-b2b[access-rule]"
-                                        value="visible-all"
-                                        type="radio"
-                                        class="select short ywhs_access_rule_all"
-                                        <?php echo ( esc_attr( $category_based_access['rule'] === 'visible-all' ? 'checked' : '' ) ); ?>>
-                                    <?php esc_html_e( 'Visible to all', 'yay-wholesale-b2b' ); ?>
-                                </label>
-                            </div>
-                            <div class="wc-radios ywhs_radios">
-                                <label>
-                                    <input
-                                        name="yay-wholesale-b2b[access-rule]"
-                                        value="visible-specific-roles"
-                                        type="radio"
-                                        class="select short ywhs_access_rule_specific"
-                                        <?php echo ( esc_attr( $category_based_access['rule'] === 'visible-specific-roles' ? 'checked' : '' ) ); ?>>
-                                    <?php esc_html_e( 'Visible to specific roles', 'yay-wholesale-b2b' ); ?>
-                                </label>
-                            </div>
-                        </div>
-                        <p class="ywhs_helptip"><?php esc_html_e( '"Visible to All", allow all users to view/purchase this product.', 'yay-wholesale-b2b' ); ?></p>
+                <p><?php esc_html_e( 'Access Rule', 'yay-wholesale-b2b' ); ?></p>
+                <div class="ywhs_field_inputs_wrapper">
+                    <div class="wc-radios ywhs_radios">
+                        <label>
+                            <input
+                                class="ywhs_access_rule_all"
+                                name="yay-wholesale-b2b[access-rule]"
+                                value="visible-all"
+                                type="radio"
+                                <?php echo ( esc_attr( $category_based_access['rule'] === 'visible-all' ? 'checked' : '' ) ); ?>>
+                            <?php esc_html_e( 'Visible to all', 'yay-wholesale-b2b' ); ?>
+                        </label>
                     </div>
+                    <div class="wc-radios ywhs_radios">
+                        <label>
+                            <input
+                                class="ywhs_access_rule_specific"
+                                name="yay-wholesale-b2b[access-rule]"
+                                value="visible-specific-roles"
+                                type="radio"
+                                <?php echo ( esc_attr( $category_based_access['rule'] === 'visible-specific-roles' ? 'checked' : '' ) ); ?>>
+                            <?php esc_html_e( 'Visible to specific roles', 'yay-wholesale-b2b' ); ?>
+                        </label>
+                    </div>
+                </div>
+                <p class="ywhs_helptip"><?php esc_html_e( '"Visible to All", allow all users to view/purchase this product.', 'yay-wholesale-b2b' ); ?></p>
+            </div>
 
-                    <div class="ywhs_access_enable_by_role">
-                        <div class="ywhs_field">
-                            <div class="ywhs_field_inputs_wrapper">
-                                <div class="ywhs_select">
-                                    <label for="ywhs_access_rule_retailer"><?php esc_html_e( 'Retailer', 'yay-wholesale-b2b' ); ?></label>
-                                    <select id="ywhs_access_rule_retailer" name="yay-wholesale-b2b[access-retailers]" class="ywhs_select ywhs_access_rule_retailer">
-                                    <option value="disabled" <?php echo ( esc_attr( $category_based_access['retailers'] === 'disabled' ? 'selected' : '' ) ); ?>><?php esc_html_e( 'Disabled', 'yay-wholesale-b2b' ); ?></option>
-                                    <option value="enabled" <?php echo ( esc_attr( $category_based_access['retailers'] === 'enabled' ? 'selected' : '' ) ); ?>><?php esc_html_e( 'Enabled', 'yay-wholesale-b2b' ); ?></option>
-                                    </select>
-                                </div>
-                                <div class="ywhs_select">
-                                    <label for="ywhs_access_rule_wholesaler"><?php esc_html_e( 'Wholesaler', 'yay-wholesale-b2b' ); ?></label>
-                                    <select id="ywhs_access_rule_wholesaler" name="yay-wholesale-b2b[access-wholesalers]" class="ywhs_select ywhs_access_rule_wholesaler">
-                                    <option value="disabled" <?php echo ( esc_attr( $category_based_access['wholesalers'] === 'disabled' ? 'selected' : '' ) ); ?>><?php esc_html_e( 'Disabled', 'yay-wholesale-b2b' ); ?></option>
-                                <option value="enabled" <?php echo ( esc_attr( $category_based_access['wholesalers'] === 'enabled' ? 'selected' : '' ) ); ?>><?php esc_html_e( 'Enabled', 'yay-wholesale-b2b' ); ?></option>
-                                <option value="enabled-selected-roles" <?php echo ( esc_attr( $category_based_access['wholesalers'] === 'enabled-selected-roles' ? 'selected' : '' ) ); ?>><?php esc_html_e( 'Enabled for Selected Roles', 'yay-wholesale-b2b' ); ?></option>
-                                    </select>
-                                </div>
-                            </div>
+            <div class="ywhs_access_enable_by_role">
+                <div class="ywhs_field">
+                    <p><?php esc_html_e( 'Retailer', 'yay-wholesale-b2b' ); ?></p>
+                    <div class="ywhs_field_inputs_wrapper">
+                        <div class="wc-radios ywhs_radios">
+                            <label>
+                                <input
+                                    name="yay-wholesale-b2b[access-retailers]"
+                                    value="disabled"
+                                    type="radio"
+                                    <?php echo ( esc_attr( $category_based_access['retailers'] === 'disabled' ? 'checked' : '' ) ); ?>>
+                                <?php esc_html_e( 'Disabled', 'yay-wholesale-b2b' ); ?>
+                            </label>
                         </div>
-
-                        <div class="ywhs_field ywhs_access_selected_roles">
-                            <p><?php esc_html_e( 'Enable Role', 'yay-wholesale-b2b' ); ?></p>
-                            <div class="ywhs_field_inputs_grid">
-                                <?php foreach ( $wholesale_roles as $wholesale_role ) : ?>
-                                    <div class="wc-radios ywhs_radios">
-                                        <label>
-                                            <input
-                                                name="yay-wholesale-b2b[access-selected-roles][<?php echo ( esc_html( $wholesale_role['slug'] ) ); ?>]"
-                                                type="checkbox"
-                                                class="select short"
-                                                <?php echo ( esc_attr( 'enabled' === $category_based_access['wholesalers'] || in_array( $wholesale_role['slug'], $category_based_access['selected_roles'], true ) ? 'checked' : '' ) ); ?>
-                                            />
-                                            <?php echo ( esc_html( $wholesale_role['name'] ) ); ?>
-                                        </label>
-                                    </div>
-                                <?php endforeach ?>
-                            </div>
+                        <div class="wc-radios ywhs_radios">
+                            <label>
+                                <input
+                                    name="yay-wholesale-b2b[access-retailers]"
+                                    value="enabled"
+                                    type="radio"
+                                    <?php echo ( esc_attr( $category_based_access['retailers'] === 'enabled' ? 'checked' : '' ) ); ?>>
+                                <?php esc_html_e( 'Enabled', 'yay-wholesale-b2b' ); ?>
+                            </label>
                         </div>
                     </div>
+                </div>
+
+                <div class="ywhs_field">
+                    <p><?php esc_html_e( 'Wholesaler', 'yay-wholesale-b2b' ); ?></p>
+                    <div class="ywhs_field_inputs_wrapper">
+                        <div class="wc-radios ywhs_radios">
+                            <label>
+                                <input
+                                    class="ywhs_access_wholesalers_disabled"
+                                    name="yay-wholesale-b2b[access-wholesalers]"
+                                    value="disabled"
+                                    type="radio"
+                                    <?php echo ( esc_attr( $category_based_access['wholesalers'] === 'disabled' ? 'checked' : '' ) ); ?>>
+                                <?php esc_html_e( 'Disabled', 'yay-wholesale-b2b' ); ?>
+                            </label>
+                        </div>
+                        <div class="wc-radios ywhs_radios">
+                            <label>
+                                <input
+                                    class="ywhs_access_wholesalers_enabled"
+                                    name="yay-wholesale-b2b[access-wholesalers]"
+                                    value="enabled"
+                                    type="radio"
+                                    <?php echo ( esc_attr( $category_based_access['wholesalers'] === 'enabled' ? 'checked' : '' ) ); ?>>
+                                <?php esc_html_e( 'Enabled', 'yay-wholesale-b2b' ); ?>
+                            </label>
+                        </div>
+                        <div class="wc-radios ywhs_radios">
+                            <label>
+                                <input
+                                    class="ywhs_access_wholesalers_enabled_selected"
+                                    name="yay-wholesale-b2b[access-wholesalers]"
+                                    value="enabled-selected-roles"
+                                    type="radio"
+                                    <?php echo ( esc_attr( $category_based_access['wholesalers'] === 'enabled-selected-roles' ? 'checked' : '' ) ); ?>>
+                                <?php esc_html_e( 'Enabled for selected roles', 'yay-wholesale-b2b' ); ?>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ywhs_field ywhs_access_selected_roles">
+                    <p><?php esc_html_e( 'Enable Role', 'yay-wholesale-b2b' ); ?></p>
+                    <div class="ywhs_field_inputs_list">
+                        <?php foreach ( $wholesale_roles as $wholesale_role ) : ?>
+                            <div class="wc-radios">
+                                <label>
+                                    <input
+                                        name="yay-wholesale-b2b[access-selected-roles][<?php echo ( esc_html( $wholesale_role['slug'] ) ); ?>]"
+                                        type="checkbox"
+                                        <?php echo ( esc_attr( 'enabled' === $category_based_access['wholesalers'] || in_array( $wholesale_role['slug'], $category_based_access['selected_roles'], true ) ? 'checked' : '' ) ); ?> />
+                                    <?php echo ( esc_html( $wholesale_role['name'] ) ); ?>
+                                </label>
+                            </div>
+                        <?php endforeach ?>
+                    </div>
+                </div>
+            </div>
                 </div>
             </div>
             <input type="hidden" name="ywhs-category-based-discount-nonce" value="<?php echo esc_attr( $custom_discounts_nonce ); ?>" />

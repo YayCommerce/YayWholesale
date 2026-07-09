@@ -130,6 +130,8 @@
     align-items: center;
     padding: 10px 12px 10px 12px;
     gap: 8px;
+    box-sizing: border-box;
+    height: 100%;
   }
 
   .ywhs_helptip {
@@ -267,7 +269,9 @@
     text-wrap-mode: nowrap;
     width: fit-content;
   }
+}
 
+.ywhs_product_based_wholesale_rules_wrapper, .ywhs_variable_product_based_wholesale_rules_wrapper{
   .ywhs_discount_roles_value {
     border-collapse: collapse;
     border: 1px solid #949494;
@@ -275,7 +279,7 @@
     line-height: 20px;
 
     th, td {
-      border: 1px solid #949494;
+      border: 1px solid #949494 !important;
     }
 
     th {
@@ -287,12 +291,18 @@
     }
 
     td {
-      padding: 10px 16px;
+      padding: 10px 16px !important;
     }
 
     .ywhs_discount_role_cell { width: 209px; }
     .ywhs_tier_base_price_cell { width: 127px; }
     .ywhs_volume_tier_cell { width: 336px; }
+
+    .ywhs_tier_cell {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
 
     td:first-child {
       padding: 20px 16px;
@@ -346,6 +356,7 @@
 
       input {
         width: 95px !important;
+        min-width: 10px !important;
       }
     }
 
@@ -357,13 +368,22 @@
       cursor: pointer;
       gap: 4px;
       border-radius: 2px;
-      margin-top: 8px;
       width: fit-content;
       padding: 0px 4px;
     }
 
     .ywhs_add_tier_volume:hover{
       background: #fafafa;
+    }
+
+    .ywhs_tier_volume_delete {
+      color: #757575;
+      cursor: pointer;
+      transition: all 0.3;
+    }
+
+    .ywhs_tier_volume_delete:hover {
+      color: #d50719;
     }
 
     .ywhs_fixed_rate_type {
@@ -440,6 +460,10 @@
 
   .ywhs_wholesale_rules {
     border: 1px solid #DDD;
+
+    .ywhs_discount_role_cell { width: 105px; }
+    .ywhs_tier_base_price_cell { width: 63px; }
+    .ywhs_volume_tier_cell { width: 168px; }
   }
 }
 

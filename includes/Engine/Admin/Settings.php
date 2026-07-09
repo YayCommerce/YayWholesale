@@ -101,7 +101,7 @@ class Settings {
     }
 
     public function admin_enqueue_general_admin_behaviors() {
-        wp_enqueue_script( 'yay-wholesale-general-admin-behaviors', YAYWHOLESALEB2B_PLUGIN_URL . 'assets/js/admin_scripts.js', [ 'jquery' ], YAYWHOLESALEB2B_VERSION, true );
+        wp_enqueue_script( 'yay-wholesale-general-admin-behaviors', YAYWHOLESALEB2B_PLUGIN_URL . 'assets/js/admin_scripts.js', [ 'jquery', 'wp-i18n' ], YAYWHOLESALEB2B_VERSION, true );
     }
 
     public function admin_redirect_to_setup_wizard( \WP_Screen $current_screen ) {

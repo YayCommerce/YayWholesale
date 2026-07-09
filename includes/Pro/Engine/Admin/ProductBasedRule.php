@@ -66,7 +66,7 @@ class ProductBasedRule {
         $post_data = wp_unslash( $_POST['yay-wholesale-b2b'] );
 
         $wholesale_roles      = RolesHelper::get_wholesale_roles();
-        $custom_discount_data = ProductPricingHelper::handle_product_based_discount_data_from_post( $wholesale_roles, $post_data );
+        $custom_discount_data = ProductPricingHelper::handle_product_based_discount_data_from_post( $post_id, $wholesale_roles, $post_data );
         $custom_access_data   = ProductAccessHelper::handle_product_based_access_restriction_from_post( $wholesale_roles, $post_data );
 
         if ( ! $custom_discount_data || ! ( isset( $_POST['woocommerce_meta_nonce'], $_POST['acme_text_id'] ) || wp_verify_nonce( sanitize_key( $_POST['woocommerce_meta_nonce'] ), 'woocommerce_save_data' ) ) ) {
@@ -106,7 +106,7 @@ class ProductBasedRule {
 
         check_ajax_referer( 'save-variations', 'security' );
         $wholesale_roles      = RolesHelper::get_wholesale_roles();
-        $custom_discount_data = ProductPricingHelper::handle_product_based_discount_data_from_post( $wholesale_roles, $post_data, $index );
+        $custom_discount_data = ProductPricingHelper::handle_product_based_discount_data_from_post( $variation_id, $wholesale_roles, $post_data, $index );
         $custom_access_data   = ProductAccessHelper::handle_product_based_access_restriction_from_post( $wholesale_roles, $post_data, $index );
 
         if ( ! $custom_discount_data ) {
