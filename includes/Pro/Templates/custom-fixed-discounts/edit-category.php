@@ -2,6 +2,7 @@
 
 use YayWholesaleB2B\Helpers\RolesHelper;
 use YayWholesaleB2B\Pro\Helpers\AccessHelpers\CategoryAccessHelper;
+use YayWholesaleB2B\Pro\Helpers\PricingHelpers\CategoryPricingHelper;
 
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
@@ -10,7 +11,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 $wholesale_roles         = RolesHelper::get_wholesale_roles();
 $custom_discounts_nonce  = wp_create_nonce( 'ywhs-category-based-discount-nonce' );
 $term_id                 = $term->term_id;
-$category_based_discount = get_term_meta( $term_id, 'yaywholesaleb2b_category_based_discount', true );
+$category_based_discount = CategoryPricingHelper::get_category_based_discount_setting( $term_id );
 $category_based_access   = CategoryAccessHelper::get_category_based_access_restriction( $term_id );
 ?>
 <tr class="form-field">

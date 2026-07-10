@@ -21,6 +21,10 @@ class CategoryBasedRule {
         add_action( 'product_cat_edit_form_fields', [ $this, 'edit_custom_category_field' ], 11 );
         add_action( 'edited_product_cat', [ $this, 'save_category_based_discount' ], 10, 2 );
         add_action( 'create_product_cat', [ $this, 'save_category_based_discount' ], 10, 2 );
+
+        // Column
+        add_filter( 'manage_edit-product_cat_columns', [ $this,'add_custom_data_columns_for_cat' ], 10, 1 );
+        add_action( 'manage_product_cat_custom_column', [ $this,'render_custom_data_columns_for_cat' ], 10, 3 );
     }
 
     /**
@@ -73,5 +77,66 @@ class CategoryBasedRule {
         CategoryAccessHelper::save_category_based_access_restriction( $term_id, $custom_access_data );
 
         do_action( 'ywhs_after_saved_category_based_discount', $custom_discount_data, $term_id );
+    }
+
+    public function add_custom_data_columns_for_cat( $columns ) {
+        $new_columns = [];
+
+        foreach ( $columns as $key => $value ) {
+            $new_columns[ $key ] = $value;
+
+            if ( $key === 'slug' ) {
+                $new_columns['discount_rule'] = 'Discount Rule';
+                $new_columns['access_rule']   = 'Access Rule';
+            }
+        }
+
+        return $new_columns;
+    }
+
+    public function render_custom_data_columns_for_cat( $content, $column, $term_id ) {
+        switch ( $column ) {
+            case 'discount_rule':
+                $discount_data = CategoryPricingHelper::get_category_based_discount_setting( $term_id );
+                ?>
+                <span class="<?php echo 'default' === $discount_data['discount_rule'] ? 'ywhs_discount_rule_default' : 'ywhs_discount_rule_custom'; ?>">
+                    <?php
+                    if ( 'default' === $discount_data['discount_rule'] ) {
+                        echo esc_attr_e( 'Default', 'yay-wholesale-b2b' );
+                    } else {
+                        echo esc_attr_e( 'Percentage Discount', 'yay-wholesale-b2b' );
+                    }
+                    ?>
+                </span>
+                <?php
+                break;
+            case 'access_rule':
+                $access_data = CategoryAccessHelper::get_category_based_access_restriction( $term_id );
+                ?>
+                <div class="<?php echo 'visible-all' === $access_data['rule'] || 'enabled' === $access_data['retailers'] ? 'ywhs_access_rule_visible' : 'ywhs_access_rule_hidden'; ?>">
+                    <?php
+                    if ( 'visible-all' === $access_data['rule'] || 'enabled' === $access_data['retailers'] ) {
+                        echo esc_attr_e( 'Retailers: Yes', 'yay-wholesale-b2b' );
+                    } else {
+                        echo esc_attr_e( 'Retailers: No', 'yay-wholesale-b2b' );
+                    }
+                    ?>
+                </div>
+                <div class="<?php echo 'visible-all' === $access_data['rule'] || 'enabled' === $access_data['wholesalers'] ? 'ywhs_access_rule_visible' : ( 'enabled-selected-roles' === $access_data['wholesalers'] ? 'ywhs_access_rule_mixed' : 'ywhs_access_rule_hidden' ); ?>">
+                    <?php
+                    if ( 'visible-all' === $access_data['rule'] || 'enabled' === $access_data['wholesalers'] ) {
+                        echo esc_attr_e( 'Wholesalers: All', 'yay-wholesale-b2b' );
+                    } elseif ( 'enabled-selected-roles' === $access_data['wholesalers'] ) {
+                        $roles = RolesHelper::get_wholesale_roles();
+                        // Translators: %1$d: The selected roles count, %2$d: All roles count
+                        echo ( esc_html( sprintf( 'Wholesalers: %1$d / %2$d', count( $access_data['selected_roles'] ), count( $roles ) ) ) );
+                    } else {
+                        echo esc_attr_e( 'Wholesalers: None', 'yay-wholesale-b2b' );
+                    }
+                    ?>
+                </div>
+                <?php
+                break;
+        }//end switch
     }
 }

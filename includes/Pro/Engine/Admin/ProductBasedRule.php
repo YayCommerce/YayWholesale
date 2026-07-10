@@ -22,6 +22,10 @@ class ProductBasedRule {
         // Variable product
         add_action( 'woocommerce_variation_options_pricing', [ $this, 'add_product_based_discount_inputs_variable_product' ], 9, 3 );
         add_action( 'woocommerce_save_product_variation', [ $this, 'save_custom_vairable_product_based_discount' ], 10, 2 );
+
+        // Column
+        add_filter( 'manage_edit-product_columns', [ $this,'add_custom_data_columns_for_product' ], 10, 1 );
+        add_action( 'manage_product_posts_custom_column', [ $this,'render_custom_data_columns_for_product' ], 10, 2 );
     }
 
     /**
@@ -119,5 +123,80 @@ class ProductBasedRule {
         ProductAccessHelper::save_product_based_access_restriction( $variation_id, $custom_access_data );
 
         do_action( 'ywhs_after_saved_variable_product_based_discount', $custom_discount_data, $variation_id );
+    }
+
+    public function add_custom_data_columns_for_product( $columns ) {
+        $new_columns = [];
+
+        foreach ( $columns as $key => $value ) {
+            $new_columns[ $key ] = $value;
+
+            // after 'price' column
+            if ( $key === 'price' ) {
+                $new_columns['discount_rule'] = 'Discount Rule';
+                $new_columns['access_rule']   = 'Access Rule';
+            }
+        }
+
+        return $new_columns;
+    }
+
+    public function render_custom_data_columns_for_product( $column, $product_id ) {
+        $product             = wc_get_product( $product_id );
+        $allow_product_types = ProductPricingHelper::get_allowed_product_types_for_display_setting();
+        $is_allowed_product  = in_array( $product->get_type(), $allow_product_types, true );
+        switch ( $column ) {
+            case 'discount_rule':
+                if ( ! $is_allowed_product ) {
+                    echo '–';
+                    return;
+                }
+                $discount_data = ProductPricingHelper::get_product_based_discount_setting( $product_id );
+                ?>
+                <span class="<?php echo 'default' === $discount_data['discount_rule'] ? 'ywhs_discount_rule_default' : 'ywhs_discount_rule_custom'; ?>">
+                    <?php
+                    if ( 'default' === $discount_data['discount_rule'] ) {
+                        echo esc_attr_e( 'Default', 'yay-wholesale-b2b' );
+                    } elseif ( 'by_role' === $discount_data['discount_type'] ) {
+                        echo esc_attr_e( 'Percentage / Fixed amount', 'yay-wholesale-b2b' );
+                    } else {
+                        echo esc_attr_e( 'Tiered Pricing', 'yay-wholesale-b2b' );
+                    }
+                    ?>
+                </span>
+                <?php
+                break;
+            case 'access_rule':
+                if ( ! $is_allowed_product ) {
+                    echo '–';
+                    return;
+                }
+                $access_data = ProductAccessHelper::get_product_based_access_restriction( $product_id );
+                ?>
+                <div class="<?php echo 'visible-all' === $access_data['rule'] || 'enabled' === $access_data['retailers'] ? 'ywhs_access_rule_visible' : 'ywhs_access_rule_hidden'; ?>">
+                    <?php
+                    if ( 'visible-all' === $access_data['rule'] || 'enabled' === $access_data['retailers'] ) {
+                        echo esc_attr_e( 'Retailers: Yes', 'yay-wholesale-b2b' );
+                    } else {
+                        echo esc_attr_e( 'Retailers: No', 'yay-wholesale-b2b' );
+                    }
+                    ?>
+                </div>
+                <div class="<?php echo 'visible-all' === $access_data['rule'] || 'enabled' === $access_data['wholesalers'] ? 'ywhs_access_rule_visible' : ( 'enabled-selected-roles' === $access_data['wholesalers'] ? 'ywhs_access_rule_mixed' : 'ywhs_access_rule_hidden' ); ?>">
+                    <?php
+                    if ( 'visible-all' === $access_data['rule'] || 'enabled' === $access_data['wholesalers'] ) {
+                        echo esc_attr_e( 'Wholesalers: All', 'yay-wholesale-b2b' );
+                    } elseif ( 'enabled-selected-roles' === $access_data['wholesalers'] ) {
+                        $roles = RolesHelper::get_wholesale_roles();
+                        // Translators: %1$d: The selected roles count, %2$d: All roles count
+                        echo ( esc_html( sprintf( 'Wholesalers: %1$d / %2$d', count( $access_data['selected_roles'] ), count( $roles ) ) ) );
+                    } else {
+                        echo esc_attr_e( 'Wholesalers: None', 'yay-wholesale-b2b' );
+                    }
+                    ?>
+                </div>
+                <?php
+                break;
+        }//end switch
     }
 }
