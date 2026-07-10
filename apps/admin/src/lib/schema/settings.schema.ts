@@ -28,6 +28,7 @@ export const settingsFormSchema = z.object({
     disable_coupon: z.boolean(),
     disable_tax: z.boolean(),
     tax_display_mode: z.enum(['inherit', 'excl', 'incl']),
+    guest_access_rule: z.enum(['no-restriction', 'hidden-prices', 'hidden-entire-shop']),
     wholesale_store_page: z.string(),
   }),
   display: z.object({

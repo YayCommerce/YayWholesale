@@ -82,7 +82,7 @@
     border: 1px solid #ffffff2e;
   }
 
-  .ywhs_body {
+  .ywhs_body, .ywhs_access_enable_by_role {
     padding: 12px 16px 16px 16px;
     display: flex;
     flex-direction: column;
@@ -149,8 +149,9 @@
     row-gap: 10px;
   }
 
-  .ywhs_discount_values {
+  .ywhs_discount_values, .ywhs_access_enable_by_role{
     display: none;
+    padding: 0;
   }
 
   .ywhs_discount_value_header {

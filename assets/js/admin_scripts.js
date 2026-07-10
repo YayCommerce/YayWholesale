@@ -3,31 +3,31 @@
 
   // #region Custom Pricing (Category-based, Product-based)
   $(document).ready(() => {
-    const allLoaded = checkRequiredElementsLoaded([
-      ".ywhs_wholesale_rules",
-      ".ywhs_cat_discount_rule_default",
-      ".ywhs_cat_discount_rule_custom",
-      ".ywhs_discount_type_switch",
-    ]);
+    const handler = () => {
+      const allLoaded = checkRequiredElementsLoaded([
+        ".ywhs_wholesale_rules",
+        ".ywhs_discount_rule_default",
+        ".ywhs_discount_rule_custom",
+      ]);
 
-    if (!allLoaded) return;
+      if (!allLoaded) return;
 
-    generalCustomPricingSetting();
-    discountTypePricingSetting();
+      generalCustomPricingSetting();
+      discountTypePricingSetting();
+    };
 
     $(document).on(
       "woocommerce_variations_loaded woocommerce_variations_saved",
-      () => {
-        generalCustomPricingSetting();
-        discountTypePricingSetting();
-      }
+      handler
     );
+
+    handler();
   });
 
   // general Product-based, Category-based pricing behaviours
   function generalCustomPricingSetting() {
-    const discountDefaultRule = $(".ywhs_cat_discount_rule_default");
-    const discountCustomRule = $(".ywhs_cat_discount_rule_custom");
+    const discountDefaultRule = $(".ywhs_discount_rule_default");
+    const discountCustomRule = $(".ywhs_discount_rule_custom");
 
     discountDefaultRule.each(function () {
       const isChecked = $(this).is(":checked");
@@ -165,6 +165,112 @@
   });
   // #endregion
 
+  // #region Access rule (Category-based, Product-based)
+  $(document).ready(() => {
+    const handler = () => {
+      const allLoaded = checkRequiredElementsLoaded([
+        ".ywhs_access_rule_all",
+        ".ywhs_access_rule_specific",
+        ".ywhs_access_enable_by_role",
+        ".ywhs_access_rule_wholesaler",
+        ".ywhs_access_selected_roles",
+      ]);
+
+      if (!allLoaded) return;
+
+      enableByRoleAccessRuleSetting();
+      selectedWholesalerRoleAccessRuleSetting();
+    };
+
+    $(document).on(
+      "woocommerce_variations_loaded woocommerce_variations_saved",
+      handler
+    );
+
+    handler();
+  });
+  // #region Enabled By Role toggle
+  function enableByRoleAccessRuleSetting() {
+    const accessAllRule = $(".ywhs_access_rule_all");
+    const accessSpecificRule = $(".ywhs_access_rule_specific");
+
+    accessAllRule.each(function () {
+      const isChecked = $(this).is(":checked");
+      const enableByRole = $(this)
+        .closest(".ywhs_field")
+        .siblings(".ywhs_access_enable_by_role");
+      if (isChecked) {
+        enableByRole.css("display", "none");
+      } else {
+        enableByRole.css("display", "flex");
+      }
+    });
+
+    accessAllRule.on("change", function () {
+      const isChecked = $(this).is(":checked");
+      const enableByRole = $(this)
+        .closest(".ywhs_field")
+        .siblings(".ywhs_access_enable_by_role");
+      if (isChecked) {
+        enableByRole.stop(true, true).slideUp(300);
+      }
+    });
+
+    accessSpecificRule.on("change", function () {
+      const isChecked = $(this).is(":checked");
+      const enableByRole = $(this)
+        .closest(".ywhs_field")
+        .siblings(".ywhs_access_enable_by_role");
+
+      if (isChecked) {
+        enableByRole
+          .css("display", "flex")
+          .stop(true, true)
+          .hide()
+          .slideDown(300);
+      }
+    });
+  }
+  // #endregion
+
+  // #region Selected Role toggle
+  function selectedWholesalerRoleAccessRuleSetting() {
+    const accessRuleWholesaler = $(".ywhs_access_rule_wholesaler");
+
+    accessRuleWholesaler.each(function () {
+      const isShowing = $(this).val() === "enabled-selected-roles";
+      const selectedRoles = $(this)
+        .closest(".ywhs_field")
+        .siblings(".ywhs_access_selected_roles");
+      if (!isShowing) {
+        selectedRoles.css("display", "none");
+      } else {
+        selectedRoles.css("display", "flex");
+      }
+    });
+
+    accessRuleWholesaler.on("change", function () {
+      const isShowing = $(this).val() === "enabled-selected-roles";
+      const selectedRoles = $(this)
+        .closest(".ywhs_field")
+        .siblings(".ywhs_access_selected_roles");
+
+      if (isShowing) {
+        selectedRoles
+          .css("display", "flex")
+          .stop(true, true)
+          .hide()
+          .slideDown(300);
+      } else {
+        selectedRoles.stop(true, true).slideUp(300);
+      }
+    });
+  }
+  // #endregion
+
+  // #endregion
+
+  // #region Helpers
   function checkRequiredElementsLoaded(requiredSelectors) {
     for (let i = 0; i < requiredSelectors.length; i++) {
       if ($(requiredSelectors[i]).length < 1) {
@@ -174,4 +280,5 @@
 
     return true;
   }
+  // #endregion
 })(jQuery);
