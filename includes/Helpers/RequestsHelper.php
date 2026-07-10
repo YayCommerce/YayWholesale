@@ -22,6 +22,7 @@ class RequestsHelper {
 
     public const USER_META_REQUEST = 'ywhs_user_request_approved';
 
+    public const EDIT_USER_EXCLUDED_FIELD_KEYS = [ 'first_name', 'last_name', 'message', 'email_address' ];
     /**
      * Insert new Wholesale request.
      *
@@ -270,6 +271,136 @@ class RequestsHelper {
     public static function label_to_input_name( string $label ): string {
         $tmp_arr = explode( ' ', strtolower( $label ) );
         return implode( '_', $tmp_arr );
+    }
+
+    /**
+     * Normalize a stored choice field value to a flat string array.
+     *
+     * @param mixed $value Stored field value.
+     * @return string[]
+     */
+    public static function normalize_choice_field_values( $value ): array {
+        if ( is_array( $value ) ) {
+            return array_values( array_map( 'strval', $value ) );
+        }
+
+        if ( is_string( $value ) && '' !== $value ) {
+            return array_values( array_filter( array_map( 'trim', explode( ',', $value ) ) ) );
+        }
+
+        return [];
+    }
+
+    /**
+     * Merge current registration field settings with stored request values.
+     *
+     * @param array $request_data Stored request meta (ywhs_request_data).
+     * @param array $excluded_keys inputName keys to skip.
+     * @return array<int, array<string, mixed>>
+     */
+    public static function get_merged_user_fields( array $request_data, array $excluded_keys = [] ): array {
+        if ( empty( $excluded_keys ) ) {
+            $excluded_keys = self::EDIT_USER_EXCLUDED_FIELD_KEYS;
+        }
+
+        $settings       = SettingsHelper::get_settings();
+        $fields_config  = $settings['registration_fields']['fields'] ?? [];
+        $values_by_key  = [];
+        $default_by_key = [];
+
+        foreach ( $request_data as $field ) {
+            if ( ! is_array( $field ) || empty( $field['key'] ) ) {
+                continue;
+            }
+
+            $values_by_key[ $field['key'] ]  = $field['value'] ?? '';
+            $default_by_key[ $field['key'] ] = ! empty( $field['is_default'] );
+        }
+
+        $merged = [];
+
+        foreach ( $fields_config as $field_config ) {
+            $input_name = $field_config['inputName'] ?? '';
+
+            if ( empty( $input_name ) || in_array( $input_name, $excluded_keys, true ) ) {
+                continue;
+            }
+
+            $merged[] = array_merge(
+                $field_config,
+                [
+                    'key'        => $input_name,
+                    'value'      => $values_by_key[ $input_name ] ?? '',
+                    'is_default' => $field_config['isDefault'] ?? ( $default_by_key[ $input_name ] ?? false ),
+                ]
+            );
+        }
+
+        return $merged;
+    }
+
+    /**
+     * Build request meta structure from merged user fields.
+     *
+     * @param array<int, array<string, mixed>> $merged_fields Merged field rows.
+     * @return array<string, array<string, mixed>>
+     */
+    public static function build_request_data_from_merged_fields( array $merged_fields ): array {
+        $request_data = [];
+
+        foreach ( $merged_fields as $field ) {
+            $label = $field['label'] ?? '';
+            $key   = $field['key'] ?? ( $field['inputName'] ?? '' );
+            $type  = $field['type'] ?? 'text';
+
+            if ( empty( $label ) || empty( $key ) ) {
+                continue;
+            }
+
+            $entry = [
+                'type'       => $type,
+                'is_default' => ! empty( $field['is_default'] ) || ! empty( $field['isDefault'] ),
+                'key'        => $key,
+            ];
+
+            if ( ! in_array( $key, [ 'email_address', 'message' ], true ) ) {
+                $entry['value'] = $field['value'] ?? '';
+            }
+
+            $request_data[ $label ] = $entry;
+        }//end foreach
+
+        return $request_data;
+    }
+
+    /**
+     * Rebuild request meta, preserving excluded fields from the original snapshot.
+     *
+     * @param array<int, array<string, mixed>>    $merged_fields           Updated merged fields.
+     * @param array<string, array<string, mixed>> $original_request_data   Original request meta.
+     * @param array                               $excluded_keys           inputName keys to preserve.
+     * @return array<string, array<string, mixed>>
+     */
+    public static function rebuild_request_data( array $merged_fields, array $original_request_data, array $excluded_keys = [] ): array {
+        if ( empty( $excluded_keys ) ) {
+            $excluded_keys = self::EDIT_USER_EXCLUDED_FIELD_KEYS;
+        }
+
+        $request_data = self::build_request_data_from_merged_fields( $merged_fields );
+
+        foreach ( $original_request_data as $label => $field ) {
+            if ( ! is_array( $field ) || empty( $field['key'] ) ) {
+                continue;
+            }
+
+            if ( ! in_array( $field['key'], $excluded_keys, true ) ) {
+                continue;
+            }
+
+            $request_data[ $label ] = $field;
+        }
+
+        return $request_data;
     }
 
     /**

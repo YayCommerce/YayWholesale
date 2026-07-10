@@ -10,41 +10,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Separator } from '@/components/ui/separator';
 import { Switch } from '@/components/ui/switch';
 import { TagsInput } from '@/components/ui/tags-input';
-import { hasAllowedExtensions, hasChoices, hasPlaceholder } from '../registration-fields.helper';
+import {
+  BILLING_MAPPING_OPTIONS,
+  FIELD_TYPE_OPTIONS,
+  hasAllowedExtensions,
+  hasChoices,
+  hasPlaceholder,
+} from '../registration-fields.helper';
 import { FileExtensionsCombobox } from './FileExtensionsCombobox';
-
-const FIELD_TYPE_OPTIONS: { value: string; label: string }[] = [
-  { value: 'text', label: __('Input', 'yay-wholesale-b2b') },
-  { value: 'email', label: __('Email', 'yay-wholesale-b2b') },
-  { value: 'number', label: __('Number', 'yay-wholesale-b2b') },
-  { value: 'phone', label: __('Phone', 'yay-wholesale-b2b') },
-  { value: 'date', label: __('Date', 'yay-wholesale-b2b') },
-  { value: 'textarea', label: __('Textarea', 'yay-wholesale-b2b') },
-  { value: 'select', label: __('Select', 'yay-wholesale-b2b') },
-  { value: 'radio', label: __('Radio', 'yay-wholesale-b2b') },
-  { value: 'checkbox', label: __('Checkbox', 'yay-wholesale-b2b') },
-  { value: 'attachment', label: __('Attachment', 'yay-wholesale-b2b') },
-];
-
-const BILLING_MAPPING_OPTIONS: { value: string; label: string }[] = [
-  { value: 'none', label: __('None', 'yay-wholesale-b2b') },
-  { value: 'billing_first_name', label: __('Billing First Name', 'yay-wholesale-b2b') },
-  { value: 'billing_last_name', label: __('Billing Last Name', 'yay-wholesale-b2b') },
-  { value: 'billing_company', label: __('Billing Company', 'yay-wholesale-b2b') },
-  {
-    value: 'billing_country_state',
-    label: __('Billing Country + State (Recommended)', 'yay-wholesale-b2b'),
-  },
-  { value: 'billing_country', label: __('Billing Country / Region', 'yay-wholesale-b2b') },
-  { value: 'billing_state', label: __('Billing State / County', 'yay-wholesale-b2b') },
-  { value: 'billing_address_1', label: __('Billing Street Address', 'yay-wholesale-b2b') },
-  { value: 'billing_address_2', label: __('Billing Address Line 2', 'yay-wholesale-b2b') },
-  { value: 'billing_city', label: __('Billing Town / City', 'yay-wholesale-b2b') },
-  { value: 'billing_postcode', label: __('Billing Postcode / ZIP', 'yay-wholesale-b2b') },
-  { value: 'billing_phone', label: __('Billing Phone Number', 'yay-wholesale-b2b') },
-  { value: 'billing_vat', label: __('Billing VAT ID', 'yay-wholesale-b2b') },
-  { value: 'custom', label: __('Custom User Meta Key Mapping', 'yay-wholesale-b2b') },
-];
 
 export default function FieldFormContent() {
   const { control } = useFormContext<FieldFormValues>();

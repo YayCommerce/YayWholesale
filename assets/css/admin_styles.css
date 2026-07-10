@@ -324,16 +324,8 @@
 
 /* #region User page */
 /* User wholesaler information */
-#ywhs_wholesaler_user_table {
-  input,
-  textarea {
-    background: #ffffff;
-  }
-}
-#ywhs_wholesaler_user_table input:read-only,
-#ywhs_wholesaler_user_table textarea:read-only {
-  background-color: #f6f7f7;
-  border-color: #dcdcde;
-  color: #50575c;
+.ywhs_wholesaler_user_wrapper.ywhs_category_based_wholesale_rules_wrapper {
+  border-top: none;
+  max-width: 575px;
 }
 /* #endregion */

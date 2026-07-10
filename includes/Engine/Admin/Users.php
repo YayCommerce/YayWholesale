@@ -85,62 +85,39 @@ class Users {
             return;
         }
 
-        $editable_types = [ 'text', 'email', 'phone', 'number', 'date', 'textarea' ];
-        $updated        = false;
+        $merged_fields = RequestsHelper::get_merged_user_fields( $request_data );
+        $updated       = false;
 
-        foreach ( $request_data as $label => &$field ) {
-            if ( ! is_array( $field ) || empty( $field['key'] ) || empty( $field['type'] ) ) {
+        foreach ( $merged_fields as $index => $field ) {
+            $field_type = $field['type'] ?? '';
+            $field_key  = $field['key'] ?? '';
+
+            if ( empty( $field_key ) || in_array( $field_type, [ 'attachment' ], true ) ) {
                 continue;
             }
 
-            if ( ! in_array( $field['type'], $editable_types, true ) ) {
+            if ( 'checkbox' === $field_type ) {
+                $raw_value = isset( $_POST[ $field_key ] ) && is_array( $_POST[ $field_key ] )
+                ? array_values( array_map( 'sanitize_text_field', wp_unslash( $_POST[ $field_key ] ) ) )
+                : [];
+
+                $merged_fields[ $index ]['value'] = $raw_value;
+                $updated                          = true;
                 continue;
             }
 
-            $field_key = $field['key'];
             if ( ! isset( $_POST[ $field_key ] ) ) {
                 continue;
             }
 
-            $field['value'] = $this->sanitize_request_field_value( $field['type'], sanitize_text_field( wp_unslash( $_POST[ $field_key ] ) ) );
-            $updated        = true;
-        }
-        unset( $field );
+            $merged_fields[ $index ]['value'] = sanitize_text_field( wp_unslash( $_POST[ $field_key ] ) );
+            $updated                          = true;
+        }//end foreach
 
         if ( $updated ) {
+            $request_data = RequestsHelper::rebuild_request_data( $merged_fields, $request_data );
             update_post_meta( $approved_request_id, RequestsHelper::REQUEST_META_DATA, $request_data );
-            // Apply billing field mappings on approval.
             RequestsHelper::apply_billing_field_mappings_on_approval( $user_id, $request_data );
-        }
-    }
-
-    /**
-     * Sanitize a registration field value by type.
-     *
-     * @param string $type  Field type.
-     * @param mixed  $value Raw submitted value.
-     * @return string
-     */
-    private function sanitize_request_field_value( string $type, $value ): string {
-        if ( ! is_scalar( $value ) ) {
-            return '';
-        }
-
-        switch ( $type ) {
-            case 'email':
-                return sanitize_email( (string) $value );
-            case 'textarea':
-                return sanitize_textarea_field( (string) $value );
-            case 'number':
-                return is_numeric( $value ) ? (string) $value : sanitize_text_field( (string) $value );
-            case 'date':
-                $sanitized = sanitize_text_field( (string) $value );
-                if ( ! empty( $sanitized ) && ! preg_match( '/^\d{4}-\d{2}-\d{2}$/', $sanitized ) ) {
-                    return '';
-                }
-                return $sanitized;
-            default:
-                return sanitize_text_field( (string) $value );
         }
     }
 }

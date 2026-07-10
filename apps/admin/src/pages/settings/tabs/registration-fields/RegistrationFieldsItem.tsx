@@ -1,11 +1,13 @@
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { GripVertical } from 'lucide-react';
+import { GripVertical, MapPinIcon } from 'lucide-react';
 import { __ } from '@wordpress/i18n';
 
 import type { Field } from '@/lib/schema/settingsRegistration.schema';
 import { cn } from '@/lib/utils';
+import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
+import { getBillingMappingLabel } from './registration-fields.helper';
 
 interface RegistrationFieldsItemProps {
   index: number;
@@ -31,7 +33,7 @@ export function RegistrationFieldsItem({
       ref={setNodeRef}
       style={{ transform: CSS.Transform.toString(transform), transition }} // for dnd-kit
       className={cn(
-        'group bg-background flex items-center gap-4 rounded-md border py-2.5 pr-5 pl-4 transition-shadow',
+        'group bg-background flex items-center gap-2.5 rounded-md border py-2.5 pr-5 pl-4 transition-shadow',
         isDragging && 'z-10 opacity-60 shadow-md',
         !isDragging && 'hover:shadow-xs',
       )}
@@ -45,10 +47,24 @@ export function RegistrationFieldsItem({
         <GripVertical className="size-5" />
       </div>
 
-      <div className="flex w-full flex-1 items-center gap-2 text-left">
+      <div className="flex w-full flex-1 flex-col items-start gap-1 text-left">
         <span className={cn('truncate text-sm font-medium', field.isHidden && 'text-muted-foreground line-through')}>
-          {field.label}
+          {field.label} {field.isRequired && <Badge variant="outline">Required</Badge>}
         </span>
+
+        <div className="text-muted-foreground flex items-center gap-2 text-xs">
+          <span>{field.type[0].toUpperCase() + field.type.slice(1)} field</span>
+          {field.billingMapping !== '' && field.billingMapping !== 'none' && (
+            <span className="flex items-center gap-0.5">
+              <MapPinIcon className="size-2.5" />
+              {__('Mapping:', 'yay-wholesale-b2b')}
+              {field.billingMapping != 'custom'
+                ? ` ${getBillingMappingLabel(field.billingMapping)}`
+                : ` ${field.customBillingMetaKey} ${__('[custom]', 'yay-wholesale-b2b')}`}{' '}
+              {__('billing', 'yay-wholesale-b2b')}
+            </span>
+          )}
+        </div>
       </div>
 
       <div onPointerDown={(e) => e.stopPropagation()} onClick={(e) => e.stopPropagation()}>
