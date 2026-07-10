@@ -119,10 +119,11 @@ class AccessRestriction {
         );
 
         $tax_query[] = [
-            'taxonomy' => 'product_cat',
-            'field'    => 'slug',
-            'terms'    => array_column( $visible_terms, 'slug' ),
-            'operator' => 'IN',
+            'taxonomy'         => 'product_cat',
+            'field'            => 'slug',
+            'terms'            => array_column( $visible_terms, 'slug' ),
+            'operator'         => 'IN',
+            'include_children' => false,
         ];
 
         $query->set( 'tax_query', $tax_query );

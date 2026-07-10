@@ -56,12 +56,22 @@ class Pricing {
         }
 
         if ( $is_discounted ) {
+            $quantity_map = [];
+            foreach ( $cart->get_cart_contents() as $cart_item_key => $cart_item ) {
+                $product_id = $cart_item['product_id'];
+                if ( ! array_key_exists( $product_id, $quantity_map ) ) {
+                    $quantity_map[ $product_id ] = $cart_item['quantity'];
+                } else {
+                    $quantity_map[ $product_id ] += $cart_item['quantity'];
+                }
+            }
+
             do_action( 'ywhs_before_cart_calculate_totals', $cart, $role_config );
             foreach ( $cart->get_cart_contents() as $cart_item_key => $cart_item ) {
                 if ( ! empty( $cart_item['data'] ) ) {
                     do_action( 'ywhs_before_cart_item_calculate_totals', $cart_item, $cart_item_key, $role_config );
 
-                    $quantity = $cart_item['quantity'];
+                    $quantity = $quantity_map[ $cart_item['product_id'] ];
 
                     $discounted_prices = ShopPricingHelper::get_cart_item_wholesale_price( $cart_item, $role_config, $quantity );
 

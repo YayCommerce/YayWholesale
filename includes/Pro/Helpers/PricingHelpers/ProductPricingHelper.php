@@ -125,9 +125,10 @@ class ProductPricingHelper {
      *
      * @param int   $product_id The product id.
      * @param array $wholesale_role The list of wholesale roles.
+     * @param int   $quantity the in-cart quantity of product.
      * @return array | null
      */
-    public static function get_product_based_discount( $product_id, $wholesale_role ) {
+    public static function get_product_based_discount( $product_id, $wholesale_role, $quantity ) {
         if ( ! isset( $wholesale_role ) ) {
             return false;
         }
@@ -138,18 +139,36 @@ class ProductPricingHelper {
             return false;
         }
 
-        $type = $product_based_discount_setting['discount_type'] ?? 'fixed';
-
+        $type = $product_based_discount_setting['discount_type'] ?? 'by_role';
         switch ( $type ) {
-            case 'fixed':
-                $product_based_discount = $product_based_discount_setting['discount_fixed'][ $wholesale_role['slug'] ] ?? 0;
+            case 'by_role':
+                $product_by_role = $product_based_discount_setting['discount_by_role']['wholesaler'][ $wholesale_role['slug'] ];
+                $type            = $product_by_role['type'];
+
+                if ( 'fixed' === $product_by_role['type'] ) {
+                    $product_based_discount = $product_by_role['fixed'];
+                    break;
+                }
+
+                if ( 'rate' === $product_by_role['type'] ) {
+                    $product_based_discount = $product_by_role['rate'];
+                }
                 break;
-            case 'rate':
-                $product_based_discount = $product_based_discount_setting['discount_rates'][ $wholesale_role['slug'] ] ?? 0;
+            case 'tiered':
+                $product_tiered         = $product_based_discount_setting['discount_tiered']['wholesaler'][ $wholesale_role['slug'] ];
+                $product_based_discount = $product_tiered['base_tier']['price'];
+                $product_tier_list      = $product_tiered['tier_list'];
+
+                foreach ( $product_tier_list as $tier ) {
+                    if ( $quantity >= $tier['from'] ) {
+                        $product_based_discount = $tier['price'];
+                    }
+                }
+
                 break;
             default:
                 return false;
-        }
+        }//end switch
 
         if ( empty( $product_based_discount ) ) {
             return false;
@@ -167,15 +186,16 @@ class ProductPricingHelper {
      * @param float $price The product price.
      * @param int   $product_id The current handling product ID.
      * @param array $wholesale_role The wholesale role.
+     * @param int   $quantity The in-cart quantity of product.
      * @return float | bool
      */
-    public static function calculate_product_based_price( $price, $product_id, $wholesale_role ) {
-        $discount = self::get_product_based_discount( $product_id, $wholesale_role );
+    public static function calculate_product_based_price( $price, $product_id, $wholesale_role, $quantity ) {
+        $discount = self::get_product_based_discount( $product_id, $wholesale_role, $quantity );
         if ( empty( $discount ) ) {
             return false;
         }
 
-        if ( 'fixed' === $discount['wholesale_discount_type'] ) {
+        if ( 'fixed' === $discount['wholesale_discount_type'] || 'tiered' === $discount['wholesale_discount_type'] ) {
             return $discount['wholesale_discount_value'];
         }
 

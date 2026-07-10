@@ -60,8 +60,9 @@ class ShopPricingHelper {
         // if (! RequirementHelper::is_cart_meet_requirement( $role ) ) {
             // return $price;
             // }
+        $quantity = self::get_product_quantity( $product->get_id() );
 
-        $discounted = ProductPricingHelper::get_wholesale_price( $product, $role, 1 );
+        $discounted = ProductPricingHelper::get_wholesale_price( $product, $role, $quantity );
 
         $decimals = absint( get_option( 'woocommerce_price_num_decimals', 2 ) );
 
@@ -144,5 +145,25 @@ class ShopPricingHelper {
         $decimals = absint( get_option( 'woocommerce_price_num_decimals', 2 ) );
 
         return wc_format_decimal( $discounted_extra, $decimals );
+    }
+
+    /**
+     * Get the product's quantity in cart (count every line item quantity has same product_id)
+     *
+     * @param int $product_id The product id.
+     * @return int
+     */
+    public static function get_product_quantity( $product_id ) {
+        $quantity = 0;
+        if ( WC()->cart ) {
+            foreach ( WC()->cart->get_cart() as $cart_item_key => $cart_item ) {
+                if ( $cart_item['product_id'] === $product_id ||
+                    ( ! empty( $cart_item['variation_id'] ) && $cart_item['variation_id'] === $product_id ) ) {
+                    $quantity += $cart_item['quantity'];
+                }
+            }
+        }
+
+        return $quantity;
     }
 }

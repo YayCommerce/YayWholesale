@@ -4,6 +4,7 @@ namespace YayWholesaleB2B\Engine\Compatibles;
 use WC_Tax;
 use YayWholesaleB2B\Helpers\CustomerHelper;
 use YayWholesaleB2B\Helpers\PricingHelpers\ProductPricingHelper;
+use YayWholesaleB2B\Helpers\PricingHelpers\ShopPricingHelper;
 use YayWholesaleB2B\Utils\SingletonTrait;
 
 defined( 'ABSPATH' ) || exit;
@@ -60,12 +61,14 @@ class YayExtra {
                 $child_product            = wc_get_product( $child );
                 $sale_prices[ $child ]    = (float) $child_product->get_sale_price();
                 $regular_prices[ $child ] = (float) $child_product->get_regular_price();
-                $discount_data[ $child ]  = ProductPricingHelper::get_product_wholesale_discount_data( $child_product, $wholesale_role, 1 );
+                $quantity                 = ShopPricingHelper::get_product_quantity( $child );
+                $discount_data[ $child ]  = ProductPricingHelper::get_product_wholesale_discount_data( $child_product, $wholesale_role, $quantity );
             }
         } else {
             $sale_prices[ $product_id ]    = (float) $product->get_sale_price();
             $regular_prices[ $product_id ] = (float) $product->get_regular_price();
-            $discount_data[ $product_id ]  = ProductPricingHelper::get_product_wholesale_discount_data( $product, $wholesale_role, 1 );
+            $quantity                      = ShopPricingHelper::get_product_quantity( $product_id );
+            $discount_data[ $product_id ]  = ProductPricingHelper::get_product_wholesale_discount_data( $product, $wholesale_role, $quantity );
         }
 
         // Currency
