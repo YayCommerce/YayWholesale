@@ -189,22 +189,25 @@
 }
 
 /* Product and Category List page */
-.ywhs_access_rule_visible {
-  margin-bottom: 4px;
-  font-weight: 600;
-  color: #1f751f;
-}
+.ywhs_access_rule_column, .ywhs_discount_rule_column{
+  span {
+    word-break: normal !important;
+    margin-bottom: 4px;
+    font-weight: 600;
+    cursor: default;
+  }
 
-.ywhs_access_rule_hidden {
-  margin-bottom: 4px;
-  font-weight: 600;
-  color: #be0010;
-}
+  .ywhs_access_rule_visible {
+    color: #1f751f;
+  }
 
-.ywhs_access_rule_mixed {
-  margin-bottom: 4px;
-  font-weight: 600;
-  color: #f4a20a;
+  .ywhs_access_rule_hidden {
+    color: #be0010;
+  }
+
+  .ywhs_access_rule_mixed {
+    color: #f4a20a;
+  }
 }
 /* #endregion */
 
