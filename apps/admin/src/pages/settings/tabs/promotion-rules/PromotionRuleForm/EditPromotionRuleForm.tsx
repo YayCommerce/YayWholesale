@@ -6,7 +6,6 @@ import { __ } from '@wordpress/i18n';
 
 import type { PromotionRuleFormValues } from '@/lib/schema/promotion.schema';
 import { promotionRuleSchema } from '@/lib/schema/promotion.schema';
-import { Role } from '@/lib/schema/roles.schema';
 import { Button } from '@/components/ui/button';
 import { SheetClose, SheetFooter, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { DeletePromotionRuleDialog } from '../PromotionRuleForm/DeletePromotionRuleDialog';
@@ -14,17 +13,11 @@ import PromotionRuleFormContent from './PromotionRuleFormContent';
 
 interface EditPromotionRuleFormProps {
   promotionRule: PromotionRuleFormValues;
-  activeRoles: Role[];
   onSave: (promotionRule: PromotionRuleFormValues) => void;
   onDelete: () => void;
 }
 
-export default function EditPromotionRuleForm({
-  promotionRule,
-  activeRoles,
-  onSave,
-  onDelete,
-}: EditPromotionRuleFormProps) {
+export default function EditPromotionRuleForm({ promotionRule, onSave, onDelete }: EditPromotionRuleFormProps) {
   const form = useForm<PromotionRuleFormValues>({
     resolver: zodResolver(promotionRuleSchema),
     mode: 'onChange',
@@ -49,7 +42,7 @@ export default function EditPromotionRuleForm({
         </div>
       </SheetHeader>
       <div className="flex flex-1 flex-col gap-5 overflow-y-auto p-5">
-        <PromotionRuleFormContent roles={activeRoles} />
+        <PromotionRuleFormContent />
       </div>
       <SheetFooter className="shrink-0 border-t px-5 py-4">
         <div className="flex w-full items-center justify-between gap-3">
