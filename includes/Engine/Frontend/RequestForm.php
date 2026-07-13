@@ -2,8 +2,7 @@
 
 namespace YayWholesaleB2B\Engine\Frontend;
 
-use YayWholesaleB2B\Helpers\RequestsHelper;
-use YayWholesaleB2B\Helpers\SettingsHelper;
+use YayWholesaleB2B\Helpers\RegistrationFieldsHelper;
 use YayWholesaleB2B\Utils\SingletonTrait;
 
 defined( 'ABSPATH' ) || exit;
@@ -59,117 +58,18 @@ class RequestForm {
      * @return string Form HTML ouput.
      */
     protected function ywhs_request_form_html( array $attr = [] ): string {
-        $settings            = SettingsHelper::get_settings();
-        $is_autofill         = is_user_logged_in();
-        $first_name_autofill = '';
-        $last_name_autofill  = '';
-        $email_autofill      = '';
-
-        if ( $is_autofill ) {
-            $user                = wp_get_current_user();
-            $first_name_autofill = $user->first_name;
-            $last_name_autofill  = $user->last_name;
-            $email_autofill      = $user->user_email;
-        }
-
         if ( empty( $_COOKIE['yaywholesaleb2b_cid'] ) ) {
             $cid = wp_generate_uuid4();
-
-            setcookie(
-                'yaywholesaleb2b_cid',
-                $cid,
-                time() + MONTH_IN_SECONDS,
-                COOKIEPATH,
-                COOKIE_DOMAIN,
-                is_ssl(),
-                true
-            );
+            setcookie( 'yaywholesaleb2b_cid', $cid, time() + MONTH_IN_SECONDS, COOKIEPATH, COOKIE_DOMAIN, is_ssl(), true );
         }
         ob_start();
         ?>
         <div>
             <h4><?php echo esc_html( $attr['title'] ); ?></h4>
-            <div class="ywhs_request_form_error">
-                <div>
-                    <svg xmlns="http://www.w3.org/2000/svg" 
-                    width="18" 
-                    height="18" 
-                    viewBox="0 0 24 24" 
-                    fill="none" 
-                    stroke="red" 
-                    stroke-width="2.5" 
-                    stroke-linecap="round" 
-                    stroke-linejoin="round" 
-                    class="lucide lucide-circle-alert-icon lucide-circle-alert">
-                        <circle cx="12" cy="12" r="10"/>
-                        <line x1="12" x2="12" y1="8" y2="12"/>
-                        <line x1="12" x2="12.01" y1="16" y2="16"/>
-                    </svg>
-                    <div class="ywhs_form_error_content">
-                        <div><strong><?php echo esc_html( __( 'Unable to send your request', 'yay-wholesale-b2b' ) ); ?></strong></div>
-                        <span class="ywhs_form_error_msg"></span>
-                    </div>
-                </div>
-            </div>
-            <form id="ywhs_request_form">
-                <div id="ywhs_form_fields_container">
-                <?php
-                foreach ( $settings['registration_fields']['fields'] as $field ) :
-                    ?>
-                    <?php if ( ! $field['isHidden'] ) : ?>
-                    <div <?php echo esc_html( $field['columnWidth'] ) === '50%' ? 'class="ywhs_half"' : 'class="ywhs_full"'; ?> >
-                        <label class="ywhs_requirement_title" for="<?php echo esc_html( $field['id'] ); ?>" >
-                            <span>        
-                                <?php echo esc_html( $field['label'] ); ?>
-                                <span style="color: red">
-                                    <?php
-                                    if ( $field['isRequired'] ) {
-                                        echo '*';
-                                    }
-                                    ?>
-                            </span>
-                        </span>
-                        </label>
-                        <?php if ( esc_html( $field['type'] ) !== 'textarea' ) : ?>
-                            <input 
-                                id="<?php echo esc_html( $field['id'] ); ?>" 
-                                type="<?php echo esc_html( $field['type'] ); ?>" 
-                                placeholder="<?php echo esc_html( $field['placeholder'] ); ?>"
-                                name="<?php echo esc_html( $field['inputName'] ); ?>" 
-                                <?php echo( $field['isRequired'] ? 'required' : '' ); ?>
-                                <?php echo( 'email_address' === $field['inputName'] && $is_autofill ? 'readonly' : '' ); ?>
-                                <?php if ( 'email_address' === $field['inputName'] ) : ?>
-                                value="<?php echo esc_html( trim( $email_autofill ) ); ?>" 
-                                <?php elseif ( 'first_name' === $field['inputName'] ) : ?>
-                                    value="<?php echo esc_html( trim( $first_name_autofill ) ); ?>" 
-                                <?php elseif ( 'last_name' === $field['inputName'] ) : ?>    
-                                    value="<?php echo esc_html( trim( $last_name_autofill ) ); ?>"
-                                <?php endif ?>                                
-                                />
-                        <?php else : ?>
-                            <textarea 
-                                id="<?php echo esc_html( $field['id'] ); ?>" 
-                                placeholder="<?php echo esc_html( $field['placeholder'] ); ?>" 
-                                name="<?php echo esc_html( $field['inputName'] ); ?>" 
-                                <?php echo( $field['isRequired'] ? 'required' : '' ); ?>
-                                ></textarea>
-                        <?php endif ?>
-                    </div>
-                        <?php
-                    endif
-                    ?>
-                    <?php
-                    endforeach;
-                ?>
-                </div>
-
-                <button type="submit" ><?php echo esc_html( $settings['registration']['submit_button_label'] ); ?></button>
-            </form>
-
-            <h3 id="ywhs_success_notice"><?php echo esc_html( $settings['registration']['successful_registration_message'] ); ?></h3>
+            <?php RegistrationFieldsHelper::render_form(); ?>
         </div>
-                    <?php
-                    return ob_get_clean();
+        <?php
+        return ob_get_clean();
     }
 
     public function create_ywhs_block_request_form_block_init() {

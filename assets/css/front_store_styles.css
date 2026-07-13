@@ -6,75 +6,352 @@
 /* #endregion */
 
 /* #region Registration Form */
-#ywhs_form_fields_container {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 15px;
+#ywhs_request_form {
+  --ywhs-foreground: #171719;
+  --ywhs-destructive: #d50719;
+  --ywhs-border: #e4e4e7;
+  --ywhs-input: #e4e4e7;
+  --ywhs-primary: #3858e9;
+  --ywhs-primary-foreground: #ffffff;
+  --ywhs-primary-accent: #2f4ac4;
+  --ywhs-muted-foreground: #7b7c80;
+  --ywhs-muted-400: #fafafa;
+  --ywhs-background: #ffffff;
+  --ywhs-radius-md: 8px;
+  --ywhs-shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 0.05);
 }
 
-#ywhs_form_fields_container > div {
+.ywhs_registration_form_card {
   display: flex;
   flex-direction: column;
+  gap: 8px;
+  border: 1px solid var(--ywhs-border);
+  border-radius: 10px;
+  background-color: var(--ywhs-background);
 }
 
-.ywhs_half {
-  /* flex: 0 0 calc(50% - 15px); */
+.ywhs_registration_form_body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 30px;
+  padding: 20px;
+}
+
+.ywhs_registration_form_empty {
+  margin: 0;
+  padding: 32px 0;
+  text-align: center;
+  font-size: 14px;
+  color: var(--ywhs-muted-foreground);
+}
+
+.ywhs_registration_form_grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+}
+
+.ywhs_registration_form_field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.ywhs_registration_form_field--half {
   grid-column: span 1;
 }
 
-.ywhs_full {
-  /* flex: 0 0 calc(100% - 15px); */
+.ywhs_registration_form_field--full {
   grid-column: span 2;
 }
 
-#ywhs_form_fields_container textarea {
+.ywhs_registration_form_label {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  margin: 0;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1;
+  color: var(--ywhs-foreground);
+}
+
+.ywhs_registration_form_required {
+  margin-left: 2px;
+  color: var(--ywhs-destructive);
+}
+
+.ywhs_registration_form_input,
+.ywhs_registration_form_select,
+.ywhs_registration_form_textarea {
+  box-sizing: border-box !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  border: 1px solid var(--ywhs-input) !important;
+  border-radius: var(--ywhs-radius-md) !important;
+  background-color: transparent !important;
+  color: var(--ywhs-foreground) !important;
+  font-size: 14px;
+  line-height: 1.25;
+  box-shadow: var(--ywhs-shadow-xs) !important;
+  outline: none !important;
+  transition:
+    color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    border-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.ywhs_registration_form_input:focus-visible,
+.ywhs_registration_form_textarea:focus-visible {
+  outline: none !important;
+  border-color: var(--ywhs-input) !important;
+
+  box-shadow:
+    var(--ywhs-shadow-xs),
+    0 0 0 2px var(--ywhs-background),
+    0 0 0 3.5px var(--ywhs-primary) !important;
+}
+
+.ywhs_registration_form_input:hover:not(:focus-visible),
+.ywhs_registration_form_textarea:hover:not(:focus-visible) {
+  border-color: var(--ywhs-muted-foreground) !important;
+}
+.ywhs_registration_form_select:hover {
+  background-color: var(--ywhs-muted-400) !important;
+}
+
+.ywhs_registration_form_input,
+.ywhs_registration_form_select {
+  height: 36px;
+  padding: 8px 12px;
+}
+
+.ywhs_registration_form_input::placeholder,
+.ywhs_registration_form_textarea::placeholder {
+  color: var(--ywhs-muted-foreground);
+}
+
+.ywhs_registration_form_input:hover,
+.ywhs_registration_form_select:hover,
+.ywhs_registration_form_textarea:hover {
+  border-color: var(--ywhs-muted-foreground);
+}
+
+.ywhs_registration_form_input:focus-visible,
+.ywhs_registration_form_select:focus-visible,
+.ywhs_registration_form_textarea:focus-visible {
+  border-color: var(--ywhs-input);
+  box-shadow: 0 0 0 1.5px var(--ywhs-primary);
+}
+
+.ywhs_registration_form_input:focus-visible:hover,
+.ywhs_registration_form_select:focus-visible:hover,
+.ywhs_registration_form_textarea:focus-visible:hover {
+  border-color: var(--ywhs-input);
+}
+
+.ywhs_registration_form_input:read-only {
+  cursor: default;
+  opacity: 1;
+}
+
+.ywhs_registration_form_select {
+  appearance: none;
+  padding-right: 36px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%237b7c80' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 16px;
+  cursor: pointer;
+}
+
+.ywhs_registration_form_select:hover {
+  background-color: var(--ywhs-muted-400);
+}
+
+.ywhs_registration_form_textarea {
+  min-height: 80px;
+  padding: 8px 12px;
   resize: none;
-  font-family: sans-serif;
-  min-height: 50px;
   overflow: hidden;
+  font-family: inherit;
+  font-weight: 400;
+}
+
+.ywhs_registration_form_radios,
+.ywhs_registration_form_checkboxes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.ywhs_registration_form_radios {
+  flex-wrap: nowrap;
+}
+
+.ywhs_registration_form_choice {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ywhs_registration_form_choice_label {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.25;
+  color: var(--ywhs-foreground);
+  cursor: pointer;
+}
+
+.ywhs_registration_form_radio,
+.ywhs_registration_form_checkbox {
+  box-sizing: border-box;
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  border: 1px solid var(--ywhs-input);
+  background-color: transparent;
+  box-shadow: var(--ywhs-shadow-xs);
+  outline: none;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition:
+    border-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.ywhs_registration_form_radio {
+  border-radius: 9999px;
+  appearance: none;
+  position: relative;
+}
+
+.ywhs_registration_form_radio:checked {
+  border-color: var(--ywhs-primary);
+  background-color: var(--ywhs-primary);
+}
+
+.ywhs_registration_form_radio:checked::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 8px;
+  height: 8px;
+  border-radius: 9999px;
+  background-color: var(--ywhs-background);
+  transform: translate(-50%, -50%);
+}
+
+.ywhs_registration_form_radio:focus-visible,
+.ywhs_registration_form_checkbox:focus-visible {
+  box-shadow: 0 0 0 1.5px var(--ywhs-primary);
+}
+
+.ywhs_registration_form_checkbox {
+  border-radius: 4px;
+  appearance: none;
+  position: relative;
+}
+
+.ywhs_registration_form_checkbox:checked {
+  border-color: var(--ywhs-primary);
+  background-color: var(--ywhs-primary);
+}
+
+.ywhs_registration_form_checkbox:checked::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 10px;
+  height: 6px;
+  border: 2px solid var(--ywhs-primary-foreground);
+  border-top: 0;
+  border-right: 0;
+  transform: translate(-50%, -60%) rotate(-45deg);
+}
+
+.ywhs_registration_form_attachment {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+}
+
+.ywhs_registration_form_attachment_controls {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.ywhs_registration_form_file_name {
+  padding-left: 8px;
+  font-size: 14px;
+  color: var(--ywhs-muted-foreground);
+}
+
+.ywhs_registration_form_file_hint {
+  margin: 0 !important;
+  padding-left: 8px !important;
+  font-size: 14px;
+  color: var(--ywhs-muted-foreground);
+}
+
+.ywhs_registration_form_field_error {
+  margin: 0;
+  padding-left: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ywhs-destructive);
+}
+
+.ywhs_registration_form_submit {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 36px;
+  margin-top: auto;
+  padding: 8px 16px;
+  border: 1px solid transparent;
+  border-radius: var(--ywhs-radius-md);
+  background-color: var(--ywhs-primary);
+  color: var(--ywhs-primary-foreground);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.25;
+  box-shadow: var(--ywhs-shadow-xs);
+  cursor: pointer;
+  outline: none;
+  transition:
+    background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    border-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.ywhs_registration_form_submit:hover {
+  background-color: var(--ywhs-primary-accent);
+  color: var(--ywhs-primary-foreground);
+  border: 1px solid transparent;
+}
+
+.ywhs_registration_form_submit:focus-visible {
+  box-shadow: 0 0 0 1.5px var(--ywhs-primary);
+}
+
+.ywhs_registration_form_submit:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 #ywhs_success_notice {
   display: none;
-}
-
-#ywhs_form_fields_container label {
-  font-size: small;
-  margin: 5px 0px;
-}
-
-#ywhs_form_fields_container input,
-#ywhs_form_fields_container textarea {
-  padding: 10px;
-  font-size: small;
-  border-radius: 10px;
-  border: 1px solid #e5e5e5;
-  box-shadow: 0px 1px 2px 0px #e5e5e5;
-}
-
-#ywhs_form_fields_container input:hover,
-#ywhs_form_fields_container textarea:hover {
-  border: 1px solid black;
-  transition: color 3s;
-}
-
-#ywhs_form_fields_container input:focus-visible:hover,
-#ywhs_form_fields_container textarea:focus-visible:hover {
-  border: 1px solid #e5e5e5;
-}
-
-#ywhs_request_form > button {
-  padding: 10px 15px;
-  margin-top: 20px;
-  border-radius: 10px;
-  border: none;
-  box-shadow: 0px 1px 2px 0px #e5e5e5;
-  background-color: black;
-  color: white;
-}
-
-#ywhs_request_form > button:hover {
-  background-color: rgb(40, 40, 40);
 }
 
 .ywhs_request_form_error {
@@ -85,6 +362,7 @@
   display: none;
   margin-bottom: 20px;
 }
+
 .ywhs_request_form_error > div {
   display: flex;
   gap: 10px;

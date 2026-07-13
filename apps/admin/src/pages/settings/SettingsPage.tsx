@@ -62,6 +62,7 @@ export default function SettingsPage() {
   }
 
   const onError = (errors: FieldErrors<Settings>) => {
+    console.log({ errors });
     const firstErrorSection = getFirstErrorSection(errors);
     if (!firstErrorSection) return;
     navigate(`/settings/${firstErrorSection.replaceAll('_', '-')}`);

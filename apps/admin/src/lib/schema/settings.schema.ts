@@ -2,31 +2,13 @@ import { z } from 'zod';
 import { __ } from '@wordpress/i18n';
 
 import { enableByRoleSchema } from './common.schema';
+import { fieldSchema } from './settingsRegistration.schema';
 
 export const registrationSettingsSchema = z.object({
   moderate: z.boolean(),
   wholesale_registration_page: z.string(),
   submit_button_label: z.string(),
   successful_registration_message: z.string(),
-});
-
-const fieldSchema = z.object({
-  id: z.string(),
-  label: z
-    .string()
-    .min(1, __('Fill in the field label', 'yay-wholesale-b2b'))
-    .regex(
-      /^[\p{L}0-9 _\-&:/]+$/u,
-      __('Label can only contain letters, numbers, spaces, and common symbols (-, _, &, :, /.).', 'yay-wholesale-b2b'),
-    ),
-  inputName: z.string(),
-  type: z.enum(['text', 'email', 'number', 'phone', 'date', 'textarea', 'select']),
-  placeholder: z.string(),
-  columnWidth: z.enum(['50%', '100%']),
-  deletable: z.boolean(),
-  isDefault: z.boolean(),
-  isRequired: z.boolean(),
-  isHidden: z.boolean(),
 });
 
 const paymentMethodSettingSchema = z.object({
@@ -57,21 +39,7 @@ export const settingsFormSchema = z.object({
   }),
   registration: registrationSettingsSchema,
   registration_fields: z.object({
-    fields: z.array(fieldSchema).superRefine((fields, ctx) => {
-      const existedLabels = new Set<string>();
-
-      fields.forEach((field, index) => {
-        if (existedLabels.has(field.label.toLowerCase())) {
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            message: __('Label must be unique', 'yay-wholesale-b2b'),
-            path: [index, 'label'], // direct to the duplicate label and show error
-          });
-        } else {
-          existedLabels.add(field.label.toLowerCase());
-        }
-      });
-    }),
+    fields: z.array(fieldSchema),
   }),
   payment_roles: z.array(paymentMethodSettingSchema).optional(),
   shipping_roles: z.array(shippingMethodSettingSchema).optional(),
