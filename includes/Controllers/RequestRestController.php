@@ -1,15 +1,15 @@
 <?php
 namespace YayWholesaleB2B\Controllers;
 
-use Exception;
 use WP_Error;
 use WP_REST_Request;
-use WP_REST_Response;
+
 use YayWholesaleB2B\Utils\SingletonTrait;
 use YayWholesaleB2B\Helpers\CustomerHelper;
 use YayWholesaleB2B\Helpers\RequestsHelper;
 use YayWholesaleB2B\Helpers\RolesHelper;
 use YayWholesaleB2B\Helpers\SettingsHelper;
+use YayWholesaleB2B\Helpers\RegistrationFieldsHelper;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -142,7 +142,17 @@ class RequestRestController extends BaseRestController {
             set_transient( "yaywholesaleb2b_client_$cookie_id", $count, 15 * MINUTE_IN_SECONDS );
         }
 
-        $body_params                   = $request->get_body_params();
+        $body_params    = $request->get_body_params();
+        $uploaded_files = RegistrationFieldsHelper::upload_attachment_fields( $request );
+        if ( is_wp_error( $uploaded_files ) ) {
+            return $uploaded_files;
+        }
+
+        $body_params = array_merge(
+            $body_params,
+            $uploaded_files
+        );
+
         $is_logged_in                  = is_user_logged_in();
         $current_user_id               = get_current_user_id();
         $is_current_wholesale_customer = CustomerHelper::is_current_wholesale_customer();
@@ -170,6 +180,11 @@ class RequestRestController extends BaseRestController {
             $current_user = wp_get_current_user();
             RolesHelper::remove_ywhs_role_from_user( $current_user );
             $current_user->add_role( $default_role['slug'] );
+
+            $post_meta = get_post_meta( $new_request_id, RequestsHelper::REQUEST_META_DATA, true );
+            if ( is_array( $post_meta ) ) {
+                RequestsHelper::apply_billing_field_mappings_on_approval( $current_user_id, $post_meta );
+            }
 
             do_action( 'ywhs_account_registration_submitted', $new_request_id );
             do_action( 'ywhs_account_registration_approved', $new_request_id );

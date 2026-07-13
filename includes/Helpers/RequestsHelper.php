@@ -22,6 +22,7 @@ class RequestsHelper {
 
     public const USER_META_REQUEST = 'ywhs_user_request_approved';
 
+    public const EDIT_USER_EXCLUDED_FIELD_KEYS = [ 'first_name', 'last_name', 'message', 'email_address' ];
     /**
      * Insert new Wholesale request.
      *
@@ -69,7 +70,7 @@ class RequestsHelper {
             if ( array_key_exists( $key, $body_params ) ) {
                 $request_data[ $gsetting['label'] ] = [
                     'type'       => $gsetting['type'],
-                    'is_default' => $gsetting['isDefault'],
+                    'is_default' => isset( $gsetting['isDefault'] ) ? $gsetting['isDefault'] : false,
                     'key'        => $key,
                 ];
 
@@ -273,6 +274,136 @@ class RequestsHelper {
     }
 
     /**
+     * Normalize a stored choice field value to a flat string array.
+     *
+     * @param mixed $value Stored field value.
+     * @return string[]
+     */
+    public static function normalize_choice_field_values( $value ): array {
+        if ( is_array( $value ) ) {
+            return array_values( array_map( 'strval', $value ) );
+        }
+
+        if ( is_string( $value ) && '' !== $value ) {
+            return array_values( array_filter( array_map( 'trim', explode( ',', $value ) ) ) );
+        }
+
+        return [];
+    }
+
+    /**
+     * Merge current registration field settings with stored request values.
+     *
+     * @param array $request_data Stored request meta (ywhs_request_data).
+     * @param array $excluded_keys inputName keys to skip.
+     * @return array<int, array<string, mixed>>
+     */
+    public static function get_merged_user_fields( array $request_data, array $excluded_keys = [] ): array {
+        if ( empty( $excluded_keys ) ) {
+            $excluded_keys = self::EDIT_USER_EXCLUDED_FIELD_KEYS;
+        }
+
+        $settings       = SettingsHelper::get_settings();
+        $fields_config  = $settings['registration_fields']['fields'] ?? [];
+        $values_by_key  = [];
+        $default_by_key = [];
+
+        foreach ( $request_data as $field ) {
+            if ( ! is_array( $field ) || empty( $field['key'] ) ) {
+                continue;
+            }
+
+            $values_by_key[ $field['key'] ]  = $field['value'] ?? '';
+            $default_by_key[ $field['key'] ] = ! empty( $field['is_default'] );
+        }
+
+        $merged = [];
+
+        foreach ( $fields_config as $field_config ) {
+            $input_name = $field_config['inputName'] ?? '';
+
+            if ( empty( $input_name ) || in_array( $input_name, $excluded_keys, true ) ) {
+                continue;
+            }
+
+            $merged[] = array_merge(
+                $field_config,
+                [
+                    'key'        => $input_name,
+                    'value'      => $values_by_key[ $input_name ] ?? '',
+                    'is_default' => $field_config['isDefault'] ?? ( $default_by_key[ $input_name ] ?? false ),
+                ]
+            );
+        }
+
+        return $merged;
+    }
+
+    /**
+     * Build request meta structure from merged user fields.
+     *
+     * @param array<int, array<string, mixed>> $merged_fields Merged field rows.
+     * @return array<string, array<string, mixed>>
+     */
+    public static function build_request_data_from_merged_fields( array $merged_fields ): array {
+        $request_data = [];
+
+        foreach ( $merged_fields as $field ) {
+            $label = $field['label'] ?? '';
+            $key   = $field['key'] ?? ( $field['inputName'] ?? '' );
+            $type  = $field['type'] ?? 'text';
+
+            if ( empty( $label ) || empty( $key ) ) {
+                continue;
+            }
+
+            $entry = [
+                'type'       => $type,
+                'is_default' => ! empty( $field['is_default'] ) || ! empty( $field['isDefault'] ),
+                'key'        => $key,
+            ];
+
+            if ( ! in_array( $key, [ 'email_address', 'message' ], true ) ) {
+                $entry['value'] = $field['value'] ?? '';
+            }
+
+            $request_data[ $label ] = $entry;
+        }//end foreach
+
+        return $request_data;
+    }
+
+    /**
+     * Rebuild request meta, preserving excluded fields from the original snapshot.
+     *
+     * @param array<int, array<string, mixed>>    $merged_fields           Updated merged fields.
+     * @param array<string, array<string, mixed>> $original_request_data   Original request meta.
+     * @param array                               $excluded_keys           inputName keys to preserve.
+     * @return array<string, array<string, mixed>>
+     */
+    public static function rebuild_request_data( array $merged_fields, array $original_request_data, array $excluded_keys = [] ): array {
+        if ( empty( $excluded_keys ) ) {
+            $excluded_keys = self::EDIT_USER_EXCLUDED_FIELD_KEYS;
+        }
+
+        $request_data = self::build_request_data_from_merged_fields( $merged_fields );
+
+        foreach ( $original_request_data as $label => $field ) {
+            if ( ! is_array( $field ) || empty( $field['key'] ) ) {
+                continue;
+            }
+
+            if ( ! in_array( $field['key'], $excluded_keys, true ) ) {
+                continue;
+            }
+
+            $request_data[ $label ] = $field;
+        }
+
+        return $request_data;
+    }
+
+    /**
      * Update a wholesaler request by ID
      *
      * @param int   $request_id The target request ID .
@@ -449,7 +580,7 @@ class RequestsHelper {
         }//end if
 
         if ( $user_id > 0 ) {
-            self::update_billing_data_for_user( $user_id, $post_meta );
+            self::apply_billing_field_mappings_on_approval( $user_id, $post_meta );
             update_user_meta( $user_id, self::USER_META_REQUEST, $request_id );
         }
 
@@ -518,10 +649,109 @@ class RequestsHelper {
         return $query->post_count;
     }
 
+    public static function apply_billing_field_mappings_on_approval( int $user_id, array $request_data ): void {
+        self::apply_billing_field_mappings( $user_id, $request_data );
+        self::update_billing_data_for_user( $user_id, $request_data );
+    }
+
+    protected static function apply_billing_field_mappings( int $user_id, array $request_data ): void {
+        $settings      = SettingsHelper::get_settings();
+        $fields_config = $settings['registration_fields']['fields'] ?? [];
+        $config_by_key = [];
+
+        foreach ( $fields_config as $field_config ) {
+            if ( empty( $field_config['inputName'] ) ) {
+                continue;
+            }
+
+            $config_by_key[ $field_config['inputName'] ] = $field_config;
+        }
+
+        foreach ( $request_data as $field_data ) {
+            if ( ! is_array( $field_data ) || empty( $field_data['key'] ) || ! array_key_exists( 'value', $field_data ) ) {
+                continue;
+            }
+
+            $input_name = $field_data['key'];
+            if ( ! isset( $config_by_key[ $input_name ] ) ) {
+                continue;
+            }
+
+            $field_config    = $config_by_key[ $input_name ];
+            $billing_mapping = $field_config['billingMapping'] ?? '';
+
+            if ( empty( $billing_mapping ) || 'none' === $billing_mapping ) {
+                continue;
+            }
+
+            $value = $field_data['value'];
+
+            if ( 'custom' === $billing_mapping ) {
+                $meta_key = trim( $field_config['customBillingMetaKey'] ?? '' );
+                if ( empty( $meta_key ) ) {
+                    continue;
+                }
+
+                update_user_meta( $user_id, $meta_key, $value );
+                continue;
+            }
+
+            if ( 'billing_country_state' === $billing_mapping ) {
+                self::update_billing_country_state_meta( $user_id, $value );
+                continue;
+            }
+
+            update_user_meta( $user_id, $billing_mapping, $value );
+        }//end foreach
+    }
+
+    protected static function update_billing_country_state_meta( int $user_id, $value ): void {
+        $country = '';
+        $state   = '';
+
+        if ( is_array( $value ) ) {
+            $country = isset( $value[0] ) ? (string) $value[0] : '';
+            $state   = isset( $value[1] ) ? (string) $value[1] : '';
+        } else {
+            $string_value = trim( (string) $value );
+            if ( '' !== $string_value ) {
+                if ( preg_match( '/^([^|:,]+)\s*[|:,]\s*(.+)$/', $string_value, $matches ) ) {
+                    $country = trim( $matches[1] );
+                    $state   = trim( $matches[2] );
+                } else {
+                    $country = $string_value;
+                }
+            }
+        }
+
+        if ( '' !== $country ) {
+            update_user_meta( $user_id, 'billing_country', $country );
+        }
+
+        if ( '' !== $state ) {
+            update_user_meta( $user_id, 'billing_state', $state );
+        }
+    }
+
     protected static function update_billing_data_for_user( int $user_id, array $request_data ) {
+        $settings           = SettingsHelper::get_settings();
+        $fields_config      = $settings['registration_fields']['fields'] ?? [];
+        $mapped_input_names = [];
+
+        foreach ( $fields_config as $field_config ) {
+            $billing_mapping = $field_config['billingMapping'] ?? '';
+            if ( ! empty( $billing_mapping ) && 'none' !== $billing_mapping && ! empty( $field_config['inputName'] ) ) {
+                $mapped_input_names[] = $field_config['inputName'];
+            }
+        }
+
         $customer    = new \WC_Customer( $user_id );
         $updated_map = [];
         foreach ( $request_data as $key => $val ) {
+            if ( ! empty( $val['key'] ) && in_array( $val['key'], $mapped_input_names, true ) ) {
+                continue;
+            }
+
             if ( 'first_name' === $val['key'] ) {
                 $customer->set_first_name( $val['value'] );
                 $customer->set_billing_first_name( $val['value'] );
