@@ -43,6 +43,18 @@ class SetupWizardRestController extends BaseRestController {
                 ],
             ]
         );
+
+        register_rest_route(
+            self::REST_NAMESPACE,
+            '/setup-wizard/helpful',
+            [
+                [
+                    'methods'             => 'PUT',
+                    'callback'            => [ $this, 'mark_setup_wizard_helpful' ],
+                    'permission_callback' => [ $this, 'can_manage_settings' ],
+                ],
+            ]
+        );
     }
 
     public function skip_setup_wizard( WP_REST_Request $request ) {
@@ -86,6 +98,12 @@ class SetupWizardRestController extends BaseRestController {
             'roles'    => RolesHelper::get_wholesale_roles(),
             'settings' => SettingsHelper::get_full_settings(),
         ];
+    }
+
+    public function mark_setup_wizard_helpful( WP_REST_Request $request ) {
+        $payload = $request->get_json_params();
+        update_option( 'yaywholesaleb2b_setup_helpful', $payload['helpful'] );
+        return true;
     }
 
     public function can_manage_settings() {

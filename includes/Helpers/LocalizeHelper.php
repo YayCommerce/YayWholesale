@@ -19,7 +19,10 @@ class LocalizeHelper {
             'settings'         => $settings,
             'wholesale_emails' => SettingsHelper::get_email_templates(),
             'roles'            => RolesHelper::handle_roles_data( $roles, $settings ),
-            'setup_wizard'     => [ 'status' => SetupWizardHelper::get_setup_wizard_status() ],
+            'setup_wizard'     => [
+                'status'  => SetupWizardHelper::get_setup_wizard_status(),
+                'helpful' => get_option( 'yaywholesaleb2b_setup_helpful', 'blank' ),
+            ],
             'wc_page_ids'      => array_values(
                 array_filter(
                     array_map(
