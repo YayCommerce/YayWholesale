@@ -72,6 +72,7 @@ class SettingsRestController extends BaseRestController {
             'display'             => $payload['display'],
             'registration'        => $payload['registration'],
             'registration_fields' => $payload['registration_fields'],
+            'promotion_rules'     => $payload['promotion_rules'],
         ];
         SettingsHelper::update_settings( $settings );
         do_action( 'ywhs_settings_updated', $payload );

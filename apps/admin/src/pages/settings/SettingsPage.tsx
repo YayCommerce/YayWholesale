@@ -20,6 +20,7 @@ import DisplayTab from './tabs/DisplayTab';
 import EmailsTab from './tabs/EmailsTab';
 import GeneralTab from './tabs/GeneralTab';
 import PaymentRolesTab from './tabs/PaymentRolesTabs';
+import PromotionRulesTab from './tabs/promotion-rules/PromotionRulesTab';
 import RegistrationFieldsTab from './tabs/registration-fields/RegistrationFieldsTab';
 import RegistrationTab from './tabs/RegistrationTab';
 import ShippingRolesTab from './tabs/ShippingRolesTabs';
@@ -132,6 +133,12 @@ export default function SettingsPage() {
                           <SettingsErrorIndicator tab="registration_fields" />
                         </SideNavMenuItem>
                       </TabsPrimitive.Trigger>
+                      <TabsPrimitive.Trigger value="promotion-rules" asChild>
+                        <SideNavMenuItem>
+                          <span>{__('Promotion Rules', 'yay-wholesale-b2b')}</span>
+                          <SettingsErrorIndicator tab="promotion_rules" />
+                        </SideNavMenuItem>
+                      </TabsPrimitive.Trigger>
                       <TabsPrimitive.Trigger value="emails" asChild>
                         <SideNavMenuItem>
                           <span>{__('Emails', 'yay-wholesale-b2b')}</span>
@@ -170,6 +177,12 @@ export default function SettingsPage() {
                     className="bg-card h-full rounded-md border p-6 sm:w-full"
                   >
                     <RegistrationFieldsTab />
+                  </TabsPrimitive.Content>
+                  <TabsPrimitive.Content
+                    value="promotion-rules"
+                    className="bg-card h-full rounded-md border p-6 sm:w-full"
+                  >
+                    <PromotionRulesTab />
                   </TabsPrimitive.Content>
                   <TabsPrimitive.Content value="emails" className="bg-card h-full rounded-md border p-6 sm:w-full">
                     <EmailsTab />

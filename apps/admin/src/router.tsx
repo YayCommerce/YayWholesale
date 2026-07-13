@@ -101,6 +101,7 @@ const settingSubMenus = [
   'display',
   'registration',
   'registration-fields',
+  'promotion-rules',
   'emails',
   'payment-roles',
   'shipping-roles',
