@@ -20,11 +20,7 @@ $product_based_access    = ProductAccessHelper::get_product_based_access_restric
     <div class="ywhs_wholesale_rules">
         <div class="ywhs_header">
             <!-- YayWholesale logo -->
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M20.2671 4.78611L12.4685 0.283433C12.1794 0.11646 11.823 0.11646 11.534 0.283433L3.73531 4.78611C3.11232 5.14531 3.11232 6.04473 3.73531 6.40393L11.534 10.9066C11.823 11.0736 12.1794 11.0736 12.4685 10.9066L20.2671 6.40393C20.8901 6.04473 20.8901 5.14531 20.2671 4.78611Z" fill="#FFC900" />
-                <path d="M1.0737 9.39947V18.4048C1.0737 18.7388 1.2519 19.0475 1.54095 19.213L9.3396 23.7157C9.96259 24.0749 10.7399 23.6259 10.7399 22.9075V13.9022C10.7399 13.5682 10.5617 13.2595 10.2727 13.0939L2.47403 8.59127C1.85104 8.23206 1.0737 8.68107 1.0737 9.39947Z" fill="#FFC900" />
-                <path d="M14.6658 23.7169L22.463 19.2142C22.7521 19.0472 22.9303 18.7385 22.9303 18.406V9.40201C22.9303 8.68361 22.1515 8.2332 21.5299 8.5938L13.7327 13.0965C13.4436 13.2635 13.2654 13.5721 13.2654 13.9047V22.9086C13.2654 23.6271 14.0442 24.0775 14.6658 23.7169Z" fill="#FFC900" />
-            </svg>
+            <img src="<?php echo ( esc_url( YAYWHOLESALEB2B_PLUGIN_URL . 'assets/images/logo/yaywholesale_icon.svg' ) ); ?>" width="24" height="24"/>
 
             <div class="ywhs_separator"></div>
             <p>Yay Wholesale B2B</p>
@@ -140,9 +136,9 @@ $product_based_access    = ProductAccessHelper::get_product_based_access_restric
                                                                     </div>
                                                                 </div>
                                                                 <div class="ywhs_tier_volume_delete">
-                                                                    <svg width="11" height="12" viewBox="0 0 11 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                                        <path fill-rule="evenodd" clip-rule="evenodd" d="M5.5 1.12514C5.13433 1.12504 4.77761 1.23319 4.47901 1.43469C4.18041 1.6362 3.95461 1.92115 3.83271 2.25028H7.16729C7.04529 1.92121 6.81947 1.63632 6.52089 1.43483C6.22231 1.23334 5.86565 1.12514 5.5 1.12514ZM5.5 0C4.8208 8.81952e-06 4.16244 0.223974 3.63629 0.634014C3.11014 1.04405 2.74849 1.615 2.6125 2.25028H0V3.37542H0.997857L1.64057 10.124C1.6894 10.6367 1.93725 11.1134 2.33545 11.4605C2.73365 11.8076 3.25341 12.0001 3.79264 12H7.20814C7.74711 11.9999 8.26658 11.8075 8.66459 11.4605C9.06261 11.1136 9.31043 10.6372 9.35943 10.1248L10.0021 3.37542H11V2.25028H8.3875C8.25151 1.615 7.88986 1.04405 7.36371 0.634014C6.83756 0.223974 6.1792 8.81952e-06 5.5 0ZM8.81886 3.37542H2.18114L2.81443 10.022C2.83659 10.2551 2.94924 10.4718 3.13024 10.6296C3.31124 10.7874 3.54752 10.8749 3.79264 10.8749H7.20814C7.45327 10.8749 7.68954 10.7874 7.87055 10.6296C8.05155 10.4718 8.1642 10.2551 8.18636 10.022L8.81886 3.37542Z" fill="currentColor" />
-                                                                    </svg>
+                                                                <svg width="11" height="12" fill="currentColor" aria-hidden="true" >
+                                                                    <use href="<?php echo( esc_url( YAYWHOLESALEB2B_PLUGIN_URL . 'assets/images/icon/delete.svg' ) ); ?>" >#delete_icon</use>
+                                                                </svg>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -152,16 +148,11 @@ $product_based_access    = ProductAccessHelper::get_product_based_access_restric
                                             <div
                                                 class="ywhs_add_tier_volume"
                                                 data-currency="<?php echo ( esc_html( get_woocommerce_currency_symbol() ) ); ?>"
-                                                data-role="<?php echo ( esc_html( $wholesale_role['slug'] ) ); ?>">
-                                                <svg width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                    <g clip-path="url(#clip0_10960_15952)">
-                                                        <path d="M8 3.2H4.8V0H3.2V3.2H0V4.8H3.2V8H4.8V4.8H8V3.2Z" fill="currentColor" />
-                                                    </g>
-                                                    <defs>
-                                                        <clipPath id="clip0_10960_15952">
-                                                            <rect width="8" height="8" fill="white" />
-                                                        </clipPath>
-                                                    </defs>
+                                                data-role="<?php echo ( esc_html( $wholesale_role['slug'] ) ); ?>"
+                                                data-delete-icon="<?php echo( esc_url( YAYWHOLESALEB2B_PLUGIN_URL . 'assets/images/icon/delete.svg' ) ); ?>"
+                                                >
+                                                <svg width="8" height="8" fill="currentColor" aria-hidden="true" >
+                                                    <use href="<?php echo( esc_url( YAYWHOLESALEB2B_PLUGIN_URL . 'assets/images/icon/plus.svg' ) ); ?>" >#plus_icon</use>
                                                 </svg>
 
                                                 <?php esc_html_e( 'Add Tier', 'yay-wholesale-b2b' ); ?>

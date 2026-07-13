@@ -17,7 +17,7 @@ export default function Header() {
       {/* Logo */}
       <div className="border-border flex h-full bg-[#FFF5DB] px-0.75 pt-0.75">
         <img
-          src={`${window.yayWholesaleB2BMeta.wholesaleMeta.assetsUrl}/images/favicon.svg`}
+          src={`${window.yayWholesaleB2BMeta.wholesaleMeta.assetsUrl}/images/logo/favicon.svg`}
           alt="YayWholesale"
           className="size-12.5"
         />

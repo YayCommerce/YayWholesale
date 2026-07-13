@@ -122,7 +122,7 @@ export function SetupWizardPage() {
         <div className="flex flex-col items-center justify-center gap-4">
           <div>
             <img
-              src={`${window.yayWholesaleB2BMeta.wholesaleMeta.assetsUrl}/images/yaywholesale_logo.svg`}
+              src={`${window.yayWholesaleB2BMeta.wholesaleMeta.assetsUrl}/images/logo/yaywholesale_full.svg`}
               alt="YayWholesale"
               width="100%"
             />
