@@ -28,7 +28,7 @@ export default function ReadyToGo() {
 
         <div className="bg-muted flex w-full gap-4 rounded-md p-7.5">
           <img
-            src={`${window.yayWholesaleB2BMeta.wholesaleMeta.assetsUrl}/images/setup_customer.svg`}
+            src={`${window.yayWholesaleB2BMeta.wholesaleMeta.assetsUrl}/images/setup-wizard/customer.svg`}
             alt="YayWholesale"
             width="36px"
             height="36px"

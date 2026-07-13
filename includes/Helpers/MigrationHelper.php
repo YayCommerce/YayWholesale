@@ -31,6 +31,7 @@ class MigrationHelper {
     public static function get_available_migrations() {
         return [
             [ self::class, 'v1_0_5_add_input_name_for_registration_fields_settings' ],
+            [ self::class, 'v1_2_0_refactor_product_based_discount_settings' ],
         ];
     }
 
@@ -88,7 +89,51 @@ class MigrationHelper {
         }//end foreach
 
         update_option( 'yaywholesaleb2b_settings', $setting );
+    }
 
-        return $setting;
+    public static function v1_2_0_refactor_product_based_discount_settings( string $last_version ) {
+        if ( ! version_compare( $last_version, '1.2.0', '<=' ) ) {
+            return;
+        }
+
+        $args = [
+            'post_type'              => [ 'product', 'product_variation' ],
+            'posts_per_page'         => -1,
+            'update_post_meta_cache' => true,
+            'meta_query'             => [
+                [
+                    'key'     => 'yaywholesaleb2b_product_based_discount',
+                    'compare' => 'EXIST',
+                ],
+            ],
+        ];
+
+        $query    = new \WP_Query( $args );
+        $products = $query->posts;
+        if ( empty( $products ) ) {
+            return;
+        }
+
+        foreach ( $products as $product ) {
+            $discount = get_post_meta( $product->ID, 'yaywholesaleb2b_product_based_discount', true );
+            if ( 'fixed' === $discount['discount_type'] || 'rate' === $discount['discount_type'] ) {
+                $new_value = [];
+                $is_fixed  = 'fixed' === $discount['discount_type'];
+                foreach ( $discount['discount_fixed'] as $role => $fixed ) {
+                    $new_value[ $role ] = [
+                        'type'  => $is_fixed ? 'fixed' : 'rate',
+                        'fixed' => $fixed,
+                        'rate'  => $discount['discount_rates'][ $role ],
+                    ];
+                }
+
+                $discount['discount_type']                  = 'by_role';
+                $discount['discount_by_role']['wholesaler'] = $new_value;
+                unset( $discount['discount_fixed'] );
+                unset( $discount['discount_rates'] );
+
+                update_post_meta( $product->ID, 'yaywholesaleb2b_product_based_discount', $discount );
+            }
+        }//end foreach
     }
 }

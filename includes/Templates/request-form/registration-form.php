@@ -9,23 +9,7 @@ use YayWholesaleB2B\Helpers\SettingsHelper;
 
 <div class="ywhs_request_form_error">
     <div>
-        <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="18"
-            height="18"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="red"
-            stroke-width="2.5"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            class="lucide lucide-circle-alert-icon lucide-circle-alert"
-        >
-            <circle cx="12" cy="12" r="10"/>
-            <line x1="12" x2="12" y1="8" y2="12"/>
-            <line x1="12" x2="12.01" y1="16" y2="16"/>
-        </svg>
-
+    <img src="<?php echo( esc_url( YAYWHOLESALEB2B_PLUGIN_URL . 'assets/images/icon/circle-alert.svg' ) ); ?>" width="18" height="18" />
         <div class="ywhs_form_error_content">
             <div>
                 <strong>

@@ -128,4 +128,21 @@ class CategoryPricingHelper {
 
         return max( 0, $price * ( 1 - $discount_data['wholesale_discount_value'] / 100 ) );
     }
+
+    /**
+     * Get category-based setting of term
+     *
+     * @param int $term_id The term id.
+     */
+    public static function get_category_based_discount_setting( int $term_id ) {
+        $setting = get_term_meta( $term_id, self::CATEGORY_BASED_DISCOUNT_KEY, true );
+        return array_replace_recursive( self::get_default_settings(), ! empty( $setting ) ? $setting : [] );
+    }
+
+    public static function get_default_settings() {
+        return [
+            'discount_rule'  => 'default',
+            'discount_rates' => [],
+        ];
+    }
 }

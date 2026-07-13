@@ -1,6 +1,8 @@
 (function ($) {
   ("use strict");
 
+  const { __ } = window.wp.i18n;
+
   // #region Custom Pricing (Category-based, Product-based)
   $(document).ready(() => {
     const handler = () => {
@@ -67,8 +69,8 @@
       }
     });
 
-    $(".ywhs_value_input").on("change", function () {
-      const input = $(this).find("input");
+    $(".ywhs_wholesale_rules input").on("change", function () {
+      const input = $(this);
       const value = parseFloat(input.val());
 
       if (value < 0) {
@@ -89,44 +91,55 @@
   }
 
   function discountTypePricingSetting() {
-    const switchEl = $(".ywhs_discount_type_switch");
-    if (switchEl.length < 1) {
-      return;
-    }
+    const switcherTrigger = $(".ywhs_discount_type_trigger");
+    if (switcherTrigger.length < 1) return;
+    const allSwitchers = $(".ywhs_discount_type_switcher");
 
-    const handleToggle = (el) => {
-      const input = $(el)
-        .closest(".ywhs_discount_value_header")
-        .siblings(".ywhs_discount_type");
-
-      const rates = $(el)
-        .closest(".ywhs_discount_value_header")
-        .siblings(".ywhs_discount_roles_value")
-        .find(".ywhs_discount_rate_value");
-
-      const fixed = $(el)
-        .closest(".ywhs_discount_value_header")
-        .siblings(".ywhs_discount_roles_value")
-        .find(".ywhs_discount_fixed_value");
-
-      const checked = $(el).is(":checked");
-      if (checked) {
-        input.val("fixed");
-        rates.hide();
-        fixed.show();
+    switcherTrigger.on("click", function (e) {
+      const switcher = $(this).siblings(".ywhs_discount_type_switcher");
+      if (switcher.css("display") === "none") {
+        allSwitchers.hide();
+        switcher.show();
       } else {
-        input.val("rate");
-        fixed.hide();
-        rates.show();
+        switcher.hide();
       }
-    };
-
-    switchEl.each(function () {
-      handleToggle(this);
     });
 
-    switchEl.on("change", function (e) {
-      handleToggle(this);
+    $(document).on("click", function (e) {
+      if (
+        !allSwitchers.is(e.target) &&
+        allSwitchers.has(e.target).length === 0 &&
+        !switcherTrigger.is(e.target) &&
+        switcherTrigger.has(e.target).length === 0
+      ) {
+        allSwitchers.hide();
+      }
+    });
+
+    $(".ywhs_discount_type_rate").on("click", function () {
+      const switcher = $(this).closest(".ywhs_discount_type_switcher");
+      const input = switcher.siblings(".ywhs_discount_value");
+      const trigger = switcher.siblings(".ywhs_discount_type_trigger");
+      const typeInput = switcher.siblings(".ywhs_discount_type");
+
+      input.val(input.data("rate"));
+      input.attr("max", 100);
+      trigger.text("%");
+      typeInput.val("rate");
+      switcher.hide();
+    });
+
+    $(".ywhs_discount_type_fixed").on("click", function () {
+      const switcher = $(this).closest(".ywhs_discount_type_switcher");
+      const valueInput = switcher.siblings(".ywhs_discount_value");
+      const trigger = switcher.siblings(".ywhs_discount_type_trigger");
+      const typeInput = switcher.siblings(".ywhs_discount_type");
+
+      valueInput.val(valueInput.data("fixed"));
+      valueInput.removeAttr("max");
+      trigger.text($(this).data("currency-symbol"));
+      typeInput.val("fixed");
+      switcher.hide();
     });
   }
   // #endregion
@@ -172,7 +185,9 @@
         ".ywhs_access_rule_all",
         ".ywhs_access_rule_specific",
         ".ywhs_access_enable_by_role",
-        ".ywhs_access_rule_wholesaler",
+        ".ywhs_access_wholesalers_disabled",
+        ".ywhs_access_wholesalers_enabled",
+        ".ywhs_access_wholesalers_enabled_selected",
         ".ywhs_access_selected_roles",
       ]);
 
@@ -235,10 +250,10 @@
 
   // #region Selected Role toggle
   function selectedWholesalerRoleAccessRuleSetting() {
-    const accessRuleWholesaler = $(".ywhs_access_rule_wholesaler");
+    const enabledSelected = $(".ywhs_access_wholesalers_enabled_selected");
 
-    accessRuleWholesaler.each(function () {
-      const isShowing = $(this).val() === "enabled-selected-roles";
+    enabledSelected.each(function () {
+      const isShowing = $(this).is(":checked");
       const selectedRoles = $(this)
         .closest(".ywhs_field")
         .siblings(".ywhs_access_selected_roles");
@@ -249,8 +264,8 @@
       }
     });
 
-    accessRuleWholesaler.on("change", function () {
-      const isShowing = $(this).val() === "enabled-selected-roles";
+    enabledSelected.on("change", function () {
+      const isShowing = $(this).is(":checked");
       const selectedRoles = $(this)
         .closest(".ywhs_field")
         .siblings(".ywhs_access_selected_roles");
@@ -265,11 +280,148 @@
         selectedRoles.stop(true, true).slideUp(300);
       }
     });
+
+    $(".ywhs_access_wholesalers_disabled, .ywhs_access_wholesalers_enabled").on(
+      "change",
+      function () {
+        const selectedRoles = $(this)
+          .closest(".ywhs_field")
+          .siblings(".ywhs_access_selected_roles");
+        if ($(this).is(":checked")) {
+          selectedRoles.stop(true, true).slideUp(300);
+        }
+      }
+    );
   }
   // #endregion
 
   // #endregion
 
+  // #region Product Tier Pricing
+  $(document).ready(() => {
+    const handler = () => {
+      const allLoaded = checkRequiredElementsLoaded([
+        ".ywhs_discount_type_fixed_and_percent",
+        ".ywhs_discount_rule_tier",
+        ".ywhs_discount_table",
+      ]);
+
+      if (!allLoaded) return;
+
+      discountTierSetting();
+      bindTierEvent();
+    };
+
+    $(document).on(
+      "woocommerce_variations_loaded woocommerce_variations_saved",
+      handler
+    );
+
+    handler();
+  });
+
+  function discountTierSetting() {
+    const $fixedPercent = $(".ywhs_discount_type_fixed_and_percent");
+    const $tierVolume = $(".ywhs_discount_rule_tier");
+
+    // Reusable handler function
+    function toggleDiscountFields(checkbox) {
+      if (!checkbox.length) return;
+
+      const table = checkbox
+        .closest(".ywhs_field")
+        .siblings(".ywhs_discount_table");
+
+      if (checkbox.is(":checked")) {
+        if (checkbox.hasClass("ywhs_discount_type_fixed_and_percent")) {
+          table.find(".ywhs_fixed_rate_type").show();
+          table.find(".ywhs_tier_type").hide();
+        } else {
+          table.find(".ywhs_fixed_rate_type").hide();
+          table.find(".ywhs_tier_type").show();
+        }
+      }
+    }
+
+    $fixedPercent.each(function () {
+      toggleDiscountFields($(this));
+    });
+
+    // Event listeners
+    $fixedPercent.on("change", function () {
+      toggleDiscountFields($(this));
+    });
+
+    $tierVolume.on("change", function () {
+      toggleDiscountFields($(this));
+    });
+  }
+
+  function bindTierEvent() {
+    const addTierButton = $(".ywhs_add_tier_volume");
+
+    addTierButton.on("click", function () {
+      const tierContainer = $(this).siblings(".ywhs_tier_volume_container");
+      const tierVolumes = tierContainer.find(".ywhs_tier_volume");
+      const roleSlug = $(this).data("role");
+      const currency = $(this).data("currency");
+      const deleteIcon = $(this).data("deleteIcon");
+      const variationIndex = parseInt($(this).data("variation") ?? "-1");
+      const suffix = variationIndex >= 0 ? "-" + variationIndex : "";
+      tierContainer.append(
+        newTier(tierVolumes.length, roleSlug, currency, deleteIcon, suffix)
+      );
+    });
+
+    $(".ywhs_tier_volume_container").on(
+      "click",
+      ".ywhs_tier_volume_delete",
+      function () {
+        $(this).closest(".ywhs_tier_volume").remove();
+      }
+    );
+  }
+
+  function newTier(index, roleSlug, currency, deleteIcon, suffix) {
+    return `
+    <div class="ywhs_tier_volume" data-index="${index}">
+      <div class="ywhs_tier_from_quantity">
+          <span>${__("From", "yay-wholesale-b2b")}</span>
+          <input
+              type="number"
+              id="ywhs_product_tier_from_quantity_${roleSlug}"
+              name="yay-wholesale-b2b[tier-from-quantity${suffix}][${roleSlug}][${index}]"
+              value=0
+              step="0.01"
+              min="0"
+              max="100">
+      </div>
+      <div class="ywhs_tier_price">
+          <span>${__("Price", "yay-wholesale-b2b")}</span>
+          <div class="ywhs_value_input">
+              <input
+                  type="number"
+                  id="ywhs_product_tier_base_price_${roleSlug}"
+                  name="yay-wholesale-b2b[tier-price${suffix}][${roleSlug}][${index}]"
+                  value=0
+                  step="0.01"
+                  min="0"
+                  max="100">
+              </input>
+              <div class="ywhs_input_suffix">
+                  ${currency}
+              </div>
+          </div>
+          <div class="ywhs_tier_volume_delete">
+              <svg width="11" height="12" fill="currentColor" aria-hidden="true" >
+                <use href="${deleteIcon}" >#delete_icon</use>
+              </svg>
+          </div>
+      </div>
+  </div>
+    `;
+  }
+  //#endregion
   // #region Helpers
   function checkRequiredElementsLoaded(requiredSelectors) {
     for (let i = 0; i < requiredSelectors.length; i++) {
