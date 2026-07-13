@@ -76,5 +76,6 @@ export type AdminData = {
   wc_page_ids: number[];
   setup_wizard: {
     status: 'fresh' | 'skipped' | 'completed';
+    helpful: 'yes' | 'no' | 'blank';
   };
 };
