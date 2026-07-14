@@ -1,8 +1,9 @@
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { closestCenter, DndContext, DragEndEvent, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { Plus } from 'lucide-react';
 import { useFieldArray, useFormContext } from 'react-hook-form';
+import { useNavigate } from 'react-router';
 import { __ } from '@wordpress/i18n';
 
 import { useActiveRolesQuery } from '@/lib/queries/roles.queries';
@@ -19,6 +20,8 @@ export default function PromotionRulesTab() {
   const { fields, append, remove, move, update } = useFieldArray({ control, name: 'promotion_rules.promotionRules' });
   const [promotionRuleSheetState, setPromotionRuleSheetState] = useState<PromotionRuleSheetState>(['closed']);
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 6 } }));
+
+  const navigate = useNavigate();
 
   const isAdding = promotionRuleSheetState[0] === 'add';
   const isEditing = promotionRuleSheetState[0] === 'edit';
@@ -84,7 +87,7 @@ export default function PromotionRulesTab() {
               </Button>
             </div>
             {/* Promotion Rules List */}
-            <div className="flex flex-col gap-3">
+            <div className="flex flex-col gap-2.5">
               {fields.length === 0 && (
                 <p className="text-muted-foreground text-sm font-normal">
                   {__('No promotion rules found.', 'yay-wholesale-b2b')}
@@ -105,6 +108,12 @@ export default function PromotionRulesTab() {
                   ))}
                 </SortableContext>
               </DndContext>
+            </div>
+            <div className="text-muted-foreground text-sm font-normal">
+              {__('To add new roles or edit existing ones, go to', 'yay-wholesale-b2b')}
+              <Button className="p-1.5 font-normal underline" variant="link" onClick={() => navigate('/roles')}>
+                {__('Manage Roles', 'yay-wholesale-b2b')}
+              </Button>
             </div>
           </div>
         </div>
