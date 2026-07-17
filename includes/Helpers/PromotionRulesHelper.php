@@ -2,6 +2,7 @@
 namespace YayWholesaleB2B\Helpers;
 
 use Automattic\WooCommerce\Utilities\OrderUtil;
+use YayWholesaleB2B\Engine\PromotionRules\PromotionRulesCron;
 /**
  * Promotion Rules Helper Class
  */
@@ -13,51 +14,128 @@ class PromotionRulesHelper {
     const YEARLY_CONDITIONS = [ 'last-year-spend-at-least', 'last-year-spend-less-than' ];
 
     /**
-     * Cron entry point: evaluate promotion rules for the current month.
+     * Batch rules key.
+     */
+    const BATCH_RULES_KEY = 'ywhs_promotion_rules_batch_rules';
+    /**
+     * Batch size.
+     */
+    const BATCH_SIZE = 100;
+
+    /**
+     * Evaluate promotion rules for the current month.
      *
      * @return void
      */
     public static function evaluate_promotion_rules(): void {
-        // Only run on the first day of the month
-        if ( (int) wp_date( 'j' ) !== 1 ) {
-            return;
-        }
-
         $rules = self::get_applicable_rules();
 
         if ( empty( $rules ) ) {
             return;
         }
 
-        // Get all eligible user IDs to evaluate the promotion rules.
-        $user_ids = self::get_eligible_user_ids();
+        // set the rules to a transient
+        set_transient( self::BATCH_RULES_KEY, $rules, HOUR_IN_SECONDS );
 
-        foreach ( $user_ids as $user_id ) {
-            $user = get_user_by( 'ID', (int) $user_id );
-            if ( ! ( $user instanceof \WP_User ) ) {
-                continue;
-            }
-            self::evaluate_user( $user, $rules );
-        }
+        // Process the first batch immediately.
+        // Additional batches (if required) will be scheduled automatically.
+        self::schedule_batch();
     }
 
     /**
-     * Get all eligible user IDs.
+     * Get a batch of user IDs.
+     *
+     * @param int $offset User offset.
+     * @param int $limit  Number of users to retrieve.
      *
      * @return int[]
      */
-    public static function get_eligible_user_ids(): array {
-        $roles = array_merge(
-            [ 'customer' ],
-            array_column( RolesHelper::get_wholesale_roles(), 'slug' )
+    public static function get_eligible_user_ids( int $offset = 0, int $limit = self::BATCH_SIZE ): array {
+        return get_users(
+            [
+                'fields'  => 'ids',
+                'number'  => $limit,
+                'offset'  => $offset,
+                'orderby' => 'ID',
+                'order'   => 'ASC',
+            ]
         );
+    }
+
+    /**
+     * Get a batch of users.
+     *
+     * @param int $offset User offset.
+     * @param int $limit  Number of users to retrieve.
+     *
+     * @return \WP_User[]
+     */
+    public static function get_eligible_users( int $offset = 0, int $limit = self::BATCH_SIZE ): array {
 
         return get_users(
             [
-                'fields'   => 'ids',
-                'role__in' => $roles,
+                'number'  => $limit,
+                'offset'  => $offset,
+                'orderby' => 'ID',
+                'order'   => 'ASC',
             ]
         );
+    }
+
+    /**
+     * Delete the batch rules.
+     *
+     * @return void
+     */
+    public static function cleanup_batch(): void {
+        // clear the scheduled hook
+        wp_clear_scheduled_hook( PromotionRulesCron::CRON_BATCH );
+        // delete the transient
+        delete_transient( self::BATCH_RULES_KEY );
+    }
+
+    /**
+     * Schedule the batch.
+     *
+     * @param int $offset User offset.
+     * @param int $limit  Number of users to retrieve.
+     *
+     * @return void
+     */
+    public static function schedule_batch( int $offset = 0, int $limit = self::BATCH_SIZE ): void {
+
+        $rules = get_transient( self::BATCH_RULES_KEY );
+
+        if ( empty( $rules ) || ! is_array( $rules ) ) {
+            self::cleanup_batch();
+            return;
+        }
+
+        // Get users in this batch.
+        $users = self::get_eligible_users( $offset, $limit );
+
+        // if there are no user ids, cleanup and return
+        if ( empty( $users ) ) {
+            self::cleanup_batch();
+            return;
+        }
+
+        // evaluate the rules for the users in the batch
+        foreach ( $users as $user ) {
+            self::evaluate_user( $user, $rules );
+        }
+
+        // check if there are more users to process
+        if ( count( $users ) === $limit ) {
+            // add 1 minute to the current timestamp to avoid race conditions
+            $timestamp = current_datetime()->getTimestamp() + MINUTE_IN_SECONDS;
+            // schedule the next batch
+            wp_schedule_single_event( $timestamp, PromotionRulesCron::CRON_BATCH, [ $offset + $limit, $limit ] );
+            return;
+        }
+
+        // cleanup the batch
+        self::cleanup_batch();
     }
 
     /**
@@ -94,12 +172,10 @@ class PromotionRulesHelper {
      * @return void
      */
     protected static function evaluate_user( \WP_User $user, array $rules ): void {
+
         $spend = null;
 
         foreach ( $rules as $rule ) {
-            if ( ! is_array( $rule ) ) {
-                continue;
-            }
 
             $from_roles = $rule['fromRoles'] ?? null;
 
@@ -246,14 +322,13 @@ class PromotionRulesHelper {
     public static function get_user_spend( int $user_id ): array {
         global $wpdb;
 
-        $timezone = wp_timezone();
-        $now      = new \DateTime( 'now', $timezone );
+        $now = current_datetime();
 
-        $this_month_start = new \DateTime( $now->format( 'Y-m-01 00:00:00' ), $timezone );
-        $last_month_start = ( clone $this_month_start )->modify( '-1 month' );
+        $this_month_start = $now->modify( 'first day of this month midnight' );
+        $last_month_start = $this_month_start->modify( '-1 month' );
 
-        $this_year_start = new \DateTime( $now->format( 'Y-01-01 00:00:00' ), $timezone );
-        $last_year_start = ( clone $this_year_start )->modify( '-1 year' );
+        $this_year_start = $now->modify( 'first day of january this year midnight' );
+        $last_year_start = $this_year_start->modify( '-1 year' );
 
         if ( OrderUtil::custom_orders_table_usage_is_enabled() ) {
             $sql_query = "SELECT 
