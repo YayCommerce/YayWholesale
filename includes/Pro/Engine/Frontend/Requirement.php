@@ -3,6 +3,7 @@ namespace YayWholesaleB2B\Pro\Engine\Frontend;
 
 use YayWholesaleB2B\Helpers\CustomerHelper;
 use YayWholesaleB2B\Helpers\RequirementHelper;
+use YayWholesaleB2B\Pro\Helpers\TemplatesHelper;
 use YayWholesaleB2B\Utils\SingletonTrait;
 
 defined( 'ABSPATH' ) || exit;
@@ -175,6 +176,12 @@ class Requirement {
     public function enqueue_yay_wholesale_requirement() {
         if ( ( function_exists( 'is_checkout' ) && is_checkout() ) ||
             ( function_exists( 'is_cart' ) && is_cart() ) ) {
+
+            // var_dump( wp_is_block_theme() );
+            if ( ! TemplatesHelper::is_requirement_enabled_in_cart() ) {
+                return;
+            }
+
             $wholesale = CustomerHelper::get_current_user_wholesale_role();
             $slug      = 'ywhs_wholesale_requirement';
             $asset     = include YAYWHOLESALEB2B_PLUGIN_DIR . 'assets/dist/blocks/requirement-slot-fill/index.asset.php';

@@ -14,6 +14,6 @@ class Support {
     use SingletonTrait;
 
     protected function __construct() {
-        StorePage::get_instance();
+        // StorePage::get_instance();
     }
 }
