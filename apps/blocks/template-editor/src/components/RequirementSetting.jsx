@@ -1,7 +1,7 @@
 const TARGET_BLOCKS = ["woocommerce/cart"];
 
 // Add attrs
-function addRequirementBarToggle(settings, name) {
+export function addAttributesToBlocks(settings, name) {
   if (typeof settings.attributes !== "undefined") {
     if (TARGET_BLOCKS.includes(name)) {
       settings.attributes = {
@@ -16,14 +16,8 @@ function addRequirementBarToggle(settings, name) {
   return settings;
 }
 
-wp.hooks.addFilter(
-  "blocks.registerBlockType",
-  "ywhs/custom-attribute-editor",
-  addRequirementBarToggle
-);
-
 // Render Props
-const coverAdvancedControls = wp.compose.createHigherOrderComponent(
+const RequirementSettings = wp.compose.createHigherOrderComponent(
   (BlockEdit) => {
     return (props) => {
       const { Fragment } = wp.element;
@@ -55,11 +49,7 @@ const coverAdvancedControls = wp.compose.createHigherOrderComponent(
       );
     };
   },
-  "coverAdvancedControls"
+  "ywhs/requirement-toggle"
 );
 
-wp.hooks.addFilter(
-  "editor.BlockEdit",
-  "ywhs/custom-attribute-editor",
-  coverAdvancedControls
-);
+export default RequirementSettings;

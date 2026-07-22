@@ -4,6 +4,7 @@ namespace YayWholesaleB2B\Pro\Engine\Frontend;
 use YayWholesaleB2B\Helpers\CustomerHelper;
 use YayWholesaleB2B\Helpers\SettingsHelper;
 use YayWholesaleB2B\Helpers\SupportHelper;
+use YayWholesaleB2B\Pro\Helpers\TemplatesHelper;
 use YayWholesaleB2B\Utils\SingletonTrait;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -24,11 +25,11 @@ class StorePage {
         add_filter( 'get_block_templates', [ $this, 'replace_templates' ], 999, 3 );
         add_filter( 'archive_template_hierarchy', [ $this, 'add_to_archive_template_hierachy' ] );
 
-        // Change template with classic theme
-        add_filter( 'template_include', [ $this, 'replace_templates_classic' ], 999, 1 );
+        // // Change template with classic theme
+        // add_filter( 'template_include', [ $this, 'replace_templates_classic' ], 999, 1 );
 
-        // shop page query
-        add_action( 'pre_get_posts', [ $this, 'shop_page_products_query' ] );
+        // // shop page query
+        // add_action( 'pre_get_posts', [ $this, 'shop_page_products_query' ] );
     }
 
     /**
@@ -48,6 +49,14 @@ class StorePage {
         }
     }
 
+    /**
+     * Add the YayWholesale Template to the default template list
+     *
+     * @param array  $templates The templates list.
+     * @param array  $query The Query.
+     * @param string $template_type The template type.
+     * @return array.
+     */
     public function replace_templates( $templates, $query, $template_type ) {
         if ( 'wp_template' !== $template_type ) {
             return $templates;
@@ -61,32 +70,38 @@ class StorePage {
             return $templates;
         }
 
-        if ( CustomerHelper::is_current_wholesale_customer() ) {
-            $new_template = get_block_template(
-                get_stylesheet() . '//ywhs-wholesale-shop',
-                'wp_template'
-            );
-        } else {
-            $new_template = get_block_template(
-                get_stylesheet() . '//ywhs-retail-shop',
-                'wp_template'
-            );
+        $slug = TemplatesHelper::get_block_template_slug_by_role( CustomerHelper::get_current_user_wholesale_role() );
+        if ( false === $slug ) {
+            return $templates;
         }
+
+        $new_template = get_block_template(
+            get_stylesheet() . '//' . $slug,
+            'wp_template'
+        );
 
         $templates[] = $new_template;
 
         return $templates;
     }
 
+    /**
+     * Add the YayWholesale Template slug to the hierachy of shop page, mark it as the highest priority
+     *
+     * @param array $templates The templates hierachy.
+     * @return array
+     */
     public function add_to_archive_template_hierachy( $templates ) {
         if ( ! current_theme_supports( 'block-templates' ) ) {
             return $templates;
         }
-        if ( CustomerHelper::is_current_wholesale_customer() ) {
-            return array_merge( [ 'ywhs-wholesale-shop' ], $templates );
-        } else {
-            return array_merge( [ 'ywhs-retail-shop' ], $templates );
+
+        $slug = TemplatesHelper::get_block_template_slug_by_role( CustomerHelper::get_current_user_wholesale_role() );
+        if ( false === $slug ) {
+            return $templates;
         }
+
+        return array_merge( [ $slug ], $templates );
     }
 
     public function replace_templates_classic( $template ) {

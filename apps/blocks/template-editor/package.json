@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "start": "wp-scripts start --output-path=../../../assets/pro/dist/requirement-bar-attribute-editor",
-    "build": "wp-scripts build --config ../webpack.config.js --output-path=../../../assets/pro/dist/requirement-bar-attribute-editor"
+    "start": "wp-scripts start --output-path=../../../assets/pro/dist/template-editor",
+    "build": "wp-scripts build --config ../webpack.config.js --output-path=../../../assets/pro/dist/template-editor"
   },
   "devDependencies": {
   "@wordpress/scripts": "^31.0.0",
@@ -17,6 +17,8 @@
     "@wordpress/compose": "^8.0.0",
     "@wordpress/element": "^8.0.0",
     "@wordpress/hooks": "^4.0.0",
-    "@wordpress/i18n": "^6.0.0"
+    "@wordpress/i18n": "^6.0.0",
+    "@wordpress/plugins": "^7.51.0",
+    "@wordpress/editor": "^14.51.0"
   }
 }
