@@ -155,11 +155,15 @@ class TemplatesHelper {
         }
 
         $existing = array_flip( $existing_titles );
-        // Fast lookup
 
-        $counter = 1;
+        $counter = 0;
         while ( true ) {
-            $candidate = $base_name . ' ' . ( $counter++ );
+            if ( $counter > 0 ) {
+                $candidate = $base_name . ' ' . ( $counter++ );
+            } else {
+                $candidate = $base_name;
+                ++$counter;
+            }
             if ( ! isset( $existing[ $candidate ] ) ) {
                 return $candidate;
             }
