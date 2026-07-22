@@ -72,10 +72,10 @@ class YayCurrency {
             $base_price     = $wholesale_role['applyToSalePrice'] && $sale_price > 0 ? $sale_price : $regular_price;
             $discount_data  = ProductPricingHelper::get_product_wholesale_discount_data( $product, $wholesale_role, 1 );
 
-            if ( $discount_data['wholesale_discount_type'] === 'fixed' ) {
-                return $product_price;
-            } else {
+            if ( $discount_data['wholesale_discount_type'] === 'rate' ) {
                 return $base_price * ( 1 - floatval( $discount_data['wholesale_discount_value'] ) / 100 );
+            } else {
+                return $product_price;
             }
         }
         return $product_price;

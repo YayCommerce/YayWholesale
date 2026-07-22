@@ -12,22 +12,15 @@ if ( ! defined( 'ABSPATH' ) ) {
 $wholesale_roles         = RolesHelper::get_wholesale_roles();
 $custom_discounts_nonce  = wp_create_nonce( 'ywhs-product-based-discount-nonce' );
 $product_id              = get_the_ID();
-$product_based_discounts = get_post_meta( $product_id, ProductPricingHelper::PRODUCT_BASED_DISCOUNT_KEY, true );
-if ( empty( $product_based_discounts ) ) {
-    $product_based_discounts = ProductPricingHelper::get_default_settings();
-}
-
-$product_based_access = ProductAccessHelper::get_product_based_access_restriction( $product_id );
+$product                 = wc_get_product( $product_id );
+$product_based_discounts = ProductPricingHelper::get_product_based_discount_setting( $product_id );
+$product_based_access    = ProductAccessHelper::get_product_based_access_restriction( $product_id );
 ?>
 <div class="form-field ywhs_product_based_wholesale_rules_wrapper">
     <div class="ywhs_wholesale_rules">
         <div class="ywhs_header">
             <!-- YayWholesale logo -->
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M20.2671 4.78611L12.4685 0.283433C12.1794 0.11646 11.823 0.11646 11.534 0.283433L3.73531 4.78611C3.11232 5.14531 3.11232 6.04473 3.73531 6.40393L11.534 10.9066C11.823 11.0736 12.1794 11.0736 12.4685 10.9066L20.2671 6.40393C20.8901 6.04473 20.8901 5.14531 20.2671 4.78611Z" fill="#FFC900" />
-                <path d="M1.0737 9.39947V18.4048C1.0737 18.7388 1.2519 19.0475 1.54095 19.213L9.3396 23.7157C9.96259 24.0749 10.7399 23.6259 10.7399 22.9075V13.9022C10.7399 13.5682 10.5617 13.2595 10.2727 13.0939L2.47403 8.59127C1.85104 8.23206 1.0737 8.68107 1.0737 9.39947Z" fill="#FFC900" />
-                <path d="M14.6658 23.7169L22.463 19.2142C22.7521 19.0472 22.9303 18.7385 22.9303 18.406V9.40201C22.9303 8.68361 22.1515 8.2332 21.5299 8.5938L13.7327 13.0965C13.4436 13.2635 13.2654 13.5721 13.2654 13.9047V22.9086C13.2654 23.6271 14.0442 24.0775 14.6658 23.7169Z" fill="#FFC900" />
-            </svg>
+            <img src="<?php echo ( esc_url( YAYWHOLESALEB2B_PLUGIN_URL . 'assets/images/logo/yaywholesale_icon.svg' ) ); ?>" width="24" height="24"/>
 
             <div class="ywhs_separator"></div>
             <p>Yay Wholesale B2B</p>
@@ -57,55 +50,149 @@ $product_based_access = ProductAccessHelper::get_product_based_access_restrictio
                 <p class="ywhs_helptip"><?php esc_html_e( '"Default", use the role\'s default discount rate. ', 'yay-wholesale-b2b' ); ?></p>
             </div>
 
-            <div class="ywhs_field ywhs_discount_values">
-                <input type="hidden" name="yay-wholesale-b2b[discount-type]" class="ywhs_discount_type" value="<?php echo ( esc_attr( $product_based_discounts['discount_type'] ?? 'fixed' ) ); ?>" />
-                <div class="ywhs_discount_value_header">
-                    <p><?php esc_html_e( 'Discount Value', 'yay-wholesale-b2b' ); ?></p>
-                    <label>
-                        <p><?php esc_html_e( 'Percentage', 'yay-wholesale-b2b' ); ?></p>
-                        <div class="ywhs_switch">
-                            <input type="checkbox"
-                                class="ywhs_discount_type_switch"
-                                <?php echo ( esc_attr( $product_based_discounts['discount_type'] === 'fixed' ? 'checked' : '' ) ); ?> />
-                            <span></span>
+            <div class="ywhs_discount_values">
+                <div class="ywhs_field">
+                    <p><?php esc_html_e( 'Discount Type', 'yay-wholesale-b2b' ); ?></p>
+                    <div class="ywhs_field_inputs_wrapper">
+                        <div class="wc-radios ywhs_radios">
+                            <label>
+                                <input class='ywhs_discount_type_fixed_and_percent' name="yay-wholesale-b2b[discount-type]" value="by_role" type="radio"
+                                    <?php echo ( esc_attr( $product_based_discounts['discount_type'] === 'by_role' ? 'checked' : '' ) ); ?>>
+                                <?php esc_html_e( 'Percentage / Fixed Amount', 'yay-wholesale-b2b' ); ?>
+                            </label>
                         </div>
-                        <p><?php esc_html_e( 'Fixed amount', 'yay-wholesale-b2b' ); ?></p>
-                    </label>
+                        <div class="wc-radios ywhs_radios">
+                            <label>
+                                <input class='ywhs_discount_rule_tier' name="yay-wholesale-b2b[discount-type]" value="tiered" type="radio"
+                                    <?php echo ( esc_attr( $product_based_discounts['discount_type'] === 'tiered' ? 'checked' : '' ) ); ?>>
+                                <?php esc_html_e( 'Tiered pricing', 'yay-wholesale-b2b' ); ?>
+                            </label>
+                        </div>
+                    </div>
                 </div>
-                <div class="ywhs_discount_roles_value">
-                    <?php foreach ( $wholesale_roles as $wholesale_role ) : ?>
-                        <div class="ywhs_discount_role_value_item">
-                            <div class="ywhs_discount_role">
-                                <?php echo ( esc_html( $wholesale_role['name'] ) ); ?>
-                            </div>
-                            <div class="ywhs_value_input ywhs_discount_rate_value">
-                                <input
-                                    type="number"
-                                    id="ywhs_product_based_rate_<?php echo ( esc_html( $wholesale_role['slug'] ) ); ?>"
-                                    name="yay-wholesale-b2b[discount-rates][<?php echo ( esc_html( $wholesale_role['slug'] ) ); ?>]"
-                                    placeholder="<?php esc_attr_e( 'Auto', 'yay-wholesale-b2b' ); ?>"
-                                    value=<?php echo ( esc_html( $product_based_discounts['discount_rates'][ $wholesale_role['slug'] ] ?? '' ) ); ?>
-                                    step="0.01"
-                                    min="0"
-                                    max="100">
-                                </input>
-                                <span class="ywhs_input_suffix">%</span>
-                            </div>
-                            <div class="ywhs_value_input ywhs_discount_fixed_value">
-                                <input
-                                    type="number"
-                                    id="ywhs_product_based_fixed_<?php echo ( esc_html( $wholesale_role['slug'] ) ); ?>"
-                                    name="yay-wholesale-b2b[discount-fixed][<?php echo ( esc_html( $wholesale_role['slug'] ) ); ?>]"
-                                    placeholder="<?php esc_attr_e( 'Auto', 'yay-wholesale-b2b' ); ?>"
-                                    value=<?php echo ( esc_html( $product_based_discounts['discount_fixed'][ $wholesale_role['slug'] ] ?? '' ) ); ?>
-                                    step="0.01"
-                                    min="0" />
-                                <span class="ywhs_input_suffix">
-                                    <?php echo ( esc_html( get_woocommerce_currency_symbol() ) ); ?>
-                                </span>
-                            </div>
-                        </div>
-                    <?php endforeach ?>
+                <div class="ywhs_field ywhs_discount_table">
+                    <div class="ywhs_discount_value_header">
+                        <p><?php esc_html_e( 'Discount Value', 'yay-wholesale-b2b' ); ?></p>
+                    </div>
+                    <table class="ywhs_discount_roles_value">
+                        <thead>
+                            <tr>
+                                <th><?php esc_html_e( 'Role', 'yay-wholesale-b2b' ); ?></th>
+                                <th class="ywhs_tier_type"><?php esc_html_e( 'Base price', 'yay-wholesale-b2b' ); ?></th>
+                                <th class="ywhs_tier_type"><?php esc_html_e( 'Volume Tiers', 'yay-wholesale-b2b' ); ?></th>
+                                <th class="ywhs_fixed_rate_type"><?php esc_html_e( 'Discount', 'yay-wholesale-b2b' ); ?></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ( $wholesale_roles as $wholesale_role ) : ?>
+                                <tr>
+                                    <td class="ywhs_discount_role_cell"><?php echo ( esc_html( $wholesale_role['name'] ) ); ?></td>
+                                    <td class="ywhs_tier_base_price_cell ywhs_tier_type">
+                                        <div class="ywhs_value_input">
+                                            <input
+                                                type="number"
+                                                id="ywhs_product_tier_base_price_<?php echo ( esc_html( $wholesale_role['slug'] ) ); ?>"
+                                                name="yay-wholesale-b2b[base-tier-price][<?php echo ( esc_html( $wholesale_role['slug'] ) ); ?>]"
+                                                value=<?php echo ( esc_html( $product_based_discounts['discount_tiered']['wholesaler'][ $wholesale_role['slug'] ]['base_tier']['price'] ?? $product->get_price( 'edit' ) ) ); ?>
+                                                step="0.01"
+                                                min="0"
+                                                >
+                                            <div class="ywhs_input_suffix">
+                                                <?php echo ( esc_html( get_woocommerce_currency_symbol() ) ); ?>
+                                            </div>
+                                            </input>
+                                        </div>
+                                    </td>
+                                    <td class="ywhs_volume_tier_cell ywhs_tier_type">
+                                        <div class="ywhs_tier_cell">
+                                            <div class="ywhs_tier_volume_container">
+                                                <?php if ( array_key_exists( $wholesale_role['slug'], $product_based_discounts['discount_tiered']['wholesaler'] ) ) : ?>
+                                                    <?php foreach ( $product_based_discounts['discount_tiered']['wholesaler'][ $wholesale_role['slug'] ]['tier_list'] as $index => $tier ) : ?>
+
+                                                        <div class="ywhs_tier_volume">
+                                                            <div class="ywhs_tier_from_quantity">
+                                                                <span><?php esc_html_e( 'From', 'yay-wholesale-b2b' ); ?></span>
+                                                                <input
+                                                                    type="number"
+                                                                    id="ywhs_product_tier_from_quantity_<?php echo ( esc_html( $wholesale_role['slug'] ) ); ?>"
+                                                                    name="yay-wholesale-b2b[tier-from-quantity][<?php echo ( esc_html( $wholesale_role['slug'] ) ); ?>][<?php echo ( esc_html( $index ) ); ?>]"
+                                                                    value=<?php echo ( esc_html( $tier['from'] ) ); ?>
+                                                                    step="0.01"
+                                                                    min="0">
+                                                            </div>
+                                                            <div class="ywhs_tier_price">
+                                                                <span><?php esc_html_e( 'Price', 'yay-wholesale-b2b' ); ?></span>
+                                                                <div class="ywhs_value_input">
+                                                                    <input
+                                                                        type="number"
+                                                                        id="ywhs_product_tier_base_price_<?php echo ( esc_html( $wholesale_role['slug'] ) ); ?>"
+                                                                        name="yay-wholesale-b2b[tier-price][<?php echo ( esc_html( $wholesale_role['slug'] ) ); ?>][<?php echo ( esc_html( $index ) ); ?>]"
+                                                                        value=<?php echo ( esc_html( $tier['price'] ) ); ?>
+                                                                        step="0.01"
+                                                                        min="0">
+                                                                    </input>
+                                                                    <div class="ywhs_input_suffix">
+                                                                        <?php echo ( esc_html( get_woocommerce_currency_symbol() ) ); ?>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="ywhs_tier_volume_delete">
+                                                                <svg width="11" height="12" fill="currentColor" aria-hidden="true" >
+                                                                    <use href="<?php echo( esc_url( YAYWHOLESALEB2B_PLUGIN_URL . 'assets/images/icon/delete.svg' ) ); ?>" >#delete_icon</use>
+                                                                </svg>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    <?php endforeach ?>
+                                                <?php endif ?>
+                                            </div>
+                                            <div
+                                                class="ywhs_add_tier_volume"
+                                                data-currency="<?php echo ( esc_html( get_woocommerce_currency_symbol() ) ); ?>"
+                                                data-role="<?php echo ( esc_html( $wholesale_role['slug'] ) ); ?>"
+                                                data-delete-icon="<?php echo( esc_url( YAYWHOLESALEB2B_PLUGIN_URL . 'assets/images/icon/delete.svg' ) ); ?>"
+                                                >
+                                                <svg width="8" height="8" fill="currentColor" aria-hidden="true" >
+                                                    <use href="<?php echo( esc_url( YAYWHOLESALEB2B_PLUGIN_URL . 'assets/images/icon/plus.svg' ) ); ?>" >#plus_icon</use>
+                                                </svg>
+
+                                                <?php esc_html_e( 'Add Tier', 'yay-wholesale-b2b' ); ?>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="ywhs_fixed_rate_type ywhs_tier_base_price_cell">
+                                        <div class="ywhs_value_input">
+                                            <input type="hidden" class="ywhs_discount_type" name="yay-wholesale-b2b[discount-by-role-types][<?php echo ( esc_html( $wholesale_role['slug'] ) ); ?>]" value=<?php echo ( esc_html( $product_based_discounts['discount_by_role']['wholesaler'][ $wholesale_role['slug'] ]['type'] ) ); ?> />
+                                            <input
+                                                type="number"
+                                                id="ywhs_product_based_value_<?php echo ( esc_html( $wholesale_role['slug'] ) ); ?>"
+                                                class="ywhs_discount_value"
+                                                name="yay-wholesale-b2b[discount-by-role-val][<?php echo ( esc_html( $wholesale_role['slug'] ) ); ?>]"
+                                                placeholder="<?php esc_attr_e( 'Auto', 'yay-wholesale-b2b' ); ?>"
+                                                value=<?php echo ( esc_html( 'fixed' === $product_based_discounts['discount_by_role']['wholesaler'][ $wholesale_role['slug'] ]['type'] ? $product_based_discounts['discount_by_role']['wholesaler'][ $wholesale_role['slug'] ]['fixed'] : $product_based_discounts['discount_by_role']['wholesaler'][ $wholesale_role['slug'] ]['rate'] ) ); ?>
+                                                data-rate="<?php echo ( esc_html( $product_based_discounts['discount_by_role']['wholesaler'][ $wholesale_role['slug'] ]['rate'] ?? '' ) ); ?>"
+                                                data-fixed="<?php echo ( esc_html( $product_based_discounts['discount_by_role']['wholesaler'][ $wholesale_role['slug'] ]['fixed'] ?? '' ) ); ?>"
+                                                step="0.01"
+                                                min="0"
+                                                <?php echo ( esc_html( 'rate' === $product_based_discounts['discount_by_role']['wholesaler'][ $wholesale_role['slug'] ]['type'] ? 'max=100' : '' ) ); ?>
+                                                >
+                                            </input>
+                                            <div class="ywhs_discount_type_trigger">
+                                                <?php echo ( esc_html( 'fixed' === $product_based_discounts['discount_by_role']['wholesaler'][ $wholesale_role['slug'] ]['type'] ? get_woocommerce_currency_symbol() : '%' ) ); ?>
+                                            </div>
+                                            <div class="ywhs_discount_type_switcher">
+                                                <div class="ywhs_discount_type_menu">
+                                                    <div class="ywhs_discount_type_rate"><?php esc_attr_e( 'Percentage', 'yay-wholesale-b2b' ); ?></div>
+                                                    <div class="ywhs_discount_type_fixed" data-currency-symbol="<?php echo ( esc_html( get_woocommerce_currency_symbol() ) ); ?>">
+                                                        <?php esc_attr_e( 'Fixed Amount', 'yay-wholesale-b2b' ); ?>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            <?php endforeach ?>
+                        </tbody>
+                    </table>
                 </div>
             </div>
 
@@ -140,43 +227,80 @@ $product_based_access = ProductAccessHelper::get_product_based_access_restrictio
 
             <div class="ywhs_access_enable_by_role">
                 <div class="ywhs_field">
+                    <p><?php esc_html_e( 'Retailer', 'yay-wholesale-b2b' ); ?></p>
                     <div class="ywhs_field_inputs_wrapper">
-                        <div class="ywhs_select">
-                            <label for="ywhs_access_rule_retailer"><?php esc_html_e( 'Retailer', 'yay-wholesale-b2b' ); ?></label>
-                            <select
-                                id="ywhs_access_rule_retailer"
-                                name="yay-wholesale-b2b[access-retailers]"
-                                class="ywhs_select ywhs_access_rule_retailer">
-                                <option value="disabled" <?php echo ( esc_attr( $product_based_access['retailers'] === 'disabled' ? 'selected' : '' ) ); ?>><?php esc_html_e( 'Disabled', 'yay-wholesale-b2b' ); ?></option>
-                                <option value="enabled" <?php echo ( esc_attr( $product_based_access['retailers'] === 'enabled' ? 'selected' : '' ) ); ?>><?php esc_html_e( 'Enabled', 'yay-wholesale-b2b' ); ?></option>
-                            </select>
+                        <div class="wc-radios ywhs_radios">
+                            <label>
+                                <input
+                                    name="yay-wholesale-b2b[access-retailers]"
+                                    value="disabled"
+                                    type="radio"
+                                    <?php echo ( esc_attr( $product_based_access['retailers'] === 'disabled' ? 'checked' : '' ) ); ?>>
+                                <?php esc_html_e( 'Disabled', 'yay-wholesale-b2b' ); ?>
+                            </label>
                         </div>
-                        <div class="ywhs_select">
-                            <label for="ywhs_access_rule_wholesaler"><?php esc_html_e( 'Wholesaler', 'yay-wholesale-b2b' ); ?></label>
-                            <select
-                                id="ywhs_access_rule_wholesaler"
-                                name="yay-wholesale-b2b[access-wholesalers]"
-                                class="ywhs_select ywhs_access_rule_wholesaler"
-                                value="<?php echo ( esc_attr( $product_based_access['wholesalers'] ?? 'enabled' ) ); ?>">
-                                <option value="disabled" <?php echo ( esc_attr( $product_based_access['wholesalers'] === 'disabled' ? 'selected' : '' ) ); ?>><?php esc_html_e( 'Disabled', 'yay-wholesale-b2b' ); ?></option>
-                                <option value="enabled" <?php echo ( esc_attr( $product_based_access['wholesalers'] === 'enabled' ? 'selected' : '' ) ); ?>><?php esc_html_e( 'Enabled', 'yay-wholesale-b2b' ); ?></option>
-                                <option value="enabled-selected-roles" <?php echo ( esc_attr( $product_based_access['wholesalers'] === 'enabled-selected-roles' ? 'selected' : '' ) ); ?>><?php esc_html_e( 'Enabled for Selected Roles', 'yay-wholesale-b2b' ); ?></option>
-                            </select>
+                        <div class="wc-radios ywhs_radios">
+                            <label>
+                                <input
+                                    name="yay-wholesale-b2b[access-retailers]"
+                                    value="enabled"
+                                    type="radio"
+                                    <?php echo ( esc_attr( $product_based_access['retailers'] === 'enabled' ? 'checked' : '' ) ); ?>>
+                                <?php esc_html_e( 'Enabled', 'yay-wholesale-b2b' ); ?>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ywhs_field">
+                    <p><?php esc_html_e( 'Wholesaler', 'yay-wholesale-b2b' ); ?></p>
+                    <div class="ywhs_field_inputs_wrapper">
+                        <div class="wc-radios ywhs_radios">
+                            <label>
+                                <input
+                                    class="ywhs_access_wholesalers_disabled"
+                                    name="yay-wholesale-b2b[access-wholesalers]"
+                                    value="disabled"
+                                    type="radio"
+                                    <?php echo ( esc_attr( $product_based_access['wholesalers'] === 'disabled' ? 'checked' : '' ) ); ?>>
+                                <?php esc_html_e( 'Disabled', 'yay-wholesale-b2b' ); ?>
+                            </label>
+                        </div>
+                        <div class="wc-radios ywhs_radios">
+                            <label>
+                                <input
+                                    class="ywhs_access_wholesalers_enabled"
+                                    name="yay-wholesale-b2b[access-wholesalers]"
+                                    value="enabled"
+                                    type="radio"
+                                    <?php echo ( esc_attr( $product_based_access['wholesalers'] === 'enabled' ? 'checked' : '' ) ); ?>>
+                                <?php esc_html_e( 'Enabled', 'yay-wholesale-b2b' ); ?>
+                            </label>
+                        </div>
+                        <div class="wc-radios ywhs_radios">
+                            <label>
+                                <input
+                                    class="ywhs_access_wholesalers_enabled_selected"
+                                    name="yay-wholesale-b2b[access-wholesalers]"
+                                    value="enabled-selected-roles"
+                                    type="radio"
+                                    <?php echo ( esc_attr( $product_based_access['wholesalers'] === 'enabled-selected-roles' ? 'checked' : '' ) ); ?>>
+                                <?php esc_html_e( 'Enabled for selected roles', 'yay-wholesale-b2b' ); ?>
+                            </label>
                         </div>
                     </div>
                 </div>
 
                 <div class="ywhs_field ywhs_access_selected_roles">
                     <p><?php esc_html_e( 'Enable Role', 'yay-wholesale-b2b' ); ?></p>
-                    <div class="ywhs_field_inputs_grid">
+                    <div class="ywhs_field_inputs_list">
                         <?php foreach ( $wholesale_roles as $wholesale_role ) : ?>
-                            <div class="wc-radios ywhs_radios">
+                            <div class="wc-radios">
                                 <label>
                                     <input
                                         name="yay-wholesale-b2b[access-selected-roles][<?php echo ( esc_html( $wholesale_role['slug'] ) ); ?>]"
                                         type="checkbox"
-                                        <?php echo ( esc_attr( 'enabled' === $product_based_access['wholesalers'] || in_array( $wholesale_role['slug'], $product_based_access['selected_roles'], true ) ? 'checked' : '' ) ); ?>
-                                        />
+                                        <?php echo ( esc_attr( 'enabled' === $product_based_access['wholesalers'] || in_array( $wholesale_role['slug'], $product_based_access['selected_roles'], true ) ? 'checked' : '' ) ); ?> />
                                     <?php echo ( esc_html( $wholesale_role['name'] ) ); ?>
                                 </label>
                             </div>

@@ -10,3 +10,7 @@ export function saveSetup(data: SetupWizardForm) {
 export function skipSetup() {
   return api.post('setup-wizard/skip').json<boolean>();
 }
+
+export function updateSetupHelpful(value: 'yes' | 'no') {
+  return api.put('setup-wizard/helpful', { json: { helpful: value } }).json<boolean>();
+}

@@ -13,7 +13,7 @@ export default function Welcome({ setStep, skip, isPendingSkip }: SingleSetupSte
     <div className="flex flex-col items-center justify-center gap-6">
       <div className="border-border flex size-17.5 items-center justify-center rounded-full bg-[#F2FAFF]">
         <img
-          src={`${window.yayWholesaleB2BMeta.wholesaleMeta.assetsUrl}/images/waving_hand.svg`}
+          src={`${window.yayWholesaleB2BMeta.wholesaleMeta.assetsUrl}/images/setup-wizard/waving_hand.svg`}
           alt="YayWholesale"
           className="size-10"
         />

@@ -42,7 +42,7 @@ class Pricing {
         }
 
         // Product based price
-        $product_based_price = ProductPricingHelper::calculate_product_based_price( $before_discounted_price, $product->get_id(), $wholesale_role );
+        $product_based_price = ProductPricingHelper::calculate_product_based_price( $before_discounted_price, $product->get_id(), $wholesale_role, $quantity );
 
         if ( $product_based_price ) {
             return $product_based_price;
@@ -73,7 +73,7 @@ class Pricing {
         }
 
         // Product based discount
-        $product_based_discount = ProductPricingHelper::get_product_based_discount( $product->get_id(), $wholesale_role );
+        $product_based_discount = ProductPricingHelper::get_product_based_discount( $product->get_id(), $wholesale_role, $quantity );
 
         if ( ! empty( $product_based_discount ) ) {
             return $product_based_discount;

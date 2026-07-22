@@ -26,6 +26,7 @@ import {
 import { Separator } from '@/components/ui/separator';
 import { Toaster } from '@/components/ui/sonner';
 import SetupStepsDisplay from '@/pages/setup-wizard/SetupStepsDisplay';
+import SetupWizardHelpful from '@/pages/setup-wizard/SetupWizardHelpful';
 import ReadyToGo from '@/pages/setup-wizard/steps/ReadyToGo';
 import RoleSetup from '@/pages/setup-wizard/steps/RoleSetup';
 import Welcome from '@/pages/setup-wizard/steps/Welcome';
@@ -122,7 +123,7 @@ export function SetupWizardPage() {
         <div className="flex flex-col items-center justify-center gap-4">
           <div>
             <img
-              src={`${window.yayWholesaleB2BMeta.wholesaleMeta.assetsUrl}/images/yaywholesale_logo.svg`}
+              src={`${window.yayWholesaleB2BMeta.wholesaleMeta.assetsUrl}/images/logo/yaywholesale_full.svg`}
               alt="YayWholesale"
               width="100%"
             />
@@ -151,6 +152,8 @@ export function SetupWizardPage() {
             </form>
           </FormProvider>
         </Card>
+
+        <SetupWizardHelpful step={step} maxSteps={steps.length - 1} />
       </div>
       <Dialog open={openSkip} onOpenChange={setOpenSkip}>
         <DialogContent className="bw:max-w-md">
