@@ -3,7 +3,6 @@ namespace YayWholesaleB2B\Pro\Engine\Frontend;
 
 use YayWholesaleB2B\Helpers\CustomerHelper;
 use YayWholesaleB2B\Helpers\RequirementHelper;
-use YayWholesaleB2B\Pro\Helpers\TemplatesHelper;
 use YayWholesaleB2B\Utils\SingletonTrait;
 
 defined( 'ABSPATH' ) || exit;
@@ -47,15 +46,15 @@ class Requirement {
             return;
         }
 
+        if ( ! RequirementHelper::is_requirement_bar_visible() ) {
+            return;
+        }
+
         $min_order_quantity = RequirementHelper::get_min_order_quantity( $wholesale );
         $min_order_amount   = RequirementHelper::get_min_order_amount( $wholesale );
 
         $is_hidden_quantity = 0.0 === (float) $min_order_quantity;
         $is_hidden_amount   = 0.0 === (float) $min_order_amount;
-
-        // if ( $is_hidden_quantity && $is_hidden_amount ) {
-        // return;
-        // }
 
         $is_discounted   = isset( $wholesale ) && RequirementHelper::is_cart_meet_requirement( $wholesale );
         $actual_subtotal = RequirementHelper::calc_actual_subtotal_of_cart();
@@ -177,8 +176,7 @@ class Requirement {
         if ( ( function_exists( 'is_checkout' ) && is_checkout() ) ||
             ( function_exists( 'is_cart' ) && is_cart() ) ) {
 
-            // var_dump( wp_is_block_theme() );
-            if ( ! TemplatesHelper::is_requirement_enabled_in_cart() ) {
+            if ( ! RequirementHelper::is_requirement_bar_visible() ) {
                 return;
             }
 
@@ -243,6 +241,10 @@ class Requirement {
      */
     public function automatically_add_ywhs_to_mini_cart( $block_content ) {
         // Your custom block HTML
+        if ( ! RequirementHelper::is_requirement_bar_visible() ) {
+            return $block_content;
+        }
+
         $custom_block         = '<!-- wp:yay-wholesale/requirement-block /-->';
         $custom_block_content = do_blocks( $custom_block );
 

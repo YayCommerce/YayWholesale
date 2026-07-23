@@ -4,15 +4,17 @@ namespace YayWholesaleB2B\Pro\Helpers;
 
 use WP_Query;
 use YayWholesaleB2B\Helpers\RolesHelper;
+use YayWholesaleB2B\Helpers\TemplatesHelper as ClassicTemplatesHelper;
 
 /**
  * Template Helper
  */
 class TemplatesHelper {
-    const TAXONOMY_SLUG            = 'yay_wholesale_b2b';
-    const SHOP_TEMPLATE_TERM_SLUG  = 'ywhs_shop_template';
-    const SHOP_TEMPLATE_SLUG_LIST  = 'yaywholesaleb2b_shop_block_templates';
-    const TEMPLATE_VISIBILITY_META = 'ywhs_template_visibility';
+    const TAXONOMY_SLUG                  = 'yay_wholesale_b2b';
+    const SHOP_TEMPLATE_TERM_SLUG        = 'ywhs_shop_template';
+    const SHOP_TEMPLATE_SLUG_LIST        = 'yaywholesaleb2b_shop_block_templates';
+    const TEMPLATE_VISIBILITY_META       = 'ywhs_template_visibility';
+    const SHOP_CLASSIC_TEMPLATE_SETTINGS = 'yaywholesaleb2b_classic_shop_templates';
 
     public static function get_archive_product_template() {
         $template = get_block_template(
@@ -33,6 +35,15 @@ class TemplatesHelper {
 
     public static function get_template_visibility_meta( int $template_wp_id ) {
         return get_post_meta( $template_wp_id, self::TEMPLATE_VISIBILITY_META, true );
+    }
+
+    public static function get_default_template_visibility_meta() {
+        return [
+            'is_active'      => true,
+            'retailers'      => 'enabled',
+            'wholesalers'    => 'enabled',
+            'selected_roles' => [],
+        ];
     }
 
     public static function save_template_visibility_meta( int $template_wp_id, array $meta ) {
@@ -63,7 +74,7 @@ class TemplatesHelper {
             return false;
         }
 
-        foreach ( $template_slug_list as $slug ) {
+        foreach ( $template_slug_list[ get_stylesheet() ] as $slug ) {
             $template_post = get_page_by_path( $slug, OBJECT, 'wp_template' );
             if ( empty( $template_post ) ) {
                 continue;
@@ -84,7 +95,7 @@ class TemplatesHelper {
             return false;
         }
 
-        if ( ! $visibility['isActive'] ) {
+        if ( ! $visibility['is_active'] ) {
             return false;
         }
 
@@ -107,7 +118,7 @@ class TemplatesHelper {
             return __( '( Active - Visible to All )', 'yay-wholesale-b2b' );
         }
 
-        if ( $visibility['isActive'] ) {
+        if ( $visibility['is_active'] ) {
             $active_str = __( 'Active', 'yay-wholesale-b2b' );
         }
 
@@ -204,5 +215,27 @@ class TemplatesHelper {
         }
 
         return false;
+    }
+
+    public static function get_classic_templates_setting() {
+        $default           = [
+            'retailers'   => 'wc',
+            'wholesalers' => 'wc',
+        ];
+        $template_settings = get_option( self::SHOP_CLASSIC_TEMPLATE_SETTINGS, $default );
+
+        // Check if the current slug is active
+        $template_slug_list = array_column( ClassicTemplatesHelper::get_classic_templates(), 'slug' );
+        foreach ( $template_settings as $key => $template_slug ) {
+            if ( ! in_array( $template_slug, $template_slug_list, true ) ) {
+                $template_settings[ $key ] = 'wc';
+            }
+        }
+
+        return $template_settings;
+    }
+
+    public static function save_classic_templates_setting( array $settings ) {
+        update_option( self::SHOP_CLASSIC_TEMPLATE_SETTINGS, $settings );
     }
 }

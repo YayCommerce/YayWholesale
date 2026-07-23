@@ -139,4 +139,9 @@ class RequirementHelper {
         }
         return $subtotal;
     }
+
+    public static function is_requirement_bar_visible() {
+        $settings = SettingsHelper::get_settings();
+        return (bool) $settings['display']['requirement_bar_visible'];
+    }
 }

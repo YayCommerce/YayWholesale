@@ -29,6 +29,11 @@ class TemplateEditor {
 
         // Others
         add_filter( 'register_block_type_args', [ $this, 'my_plugin_add_cart_toggle' ], 10, 2 );
+
+        // Classic (Yay Wholesale settings)
+        add_filter( 'ywhs_full_settings', [ $this, 'get_template_list' ], 10, 1 );
+        add_action( 'ywhs_settings_updated', [ $this, 'update_template_list' ], 10, 1 );
+        add_filter( 'ywhs_classic_shop_template_list', [ $this, 'add_new_templates_classic' ], 10, 1 );
     }
 
     /**
@@ -228,12 +233,14 @@ class TemplateEditor {
         );
 
         if ( ! in_array( $slug, $template_slugs, true ) ) {
-            $template_slugs[] = $slug;
+            $template_slugs[ get_stylesheet() ][] = $slug;
             TemplatesHelper::save_block_shop_templates_list( $template_slugs );
         }
 
-            // Re-add the hook
-            add_action( 'save_post_wp_template', [ $this, 'create_shop_template' ], 10, 3 );
+        TemplatesHelper::save_template_visibility_meta( $post_id, TemplatesHelper::get_default_template_visibility_meta() );
+
+        // Re-add the hook
+        add_action( 'save_post_wp_template', [ $this, 'create_shop_template' ], 10, 3 );
     }
 
     /**
@@ -253,12 +260,12 @@ class TemplateEditor {
         wp_cache_delete( TemplatesHelper::SHOP_TEMPLATE_SLUG_LIST, 'options' );
         wp_cache_delete( 'alloptions', 'options' );
 
-        $template_slugs = TemplatesHelper::get_block_shop_templates_list();
+        $templates = TemplatesHelper::get_block_shop_templates_list();
 
         foreach ( $terms as $term ) {
             if ( $term->slug === TemplatesHelper::SHOP_TEMPLATE_TERM_SLUG ) {
-                $template_slugs = array_filter( $template_slugs, fn( $slug ) => $slug !== $post->post_name );
-                TemplatesHelper::save_block_shop_templates_list( $template_slugs );
+                $templates[ get_stylesheet() ] = array_filter( $templates[ get_stylesheet() ], fn( $slug ) => $slug !== $post->post_name );
+                TemplatesHelper::save_block_shop_templates_list( $templates );
                 break;
             }
         }
@@ -293,5 +300,35 @@ class TemplateEditor {
         );
         // Re-add the hook
         add_action( 'wp_after_insert_post', [ $this, 'update_shop_template' ], 20, 2 );
+    }
+
+    public function get_template_list( array $settings ) {
+        $classic_templates_setting                          = TemplatesHelper::get_classic_templates_setting();
+        $settings['display']['classic_retailer_template']   = $classic_templates_setting['retailers'];
+        $settings['display']['classic_wholesaler_template'] = $classic_templates_setting['wholesalers'];
+        return $settings;
+    }
+
+    public function update_template_list( array $settings ) {
+        $classic_templates_setting = [
+            'retailers'   => $settings['display']['classic_retailer_template'],
+            'wholesalers' => $settings['display']['classic_wholesaler_template'],
+        ];
+        TemplatesHelper::save_classic_templates_setting( $classic_templates_setting );
+    }
+
+    public function add_new_templates_classic( $templates ) {
+        $templates[] = [
+            'slug' => 'ywhs_wholesalers',
+            'name' => 'YayWholesale Template',
+            'path' => YAYWHOLESALEB2B_PLUGIN_DIR . 'includes/Pro/Templates/shop-template/wholesale-shop.php',
+        ];
+        $templates[] = [
+            'slug' => 'ywhs_retailers',
+            'name' => 'YayWholesale Retailer Template',
+            'path' => YAYWHOLESALEB2B_PLUGIN_DIR . 'includes/Pro/Templates/shop-template/retail-shop.php',
+        ];
+
+        return $templates;
     }
 }

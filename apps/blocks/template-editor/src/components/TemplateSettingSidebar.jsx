@@ -9,15 +9,6 @@ import {
 import { useSelect, useDispatch } from "@wordpress/data";
 import { useState, useMemo, useEffect } from "@wordpress/element";
 
-const DEFAULT_SETTINGS = {
-  templateVisibility: {
-    isActive: true,
-    retailers: "enabled",
-    wholesalers: "enabled",
-    selected_roles: [],
-  },
-};
-
 const WHOLESALE_ROLES = window.yayWholesaleMeta.wholesale_roles ?? [];
 
 export default function TemplateSettingSidebar() {
@@ -44,7 +35,7 @@ export default function TemplateSettingSidebar() {
   }, []);
 
   const { editPost } = useDispatch("core/editor");
-  const [settings, setSettings] = useState(DEFAULT_SETTINGS);
+  const [settings, setSettings] = useState(null);
   const [currentTemplateId, setTemplateId] = useState("");
 
   const meta = useSelect(
@@ -53,8 +44,10 @@ export default function TemplateSettingSidebar() {
   );
 
   const isShowingRolesPanel = useMemo(
-    () => settings.templateVisibility.wholesalers === "enabled-selected-roles",
-    [settings.templateVisibility, settings.templateVisibility.wholesalers]
+    () =>
+      settings?.templateVisibility &&
+      settings.templateVisibility.wholesalers === "enabled-selected-roles",
+    [settings?.templateVisibility, settings?.templateVisibility.wholesalers]
   );
 
   const handleChange = (newSettings) => {
@@ -68,23 +61,26 @@ export default function TemplateSettingSidebar() {
   };
 
   useEffect(() => {
-    if (meta?.ywhs_template_visibility || currentTemplateId != templateId) {
-      const templateVisibility =
-        meta && meta.ywhs_template_visibility
-          ? meta.ywhs_template_visibility
-          : DEFAULT_SETTINGS.templateVisibility;
+    if (!isYayWholesaleTemplateEditor) return;
+
+    if (
+      meta?.ywhs_template_visibility ||
+      (templateId && currentTemplateId != templateId)
+    ) {
+      const templateVisibility = meta.ywhs_template_visibility;
       if (
         templateVisibility.selected_roles.length < 1 &&
         templateVisibility.wholesalers === "enabled"
       ) {
         templateVisibility.selected_roles = WHOLESALE_ROLES.map((r) => r.slug);
       }
+
       setSettings({ ...settings, templateVisibility });
       setTemplateId(templateId);
     }
   }, [meta?.ywhs_template_visibility, templateId]);
 
-  if (!isYayWholesaleTemplateEditor) {
+  if (!isYayWholesaleTemplateEditor || !settings) {
     return null;
   }
 
@@ -107,13 +103,13 @@ export default function TemplateSettingSidebar() {
             <ToggleControl
               label={__("Active", "yay-wholesale-b2b")}
               help={__("Apply this template to Shop page", "yay-wholesale-b2b")}
-              checked={settings.templateVisibility.isActive}
+              checked={settings.templateVisibility.is_active}
               onChange={(value) =>
                 handleChange({
                   ...settings,
                   templateVisibility: {
                     ...settings.templateVisibility,
-                    isActive: !settings.templateVisibility.isActive,
+                    is_active: !settings.templateVisibility.is_active,
                   },
                 })
               }

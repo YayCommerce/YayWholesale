@@ -53,6 +53,7 @@ class LocalizeHelper {
                 'restRoot'     => esc_url_raw( rest_url() ),
                 'restBase'     => BaseRestController::REST_NAMESPACE,
                 'restNonce'    => wp_create_nonce( 'wp_rest' ),
+                'isBlockTheme' => wp_is_block_theme(),
 
                 'usersUrl'     => [
                     'list' => esc_url_raw( admin_url( 'users.php' ) ),
@@ -92,8 +93,9 @@ class LocalizeHelper {
                     'list' => esc_url_raw( admin_url( 'edit.php?post_type=shop_order' ) ),
                 ],
                 'setting_urls'          => [
-                    'payment'  => esc_url_raw( admin_url( 'admin.php?page=wc-settings&tab=checkout' ) ),
-                    'shipping' => esc_url_raw( admin_url( 'admin.php?page=wc-settings&tab=shipping' ) ),
+                    'payment'        => esc_url_raw( admin_url( 'admin.php?page=wc-settings&tab=checkout' ) ),
+                    'shipping'       => esc_url_raw( admin_url( 'admin.php?page=wc-settings&tab=shipping' ) ),
+                    'templateEditor' => esc_url_raw( admin_url( 'site-editor.php?p=%2Ftemplate&activeView=root' ) ),
                 ],
                 'currency_data'         => [
                     'currency'     => get_woocommerce_currency(),
@@ -105,6 +107,7 @@ class LocalizeHelper {
                 ],
                 'payment_methods_info'  => WoocommerceHelper::get_enabled_payment_methods(),
                 'shipping_methods_info' => WoocommerceHelper::get_enabled_shipping_methods(),
+                'classic_templates'     => TemplatesHelper::get_classic_templates(),
             ],
         ];
 

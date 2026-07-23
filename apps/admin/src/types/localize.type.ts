@@ -10,6 +10,7 @@ export type Meta = {
     restRoot: string;
     restBase: string;
     restNonce: string;
+    isBlockTheme: boolean;
 
     usersUrl: {
       list: string;
@@ -35,6 +36,7 @@ export type Meta = {
     setting_urls: {
       payment: string;
       shipping: string;
+      templateEditor: string;
     };
     currency_data: {
       currency: string;
@@ -57,6 +59,10 @@ export type Meta = {
       zone_name: string;
       method_name: string;
       description: string;
+    }[];
+    classic_templates: {
+      slug: string;
+      name: string;
     }[];
   };
 };

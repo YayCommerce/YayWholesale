@@ -1,9 +1,12 @@
 import { useMemo, useState } from 'react';
+import { Edit } from 'lucide-react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { __ } from '@wordpress/i18n';
 
 import { parseWPCurrency } from '@/lib/helpers/format.helper';
 import type { Settings } from '@/lib/schema/settings.schema';
+import { isPro } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
 import {
   ColorPicker,
   ColorPickerContent,
@@ -14,11 +17,14 @@ import {
   ColorPickerTrigger,
 } from '@/components/ui/color-picker';
 import { AddToCartSkeleton, ProductImageSkeleton } from '@/components/ui/custom/shop-skeleton';
+import { UpgradeToProBadge } from '@/components/ui/custom/upgrate-to-pro';
 import { Field, FieldContent, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { Segmented, SegmentedItem } from '@/components/ui/segmented';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Separator } from '@/components/ui/separator';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Switch } from '@/components/ui/switch';
 
 export default function DisplayTab() {
   const { control, watch } = useFormContext<Settings>();
@@ -123,6 +129,117 @@ export default function DisplayTab() {
             </Field>
           )}
         />
+
+        <Separator />
+        <Controller
+          control={control}
+          name="display.requirement_bar_visible"
+          render={({ field }) => (
+            <div className="flex items-center justify-between gap-5 rounded-md">
+              <div>
+                <FieldLabel className="flex items-center gap-2 leading-3.5 font-medium">
+                  {__('Requirement Bar', 'yay-wholesale-b2b')}
+                  {!isPro && <UpgradeToProBadge />}
+                </FieldLabel>
+                <p className="text-muted-foreground mt-1 text-xs font-normal">
+                  {__('Display a requirement progress bar in mini cart, cart and checkout pages.', 'yay-wholesale-b2b')}
+                  <br />
+                  {__(
+                    "Note: This setting does not affect to the visibility of 'Wholesale Requirement' Block",
+                    'yay-wholesale-b2b',
+                  )}
+                </p>
+              </div>
+              <Switch checked={field.value} onCheckedChange={field.onChange} disabled={!isPro} />
+            </div>
+          )}
+        />
+
+        {isBlockTheme ? (
+          <div className="flex items-center justify-between gap-15 rounded-md">
+            <div>
+              <p className="text-foreground text-[13px] font-semibold">Template Editor</p>
+              <span className="text-muted-foreground mt-2 text-xs font-normal">
+                {__(
+                  "Create, customize and manage access permissions for each user role in the shop page. Build your shop catalog using the 'Products with Wholesale' template.",
+                  'yay-wholesale-b2b',
+                )}
+              </span>
+            </div>
+            <Button
+              variant="outline"
+              className="flex items-center gap-2"
+              onClick={() => {
+                window.open(window.yayWholesaleB2BMeta.wcMeta.setting_urls.templateEditor);
+              }}
+            >
+              <Edit className="size-4" />
+              <span className="text-[13px]">{__('Manage', 'yay-wholesale-b2b')}</span>
+            </Button>
+          </div>
+        ) : (
+          <div className="flex flex-col gap-6">
+            <Controller
+              control={control}
+              name="display.classic_retailer_template"
+              render={({ field }) => (
+                <div className="flex items-center justify-between gap-5 rounded-md">
+                  <div>
+                    <FieldLabel className="flex items-center gap-2 leading-3.5 font-medium">
+                      {__('Retailer Shop Template', 'yay-wholesale-b2b')}
+                      {!isPro && <UpgradeToProBadge />}
+                    </FieldLabel>
+                    <p className="text-muted-foreground mt-1 text-xs font-normal">
+                      {__("Select a template for your retailer's product catalog page", 'yay-wholesale-b2b')}
+                    </p>
+                  </div>
+                  <Select value={field.value ? field.value : 'wc'} onValueChange={field.onChange} disabled={!isPro}>
+                    <SelectTrigger className="w-35 min-w-35 sm:w-55 sm:min-w-55">
+                      <SelectValue placeholder={__('Select the template', 'yay-wholesale-b2b')} />
+                    </SelectTrigger>
+                    <SelectContent align="end">
+                      {classic_templates.map((template, index) => (
+                        <SelectItem key={index} value={template.slug}>
+                          {template.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+            />
+
+            <Controller
+              control={control}
+              name="display.classic_wholesaler_template"
+              render={({ field }) => (
+                <div className="flex items-center justify-between gap-5 rounded-md">
+                  <div>
+                    <FieldLabel className="flex items-center gap-2 leading-3.5 font-medium">
+                      {__('Wholesaler Shop Template', 'yay-wholesale-b2b')}
+                      {!isPro && <UpgradeToProBadge />}
+                    </FieldLabel>
+                    <p className="text-muted-foreground mt-1 text-xs font-normal">
+                      {__("Select a template for your wholesaler's product catalog page", 'yay-wholesale-b2b')}
+                    </p>
+                  </div>
+                  <Select value={field.value ? field.value : 'wc'} onValueChange={field.onChange} disabled={!isPro}>
+                    <SelectTrigger className="w-35 min-w-35 sm:w-55 sm:min-w-55">
+                      <SelectValue placeholder={__('Select the template', 'yay-wholesale-b2b')} />
+                    </SelectTrigger>
+                    <SelectContent align="end">
+                      {classic_templates.map((template, index) => (
+                        <SelectItem key={index} value={template.slug}>
+                          {template.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+            />
+          </div>
+        )}
       </div>
       <div className="border-divider flex w-fit flex-1 justify-center border-t py-4 lg:flex-0 lg:border-t-0 lg:border-l lg:pr-6 lg:pl-10">
         <div className="flex flex-col gap-4">
@@ -192,3 +309,6 @@ function CustomColorPicker({ children, ...props }: ColorPickerProps) {
     </ColorPicker>
   );
 }
+
+const { isBlockTheme } = window.yayWholesaleB2BMeta.wpMeta;
+const { classic_templates } = window.yayWholesaleB2BMeta.wcMeta;
