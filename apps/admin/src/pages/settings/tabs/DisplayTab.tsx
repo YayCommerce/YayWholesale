@@ -143,11 +143,6 @@ export default function DisplayTab() {
                 </FieldLabel>
                 <p className="text-muted-foreground mt-1 text-xs font-normal">
                   {__('Display a requirement progress bar in mini cart, cart and checkout pages.', 'yay-wholesale-b2b')}
-                  <br />
-                  {__(
-                    "Note: This setting does not affect to the visibility of 'Wholesale Requirement' Block",
-                    'yay-wholesale-b2b',
-                  )}
                 </p>
               </div>
               <Switch checked={field.value} onCheckedChange={field.onChange} disabled={!isPro} />

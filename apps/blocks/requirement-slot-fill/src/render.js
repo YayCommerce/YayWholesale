@@ -17,10 +17,6 @@ const Render = () => {
   const isHiddenQuantity = wholesale.minOrderQuantity == 0;
   const isHiddenAmount = wholesale.minOrderAmount == 0;
 
-  // if (isHiddenQuantity && isHiddenAmount) {
-  //   return null;
-  // }
-
   const { cart, isLoading } = useSelect((select) => {
     const store = select("wc/store/cart");
 

@@ -1,6 +1,7 @@
 // import RequirementSettings, {
 //   addAttributesToBlocks,
 // } from "./components/RequirementSetting";
+import { RequirementEditSlotFill } from "./components/RequirementSetting";
 import TemplateSettingSidebar from "./components/TemplateSettingSidebar";
 import { registerPlugin } from "@wordpress/plugins";
 
@@ -18,6 +19,13 @@ import { registerPlugin } from "@wordpress/plugins";
 //   "ywhs/requirement-toggle",
 //   RequirementSettings
 // );
+
+// Render Slotfill in edit
+wp.hooks.addFilter(
+  "editor.BlockEdit",
+  "my-plugin/checkout-editor",
+  RequirementEditSlotFill
+);
 // #endregion
 
 // #region Template Setting Sidebar

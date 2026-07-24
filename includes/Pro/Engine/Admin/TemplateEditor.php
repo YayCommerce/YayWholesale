@@ -1,6 +1,7 @@
 <?php
 namespace YayWholesaleB2B\Pro\Engine\Admin;
 
+use YayWholesaleB2B\Helpers\RequirementHelper;
 use YayWholesaleB2B\Helpers\RolesHelper;
 use YayWholesaleB2B\Pro\Helpers\TemplatesHelper;
 use YayWholesaleB2B\Utils\SingletonTrait;
@@ -77,7 +78,8 @@ class TemplateEditor {
             $handle,
             'yayWholesaleMeta',
             [
-                'wholesale_roles' => RolesHelper::get_wholesale_roles(),
+                'wholesale_roles'        => RolesHelper::get_wholesale_roles(),
+                'is_requirement_visible' => RequirementHelper::is_requirement_bar_visible() && class_exists( 'Automattic\WooCommerce\Blocks\Package' ),
             ]
         );
     }
