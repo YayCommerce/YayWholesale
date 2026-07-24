@@ -39,7 +39,6 @@ do_action( 'woocommerce_before_main_content' );
 ?>
 <?php if ( apply_filters( 'woocommerce_show_page_title', true ) ) : ?>
     <h1 class="woocommerce-products-header__title page-title"><?php woocommerce_page_title(); ?></h1>
-    <div><?php esc_attr_e( 'This is a wholesale shop', 'yay-wholesale-b2b' ); ?></div>
 <?php endif ?>
 <?php
 
@@ -53,6 +52,8 @@ if ( woocommerce_product_loop() ) {
      * @hooked woocommerce_catalog_ordering - 30
      */
     do_action( 'woocommerce_before_shop_loop' );
+
+    do_action( 'ywhs_wpt_before_shop_loop' );
 
     woocommerce_product_loop_start();
 
@@ -71,6 +72,8 @@ if ( woocommerce_product_loop() ) {
 
     woocommerce_product_loop_end();
 
+    do_action( 'ywhs_wpt_after_shop_loop' );
+
     /**
      * Hook: woocommerce_after_shop_loop.
      *
@@ -85,7 +88,6 @@ if ( woocommerce_product_loop() ) {
      */
     do_action( 'woocommerce_no_products_found' );
 }//end if
-
 /**
  * Hook: woocommerce_after_main_content.
  *

@@ -34,7 +34,7 @@ class TemplateEditor {
         // Classic (Yay Wholesale settings)
         add_filter( 'ywhs_full_settings', [ $this, 'get_template_list' ], 10, 1 );
         add_action( 'ywhs_settings_updated', [ $this, 'update_template_list' ], 10, 1 );
-        add_filter( 'ywhs_classic_shop_template_list', [ $this, 'add_new_templates_classic' ], 10, 1 );
+        add_filter( 'ywhs_is_using_custom_templates', '__return_true', 10, 1 );
     }
 
     /**
@@ -317,20 +317,5 @@ class TemplateEditor {
             'wholesalers' => $settings['display']['classic_wholesaler_template'],
         ];
         TemplatesHelper::save_classic_templates_setting( $classic_templates_setting );
-    }
-
-    public function add_new_templates_classic( $templates ) {
-        $templates[] = [
-            'slug' => 'ywhs_wholesalers',
-            'name' => 'YayWholesale Template',
-            'path' => YAYWHOLESALEB2B_PLUGIN_DIR . 'includes/Pro/Templates/shop-template/wholesale-shop.php',
-        ];
-        $templates[] = [
-            'slug' => 'ywhs_retailers',
-            'name' => 'YayWholesale Retailer Template',
-            'path' => YAYWHOLESALEB2B_PLUGIN_DIR . 'includes/Pro/Templates/shop-template/retail-shop.php',
-        ];
-
-        return $templates;
     }
 }
