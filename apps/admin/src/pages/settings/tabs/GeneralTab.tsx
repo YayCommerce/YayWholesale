@@ -89,7 +89,7 @@ export default function GeneralTab() {
                 </p>
               </div>
               <Select value={String(field.value) || 'inherit'} onValueChange={field.onChange} disabled={!isPro}>
-                <SelectTrigger className="min-w-40">
+                <SelectTrigger className="sm:min-45 w-25 min-w-25 sm:w-45">
                   <SelectValue placeholder={__('Select your page', 'yay-wholesale-b2b')} />
                 </SelectTrigger>
                 <SelectContent align="end">

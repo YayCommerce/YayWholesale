@@ -24,10 +24,10 @@ class StorePage {
             return;
         }
 
-        // Load template (title, content)
-        add_filter( 'template_include', [ $this, 'load_template' ] );
-        // Load products
-        add_action( 'pre_get_posts', [ $this, 'store_products_query' ] );
+        // Load template (Classic theme)
+        add_filter( 'template_include', [ $this, 'classic_load_template' ] );
+        // Load products for the page
+        add_action( 'pre_get_posts', [ $this, 'load_products_query' ] );
 
         // Clean resource, query
         add_filter( 'theme_page_templates', [ $this, 'hide_page_templates' ], 10, 3 );
@@ -55,7 +55,7 @@ class StorePage {
      * @param   string $template
      * @return  string $template
      */
-    public function load_template( $template ) {
+    public function classic_load_template( $template ) {
         if ( ! SupportHelper::is_wholesale_shop_page( $this->settings ) ) {
             return $template;
         }
@@ -181,7 +181,7 @@ class StorePage {
      *
      * @param WP_Query $q
      */
-    public function store_products_query( $q ) {
+    public function load_products_query( $q ) {
         if ( ! $q->is_main_query() || ! wc_current_theme_supports_woocommerce_or_fse() ) {
             return;
         }
@@ -191,66 +191,48 @@ class StorePage {
             return;
         }
 
-            $page_id = (int) $q->get( 'page_id' );
+        $page_id = (int) $q->get( 'page_id' );
 
         if ( ! $page_id ) {
             $page_id = $q->get_queried_object_id();
         }
 
-            // bail if we are on front page and it's not the wholesale store
-            // hacky because WordPress has issues with is_front_page() inside pre_get_posts
-        if ( get_option( 'show_on_front' ) === 'page' && get_option( 'page_on_front' ) && intval( get_option( 'page_on_front' ) ) === $page_id && $page_id !== (int) $this->settings['general']['wholesale_store_page'] ) {
+        if ( ! $q->is_page() || $page_id !== (int) $this->settings['general']['wholesale_store_page'] ) {
             return;
         }
 
-            // check wholesale not on front and whether this is wholesale store
-        if ( get_option( 'page_on_front' ) !== (int) $this->settings['general']['wholesale_store_page'] && $page_id !== (int) $this->settings['general']['wholesale_store_page'] ) {
-            return;
-        }
+        $q->set( 'post_type', 'product' );
+        $q->is_singular          = false;
+        $q->is_post_type_archive = true;
+        $q->is_archive           = true;
+        $q->is_page              = true;
 
-            // When any admissible query vars is set, WordPress shows posts on the front-page. Get around that here.
-        if ( $this->is_showing_page_on_front( $q ) && $this->page_on_front_is( (int) $this->settings['general']['wholesale_store_page'] ) ) {
+        if ( 'page' === get_option( 'show_on_front' ) && (int) get_option( 'page_on_front' ) === (int) $page_id && ! $q->is_posts_page ) {
+            $parsed_query = wp_parse_args( $q->query );
 
-            $_query = wp_parse_args( $q->query );
+            // Excluded Args triggered the front-page posts.
+            $excluded_query_args = [ 'preview', 'page', 'paged', 'cpage', 'orderby', 'min_price', 'max_price', 'rating_filter' ];
 
-            // Query vars that should not trigger the front-page posts.
-            $excluded_query_vars = [ 'preview', 'page', 'paged', 'cpage', 'orderby' ];
-
-            // Query vars coming from the WWP price and rating filter widgets
-            $excluded_query_vars = array_merge( $excluded_query_vars, [ 'min_price', 'max_price', 'rating_filter' ] );
-
-            // Query vars coming from the WWP attribute filter widgets
             foreach ( wc_get_attribute_taxonomies() as $tax ) {
                 if ( taxonomy_exists( wc_attribute_taxonomy_name( $tax->attribute_name ) ) ) {
-                    $excluded_query_vars[] = 'filter_' . wc_attribute_taxonomy_slug( $tax->attribute_name );
+                    $excluded_query_args[] = 'filter_' . wc_attribute_taxonomy_slug( $tax->attribute_name );
                 }
             }
 
-            if ( empty( $_query ) || empty( array_diff( array_keys( $_query ), $excluded_query_vars ) ) ) {
-                $page_id = (int) get_option( 'page_on_front' );
+            if ( empty( $parsed_query ) || empty( array_diff( array_keys( $parsed_query ), $excluded_query_args ) ) ) {
                 $q->set( 'page_id', $page_id );
-                $q->is_page = true;
-                $q->is_home = false;
-
-                // WP supporting themes show post type archive.
-                if ( current_theme_supports( 'woocommerce' ) ) {
-                    $q->set( 'post_type', 'product' );
-                } else {
-                    $q->is_singular = true;
-                }
+                $q->is_page     = true;
+                $q->is_home     = false;
+                $q->is_singular = true;
             }
         }//end if
 
-        if ( $q->is_page() && $page_id === (int) $this->settings['general']['wholesale_store_page'] ) {
-            if ( 'page' === get_option( 'show_on_front' ) ) {
-                // Remove post type archive name from front page title tag.
-                add_filter( 'post_type_archive_title', '__return_empty_string', 5 );
-            }
-        } else {
-            return;
+        if ( 'page' === get_option( 'show_on_front' ) ) {
+            // Remove post type archive name from front page title tag.
+            add_filter( 'post_type_archive_title', '__return_empty_string', 5 );
         }
 
-            $this->product_query( $q );
+        $this->product_query( $q );
     }
 
     /**
@@ -320,7 +302,7 @@ class StorePage {
     /**
      * Query the products, applying sorting/ordering etc.
      *
-     * @param WP_Query $q Query instance.
+     * @param \WP_Query $q Query instance.
      */
     public function product_query( $q ) {
         global $wp_post_types;
@@ -332,18 +314,11 @@ class StorePage {
         $wp_post_types['product']->post_type  = $wholesale_shop_page->post_type ?? '';
         $wp_post_types['product']->ancestors  = get_ancestors( $wp_post_types['product']->ID, $wp_post_types['product']->post_type );
 
-        // Fix conditionals
-        $q->is_singular          = false;
-        $q->is_post_type_archive = true;
-        $q->is_archive           = true;
-        $q->is_page              = true;
-
         // phpcs:ignore WordPress.Security.NonceVerification.Recommended
         if ( isset( $_GET['s'] ) ) {
             $q->is_search = true;
         }
 
-        $q->set( 'post_type', 'product' );
         $q->set( 'page_id', 0 );
         $q->set( 'pagename', '' );
         $q->set( 'name', '' );
@@ -363,39 +338,17 @@ class StorePage {
             }
         }
 
-        // Query vars that affect posts shown.
-        $q->set( 'meta_query', $this->get_meta_query( $q->get( 'meta_query' ), true ) );
+        $q->set( 'meta_query', is_array( $q->get( 'meta_query' ) ) ? $q->get( 'meta_query' ) : [] );
         $q->set( 'tax_query', $this->get_tax_query( $q->get( 'tax_query' ), true ) );
         $q->set( 'wc_query', 'product_query' );
         $q->set( 'post__in', array_unique( (array) apply_filters( 'loop_shop_post_in', [] ) ) );
 
-        // Work out how many products to query.
+        // Perpage
         $q->set( 'posts_per_page', $q->get( 'posts_per_page' ) ? $q->get( 'posts_per_page' ) : apply_filters( 'loop_shop_per_page', wc_get_default_products_per_row() * wc_get_default_product_rows_per_page() ) );
-
-        if ( ! $this->is_woocommerce_3_5() ) {
-            add_filter( 'posts_clauses', [ $this, 'price_filter_post_clauses' ], 10, 2 );
-        }
     }
 
     /**
-     * Appends meta queries to an array.
-     *
-     * @see WC_Query woocommerce/includes/class-wc-query.php
-     *
-     * @param  array $meta_query Meta query.
-     * @param  bool  $main_query If is main query.
-     * @return array
-     */
-    public function get_meta_query( $meta_query = [], $main_query = false ) {
-        if ( ! is_array( $meta_query ) ) {
-            $meta_query = [];
-        }
-
-        return $meta_query;
-    }
-
-    /**
-     * Appends tax queries to an array.
+     * Get tax query to meta.
      *
      * @see WC_Query woocommerce/includes/class-wc-query.php
      *
@@ -532,81 +485,19 @@ class StorePage {
                 break;
             case 'price':
                 $callback = 'DESC' === $order ? 'order_by_price_desc_post_clauses' : 'order_by_price_asc_post_clauses';
-                $callback = $this->is_woocommerce_3_5() ? $callback . '_3_5' : $callback;
                 add_filter( 'posts_clauses', [ $this, $callback ] );
 
                 break;
             case 'popularity':
-                if ( $this->is_woocommerce_3_5() ) {
-                    $args['meta_key'] = 'total_sales'; // @codingStandardsIgnoreLine
-                    add_filter( 'posts_clauses', [ $this, 'order_by_popularity_post_clauses_3_5' ] );
-                } else {
-                    add_filter( 'posts_clauses', [ $this, 'order_by_popularity_post_clauses' ] );
-                }
+                add_filter( 'posts_clauses', [ $this, 'order_by_popularity_post_clauses' ] );
 
                 break;
             case 'rating':
-                if ( $this->is_woocommerce_3_5() ) {
-                    $args['meta_key'] = '_wc_average_rating'; // @codingStandardsIgnoreLine
-                    $args['orderby']  = [
-                        'meta_value_num' => 'DESC',
-                        'ID'             => 'ASC',
-                    ];
-                } else {
-                    add_filter( 'posts_clauses', [ $this, 'order_by_rating_post_clauses' ] );
-                }
+                add_filter( 'posts_clauses', [ $this, 'order_by_rating_post_clauses' ] );
                 break;
         }//end switch
 
         return apply_filters( 'woocommerce_get_catalog_ordering_args', $args, $orderby, $order );
-    }
-
-    /**
-     * Custom query used to filter products by price.
-     *
-     * @see \WC_Query woocommerce/includes/class-wc-query.php
-     * @since 3.6.0
-     *
-     * @param array    $args Query args.
-     * @param WC_Query $wp_query WC_Query object.
-     *
-     * @return array
-     */
-    public function price_filter_post_clauses( $args, $wp_query ) {
-        global $wpdb;
-
-        // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-        if ( ! $wp_query->is_main_query() || ( ! isset( $_GET['max_price'] ) && ! isset( $_GET['min_price'] ) ) ) {
-            return $args;
-        }
-
-        // phpcs:disable WordPress.Security.NonceVerification.Recommended
-        $current_min_price = isset( $_GET['min_price'] ) ? floatval( wp_unslash( $_GET['min_price'] ) ) : 0;
-        $current_max_price = isset( $_GET['max_price'] ) ? floatval( wp_unslash( $_GET['max_price'] ) ) : PHP_INT_MAX;
-        // phpcs:enable WordPress.Security.NonceVerification.Recommended
-
-        /**
-         * Adjust if the store taxes are not displayed how they are stored.
-         * Kicks in when prices excluding tax are displayed including tax.
-         */
-        if ( wc_tax_enabled() && 'incl' === get_option( 'woocommerce_tax_display_shop' ) && ! wc_prices_include_tax() ) {
-            $tax_class = apply_filters( 'woocommerce_price_filter_widget_tax_class', '' );
-            // Uses standard tax class.
-            $tax_rates = \WC_Tax::get_rates( $tax_class );
-
-            if ( $tax_rates ) {
-                $current_min_price -= \WC_Tax::get_tax_total( \WC_Tax::calc_inclusive_tax( $current_min_price, $tax_rates ) );
-                $current_max_price -= \WC_Tax::get_tax_total( \WC_Tax::calc_inclusive_tax( $current_max_price, $tax_rates ) );
-            }
-        }
-
-        $args['join']   = $this->append_product_sorting_table_join( $args['join'] );
-        $args['where'] .= $wpdb->prepare(
-            ' AND wc_product_meta_lookup.min_price >= %f AND wc_product_meta_lookup.max_price <= %f ',
-            $current_min_price,
-            $current_max_price
-        );
-        return $args;
     }
 
     /**
@@ -618,43 +509,8 @@ class StorePage {
      * @return array
      */
     public function order_by_price_asc_post_clauses( $args ) {
-        $args['join']    = $this->append_product_sorting_table_join( $args['join'] );
+        $args['join']    = SupportHelper::append_product_sorting_table_join( $args['join'] );
         $args['orderby'] = ' wc_product_meta_lookup.min_price ASC, wc_product_meta_lookup.product_id ASC ';
-        return $args;
-    }
-
-    /**
-     * Handle numeric price sorting.
-     *
-     * @param array $args Query args.
-     * @return array
-     */
-    public function order_by_price_asc_post_clauses_3_5( $args ) {
-        global $wpdb, $wp_query;
-
-        if ( isset( $wp_query->queried_object, $wp_query->queried_object->term_taxonomy_id, $wp_query->queried_object->taxonomy ) && is_a( $wp_query->queried_object, 'WP_Term' ) ) {
-            $search_within_terms   = get_terms(
-                [
-                    'taxonomy' => $wp_query->queried_object->taxonomy,
-                    'child_of' => $wp_query->queried_object->term_id,
-                    'fields'   => 'tt_ids',
-                ]
-            );
-            $search_within_terms[] = $wp_query->queried_object->term_taxonomy_id;
-            $args['join']         .= " INNER JOIN (
-				SELECT post_id, min( meta_value+0 ) price
-				FROM $wpdb->postmeta
-				INNER JOIN (
-					SELECT $wpdb->term_relationships.object_id
-					FROM $wpdb->term_relationships
-					WHERE 1=1
-					AND $wpdb->term_relationships.term_taxonomy_id IN (" . implode( ',', array_map( 'absint', $search_within_terms ) ) . ")
-				) as products_within_terms ON $wpdb->postmeta.post_id = products_within_terms.object_id
-				WHERE meta_key='_price' GROUP BY post_id ) as ywhs_price_query ON $wpdb->posts.ID = ywhs_price_query.post_id ";
-        } else {
-            $args['join'] .= " INNER JOIN ( SELECT post_id, min( meta_value+0 ) price FROM $wpdb->postmeta WHERE meta_key='_price' GROUP BY post_id ) as ywhs_price_query ON $wpdb->posts.ID = ywhs_price_query.post_id ";
-        }//end if
-        $args['orderby'] = " ywhs_price_query.price ASC, $wpdb->posts.ID ASC ";
         return $args;
     }
 
@@ -667,46 +523,8 @@ class StorePage {
      * @return array
      */
     public function order_by_price_desc_post_clauses( $args ) {
-        $args['join']    = $this->append_product_sorting_table_join( $args['join'] );
+        $args['join']    = SupportHelper::append_product_sorting_table_join( $args['join'] );
         $args['orderby'] = ' wc_product_meta_lookup.max_price DESC, wc_product_meta_lookup.product_id DESC ';
-        return $args;
-    }
-
-    /**
-     * Handle numeric price sorting for WC 3.5
-     *
-     * @see \WC_Query woocommerce/includes/class-wc-query.php
-     *
-     * @param array $args Query args.
-     * @return array
-     */
-    public function order_by_price_desc_post_clauses_3_5( $args ) {
-        global $wpdb, $wp_query;
-
-        if ( isset( $wp_query->queried_object, $wp_query->queried_object->term_taxonomy_id, $wp_query->queried_object->taxonomy ) && is_a( $wp_query->queried_object, 'WP_Term' ) ) {
-            $search_within_terms   = get_terms(
-                [
-                    'taxonomy' => $wp_query->queried_object->taxonomy,
-                    'child_of' => $wp_query->queried_object->term_id,
-                    'fields'   => 'tt_ids',
-                ]
-            );
-            $search_within_terms[] = $wp_query->queried_object->term_taxonomy_id;
-            $args['join']         .= " INNER JOIN (
-				SELECT post_id, max( meta_value+0 ) price
-				FROM $wpdb->postmeta
-				INNER JOIN (
-					SELECT $wpdb->term_relationships.object_id
-					FROM $wpdb->term_relationships
-					WHERE 1=1
-					AND $wpdb->term_relationships.term_taxonomy_id IN (" . implode( ',', array_map( 'absint', $search_within_terms ) ) . ")
-				) as products_within_terms ON $wpdb->postmeta.post_id = products_within_terms.object_id
-				WHERE meta_key='_price' GROUP BY post_id ) as ywhs_price_query ON $wpdb->posts.ID = ywhs_price_query.post_id ";
-        } else {
-            $args['join'] .= " INNER JOIN ( SELECT post_id, max( meta_value+0 ) price FROM $wpdb->postmeta WHERE meta_key='_price' GROUP BY post_id ) as ywhs_price_query ON $wpdb->posts.ID = ywhs_price_query.post_id ";
-        }//end if
-
-        $args['orderby'] = " ywhs_price_query.price DESC, $wpdb->posts.ID DESC ";
         return $args;
     }
 
@@ -721,22 +539,8 @@ class StorePage {
      * @return array
      */
     public function order_by_popularity_post_clauses( $args ) {
-        $args['join']    = $this->append_product_sorting_table_join( $args['join'] );
+        $args['join']    = SupportHelper::append_product_sorting_table_join( $args['join'] );
         $args['orderby'] = ' wc_product_meta_lookup.total_sales DESC, wc_product_meta_lookup.product_id DESC ';
-        return $args;
-    }
-
-    /**
-     * WP Core doens't let us change the sort direction for individual orderby params - https://core.trac.wordpress.org/ticket/17065.
-     *
-     * This lets us sort by meta value desc, and have a second orderby param.
-     *
-     * @param array $args Query args.
-     * @return array
-     */
-    public function order_by_popularity_post_clauses_3_5( $args ) {
-        global $wpdb;
-        $args['orderby'] = "$wpdb->postmeta.meta_value+0 DESC, $wpdb->posts.post_date DESC";
         return $args;
     }
 
@@ -749,7 +553,7 @@ class StorePage {
      * @return array
      */
     public function order_by_rating_post_clauses( $args ) {
-        $args['join']    = $this->append_product_sorting_table_join( $args['join'] );
+        $args['join']    = SupportHelper::append_product_sorting_table_join( $args['join'] );
         $args['orderby'] = ' wc_product_meta_lookup.average_rating DESC, wc_product_meta_lookup.product_id DESC ';
         return $args;
     }
@@ -764,34 +568,12 @@ class StorePage {
      * @return array
      */
     public function remove_product_query_filters( $posts ) {
-        if ( $this->is_woocommerce_3_5() ) {
-            $this->remove_ordering_args_3_5();
-        } else {
-            $this->remove_ordering_args();
-        }
-
-        return $posts;
-    }
-
-    /**
-     * Remove ordering queries.
-     */
-    public function remove_ordering_args() {
         remove_filter( 'posts_clauses', [ $this, 'order_by_price_asc_post_clauses' ] );
         remove_filter( 'posts_clauses', [ $this, 'order_by_price_desc_post_clauses' ] );
         remove_filter( 'posts_clauses', [ $this, 'order_by_popularity_post_clauses' ] );
         remove_filter( 'posts_clauses', [ $this, 'order_by_rating_post_clauses' ] );
-    }
 
-    /**
-     * Remove ordering queries.
-     */
-    public function remove_ordering_args_3_5() {
-        remove_filter( 'posts_clauses', [ $this, 'order_by_price_asc_post_clauses_3_5' ] );
-        remove_filter( 'posts_clauses', [ $this, 'order_by_price_desc_post_clauses_3_5' ] );
-        remove_filter( 'posts_clauses', [ $this, 'order_by_popularity_post_clauses_3_5' ] );
-        remove_filter( 'posts_clauses', [ $this, 'order_by_rating_post_clauses' ] );
-        remove_filter( 'posts_clauses', [ $this, 'price_filter_post_clauses' ], 10, 2 );
+        return $posts;
     }
 
     /**
@@ -804,6 +586,7 @@ class StorePage {
             return;
         }
 
+        // Redirect to Wholesale shop if access to default shop
         if ( is_shop() && ! SupportHelper::is_wholesale_shop_page( $this->settings ) && is_user_logged_in() && isset( $role ) ) {
             $url = SupportHelper::get_wholesale_store_url( $this->settings );
 
@@ -812,8 +595,6 @@ class StorePage {
             }
 
             if ( is_search() ) {
-                // redirect WC product search to wholesale page for wholesale users
-
                 if ( isset( $_GET['s'] ) && isset( $_GET['post_type'] ) && 'product' === $_GET['post_type'] ) {
                     $url = esc_url_raw(
                         add_query_arg(
@@ -833,60 +614,7 @@ class StorePage {
     }
 
     /**
-     * Join wc_product_meta_lookup to posts if not already joined.
-     *
-     * @see \WC_Query woocommerce/includes/class-wc-query.php
-     *
-     * @param string $sql SQL join.
-     * @return string
-     */
-    private function append_product_sorting_table_join( $sql ) {
-        global $wpdb;
-
-        if ( ! strstr( $sql, 'wc_product_meta_lookup' ) ) {
-            $sql .= " LEFT JOIN {$wpdb->wc_product_meta_lookup} wc_product_meta_lookup ON $wpdb->posts.ID = wc_product_meta_lookup.product_id ";
-        }
-        return $sql;
-    }
-
-    /**
-     * Are we currently on the front page?
-     *
-     * @see \WC_Query woocommerce/includes/class-wc-query.php
-     *
-     * @param WP_Query $q Query instance.
-     * @return bool
-     */
-    private function is_showing_page_on_front( $q ) {
-        return ( $q->is_home() && ! $q->is_posts_page ) && 'page' === get_option( 'show_on_front' );
-    }
-
-    /**
-     * Is the front page a page we define?
-     *
-     * @see \WC_Query woocommerce/includes/class-wc-query.php
-     *
-     * @param int $page_id Page ID.
-     * @return bool
-     */
-    private function page_on_front_is( $page_id ) {
-        return intval( get_option( 'page_on_front' ) ) === intval( $page_id );
-    }
-
-    /**
-     * Checks whether we need to include features for < WC 3.6
-     * Plugin Activation checks we are atleast on WC 3.5
-     *
-     * @return boolean
-     */
-    private function is_woocommerce_3_5() {
-        global $woocommerce;
-
-        return $woocommerce && version_compare( $woocommerce->version, '3.6', '<' );
-    }
-
-    /**
-     * Alter the document title for the wholesale store page.
+     * Replace the title for the wholesale page.
      *
      * @param array $title Current title parts.
      * @return array
@@ -946,21 +674,11 @@ class StorePage {
     public function handler_menu( $menu_items ) {
         $removed_items = [];
 
-        $logged_in     = false;
-        $is_wholesaler = false;
-        $is_shop_admin = false;
+        $logged_in     = is_user_logged_in();
+        $is_wholesaler = CustomerHelper::is_current_wholesale_customer();
+        $is_shop_admin = current_user_can( 'manage_woocommerce' );
 
-        $current_user        = wp_get_current_user();
-        $administrator_roles = $current_user ? array_values( array_intersect( [ 'administrator', 'shop_manager' ], $current_user->roles ) ) : [];
-        $is_wholesale        = CustomerHelper::is_current_wholesale_customer();
-
-        if ( is_user_logged_in() ) {
-            $logged_in     = true;
-            $is_wholesaler = $is_wholesale;
-            $is_shop_admin = ! empty( $administrator_roles );
-        }
-
-        // loop through menu_items and enforce our requirements as necessary
+        // Take the menu id to be removed / hide
         foreach ( $menu_items as $key => $menu_item ) {
             if ( 'page' !== $menu_item->object ) {
                 continue;
@@ -987,7 +705,7 @@ class StorePage {
             }//end if
         }//end foreach
 
-        // Now find and remove any children of any removed menu item
+        // Remove the menus
         while ( $removed_items ) {
             $child_items_removed = [];
 
@@ -998,7 +716,6 @@ class StorePage {
                 }
             }
 
-            // Update the removed list with the removed child items and start over
             $removed_items = $child_items_removed;
         }
 
@@ -1007,8 +724,6 @@ class StorePage {
 
     /**
      * Get the shop page id currently use
-     *
-     * @see \WC_Query woocommerce/includes/class-wc-query.php
      *
      * @param int $page_id Page ID.
      * @return bool

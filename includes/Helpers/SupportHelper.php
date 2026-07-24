@@ -93,4 +93,21 @@ class SupportHelper {
 
         return get_permalink( $page_id );
     }
+
+        /**
+         * Join wc_product_meta_lookup to posts if not already joined.
+         *
+         * @see \WC_Query woocommerce/includes/class-wc-query.php
+         *
+         * @param string $sql SQL join.
+         * @return string
+         */
+    public static function append_product_sorting_table_join( $sql ) {
+        global $wpdb;
+
+        if ( ! strstr( $sql, 'wc_product_meta_lookup' ) ) {
+            $sql .= " LEFT JOIN {$wpdb->wc_product_meta_lookup} wc_product_meta_lookup ON $wpdb->posts.ID = wc_product_meta_lookup.product_id ";
+        }
+        return $sql;
+    }
 }

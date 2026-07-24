@@ -30,7 +30,7 @@ class YayWholesaleB2BPro {
         \YayWholesaleB2B\Pro\Engine\Admin\ShippingMethod::get_instance();
         \YayWholesaleB2B\Pro\Engine\Admin\TemplateEditor::get_instance();
 
-        // \YayWholesaleB2B\Pro\Engine\Support\Support::get_instance();
+        \YayWholesaleB2B\Pro\Engine\Support\Support::get_instance();
     }
 
     public static function initialize() {
