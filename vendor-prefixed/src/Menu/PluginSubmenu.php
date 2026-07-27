@@ -5,6 +5,7 @@ namespace YayWholesaleB2BScoped\YayCommerce\AdminShell\Menu;
 use YayWholesaleB2BScoped\YayCommerce\AdminShell\Contracts\PluginMenuAdapter;
 use YayWholesaleB2BScoped\YayCommerce\AdminShell\License\Contracts\LicenseConfigAdapter;
 use YayWholesaleB2BScoped\YayCommerce\AdminShell\License\License;
+use YayWholesaleB2BScoped\YayCommerce\AdminShell\Pages\WooCommerceRequiredPage;
 use YayWholesaleB2BScoped\YayCommerce\AdminShell\Support\AdminContext;
 /**
  * Registers a plugin-named submenu under YayCommerce.
@@ -76,6 +77,19 @@ class PluginSubmenu
                 $needs_redirect = \true;
                 $callback = null;
             }
+        }
+        // WooCommerce dependency gate: when the plugin depends on WooCommerce and it
+        // is inactive, render the shared "install WooCommerce" screen in place of the
+        // settings page. Applied only on the real render path — the license redirect
+        // above takes precedence, so unlicensed pro plugins still land on Licenses.
+        // Opt-in via the optional needs_woocommerce_screen() adapter method; the
+        // adapter owns the runtime WooCommerce check so it runs un-prefixed under
+        // PHP-Scoper (the adapter class is excluded from scoping in each plugin).
+        if (!$needs_redirect && \method_exists($this->adapter, 'needs_woocommerce_screen') && $this->adapter->needs_woocommerce_screen()) {
+            $screen_copy = \method_exists($this->adapter, 'get_woocommerce_screen_copy') ? (array) $this->adapter->get_woocommerce_screen_copy() : [];
+            $callback = static function () use($screen_copy) {
+                WooCommerceRequiredPage::render($screen_copy);
+            };
         }
         $page_id = add_submenu_page(
             'yaycommerce',
