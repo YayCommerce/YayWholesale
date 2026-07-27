@@ -69,7 +69,7 @@ class StorePage {
         }
 
         $slug = TemplatesHelper::get_block_template_slug_by_role( CustomerHelper::get_current_user_wholesale_role() );
-        if ( false === $slug ) {
+        if ( empty( $slug ) ) {
             return $templates;
         }
 
@@ -99,7 +99,7 @@ class StorePage {
         }
 
         $slug = TemplatesHelper::get_block_template_slug_by_role( CustomerHelper::get_current_user_wholesale_role() );
-        if ( false === $slug ) {
+        if ( empty( $slug ) ) {
             return $templates;
         }
 

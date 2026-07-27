@@ -95,7 +95,7 @@ class TemplatesHelper {
             return false;
         }
 
-        if ( ! $visibility['is_active'] ) {
+        if ( empty( $visibility['is_active'] ) ) {
             return false;
         }
 

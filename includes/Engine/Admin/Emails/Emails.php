@@ -20,6 +20,8 @@ class Emails {
 
         // Disable email
         add_filter( 'woocommerce_email_enabled_new_order', [ $this, 'ywhs_handle_wc_default_email' ], 10, 2 );
+        // Resend New Order Email
+        add_action( 'woocommerce_after_resend_order_email', [ $this, 'ywhs_resend_new_wholesale_order_email' ], 100, 2 );
     }
 
     public function ywhs_register_email_classes( $email_classes ) {
@@ -81,10 +83,37 @@ class Emails {
      * @return bool
      */
     public function ywhs_handle_wc_default_email( $enabled, $order ) {
-        if ( ! isset($order) ) {
+        if ( ! isset( $order ) ) {
             return $enabled;
         }
 
+        $wholesale_mail_setting = $this->get_new_wholesale_order_email();
+
+        if ( ! empty( $wholesale_mail_setting ) && 'yes' === $wholesale_mail_setting['enabled'] ) {
+            $is_wholesale_order = $order->get_meta( '_ywhs_wholesale_role' );
+            if ( isset( $is_wholesale_order ) && ! empty( $is_wholesale_order ) ) {
+                return false;
+            }
+        }
+
+        return $enabled;
+    }
+
+    public function ywhs_resend_new_wholesale_order_email( $order, $email_id ) {
+        if ( 'new_order' !== $email_id || ! isset( $order ) ) {
+            return;
+        }
+
+        $wholesale_mail_setting = $this->get_new_wholesale_order_email();
+        if ( ! empty( $wholesale_mail_setting ) && 'yes' === $wholesale_mail_setting['enabled'] ) {
+            $is_wholesale_order = $order->get_meta( '_ywhs_wholesale_role' );
+            if ( isset( $is_wholesale_order ) && ! empty( $is_wholesale_order ) ) {
+                do_action( 'ywhs_new_wholesale_order_placed', $order->get_id(), $order );
+            }
+        }
+    }
+
+    protected function get_new_wholesale_order_email() {
         $wholesale_mail_id      = 'yaywholesaleb2b_new_order_placed';
         $wholesale_mail_setting = get_option( sprintf( 'woocommerce_%s_settings', $wholesale_mail_id ), [] );
 
@@ -97,17 +126,6 @@ class Emails {
             }
         }
 
-        if ( empty( $wholesale_mail_setting ) ) {
-            return $enabled;
-        }
-
-        if ( $wholesale_mail_setting && 'yes' === $wholesale_mail_setting['enabled'] ) {
-            $is_wholesale_order = $order->get_meta( '_ywhs_wholesale_role' );
-            if ( isset( $is_wholesale_order ) && ! empty( $is_wholesale_order ) ) {
-                return false;
-            }
-        }
-
-        return $enabled;
+        return $wholesale_mail_setting;
     }
 }

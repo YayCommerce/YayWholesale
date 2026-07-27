@@ -23,9 +23,6 @@ class StorePage {
         if ( SupportHelper::is_using_wc_shop_page( $this->settings ) ) {
             return;
         }
-
-        // Load template (Classic theme)
-        add_filter( 'template_include', [ $this, 'classic_load_template' ] );
         // Load products for the page
         add_action( 'pre_get_posts', [ $this, 'load_products_query' ] );
 
@@ -38,6 +35,7 @@ class StorePage {
 
         // Customize the page
         add_filter( 'woocommerce_page_title', [ $this, 'page_title' ] );
+        add_filter( 'get_the_archive_title', [ $this, 'page_title' ], 10, 1 );
         add_action( 'woocommerce_archive_description', [ $this, 'page_content' ], 2 );
         add_filter( 'woocommerce_get_breadcrumb', [ $this, 'page_breadcrumb' ], 10, 2 );
         add_filter( 'document_title_parts', [ $this, 'document_title_parts' ] );
@@ -49,114 +47,6 @@ class StorePage {
         add_filter( 'ywhs_shop_page_id', [ $this, 'get_shop_page_id' ] );
     }
 
-    /**
-     * Load the archive-product.php template
-     *
-     * @param   string $template
-     * @return  string $template
-     */
-    public function classic_load_template( $template ) {
-        if ( ! SupportHelper::is_wholesale_shop_page( $this->settings ) ) {
-            return $template;
-        }
-
-        $wholesale_role = CustomerHelper::get_current_user_wholesale_role();
-        if ( ! isset( $wholesale_role ) ) {
-            return $template;
-        }
-
-        if ( ! SupportHelper::has_block_template( 'archive-product' ) ) {
-            if ( wc_current_theme_supports_woocommerce_or_fse() ) {
-                $woocommerce_template = locate_template( 'woocommerce.php' );
-
-                if ( $woocommerce_template ) {
-                    return $woocommerce_template;
-                }
-
-                $archive_product = locate_template( 'woocommerce/archive-product.php' );
-
-                if ( $archive_product ) {
-                    return $archive_product;
-                }
-
-                $factory_template = wc_locate_template( 'archive-product.php' );
-
-                if ( $factory_template ) {
-                    return $factory_template;
-                }
-            } else {
-                add_filter( 'the_content', [ $this, 'unsupported_theme_shop_content_filter' ] );
-                add_filter( 'the_title', [ $this, 'unsupported_theme_title_filter' ] );
-            }//end if
-        }//end if
-
-        return $template;
-    }
-
-    /**
-     * Handle the content of page to add the products shortcode to the page's content (if Woocommerce is not supported)
-     *
-     * @param   string $content
-     * @return  string
-     */
-    public function unsupported_theme_shop_content_filter( $content ) {
-        if ( wc_current_theme_supports_woocommerce_or_fse() || ! is_main_query() || ! in_the_loop() ) {
-            return $content;
-        }
-
-        remove_filter( 'the_content', [ $this, 'unsupported_theme_shop_content_filter' ] );
-
-        $args = (object) [
-            'page'    => max( 1, (int) get_query_var( 'paged' ) ),
-            'columns' => wc_get_default_products_per_row(),
-            'rows'    => wc_get_default_product_rows_per_page(),
-        ];
-
-        $shortcode = new \WC_Shortcode_Products(
-            array_merge(
-                WC()->query->get_catalog_ordering_args(),
-                [
-                    'page'     => $args->page,
-                    'columns'  => $args->columns,
-                    'rows'     => $args->rows,
-                    'orderby'  => '',
-                    'order'    => '',
-                    'paginate' => true,
-                    'cache'    => false,
-                ]
-            ),
-            'products'
-        );
-
-        add_action( 'pre_get_posts', [ WC()->query, 'product_query' ] );
-
-        $content = $shortcode->get_content();
-
-        remove_action( 'pre_get_posts', [ WC()->query, 'product_query' ] );
-        WC()->query->remove_ordering_args();
-
-        return $content;
-    }
-
-    /**
-     * Handle to add the setting page's title to the page's content (if Woocommerce is not supported)
-     *
-     * @param   string $title
-     * @return  string
-     */
-    public function unsupported_theme_title_filter( $title ) {
-        if ( wc_current_theme_supports_woocommerce_or_fse() ) {
-            return $title;
-        }
-
-        remove_filter( 'the_title', [ $this, 'unsupported_theme_title_filter' ] );
-        $title = get_the_title( (int) $this->settings['general']['wholesale_store_page'] );
-
-        return $title;
-    }
-
-
-    // ------------------------------------------------------
     /**
      * When editing the wholesale store page, we should hide templates.
      *

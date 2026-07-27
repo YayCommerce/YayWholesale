@@ -55,15 +55,10 @@ class Barn2WoocommerceProductTable {
             return;
         }
 
-        $is_using_custom_templates = apply_filters( 'ywhs_is_using_custom_templates', false );
-        if ( $is_using_custom_templates ) {
-            return;
-        }
-
         $args = [
             'labels'            => [
-                'name'          => __( 'Yay Wholesale B2B store', 'yay-wholesale-b2b' ),
-                'singular_name' => __( 'Yay Wholesale B2B store', 'yay-wholesale-b2b' ),
+                'name'          => __( 'Products By Wholesale Role', 'yay-wholesale-b2b' ),
+                'singular_name' => __( 'Yay Wholesale B2B Templates', 'yay-wholesale-b2b' ),
             ],
             'hierarchical'      => false,
             'public'            => true,
@@ -73,7 +68,7 @@ class Barn2WoocommerceProductTable {
             'show_in_nav_menus' => false,
             'show_in_rest'      => true,
             'query_var'         => true,
-            'rewrite'           => [ 'slug' => 'yay-wholesale-b2b' ],
+            'rewrite'           => [ 'slug' => 'yay_wholesale_b2b' ],
             'capabilities'      => [
                 'manage_terms' => 'manage_woocommerce',
                 'edit_terms'   => 'manage_woocommerce',
@@ -137,11 +132,14 @@ class Barn2WoocommerceProductTable {
      * @return  array
      */
     public function add_wpt_templates( $templates ) {
-        $templates[] = [
-            'slug' => 'wpt_product_table',
-            'name' => 'Barn2 Product Table Template',
-            'path' => YAYWHOLESALEB2B_PLUGIN_DIR . 'includes/Compatibles/Barn2WoocommerceProductTable/templates/product-table-shop.php',
-        ];
+        $layout = get_option( 'ywhs_wholesale_layout', 'default' );
+        if ( $layout === 'product_table' ) {
+            $templates[] = [
+                'slug' => 'wpt_product_table',
+                'name' => 'Barn2 Product Table Template',
+                'path' => YAYWHOLESALEB2B_PLUGIN_DIR . 'includes/Engine/Compatibles/Barn2WoocommerceProductTable/templates/product-table-shop.php',
+            ];
+        }
 
         return $templates;
     }

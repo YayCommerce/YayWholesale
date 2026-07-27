@@ -113,7 +113,7 @@ class TemplateEditor {
                     'assign_terms' => 'edit_products',
                 ],
             ];
-            register_taxonomy( TemplatesHelper::TAXONOMY_SLUG, [ 'wp_template', 'wp_template_part' ], $args );
+            register_taxonomy( TemplatesHelper::TAXONOMY_SLUG, [ 'product', 'wp_template', 'wp_template_part' ], $args );
         }//end if
 
         if ( ! term_exists( TemplatesHelper::SHOP_TEMPLATE_TERM_SLUG, TemplatesHelper::TAXONOMY_SLUG ) ) {

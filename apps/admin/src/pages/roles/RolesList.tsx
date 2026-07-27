@@ -200,7 +200,11 @@ export default function RolesList() {
             )}
 
             {table.getRowModel().rows.map((row) => (
-              <TableRow key={row.id} className="group not-last:border-divider not-last:border-b">
+              <TableRow
+                key={row.id}
+                className="group not-last:border-divider not-last:border-b"
+                onClick={(e) => e.currentTarget.classList.toggle('is-row-pressed')}
+              >
                 {row.getVisibleCells().map((cell) => (
                   <TableCell
                     key={cell.id}
