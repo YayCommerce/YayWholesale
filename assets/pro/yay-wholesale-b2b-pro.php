@@ -3,7 +3,7 @@
  * Plugin Name:       Yay Wholesale B2B Pro for Woocommerce
  * Plugin URI:        https://yaycommerce.com/
  * Description:       WooCommerce wholesale plugin for serving wholesale & B2B customers.
- * Version:           1.1.1.4
+ * Version:           1.1.1.5
  * Author:            YayCommerce
  * Author URI:        https://yaycommerce.com
  * Text Domain:       yay-wholesale-b2b
@@ -35,7 +35,7 @@ if ( ! defined( 'YAYWHOLESALEB2B_FILE' ) ) {
 }
 
 if ( ! defined( 'YAYWHOLESALEB2B_VERSION' ) ) {
-    define( 'YAYWHOLESALEB2B_VERSION', '1.1.1.4' );
+    define( 'YAYWHOLESALEB2B_VERSION', '1.1.1.5' );
 }
 
 if ( ! defined( 'YAYWHOLESALEB2B_PLUGIN_URL' ) ) {

@@ -27,7 +27,15 @@ import ShippingRolesTab from './tabs/ShippingRolesTabs';
 
 export default function SettingsPage() {
   const { subMenu } = useParams();
-  const tabs = ['general', 'display', 'registration', 'registration-fields', 'payment-roles', 'shipping-roles'];
+  const tabs = [
+    'general',
+    'display',
+    'registration',
+    'registration-fields',
+    'payment-roles',
+    'shipping-roles',
+    'emails',
+  ];
   const activeTab = tabs.find((tab) => tab === subMenu) ?? tabs[0];
   const headerActionPortal = document.getElementById('yay-wholesale-b2b-header-actions');
 
@@ -136,6 +144,11 @@ export default function SettingsPage() {
                           <SettingsErrorIndicator tab="registration_fields" />
                         </SideNavMenuItem>
                       </TabsPrimitive.Trigger>
+                      <TabsPrimitive.Trigger value="emails" asChild>
+                        <SideNavMenuItem>
+                          <span>Emails</span>
+                        </SideNavMenuItem>
+                      </TabsPrimitive.Trigger>
                       <TabsPrimitive.Trigger value="payment-roles" asChild>
                         <SideNavMenuItem>
                           <span>Payment Roles</span>
@@ -151,7 +164,7 @@ export default function SettingsPage() {
                     </SideNavMenuList>
                   </TabsPrimitive.List>
                 </div>
-                <div className="bg-muted flex flex-1 flex-col">
+                <div className="bg-muted flex flex-1 flex-col overflow-hidden">
                   <TabsPrimitive.Content value="general" style={{ height: '100%' }}>
                     <div className="bg-card h-full rounded-md border p-6 sm:w-full">
                       <GeneralTab />

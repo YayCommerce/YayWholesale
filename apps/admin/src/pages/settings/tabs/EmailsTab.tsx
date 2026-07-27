@@ -45,6 +45,7 @@ export default function EmailsTab() {
                   disabled={loadingId === email.id}
                   checked={email.status}
                   loading={updateEmailStatusMutation.isPending && loadingId === email.id}
+                  size="sm"
                   onCheckedChange={(checked) => handleStatusChange(email.id, checked)}
                 />
               </TableCell>

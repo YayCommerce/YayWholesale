@@ -252,6 +252,7 @@ export default function RequestsList() {
                 key={row.id}
                 data-state={row.getIsSelected() && 'selected'}
                 className="group not-last:border-divider not-last:border-b"
+                onClick={(e) => e.currentTarget.classList.toggle('is-row-pressed')}
               >
                 {row.getVisibleCells().map((cell) => (
                   <TableCell
@@ -322,7 +323,7 @@ export default function RequestsList() {
                 <Button
                   size="icon"
                   variant="ghost"
-                  className="hover:text-destructive text-muted-foreground size-8  hover:bg-transparent hover:shadow-sm"
+                  className="hover:text-destructive text-muted-foreground size-8 hover:bg-transparent hover:shadow-sm"
                   onClick={() => setOpenDeleteDialog(true)}
                 >
                   <DeleteIcon className="size-4" />

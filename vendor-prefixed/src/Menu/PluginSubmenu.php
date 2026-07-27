@@ -13,7 +13,6 @@ use YayWholesaleB2BScoped\YayCommerce\AdminShell\Support\AdminContext;
  *
  * For pro plugins: automatically redirects to Licenses page when license
  * is not active — no developer action needed.
- * @internal
  */
 class PluginSubmenu
 {
@@ -22,13 +21,13 @@ class PluginSubmenu
     {
         $this->adapter = $adapter;
     }
-    public function init() : void
+    public function init(): void
     {
         // Bound to both hooks; the context gate in register() decides whether the
         // plugin actually registers in the current (site vs network) context.
         AdminContext::bind_menu([$this, 'register'], 10);
     }
-    public function register() : void
+    public function register(): void
     {
         // Context gate: register only where the plugin opted in. Network Admin
         // requires wants_network_menu(); site dashboard requires wants_site_menu().
@@ -51,7 +50,7 @@ class PluginSubmenu
             $yaycommerce_menu = $submenu['yaycommerce'];
             foreach ($yaycommerce_menu as $key => $value) {
                 if ($value[2] === $menu_slug) {
-                    if (\method_exists($this->adapter, 'is_licensed') && $this->adapter->is_licensed() || !\method_exists($this->adapter, 'is_licensed')) {
+                    if (method_exists($this->adapter, 'is_licensed') && $this->adapter->is_licensed() || !method_exists($this->adapter, 'is_licensed')) {
                         remove_submenu_page('yaycommerce', $menu_slug);
                         $is_override = \true;
                     } else {
@@ -66,7 +65,7 @@ class PluginSubmenu
         }
         $callback = $this->adapter->get_settings_page_callback();
         // Guard: ensure callback is actually callable
-        if (null !== $callback && !\is_callable($callback)) {
+        if (null !== $callback && !is_callable($callback)) {
             $callback = null;
         }
         // Pro plugins without active license → override callback to redirect
@@ -85,9 +84,9 @@ class PluginSubmenu
         // Opt-in via the optional needs_woocommerce_screen() adapter method; the
         // adapter owns the runtime WooCommerce check so it runs un-prefixed under
         // PHP-Scoper (the adapter class is excluded from scoping in each plugin).
-        if (!$needs_redirect && \method_exists($this->adapter, 'needs_woocommerce_screen') && $this->adapter->needs_woocommerce_screen()) {
-            $screen_copy = \method_exists($this->adapter, 'get_woocommerce_screen_copy') ? (array) $this->adapter->get_woocommerce_screen_copy() : [];
-            $callback = static function () use($screen_copy) {
+        if (!$needs_redirect && method_exists($this->adapter, 'needs_woocommerce_screen') && $this->adapter->needs_woocommerce_screen()) {
+            $screen_copy = method_exists($this->adapter, 'get_woocommerce_screen_copy') ? (array) $this->adapter->get_woocommerce_screen_copy() : [];
+            $callback = static function () use ($screen_copy) {
                 WooCommerceRequiredPage::render($screen_copy);
             };
         }
@@ -106,18 +105,18 @@ class PluginSubmenu
             null
         );
         if ($is_override) {
-            \remove_all_actions('load-' . $page_id);
+            remove_all_actions('load-' . $page_id);
         }
         if ($needs_redirect) {
             add_action('load-' . $page_id, [__CLASS__, 'redirect_to_licenses']);
         }
     }
-    public static function redirect_to_licenses() : void
+    public static function redirect_to_licenses(): void
     {
         // The load hook fires in the current context — target the matching dashboard
         // so a network-flagged pro plugin redirects within Network Admin, not the site.
         $path = 'admin.php?page=yaycommerce-licenses';
-        $url = AdminContext::is_network() ? network_admin_url($path) : \admin_url($path);
+        $url = AdminContext::is_network() ? network_admin_url($path) : admin_url($path);
         wp_safe_redirect($url);
         exit;
     }

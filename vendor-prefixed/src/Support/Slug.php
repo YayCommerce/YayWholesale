@@ -2,7 +2,7 @@
 
 namespace YayWholesaleB2BScoped\YayCommerce\AdminShell\Support;
 
-\defined('ABSPATH') || exit;
+defined('ABSPATH') || exit;
 /**
  * Slug utilities.
  *
@@ -10,7 +10,6 @@ namespace YayWholesaleB2BScoped\YayCommerce\AdminShell\Support;
  * and URL paths but invalid as JavaScript identifiers (e.g. hyphens, '&').
  * This helper sanitizes a slug for use as a JS variable name while the
  * original slug stays intact for option-key and REST-URL contexts.
- * @internal
  */
 class Slug
 {
@@ -26,15 +25,15 @@ class Slug
      *
      * Idempotent: to_var_name( to_var_name( $x ) ) === to_var_name( $x ).
      */
-    public static function to_var_name(string $slug) : string
+    public static function to_var_name(string $slug): string
     {
-        $name = \preg_replace('/[^A-Za-z0-9_]/', '_', $slug);
-        $name = \preg_replace('/_+/', '_', (string) $name);
-        $name = \trim((string) $name, '_');
+        $name = preg_replace('/[^A-Za-z0-9_]/', '_', $slug);
+        $name = preg_replace('/_+/', '_', (string) $name);
+        $name = trim((string) $name, '_');
         if ('' === $name) {
             return '_';
         }
-        if (\preg_match('/^\\d/', $name)) {
+        if (preg_match('/^\d/', $name)) {
             $name = '_' . $name;
         }
         return $name;

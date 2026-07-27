@@ -4,7 +4,7 @@ namespace YayWholesaleB2BScoped\YayCommerce\AdminShell\License;
 
 use YayWholesaleB2BScoped\YayCommerce\AdminShell\License\Contracts\LicenseConfigAdapter;
 use YayWholesaleB2BScoped\YayCommerce\AdminShell\Support\Slug;
-\defined('ABSPATH') || exit;
+defined('ABSPATH') || exit;
 /**
  * License activation/deactivation/check state machine.
  *
@@ -22,7 +22,6 @@ use YayWholesaleB2BScoped\YayCommerce\AdminShell\Support\Slug;
  * NOTE: The original LicenseHandler used CorePlugin::get() for item_id/slug/etc.
  * Here those values come from the injected LicenseConfigAdapter. Port is faithful;
  * any oddities from source preserved with // TODO: investigate comments.
- * @internal
  */
 class LicenseHandler
 {
@@ -33,14 +32,14 @@ class LicenseHandler
         $this->adapter = $adapter;
         $this->license = new License($adapter);
         new RestAPI($adapter);
-        if (\is_admin()) {
+        if (is_admin()) {
             $this->do_hooks();
             $this->do_cron_job();
             $this->do_post_requests();
             $this->show_plugin_page_notification();
         }
     }
-    public function do_hooks() : void
+    public function do_hooks(): void
     {
         add_action('admin_notices', [$this, 'not_activate_license_notice']);
         add_action('admin_enqueue_scripts', [$this, 'enqueue_license_scripts']);
@@ -63,40 +62,40 @@ class LicenseHandler
      * REST API (RestAPI.php) is the primary path — this is a no-op
      * placeholder for backward compatibility with any direct form posts.
      */
-    public function do_post_requests() : void
+    public function do_post_requests(): void
     {
         // REST API handles all license actions. No legacy POST handling needed.
     }
-    public function do_cron_job() : void
+    public function do_cron_job(): void
     {
         add_filter('cron_schedules', [$this, 'custom_schedules']);
         add_action('check_license_cron_' . $this->adapter->get_plugin_slug(), [$this, 'check_license_cron_run']);
         $cron_hook = 'check_license_cron_' . $this->adapter->get_plugin_slug();
         if (!wp_next_scheduled($cron_hook)) {
-            wp_schedule_event(\time(), 'daily', $cron_hook);
+            wp_schedule_event(time(), 'daily', $cron_hook);
         }
     }
-    public function custom_schedules(array $schedules) : array
+    public function custom_schedules(array $schedules): array
     {
         $schedules['3hours'] = ['interval' => 60 * 60 * 3, 'display' => 'Three Hours'];
         return $schedules;
     }
-    public function check_license_cron_run() : void
+    public function check_license_cron_run(): void
     {
         $this->license->update();
     }
-    public function enqueue_license_scripts() : void
+    public function enqueue_license_scripts(): void
     {
         if (!isset($_GET['page']) || 'yaycommerce-licenses' !== $_GET['page']) {
             // phpcs:ignore WordPress.Security.NonceVerification
             return;
         }
         $slug = $this->adapter->get_plugin_slug();
-        $assets_url = \plugin_dir_url(__FILE__) . '../../assets/';
+        $assets_url = plugin_dir_url(__FILE__) . '../../assets/';
         wp_enqueue_script('yaycommerce-license', $assets_url . 'js/license.js', ['jquery'], $this->adapter->get_plugin_version(), \true);
-        wp_localize_script('yaycommerce-license', Slug::to_var_name($slug) . 'LicenseData', ['slug' => $slug, 'apiSettings' => ['restNonce' => wp_create_nonce('wp_rest'), 'restUrl' => \esc_url_raw(rest_url(Slug::to_var_name($slug) . '/v1')), 'adminUrl' => \admin_url()]]);
+        wp_localize_script('yaycommerce-license', Slug::to_var_name($slug) . 'LicenseData', ['slug' => $slug, 'apiSettings' => ['restNonce' => wp_create_nonce('wp_rest'), 'restUrl' => esc_url_raw(rest_url(Slug::to_var_name($slug) . '/v1')), 'adminUrl' => admin_url()]]);
     }
-    public function render_license_settings() : void
+    public function render_license_settings(): void
     {
         $license = $this->license;
         $_plugin = ['slug' => $this->adapter->get_plugin_slug(), 'name' => $this->adapter->get_plugin_name()];
@@ -106,12 +105,12 @@ class LicenseHandler
             include __DIR__ . '/../../views/license-activate-card.php';
         }
     }
-    public function register_licensing_plugins(array $plugins = []) : array
+    public function register_licensing_plugins(array $plugins = []): array
     {
         $plugin_data = ['name' => $this->adapter->get_plugin_name(), 'slug' => $this->adapter->get_plugin_slug(), 'basename' => $this->adapter->get_plugin_basename(), 'file' => $this->adapter->get_plugin_file(), 'url' => $this->adapter->get_store_link(), 'item_id' => $this->adapter->get_item_id()];
-        return \array_merge($plugins, [$plugin_data]);
+        return array_merge($plugins, [$plugin_data]);
     }
-    public function not_activate_license_notice() : void
+    public function not_activate_license_notice(): void
     {
         $current_screen = get_current_screen();
         if (!$current_screen || $current_screen->id !== 'plugins') {
@@ -127,13 +126,13 @@ class LicenseHandler
             <p>
             <?php 
         // translators: %1$s plugin name, %2$s link open, %3$s link close
-        \printf(\esc_html__('%1$s license key is required. %2$sPlease enter your license key to start using the plugin%3$s.', 'yaycommerce'), \esc_html($name), '<a href="' . \esc_url(\admin_url('admin.php?page=yaycommerce-licenses')) . '">', '</a>');
+        printf(esc_html__('%1$s license key is required. %2$sPlease enter your license key to start using the plugin%3$s.', 'yaycommerce'), esc_html($name), '<a href="' . esc_url(admin_url('admin.php?page=yaycommerce-licenses')) . '">', '</a>');
         ?>
             </p>
         </div>
         <?php 
     }
-    public function license_expired_admin_notice() : void
+    public function license_expired_admin_notice(): void
     {
         if ($this->license->is_active() && $this->license->is_expired()) {
             $name = $this->adapter->get_plugin_name();
@@ -142,11 +141,11 @@ class LicenseHandler
             <div class="notice notice-warning">
                 <p>
                 <?php 
-            \printf(
+            printf(
                 /* translators: %1$s plugin name, %2$s renewal URL */
-                \esc_html__('%1$s: Your license has expired. %2$sRenew now%3$s to continue receiving updates.', 'yaycommerce'),
-                \esc_html($name),
-                '<a href="' . \esc_url($renewal_url) . '" target="_blank">',
+                esc_html__('%1$s: Your license has expired. %2$sRenew now%3$s to continue receiving updates.', 'yaycommerce'),
+                esc_html($name),
+                '<a href="' . esc_url($renewal_url) . '" target="_blank">',
                 '</a>'
             );
             ?>
@@ -155,11 +154,11 @@ class LicenseHandler
             <?php 
         }
     }
-    public function show_plugin_page_notification() : void
+    public function show_plugin_page_notification(): void
     {
         add_action('after_plugin_row_' . $this->adapter->get_plugin_basename(), [$this, 'plugin_notifications'], 10, 2);
     }
-    public function plugin_notifications(string $file) : void
+    public function plugin_notifications(string $file): void
     {
         if ($this->adapter->get_plugin_basename() !== $file) {
             return;
@@ -173,10 +172,10 @@ class LicenseHandler
                 <div class="update-message notice inline notice-warning notice-alt">
                     <p>
                         <a href="<?php 
-                echo \esc_url(\admin_url('admin.php?page=yaycommerce-licenses'));
+                echo esc_url(admin_url('admin.php?page=yaycommerce-licenses'));
                 ?>">
                             <?php 
-                \esc_html_e('Please activate your license for access to premium features and automatic updates', 'yaycommerce');
+                esc_html_e('Please activate your license for access to premium features and automatic updates', 'yaycommerce');
                 ?>
                         </a>.
                     </p>
@@ -190,15 +189,15 @@ class LicenseHandler
                 <div class="update-message notice inline notice-warning notice-alt">
                     <p class="license_expired_text">
                         <span><?php 
-                echo \esc_html('Your license has expired, please ');
+                echo esc_html('Your license has expired, please ');
                 ?></span>
                         <a target="_blank" href="<?php 
-                echo \esc_url($this->license->get_renewal_url());
+                echo esc_url($this->license->get_renewal_url());
                 ?>"><?php 
-                echo \esc_html('renew this license');
+                echo esc_html('renew this license');
                 ?></a>
                         <span><?php 
-                echo \esc_html(' to download this update. ');
+                echo esc_html(' to download this update. ');
                 ?></span>
                     </p>
                 </div>
@@ -212,15 +211,15 @@ class LicenseHandler
     /**
      * Add "Enter license key" action link when license is inactive.
      */
-    public function add_license_action_link(array $action_links) : array
+    public function add_license_action_link(array $action_links): array
     {
-        $link = ['license' => '<a href="' . \admin_url('admin.php?page=yaycommerce-licenses') . '">' . \esc_html__('Enter license key', 'yaycommerce') . '</a>'];
-        return \array_merge($link, $action_links);
+        $link = ['license' => '<a href="' . admin_url('admin.php?page=yaycommerce-licenses') . '">' . esc_html__('Enter license key', 'yaycommerce') . '</a>'];
+        return array_merge($link, $action_links);
     }
-    public function auto_update() : void
+    public function auto_update(): void
     {
-        $doing_cron = \defined('DOING_CRON') && \DOING_CRON;
-        if (!\current_user_can($this->adapter->get_capability()) && !$doing_cron) {
+        $doing_cron = defined('DOING_CRON') && \DOING_CRON;
+        if (!current_user_can($this->adapter->get_capability()) && !$doing_cron) {
             return;
         }
         $license_key = '';
@@ -230,13 +229,13 @@ class LicenseHandler
         $args = ['version' => $this->adapter->get_plugin_version(), 'license' => $license_key, 'author' => 'YayCommerce', 'item_id' => $this->adapter->get_item_id()];
         new EDD_SL_Plugin_Updater($this->adapter->get_store_url(), $this->adapter->get_plugin_file(), $args);
     }
-    public static function remove_site_plugin_check(LicenseConfigAdapter $adapter) : void
+    public static function remove_site_plugin_check(LicenseConfigAdapter $adapter): void
     {
         global $pagenow;
         if ('plugin-install.php' === $pagenow) {
             return;
         }
-        if (!\function_exists('YayWholesaleB2BScoped\\get_plugin_data')) {
+        if (!function_exists('YayWholesaleB2BScoped\get_plugin_data')) {
             require_once \ABSPATH . 'wp-admin/includes/plugin.php';
         }
         $basename = $adapter->get_plugin_basename();
@@ -246,7 +245,7 @@ class LicenseHandler
             set_site_transient('update_plugins', $site_transient_update_plugins);
         }
     }
-    public function support_auto_update(array $plugins) : array
+    public function support_auto_update(array $plugins): array
     {
         foreach ($plugins['all'] as $ind => $active_plugin) {
             if ('YayCommerce' === $active_plugin['Author']) {
@@ -267,11 +266,11 @@ class LicenseHandler
         }
         return $value;
     }
-    public function is_license_inactive() : bool
+    public function is_license_inactive(): bool
     {
         return !$this->license->is_active();
     }
-    public function get_license() : License
+    public function get_license(): License
     {
         return $this->license;
     }
