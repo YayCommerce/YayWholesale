@@ -40,8 +40,8 @@ const commonFieldSchema = z.object({
   isRequired: z.boolean(),
   isHidden: z.boolean(),
 
-  billingMapping: z.enum(billingMappingValues),
-  customBillingMetaKey: z.string(),
+  billingMapping: z.enum(billingMappingValues).optional(),
+  customBillingMetaKey: z.string().optional(),
 });
 
 const textFieldSchema = z.object({

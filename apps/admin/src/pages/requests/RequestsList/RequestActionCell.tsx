@@ -47,7 +47,7 @@ export function RequestActionCell({ request }: { request: Request }) {
   return (
     <Dialog open={openDialog} onOpenChange={setOpenDialog}>
       <div className="flex w-10 items-center justify-end gap-2">
-        <div className="peer flex gap-1.5 opacity-0 group-hover:opacity-100 has-data-[state='delayed-open']:opacity-100 has-data-[state='instant-open']:opacity-100">
+        <div className="peer flex gap-1.5 opacity-0 has-data-[state='delayed-open']:opacity-100 has-data-[state='instant-open']:opacity-100 [@media(hover:hover)]:group-hover:opacity-100 [@media(hover:none)]:group-[.is-row-pressed]:opacity-100">
           <WholeSaleToolTip
             trigger={
               <Button

@@ -75,7 +75,7 @@ cd "$PROJECT_PATH"
 #
 # 2) Build Request Form Block, Requirement Slot Fill, Requirement Block
 #
-echo "Build Request Form Block, Requirement Slot Fill, Requirement Block..."
+echo "Build Request Form Block, Requirement Slot Fill, Requirement Block, Template Editor..."
 pnpm --filter @yay-wholesale-blocks/* build
 cd "$PROJECT_PATH"
 

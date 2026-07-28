@@ -22,11 +22,13 @@ class YayWholesaleB2BPro {
         \YayWholesaleB2B\Pro\Engine\Frontend\Requirement::get_instance();
         \YayWholesaleB2B\Pro\Engine\Frontend\Pricing::get_instance();
         \YayWholesaleB2B\Pro\Engine\Frontend\AccessRestriction::get_instance();
+        \YayWholesaleB2B\Pro\Engine\Frontend\StorePage::get_instance();
 
         \YayWholesaleB2B\Pro\Engine\Admin\ProductBasedRule::get_instance();
         \YayWholesaleB2B\Pro\Engine\Admin\CategoryBasedRule::get_instance();
         \YayWholesaleB2B\Pro\Engine\Admin\PaymentGateway::get_instance();
         \YayWholesaleB2B\Pro\Engine\Admin\ShippingMethod::get_instance();
+        \YayWholesaleB2B\Pro\Engine\Admin\TemplateEditor::get_instance();
 
         \YayWholesaleB2B\Pro\Engine\Support\Support::get_instance();
     }

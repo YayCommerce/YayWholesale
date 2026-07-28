@@ -46,15 +46,15 @@ class Requirement {
             return;
         }
 
+        if ( ! RequirementHelper::is_requirement_bar_visible() ) {
+            return;
+        }
+
         $min_order_quantity = RequirementHelper::get_min_order_quantity( $wholesale );
         $min_order_amount   = RequirementHelper::get_min_order_amount( $wholesale );
 
         $is_hidden_quantity = 0.0 === (float) $min_order_quantity;
         $is_hidden_amount   = 0.0 === (float) $min_order_amount;
-
-        // if ( $is_hidden_quantity && $is_hidden_amount ) {
-        // return;
-        // }
 
         $is_discounted   = isset( $wholesale ) && RequirementHelper::is_cart_meet_requirement( $wholesale );
         $actual_subtotal = RequirementHelper::calc_actual_subtotal_of_cart();
@@ -175,6 +175,11 @@ class Requirement {
     public function enqueue_yay_wholesale_requirement() {
         if ( ( function_exists( 'is_checkout' ) && is_checkout() ) ||
             ( function_exists( 'is_cart' ) && is_cart() ) ) {
+
+            if ( ! RequirementHelper::is_requirement_bar_visible() ) {
+                return;
+            }
+
             $wholesale = CustomerHelper::get_current_user_wholesale_role();
             $slug      = 'ywhs_wholesale_requirement';
             $asset     = include YAYWHOLESALEB2B_PLUGIN_DIR . 'assets/dist/blocks/requirement-slot-fill/index.asset.php';
@@ -236,6 +241,10 @@ class Requirement {
      */
     public function automatically_add_ywhs_to_mini_cart( $block_content ) {
         // Your custom block HTML
+        if ( ! RequirementHelper::is_requirement_bar_visible() ) {
+            return $block_content;
+        }
+
         $custom_block         = '<!-- wp:yay-wholesale/requirement-block /-->';
         $custom_block_content = do_blocks( $custom_block );
 

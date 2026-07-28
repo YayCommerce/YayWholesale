@@ -38,9 +38,7 @@ wp_interactivity_config(
 );
 
 ?>
-<?php if ($ywhs_wholesale
-	// && !($is_hidden_quantity && $is_hidden_amount)
-) : ?>
+<?php if ($ywhs_wholesale) : ?>
 <div
 <?php
 // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped

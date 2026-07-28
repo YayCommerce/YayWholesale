@@ -89,7 +89,7 @@ export default function GeneralTab() {
                 </p>
               </div>
               <Select value={String(field.value) || 'inherit'} onValueChange={field.onChange} disabled={!isPro}>
-                <SelectTrigger className="min-w-40">
+                <SelectTrigger className="sm:min-45 w-25 min-w-25 sm:w-45">
                   <SelectValue placeholder={__('Select your page', 'yay-wholesale-b2b')} />
                 </SelectTrigger>
                 <SelectContent align="end">
@@ -142,23 +142,59 @@ export default function GeneralTab() {
 
       <Controller
         control={control}
+        name="general.tax_display_mode"
+        render={({ field }) => (
+          <div className="flex items-center justify-between gap-5 rounded-md border p-4">
+            <div>
+              <h2 className="flex items-center gap-2 leading-3.5 font-medium">
+                {__('Display prices in the shop', 'yay-wholesale-b2b')}
+                {!isPro && <UpgradeToProBadge />}
+              </h2>
+              <p className="text-muted-foreground mt-2 text-xs font-normal">
+                {__('Display product prices including or excluding tax for wholesalers in shop', 'yay-wholesale-b2b')}
+              </p>
+            </div>
+            <Select value={field.value ? field.value : 'inherit'} onValueChange={field.onChange} disabled={!isPro}>
+              <SelectTrigger className="w-25 min-w-25 sm:w-45 sm:min-w-45">
+                <SelectValue placeholder={__('Select the display mode', 'yay-wholesale-b2b')} />
+              </SelectTrigger>
+              <SelectContent align="end">
+                <SelectItem value="inherit">{__('Woocommerce setting', 'yay-wholesale-b2b')}</SelectItem>
+                <SelectItem value="incl">{__('Including tax', 'yay-wholesale-b2b')}</SelectItem>
+                <SelectItem value="excl">{__('Excluding tax', 'yay-wholesale-b2b')}</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        )}
+      />
+
+      <Controller
+        control={control}
         name="general.guest_access_rule"
         render={({ field }) => (
-          <div className="flex flex-col justify-between gap-3">
-            <h2 className="leading-3.5 font-medium">
-              {__('Guest Access Rule', 'yay-wholesale-b2b')}
-              {!isPro && <UpgradeToProBadge />}
-            </h2>
+          <div className="flex items-center justify-between gap-5 rounded-md border p-4">
+            <div>
+              <h2 className="flex items-center gap-2 leading-3.5 font-medium">
+                {__('Guest Access Rule', 'yay-wholesale-b2b')}
+                {!isPro && <UpgradeToProBadge />}
+              </h2>
+              <p className="text-muted-foreground mt-2 text-xs font-normal">
+                {__(
+                  'Configure shop access for guest users, including product visibility and pricing.',
+                  'yay-wholesale-b2b',
+                )}
+              </p>
+            </div>
 
             <Select
               value={field.value ? field.value : 'no-restriction'}
               onValueChange={field.onChange}
               disabled={!isPro}
             >
-              <SelectTrigger className="min-w-full">
+              <SelectTrigger className="w-25 min-w-25 sm:w-45 sm:min-w-45">
                 <SelectValue placeholder={__('Select the guest restriction rule', 'yay-wholesale-b2b')} />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent align="end">
                 <DescribedSelectItem
                   value="no-restriction"
                   label={__('No Restriction', 'yay-wholesale-b2b')}
@@ -180,34 +216,6 @@ export default function GeneralTab() {
                     'yay-wholesale-b2b',
                   )}
                 />
-              </SelectContent>
-            </Select>
-          </div>
-        )}
-      />
-
-      <Controller
-        control={control}
-        name="general.tax_display_mode"
-        render={({ field }) => (
-          <div className="flex items-center justify-between gap-5 rounded-md border p-4">
-            <div>
-              <h2 className="flex items-center gap-2 leading-3.5 font-medium">
-                {__('Display prices in the shop', 'yay-wholesale-b2b')}
-                {!isPro && <UpgradeToProBadge />}
-              </h2>
-              <p className="text-muted-foreground mt-2 text-xs font-normal">
-                {__('Display product prices including or excluding tax for wholesalers in shop', 'yay-wholesale-b2b')}
-              </p>
-            </div>
-            <Select value={field.value ? field.value : 'inherit'} onValueChange={field.onChange} disabled={!isPro}>
-              <SelectTrigger className="min-w-20 sm:min-w-40">
-                <SelectValue placeholder={__('Select the display mode', 'yay-wholesale-b2b')} />
-              </SelectTrigger>
-              <SelectContent align="end">
-                <SelectItem value="inherit">{__('Woocommerce setting', 'yay-wholesale-b2b')}</SelectItem>
-                <SelectItem value="incl">{__('Including tax', 'yay-wholesale-b2b')}</SelectItem>
-                <SelectItem value="excl">{__('Excluding tax', 'yay-wholesale-b2b')}</SelectItem>
               </SelectContent>
             </Select>
           </div>

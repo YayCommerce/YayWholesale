@@ -37,6 +37,9 @@ export const settingsFormSchema = z.object({
     retailer_price_format: z.enum(['retail-and-wholesale', 'retail-only']),
     wholesale_price_label: z.string(),
     wholesale_price_color: z.string(),
+    classic_retailer_template: z.string().optional(),
+    classic_wholesaler_template: z.string().optional(),
+    requirement_bar_visible: z.boolean(),
   }),
   registration: registrationSettingsSchema,
   registration_fields: z.object({

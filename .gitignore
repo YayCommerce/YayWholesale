@@ -4,6 +4,7 @@ node_modules
 .claude/settings.local.json
 
 /assets/dist/*
+/assets/pro/dist/*
 /release/dest/*
 /release/*.zip
 /blocks/dist/

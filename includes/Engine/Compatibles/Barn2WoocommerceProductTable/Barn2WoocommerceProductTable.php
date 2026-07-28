@@ -1,5 +1,5 @@
 <?php
-namespace YayWholesaleB2B\Engine\Compatibles;
+namespace YayWholesaleB2B\Engine\Compatibles\Barn2WoocommerceProductTable;
 
 use YayWholesaleB2B\Utils\SingletonTrait;
 
@@ -10,9 +10,6 @@ use Barn2\Plugin\WC_Product_Table\Dependencies\Barn2\Table_Generator\Database\Qu
 use Barn2\Plugin\WC_Product_Table\Util\Settings;
 use Barn2\Plugin\WC_Product_Table\Admin\Table_Generator\Table_Generator;
 use YayWholesaleB2B\Helpers\CustomerHelper;
-use YayWholesaleB2B\Helpers\RolesHelper;
-use YayWholesaleB2B\Helpers\SettingsHelper;
-use YayWholesaleB2B\Helpers\SupportHelper;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -28,27 +25,23 @@ class Barn2WoocommerceProductTable {
             return;
         }
 
-        add_action( 'init', [ $this, 'register_ywhs_taxonomy' ], 10, 0 );
-
-        add_action( 'admin_menu', [ $this,'hide_yay_wholesale_b2b_taxonomy_submenu' ], 999, 0 );
-
-        add_filter( 'parent_file', [ $this, 'force_hide_yay_wholesale_b2b_submenu' ], 9999 );
-
-        add_action( 'admin_init', [ $this, 'remove_yay_wholesale_metabox' ], 999, 0 );
-
-        add_filter( 'manage_edit-product_columns', [ $this, 'remove_yay_wholesale_b2b_column' ], 999 );
-
+        // ------1 Template shop mode------
+        // Table display (Front shop)
         add_action( 'template_redirect', [ $this, 'maybe_load_product_table_page' ], 11, 0 );
-
-        // add_filter( 'wc_product_table_display_admin_description', [ $this, 'custom_table_display_description' ], 10, 1 );
         add_filter( 'wc_product_table_product_purchasable_from_table', [ $this, 'maybe_allow_wholesale_only_variation' ], 10, 2 );
         add_filter( 'wc_product_table_args_id', [ $this, 'set_wholesale_store_table_id' ], 10 );
 
+        // WPT setting (Plugin admin)
+        add_action( 'init', [ $this, 'register_ywhs_taxonomy' ], 11, 0 );
         // Update WWP layout options when creating or deleting a table.
         add_filter( 'barn2_table_generator_api_response_data', [ $this, 'wizard_list_update_wwp_layout' ], 10, 3 );
-
         // Update WWP layout options when editing a table.
         add_filter( 'barn2_table_generator_table_settings', [ $this, 'edit_update_wwp_layout' ], 10, 2 );
+
+        // ------Custom Template shop mode------
+        add_filter( 'ywhs_classic_shop_template_list', [ $this, 'add_wpt_templates' ], 10, 1 );
+        add_action( 'ywhs_wpt_before_shop_loop', [ WPT_Template_Handler::class, 'disable_default_woocommerce_loop' ] );
+        add_action( 'ywhs_wpt_after_shop_loop', [ WPT_Template_Handler::class, 'add_product_table_after_shop_loop' ] );
     }
 
     /**
@@ -64,69 +57,27 @@ class Barn2WoocommerceProductTable {
 
         $args = [
             'labels'            => [
-                'name'          => __( 'Yay Wholesale B2B store', 'yay-wholesale-b2b' ),
-                'singular_name' => __( 'Yay Wholesale B2B store', 'yay-wholesale-b2b' ),
+                'name'          => __( 'Products By Wholesale Role', 'yay-wholesale-b2b' ),
+                'singular_name' => __( 'Yay Wholesale B2B Templates', 'yay-wholesale-b2b' ),
             ],
             'hierarchical'      => false,
             'public'            => true,
-            'show_ui'           => true,
-            'show_admin_column' => true,
+            'show_ui'           => false,
+            'show_admin_column' => false,
+            'show_in_menu'      => false,
+            'show_in_nav_menus' => false,
             'show_in_rest'      => true,
             'query_var'         => true,
-            'rewrite'           => [ 'slug' => 'yay-wholesale-b2b' ],
+            'rewrite'           => [ 'slug' => 'yay_wholesale_b2b' ],
+            'capabilities'      => [
+                'manage_terms' => 'manage_woocommerce',
+                'edit_terms'   => 'manage_woocommerce',
+                'delete_terms' => 'manage_woocommerce',
+                'assign_terms' => 'edit_products',
+            ],
         ];
 
         register_taxonomy( 'yay_wholesale_b2b', 'product', $args );
-    }
-
-    /**
-     * Hide new Taxonomy submenu.
-     *
-     * @return void
-     */
-    public function hide_yay_wholesale_b2b_taxonomy_submenu() {
-        remove_submenu_page( 'edit.php?post_type=product', 'edit-tags.php?taxonomy=yay_wholesale_b2b&post_type=product' );
-    }
-
-    /**
-     * Hide new Taxonomy metabox.
-     *
-     * @return void
-     */
-    public function remove_yay_wholesale_metabox() {
-        remove_meta_box( 'tagsdiv-yay_wholesale_b2b', 'product', 'side' );
-    }
-
-    /**
-     * Hide new Taxonomy column in admin product table.
-     *
-     * @param array $columns
-     * @return array
-     */
-    public function remove_yay_wholesale_b2b_column( $columns ) {
-        unset( $columns['taxonomy-yay_wholesale_b2b'] );
-        return $columns;
-    }
-
-    /**
-     * Force hiding new Taxonomy submenu.
-     *
-     * @param array $parent_file
-     * @return array
-     */
-    public function force_hide_yay_wholesale_b2b_submenu( $parent_file ) {
-        global $submenu;
-
-        if ( isset( $submenu['edit.php?post_type=product'] ) ) {
-            foreach ( $submenu['edit.php?post_type=product'] as $key => $item ) {
-                if ( isset( $item[2] ) &&
-                    ( strpos( $item[2], 'yay_wholesale_b2b' ) !== false ||
-                    $item[2] === 'edit-tags.php?taxonomy=yay_wholesale_b2b&post_type=product' ) ) {
-                    unset( $submenu['edit.php?post_type=product'][ $key ] );
-                }
-            }
-        }
-        return $parent_file;
     }
 
     /**
@@ -143,35 +94,54 @@ class Barn2WoocommerceProductTable {
             return;
         }
 
-        $setting      = SettingsHelper::get_settings();
-        $shop_display = get_option( 'woocommerce_shop_page_display', 'products' );
-        if ( ( SupportHelper::is_wholesale_shop_page( $setting )
-                && ( empty( $shop_display )
+        $is_using_custom_templates = apply_filters( 'ywhs_is_using_custom_templates', false );
+        if ( ! $is_using_custom_templates ) {
+            // If not in using-custom-template mode
+            $shop_display = get_option( 'woocommerce_shop_page_display', 'products' );
+            if ( ( is_shop() && ( empty( $shop_display )
                     || 'products' === $shop_display
                     || 'both' === $shop_display ) )
-            || ( is_product_category() && ! is_shop() ) ) {
-            $layout = get_option( 'ywhs_wholesale_layout', 'default' );
-            if ( method_exists( 'Barn2\Plugin\WC_Product_Table\Util\Util', 'get_shop_templates_tables' ) ) {
-                $tables   = WPT_Util::get_shop_templates_tables();
-                $override = $layout === 'product_table' && ! isset( $tables['shop_override'] ) && isset( $tables['yay_wholesale_b2b_override'] ) ? true : ( ( $layout === 'default' || ! isset( $tables['yay_wholesale_b2b_override'] ) ) && isset( $tables['shop_override'] ) ? false : '' );
+            || is_product_category() ) {
+                $layout = get_option( 'ywhs_wholesale_layout', 'default' );
+                if ( method_exists( 'Barn2\Plugin\WC_Product_Table\Util\Util', 'get_shop_templates_tables' ) ) {
+                    $tables   = WPT_Util::get_shop_templates_tables();
+                    $override = $layout === 'product_table' && ! isset( $tables['shop_override'] ) && isset( $tables['yay_wholesale_b2b_override'] ) ? true : ( ( $layout === 'default' || ! isset( $tables['yay_wholesale_b2b_override'] ) ) && isset( $tables['shop_override'] ) ? false : '' );
+                } else {
+                    $wcpt_misc_settings = WPT_Settings::get_setting_misc();
+                    $override           = $layout === 'product_table' && empty( $wcpt_misc_settings['shop_override'] ) ? true : ( $layout === 'default' && ! empty( $wcpt_misc_settings['shop_override'] ) ? false : '' );
+                }
             } else {
-                $wcpt_misc_settings = WPT_Settings::get_setting_misc();
-                $override           = $layout === 'product_table' && empty( $wcpt_misc_settings['shop_override'] ) ? true : ( $layout === 'default' && ! empty( $wcpt_misc_settings['shop_override'] ) ? false : '' );
+                return;
+            }//end if
+
+            if ( $override ) {
+                add_action( 'woocommerce_before_shop_loop', [ WPT_Template_Handler::class, 'disable_default_woocommerce_loop' ] );
+                add_action( 'woocommerce_after_shop_loop', [ WPT_Template_Handler::class, 'add_product_table_after_shop_loop' ] );
+            } else {
+                // If product table is active, then make sure to remove the changes for our page.
+                remove_action( 'woocommerce_before_shop_loop', [ WPT_Template_Handler::class, 'disable_default_woocommerce_loop' ] );
+                remove_action( 'woocommerce_after_shop_loop', [ WPT_Template_Handler::class, 'add_product_table_after_shop_loop' ] );
             }
-        } else {
-            return;
         }//end if
+    }
 
-        $override = true;
-
-        if ( $override ) {
-            add_action( 'woocommerce_before_shop_loop', [ WPT_Template_Handler::class, 'disable_default_woocommerce_loop' ] );
-            add_action( 'woocommerce_after_shop_loop', [ WPT_Template_Handler::class, 'add_product_table_after_shop_loop' ] );
-        } else {
-            // If product table is active, then make sure to remove the changes for our page.
-            remove_action( 'woocommerce_before_shop_loop', [ WPT_Template_Handler::class, 'disable_default_woocommerce_loop' ] );
-            remove_action( 'woocommerce_after_shop_loop', [ WPT_Template_Handler::class, 'add_product_table_after_shop_loop' ] );
+    /**
+     * Add to the classic shop template list.
+     *
+     * @param   array $templates
+     * @return  array
+     */
+    public function add_wpt_templates( $templates ) {
+        $layout = get_option( 'ywhs_wholesale_layout', 'default' );
+        if ( $layout === 'product_table' ) {
+            $templates[] = [
+                'slug' => 'wpt_product_table',
+                'name' => 'Barn2 Product Table Template',
+                'path' => YAYWHOLESALEB2B_PLUGIN_DIR . 'includes/Engine/Compatibles/Barn2WoocommerceProductTable/templates/product-table-shop.php',
+            ];
         }
+
+        return $templates;
     }
 
 
@@ -248,8 +218,7 @@ class Barn2WoocommerceProductTable {
     public function set_wholesale_store_table_id( $table_id ) {
         if ( method_exists( 'Barn2\Plugin\WC_Product_Table\Util\Util', 'get_shop_templates_tables' ) ) {
             $shop_templates_tables = WPT_Util::get_shop_templates_tables();
-            $setting               = SettingsHelper::get_settings();
-            if ( SupportHelper::is_wholesale_shop_page( $setting ) || ( is_product_category() && ! is_shop() ) ) {
+            if ( is_shop() || is_product_category() ) {
                 if ( get_option( 'ywhs_wholesale_layout', 'default' ) === 'product_table' ) {
                     return $shop_templates_tables['yay_wholesale_b2b_override']['id'];
                 }

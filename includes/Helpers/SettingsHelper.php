@@ -88,6 +88,7 @@ class SettingsHelper {
                 'wholesale_price_color'   => '#333333',
                 'wholesaler_price_format' => 'retail-and-wholesale',
                 'retailer_price_format'   => 'retail-only',
+                'requirement_bar_visible' => false,
             ],
             'registration'        => [
                 'moderate'                        => true,

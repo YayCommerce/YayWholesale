@@ -5,7 +5,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-use YayWholesaleB2B\Engine\Compatibles\Barn2WoocommerceProductTable;
+use YayWholesaleB2B\Engine\Compatibles\Barn2WoocommerceProductTable\Barn2WoocommerceProductTable;
 use YayWholesaleB2B\Engine\Compatibles\EUVATForWoocommerce;
 use YayWholesaleB2B\Engine\Compatibles\YayCurrency;
 use YayWholesaleB2B\Engine\Compatibles\YayExtra;
