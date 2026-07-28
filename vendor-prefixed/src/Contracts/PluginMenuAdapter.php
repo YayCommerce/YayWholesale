@@ -67,5 +67,19 @@ interface PluginMenuAdapter
      *
      *   // Submenu shows in the Multisite Network Admin. Absent ⇒ false.
      *   public function wants_network_menu(): bool;
+     *
+     * WooCommerce dependency gate (see PluginSubmenu + Pages\WooCommerceRequiredPage):
+     *
+     *   // Render the shared "WooCommerce required" screen in place of the settings
+     *   // page. Absent ⇒ false. The adapter owns the runtime check (typically
+     *   // `! class_exists( 'WooCommerce' )`) so it evaluates un-prefixed under
+     *   // PHP-Scoper — the adapter class is excluded from scoping in each plugin.
+     *   // The license redirect takes precedence: unlicensed pro plugins still go
+     *   // to the Licenses page even when this returns true.
+     *   public function needs_woocommerce_screen(): bool;
+     *
+     *   // Optional copy overrides for that screen: { icon, title, text, button, hint }.
+     *   // Absent ⇒ generic de-branded defaults are used.
+     *   public function get_woocommerce_screen_copy(): array;
      */
 }

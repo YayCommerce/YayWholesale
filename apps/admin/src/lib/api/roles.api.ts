@@ -1,7 +1,6 @@
 import { api } from '@/lib/api/api';
 import type { Role, RoleFormValues, UserCountByRole } from '@/lib/schema/roles.schema';
 import { Settings } from '@/lib/schema/settings.schema';
-import { PromotionRules } from '../schema/promotion.schema';
 
 export function getAllRoles() {
   return api.get('roles').json<Role[]>();
@@ -33,13 +32,4 @@ export function bulkUpdateRoleStatus(roleSlugs: string[], status: boolean) {
 
 export function countRolesUser() {
   return api.get('roles/count-users').json<UserCountByRole>();
-}
-
-// TODO v1.2: add API
-export function getPromotionRule() {
-  return api.get('roles/promotion-rules').json<PromotionRules>();
-}
-
-export function updatePromotionRule(data: PromotionRules) {
-  return api.put('roles/promotion-rules', { json: data }).json<{ promotionRules: PromotionRules; roles: Role[] }>();
 }
