@@ -9,7 +9,9 @@ import { __ } from '@wordpress/i18n';
 import { useActiveRolesQuery } from '@/lib/queries/roles.queries';
 import type { PromotionRuleFormValues } from '@/lib/schema/promotion.schema';
 import type { Settings } from '@/lib/schema/settings.schema';
+import { isPro } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
+import { UpgradeToProOverlay } from '@/components/ui/custom/upgrate-to-pro';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 import AddPromotionRuleForm from './PromotionRuleForm/AddPromotionRuleForm';
 import EditPromotionRuleForm from './PromotionRuleForm/EditPromotionRuleForm';
@@ -81,40 +83,48 @@ export default function PromotionRulesTab() {
                   {__('Customers are automatically promoted when they meet the conditions below.', 'yay-wholesale-b2b')}
                 </p>
               </div>
-              <Button variant="outline" onClick={() => setPromotionRuleSheetState(['add'])}>
-                <Plus className="size-4" />
-                <span>{__('Add New Rule', 'yay-wholesale-b2b')}</span>
-              </Button>
+              {isPro && (
+                <Button variant="outline" onClick={() => setPromotionRuleSheetState(['add'])}>
+                  <Plus className="size-4" />
+                  <span>{__('Add New Rule', 'yay-wholesale-b2b')}</span>
+                </Button>
+              )}
             </div>
             {/* Promotion Rules List */}
-            <div className="flex flex-col gap-2.5">
-              {fields.length === 0 && (
-                <p className="text-muted-foreground text-sm font-normal">
-                  {__('No promotion rules found.', 'yay-wholesale-b2b')}
-                </p>
-              )}
-              <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-                <SortableContext items={fields.map((f) => f.id)} strategy={verticalListSortingStrategy}>
-                  {fields.map((promotionRule, index) => (
-                    <PromotionRulesItem
-                      key={promotionRule.id}
-                      promotionRule={promotionRule}
-                      index={index}
-                      promotionRuleId={promotionRule.id}
-                      activeRoles={activeRoles}
-                      onCheckedChange={handleCheckedChange}
-                      onClick={() => setPromotionRuleSheetState(['edit', index])}
-                    />
-                  ))}
-                </SortableContext>
-              </DndContext>
-            </div>
-            <div className="text-muted-foreground text-sm font-normal">
-              {__('To add new roles or edit existing ones, go to', 'yay-wholesale-b2b')}
-              <Button className="p-1.5 font-normal underline" variant="link" onClick={() => navigate('/roles')}>
-                {__('Manage Roles', 'yay-wholesale-b2b')}
-              </Button>
-            </div>
+            {isPro ? (
+              <>
+                <div className="flex flex-col gap-2.5">
+                  {fields.length === 0 && (
+                    <p className="text-muted-foreground text-sm font-normal">
+                      {__('No promotion rules found.', 'yay-wholesale-b2b')}
+                    </p>
+                  )}
+                  <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+                    <SortableContext items={fields.map((f) => f.id)} strategy={verticalListSortingStrategy}>
+                      {fields.map((promotionRule, index) => (
+                        <PromotionRulesItem
+                          key={promotionRule.id}
+                          promotionRule={promotionRule}
+                          index={index}
+                          promotionRuleId={promotionRule.id}
+                          activeRoles={activeRoles}
+                          onCheckedChange={handleCheckedChange}
+                          onClick={() => setPromotionRuleSheetState(['edit', index])}
+                        />
+                      ))}
+                    </SortableContext>
+                  </DndContext>
+                </div>
+                <div className="text-muted-foreground text-sm font-normal">
+                  {__('To add new roles or edit existing ones, go to', 'yay-wholesale-b2b')}
+                  <Button className="p-1.5 font-normal underline" variant="link" onClick={() => navigate('/roles')}>
+                    {__('Manage Roles', 'yay-wholesale-b2b')}
+                  </Button>
+                </div>
+              </>
+            ) : (
+              <UpgradeToProOverlay />
+            )}
           </div>
         </div>
       </div>

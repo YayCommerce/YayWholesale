@@ -21,8 +21,6 @@ class YayWholesaleB2B {
         \YayWholesaleB2B\Engine\Admin\Orders::get_instance();
         \YayWholesaleB2B\Engine\Admin\Emails\Emails::get_instance();
 
-        \YayWholesaleB2B\Engine\PromotionRules\PromotionRulesCron::get_instance();
-
         \YayWholesaleB2B\Engine\Frontend\Frontend::get_instance();
         \YayWholesaleB2B\Engine\Frontend\Pricing::get_instance();
         \YayWholesaleB2B\Engine\Frontend\Coupon::get_instance();

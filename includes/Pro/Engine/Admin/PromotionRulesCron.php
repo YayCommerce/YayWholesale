@@ -1,7 +1,7 @@
 <?php
-namespace YayWholesaleB2B\Engine\PromotionRules;
+namespace YayWholesaleB2B\Pro\Engine\Admin;
 
-use YayWholesaleB2B\Helpers\PromotionRulesHelper;
+use YayWholesaleB2B\Pro\Helpers\PromotionRulesHelper;
 use YayWholesaleB2B\Utils\SingletonTrait;
 
 defined( 'ABSPATH' ) || exit;
