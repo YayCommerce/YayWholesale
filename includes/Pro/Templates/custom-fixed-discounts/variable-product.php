@@ -62,7 +62,7 @@ $product_based_access    = ProductAccessHelper::get_product_based_access_restric
                             <label>
                                 <input class='ywhs_discount_rule_tier' name="yay-wholesale-b2b[discount-type-<?php echo ( esc_html( $index ) ); ?>]" value="tiered" type="radio"
                                     <?php echo ( esc_attr( $product_based_discounts['discount_type'] === 'tiered' ? 'checked' : '' ) ); ?>>
-                                <?php esc_html_e( 'Tiered pricing', 'yay-wholesale-b2b' ); ?>
+                                <?php esc_html_e( 'Tiered Pricing', 'yay-wholesale-b2b' ); ?>
                             </label>
                         </div>
                     </div>
@@ -89,6 +89,7 @@ $product_based_access    = ProductAccessHelper::get_product_based_access_restric
                                                 <input
                                                 type="number"
                                                 id="ywhs_product_tier_base_price_<?php echo ( esc_html( $wholesale_role['slug'] ) ); ?>"
+                                                placeholder="<?php esc_attr_e( 'Auto', 'yay-wholesale-b2b' ); ?>"
                                                 name="yay-wholesale-b2b[base-tier-price-<?php echo ( esc_html( $index ) ); ?>][<?php echo ( esc_html( $wholesale_role['slug'] ) ); ?>]"
                                                 value=<?php echo ( esc_html( $product_based_discounts['discount_tiered']['wholesaler'][ $wholesale_role['slug'] ]['base_tier']['price'] ?? $variation_data['_price'][0] ) ); ?>
                                                 step="0.01"
@@ -120,6 +121,7 @@ $product_based_access    = ProductAccessHelper::get_product_based_access_restric
                                                                 <input
                                                                 type="number"
                                                                 id="ywhs_product_tier_base_price_<?php echo ( esc_html( $wholesale_role['slug'] ) ); ?>"
+                                                                placeholder="<?php esc_attr_e( 'Auto', 'yay-wholesale-b2b' ); ?>"
                                                                 name="yay-wholesale-b2b[tier-price-<?php echo ( esc_html( $index ) ); ?>][<?php echo ( esc_html( $wholesale_role['slug'] ) ); ?>][<?php echo( esc_html( $tier_index ) ); ?>]"
                                                                 value=<?php echo( esc_html( $tier['price'] ) ); ?>
                                                                 step="0.01"

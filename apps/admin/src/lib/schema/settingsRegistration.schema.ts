@@ -40,7 +40,7 @@ const commonFieldSchema = z.object({
   isRequired: z.boolean(),
   isHidden: z.boolean(),
 
-  billingMapping: z.enum(billingMappingValues).optional(),
+  billingMapping: z.enum(billingMappingValues),
   customBillingMetaKey: z.string().optional(),
 });
 
@@ -71,7 +71,7 @@ const attachmentFieldSchema = z.object({
 const baseFieldSchema = z.discriminatedUnion('type', [textFieldSchema, choiceFieldSchema, attachmentFieldSchema]);
 
 export const fieldSchema = baseFieldSchema.superRefine((field, ctx) => {
-  if (field.billingMapping === 'custom' && !field.customBillingMetaKey.trim()) {
+  if (field.billingMapping === 'custom' && (!field.customBillingMetaKey || !field.customBillingMetaKey.trim())) {
     ctx.addIssue({
       code: 'custom',
       path: ['customBillingMetaKey'],
@@ -112,7 +112,7 @@ export const registrationFieldsArraySchema = z.array(fieldSchema).superRefine((f
 
     // Check for duplicated custom user meta key
     if (field.billingMapping === 'custom') {
-      const trimmedMetaKey = field.customBillingMetaKey.trim();
+      const trimmedMetaKey = field.customBillingMetaKey ? field.customBillingMetaKey.trim() : '';
       if (trimmedMetaKey) {
         const existingIdx = customMetaKeyToIndex.get(trimmedMetaKey);
         if (existingIdx !== undefined) {

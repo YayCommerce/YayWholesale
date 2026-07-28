@@ -144,7 +144,8 @@ export function EditRequestForm({ request }: { request: Request }) {
         {request.fields.map((field) => {
           const handleDataByType = () => {
             const value = field.value;
-            if (value.length == 0) {
+
+            if (!value || value.length == 0) {
               return value;
             }
 
