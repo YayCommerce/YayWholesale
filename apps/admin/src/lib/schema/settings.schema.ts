@@ -2,6 +2,7 @@ import { z } from 'zod';
 import { __ } from '@wordpress/i18n';
 
 import { enableByRoleSchema } from './common.schema';
+import { promotionSettingsSchema } from './promotion.schema';
 import { fieldSchema } from './settingsRegistration.schema';
 
 export const registrationSettingsSchema = z.object({
@@ -41,6 +42,7 @@ export const settingsFormSchema = z.object({
   registration_fields: z.object({
     fields: z.array(fieldSchema),
   }),
+  promotion_rules: promotionSettingsSchema,
   payment_roles: z.array(paymentMethodSettingSchema).optional(),
   shipping_roles: z.array(shippingMethodSettingSchema).optional(),
 });

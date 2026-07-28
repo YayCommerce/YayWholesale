@@ -147,6 +147,9 @@ class SettingsHelper {
                     ],
                 ],
             ],
+            'promotion_rules'     => [
+                'promotionRules' => [],
+            ],
         ];
     }
 }

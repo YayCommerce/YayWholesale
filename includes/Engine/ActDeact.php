@@ -1,6 +1,7 @@
 <?php
 namespace YayWholesaleB2B\Engine;
 
+use YayWholesaleB2B\Engine\PromotionRules\PromotionRulesCron;
 use YayWholesaleB2B\Helpers\MigrationHelper;
 use YayWholesaleB2B\Helpers\RolesHelper;
 use YayWholesaleB2B\Helpers\SettingsHelper;
@@ -53,6 +54,8 @@ class ActDeact {
         if ( ! function_exists( 'WC' ) ) {
             return;
         }
+        // Clear the promotion rules cron schedule.
+        wp_clear_scheduled_hook( PromotionRulesCron::CRON_HOOK );
     }
 
     protected static function single_activate() {
@@ -80,5 +83,7 @@ class ActDeact {
         if ( 'fresh' === SetupWizardHelper::get_setup_wizard_status() ) {
             SetupWizardHelper::init_setup_wizard();
         }
+        // Register the promotion rules cron schedule.
+        PromotionRulesCron::register_schedule();
     }
 }
