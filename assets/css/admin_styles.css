@@ -498,8 +498,13 @@
 
 /* #region User page */
 /* User wholesaler information */
-.ywhs_wholesaler_user_wrapper.ywhs_category_based_wholesale_rules_wrapper {
+.ywhs_wholesaler_user_wrapper {
   border-top: none;
   max-width: 575px;
+
+  textarea, input {
+    width: 350px !important;
+    resize: none;
+  }
 }
 /* #endregion */

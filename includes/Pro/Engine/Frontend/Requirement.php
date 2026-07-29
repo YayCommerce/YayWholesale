@@ -173,49 +173,45 @@ class Requirement {
      * Enqueue the JSX of requirement to Frontend block (Cart, Checkout) using Fill/Slot
      */
     public function enqueue_yay_wholesale_requirement() {
-        if ( ( function_exists( 'is_checkout' ) && is_checkout() ) ||
-            ( function_exists( 'is_cart' ) && is_cart() ) ) {
+        if ( ! RequirementHelper::is_requirement_bar_visible() ) {
+            return;
+        }
 
-            if ( ! RequirementHelper::is_requirement_bar_visible() ) {
-                return;
-            }
+        $wholesale = CustomerHelper::get_current_user_wholesale_role();
+        $slug      = 'ywhs_wholesale_requirement';
+        $asset     = include YAYWHOLESALEB2B_PLUGIN_DIR . 'assets/dist/blocks/requirement-slot-fill/index.asset.php';
+        wp_enqueue_script(
+            $slug,
+            YAYWHOLESALEB2B_PLUGIN_URL . 'assets/dist/blocks/requirement-slot-fill/index.js',
+            $asset['dependencies'],
+            YAYWHOLESALEB2B_VERSION,
+            true
+        );
 
-            $wholesale = CustomerHelper::get_current_user_wholesale_role();
-            $slug      = 'ywhs_wholesale_requirement';
-            $asset     = include YAYWHOLESALEB2B_PLUGIN_DIR . 'assets/dist/blocks/requirement-slot-fill/index.asset.php';
-            wp_enqueue_script(
-                $slug,
-                YAYWHOLESALEB2B_PLUGIN_URL . 'assets/dist/blocks/requirement-slot-fill/index.js',
-                $asset['dependencies'],
-                YAYWHOLESALEB2B_VERSION,
-                true
-            );
+        $price_map = [];
+        $cart      = WC()->cart->get_cart();
 
-            $price_map = [];
-            $cart      = WC()->cart->get_cart();
+        foreach ( $cart as $cart_item_key => $cart_item ) {
+            $product = wc_get_product( $cart_item['data']->get_id() );
+            $extra   = apply_filters( 'ywhs_cart_item_extra_price_before_apply_discount', 0, $cart_item );
 
-            foreach ( $cart as $cart_item_key => $cart_item ) {
-                $product = wc_get_product( $cart_item['data']->get_id() );
-                $extra   = apply_filters( 'ywhs_cart_item_extra_price_before_apply_discount', 0, $cart_item );
+            $extra                       = apply_filters( 'ywhs_after_calc_price_additional_processed', $extra, null, $wholesale );
+            $price_map[ $cart_item_key ] = wc_get_price_excluding_tax( $product ) + $extra;
 
-                $extra                       = apply_filters( 'ywhs_after_calc_price_additional_processed', $extra, null, $wholesale );
-                $price_map[ $cart_item_key ] = wc_get_price_excluding_tax( $product ) + $extra;
+        }
 
-            }
+        $wholesale['minOrderQuantity'] = RequirementHelper::get_min_order_quantity( $wholesale );
+        $wholesale['minOrderAmount']   = RequirementHelper::get_min_order_amount( $wholesale );
 
-            $wholesale['minOrderQuantity'] = RequirementHelper::get_min_order_quantity( $wholesale );
-            $wholesale['minOrderAmount']   = RequirementHelper::get_min_order_amount( $wholesale );
-
-            wp_localize_script(
-                $slug,
-                'ywhsRequirement',
-                [
-                    'wholesale' => $wholesale,
-                    'priceMap'  => $price_map,
-                    'pluginUrl' => YAYWHOLESALEB2B_PLUGIN_URL,
-                ]
-            );
-        }//end if
+        wp_localize_script(
+            $slug,
+            'ywhsRequirement',
+            [
+                'wholesale' => $wholesale,
+                'priceMap'  => $price_map,
+                'pluginUrl' => YAYWHOLESALEB2B_PLUGIN_URL,
+            ]
+        );
     }
 
     /**

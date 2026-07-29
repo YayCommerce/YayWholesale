@@ -107,12 +107,18 @@ class SettingsRestController extends BaseRestController {
                     $mail_settings = $wc_email;
                 }
             }
-        } elseif ( is_object( $mail_settings ) ) {
-            $mail_settings = (array) $mail_settings;
         }
 
         if ( empty( $mail_settings ) ) {
             return $this->error_invalid_arguments();
+        }
+
+        if ( ! is_array( $mail_settings ) ) {
+            if ( is_object( $mail_settings ) ) {
+                $mail_settings = (array) $mail_settings;
+            } else {
+                return $this->error_invalid_arguments( __( 'Stored email settings are in an unsupported format.', 'yay-wholesale-b2b' ) );
+            }
         }
 
         // Update the enabled key

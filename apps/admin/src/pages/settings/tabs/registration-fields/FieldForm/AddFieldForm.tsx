@@ -25,7 +25,7 @@ const makeDefaultField = (): FieldFormValues => {
     columnWidth: '50%',
     isRequired: false,
     isHidden: false,
-    billingMapping: '',
+    billingMapping: 'none',
     customBillingMetaKey: '',
   };
 };

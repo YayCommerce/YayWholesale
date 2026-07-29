@@ -99,7 +99,6 @@ class SettingsHelper {
             'registration_fields' => [
                 'fields' => [
                     [
-                        'id'             => uniqid( 'field_' ),
                         'label'          => 'First Name',
                         'inputName'      => 'first_name',
                         'type'           => 'text',
@@ -111,7 +110,6 @@ class SettingsHelper {
                         'billingMapping' => 'billing_first_name',
                     ],
                     [
-                        'id'             => uniqid( 'field_' ),
                         'label'          => 'Last Name',
                         'inputName'      => 'last_name',
                         'type'           => 'text',
@@ -123,7 +121,6 @@ class SettingsHelper {
                         'billingMapping' => 'billing_last_name',
                     ],
                     [
-                        'id'             => uniqid( 'field_' ),
                         'label'          => 'Email Address',
                         'inputName'      => 'email_address',
                         'type'           => 'email',
@@ -135,7 +132,6 @@ class SettingsHelper {
                         'billingMapping' => 'none',
                     ],
                     [
-                        'id'             => uniqid( 'field_' ),
                         'label'          => 'Message',
                         'inputName'      => 'message',
                         'type'           => 'textarea',
