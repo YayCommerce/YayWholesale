@@ -203,11 +203,32 @@ class RequestsHelper {
             ],
         ];
 
-        $last_name_phrase  = __( 'Last Name', 'yay-wholesale-b2b' );
-        $first_name_phrase = __( 'First Name', 'yay-wholesale-b2b' );
         if ( $is_extra_fields ) {
             foreach ( $post_meta as $key => $field ) {
-                if ( ! $field['is_default'] ) {
+                $is_added = false;
+                if ( isset( $field['key'] ) && 'first_name' === $field['key'] ) {
+                    $cleaned['firstName']                       = $field['value'];
+                    $cleaned['defaultFieldLabels']['firstName'] = $key;
+                    $is_added                                   = true;
+                }
+
+                if ( isset( $field['key'] ) && 'last_name' === $field['key'] ) {
+                    $cleaned['lastName']                       = $field['value'];
+                    $cleaned['defaultFieldLabels']['lastName'] = $key;
+                    $is_added                                  = true;
+                }
+
+                if ( isset( $field['key'] ) && 'email_address' === $field['key'] ) {
+                    $cleaned['defaultFieldLabels']['email'] = $key;
+                    $is_added                               = true;
+                }
+
+                if ( isset( $field['key'] ) && 'message' === $field['key'] ) {
+                    $cleaned['defaultFieldLabels']['message'] = $key;
+                    $is_added                                 = true;
+                }
+
+                if ( ! $is_added ) {
                     $tmp = [
                         'label' => $key,
                         'value' => $field['value'],
@@ -215,31 +236,7 @@ class RequestsHelper {
                     ];
 
                     $cleaned['fields'][] = $tmp;
-                } else {
-                    if ( isset( $field['key'] ) && 'first_name' === $field['key'] ) {
-                        $cleaned['firstName']                       = $field['value'];
-                        $cleaned['defaultFieldLabels']['firstName'] = $key;
-                    } elseif ( preg_match( "/(?i)\b$first_name_phrase\b/", $key ) ) {
-                        $cleaned['firstName']                       = $field['value'];
-                        $cleaned['defaultFieldLabels']['firstName'] = $key;
-                    }
-
-                    if ( isset( $field['key'] ) && 'last_name' === $field['key'] ) {
-                        $cleaned['lastName']                       = $field['value'];
-                        $cleaned['defaultFieldLabels']['lastName'] = $key;
-                    } elseif ( preg_match( "/(?i)\b$last_name_phrase\b/", $key ) ) {
-                        $cleaned['lastName']                       = $field['value'];
-                        $cleaned['defaultFieldLabels']['lastName'] = $key;
-                    }
-
-                    if ( isset( $field['key'] ) && 'email_address' === $field['key'] ) {
-                        $cleaned['defaultFieldLabels']['email'] = $key;
-                    }
-
-                    if ( isset( $field['key'] ) && 'message' === $field['key'] ) {
-                        $cleaned['defaultFieldLabels']['message'] = $key;
-                    }
-                }//end if
+                }
             }//end foreach
         }//end if
 
@@ -488,6 +485,8 @@ class RequestsHelper {
         if ( ! isset( $request ) || self::REQUEST_POST_TYPE !== $request->post_type ) {
             return new WP_Error( 'not_found', 'Request not found', [ 'status' => 404 ] );
         }
+
+        self::delete_request_attachments( $request_id );
 
         $result = wp_delete_post( $request_id, true );
 
@@ -814,5 +813,23 @@ class RequestsHelper {
         $query = new WP_Query( $args );
 
         return $query->posts[0] ?? 0;
+    }
+
+    public static function delete_request_attachments( int $request_id ) {
+        $post_meta         = get_post_meta( $request_id, self::REQUEST_META_DATA, true );
+        $attachment_fields = array_filter( $post_meta, fn( $field ) => $field['type'] === 'attachment' );
+
+        if ( empty( $attachment_fields ) ) {
+            return;
+        }
+
+        $file_urls  = array_column( $attachment_fields, 'value' );
+        $upload_dir = wp_upload_dir();
+        foreach ( $file_urls as $file_url ) {
+            $file_path = str_replace( $upload_dir['baseurl'], $upload_dir['basedir'], $file_url );
+            if ( file_exists( $file_path ) ) {
+                wp_delete_file( $file_path );
+            }
+        }
     }
 }
