@@ -73,7 +73,7 @@ export default function RegistrationFieldsTab() {
               <h2 className="text-lg leading-none font-bold tracking-tight lg:text-2xl">
                 {__('Registration Fields', 'yay-wholesale-b2b')}
               </h2>
-              <Button variant="outline" onClick={() => setFieldSheetState(['add'])}>
+              <Button variant="primary-outline-fill" onClick={() => setFieldSheetState(['add'])}>
                 <Plus className="size-4" />
                 <span>{__('Add New Field', 'yay-wholesale-b2b')}</span>
               </Button>

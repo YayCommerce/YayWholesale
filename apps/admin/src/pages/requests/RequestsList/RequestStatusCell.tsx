@@ -59,13 +59,13 @@ export function RequestStatusCell({ request }: { request: Request }) {
         <DropdownMenuTrigger asChild>
           <Button
             variant="outline"
-            className="pointer-events-auto flex w-40 items-center justify-between pr-1.5! font-normal capitalize"
+            className="pointer-events-auto flex w-40 items-center justify-between px-3 py-2 font-normal capitalize"
           >
             <span className="flex items-center gap-2">
               <RequestsStatusIcon status={request.status} />
               {request.status}
             </span>
-            <ChevronDown className="text-muted-foreground/70 mt-0.5 size-6 cursor-pointer" />
+            <ChevronDown className="text-muted-foreground/70 mt-0.5 size-4 cursor-pointer" />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent className="w-40">

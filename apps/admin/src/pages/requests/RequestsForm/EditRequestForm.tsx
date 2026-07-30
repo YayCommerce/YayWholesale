@@ -98,7 +98,7 @@ export function EditRequestForm({ request }: { request: Request }) {
                 />
               )}
             </SheetTitle>
-            <SheetDescription className="mt-1 leading-5">
+            <SheetDescription className="mt-3 leading-5">
               {__("Use the button below to approve or reject this user's wholesale user request", 'yay-wholesale-b2b')}
             </SheetDescription>
           </div>

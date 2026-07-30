@@ -84,7 +84,7 @@ export default function PromotionRulesTab() {
                 </p>
               </div>
               {isPro && (
-                <Button variant="outline" onClick={() => setPromotionRuleSheetState(['add'])}>
+                <Button variant="primary-outline-fill" onClick={() => setPromotionRuleSheetState(['add'])}>
                   <Plus className="size-4" />
                   <span>{__('Add New Rule', 'yay-wholesale-b2b')}</span>
                 </Button>

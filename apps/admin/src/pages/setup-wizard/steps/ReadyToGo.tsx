@@ -10,7 +10,13 @@ export default function ReadyToGo() {
   return (
     <div className="flex w-full flex-col items-center justify-center gap-9">
       <div className="flex w-full flex-col gap-6">
-        <span className="text-3xl font-bold">{__('You’re all set! 🎉', 'yay-wholesale-b2b')}</span>
+        <span className="flex gap-0.5">
+          <span className="text-3xl font-bold">{__('You’re all set!', 'yay-wholesale-b2b')}</span>
+          <img
+            src={`${window.yayWholesaleB2BMeta.wholesaleMeta.assetsUrl}/images/setup-wizard/partying_face.svg`}
+            alt="YayWholesale"
+          />
+        </span>
         <div className="text-muted-foreground flex flex-col text-base/6.5">
           <span>
             {__(
@@ -24,7 +30,7 @@ export default function ReadyToGo() {
                 <a
                   href="https://docs.yaycommerce.com/yaywholesale/"
                   target="_blank"
-                  className="text-foreground font-medium underline"
+                  className="text-foreground font-medium underline underline-offset-3"
                 />
               ),
             })}
@@ -33,15 +39,20 @@ export default function ReadyToGo() {
       </div>
 
       <div className="flex w-full items-center justify-between gap-6">
-        <Button size="lg" variant="secondary" onClick={() => window.open('https://yaycommerce.com/support/', 'blank')}>
+        <Button
+          size="lg"
+          variant="secondary"
+          className="px-8 py-6"
+          onClick={() => window.open('https://yaycommerce.com/support/', 'blank')}
+        >
           {__('Get Support', 'yay-wholesale')}
         </Button>
         <div className="flex items-center gap-6">
-          <Button size="lg" variant="outline" onClick={() => navigate('/roles/new')}>
+          <Button size="lg" variant="outline" className="px-8 py-6" onClick={() => navigate('/roles/new')}>
             {__('Add New Role', 'yay-wholesale')}
           </Button>
 
-          <Button size="lg" onClick={() => navigate('/')}>
+          <Button size="lg" className="px-8 py-6" onClick={() => navigate('/')}>
             {__('Open Dashboard', 'yay-wholesale')}
           </Button>
         </div>

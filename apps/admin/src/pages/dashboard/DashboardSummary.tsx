@@ -21,7 +21,7 @@ export default function DashboardSummary({ reportQuery }: { reportQuery: ReturnT
 
   return (
     <div className="grid gap-3 md:grid-cols-3 md:gap-4 2xl:gap-6">
-      <Card className="p-4 md:p-5 2xl:p-6">
+      <Card className="p-4 shadow-xs md:p-5 2xl:p-6">
         <CardContent className="flex flex-col">
           <div className="mb-2 flex items-center justify-between">
             <h3 className="text-base font-medium">{__('Wholesalers', 'yay-wholesale-b2b')}</h3>
@@ -37,7 +37,7 @@ export default function DashboardSummary({ reportQuery }: { reportQuery: ReturnT
         </CardContent>
       </Card>
 
-      <Card className="p-4 md:p-5 2xl:p-6">
+      <Card className="p-4 shadow-xs md:p-5 2xl:p-6">
         <CardContent className="flex flex-col">
           <div className="mb-3 flex items-center justify-between">
             <h3 className="text-base font-medium">{__('Wholesale Orders', 'yay-wholesale-b2b')}</h3>
@@ -55,7 +55,7 @@ export default function DashboardSummary({ reportQuery }: { reportQuery: ReturnT
         </CardContent>
       </Card>
 
-      <Card className="p-4 md:p-5 2xl:p-6">
+      <Card className="p-4 shadow-xs md:p-5 2xl:p-6">
         <CardContent className="flex flex-col">
           <div className="mb-3 flex items-center justify-between">
             <h3 className="text-base font-medium">{__('Wholesale Revenue', 'yay-wholesale-b2b')}</h3>

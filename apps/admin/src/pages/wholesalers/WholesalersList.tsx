@@ -108,7 +108,7 @@ export function WholesalersList() {
   const noFilterData = !isLoading && wholesalersPage?.data?.length === 0;
 
   return (
-    <Card className="gap-4 shadow-sm">
+    <Card className="gap-4 shadow-xs">
       {/* Header */}
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="flex w-fit items-center gap-2 overflow-visible sm:w-1 lg:w-fit">
@@ -133,7 +133,7 @@ export function WholesalersList() {
 
         <div className="flex w-full flex-col-reverse items-end gap-4 sm:w-fit xl:flex-row">
           <div className="flex w-full flex-col items-end gap-4 sm:w-fit sm:flex-row">
-            <InputGroup className="w-full sm:w-80">
+            <InputGroup className="w-full sm:w-88">
               <InputGroupInput
                 placeholder={__('Search by ID, Email, Display Name', 'yay-wholesale-b2b')}
                 defaultValue={search}
@@ -171,7 +171,7 @@ export function WholesalersList() {
               </SelectContent>
             </Select>
           </div>
-          <Button variant="primary-outline-fill" asChild>
+          <Button variant="primary" asChild>
             <a href={window.yayWholesaleB2BMeta.wpMeta.usersUrl.new} target="_blank" rel="noopener noreferrer">
               <Plus className="size-4" />
               {__('Add New Wholesaler', 'yay-wholesale-b2b')}
