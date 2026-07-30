@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Separator } from '@radix-ui/react-separator';
 import { ThumbsDown, ThumbsUp, X } from 'lucide-react';
-import { toast } from 'sonner';
+import { useDebounce } from 'rooks';
 import { createInterpolateElement } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
@@ -16,23 +16,17 @@ type SetupWizardHelpfulProps = {
 };
 
 const SetupWizardHelpful = ({ step, maxSteps }: SetupWizardHelpfulProps) => {
-  const [isPendingHandle, setIsPending] = useState(false);
   const [isSkippingHelpful, setSkippingHelpful] = useState(false);
-  const [setupHelpful, setSetupHelpful] = useState(window.yayWholesaleB2BAdmin.setup_wizard.helpful);
+  const [setupHelpful, setSetupHelpful] = useState('blank');
+  const updateSetupHelpfulDebounced = useDebounce(updateSetupHelpful, 500);
 
-  const updateSetupWizardHelpful = async (value: 'yes' | 'no') => {
-    if (isPendingHandle) return;
+  const updateSetupWizardHelpful = (value: 'yes' | 'no') => {
     if (value === setupHelpful) return;
     try {
-      setIsPending(true);
       setSetupHelpful(value);
-      await updateSetupHelpful(value);
-      setIsPending(false);
+      updateSetupHelpfulDebounced(value);
     } catch (error) {
       console.warn('Update helpful failed:', error);
-      toast.error(__('An Unexpected error occured', 'yay-wholesale-b2b'));
-    } finally {
-      window.yayWholesaleB2BAdmin.setup_wizard.helpful = value;
     }
   };
 

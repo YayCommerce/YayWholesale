@@ -64,12 +64,14 @@ class ActDeact {
 
         $setting         = SettingsHelper::get_settings();
         $wholesale_roles = RolesHelper::get_wholesale_roles();
+        $enable_wizard   = false;
 
-        if ( count( $wholesale_roles ) === 0 ) {
+        if ( empty( $wholesale_roles ) ) {
             $default_slug = RolesHelper::generate_default_role();
             SetupWizardHelper::save_setup_wizard_status( 'fresh' );
             $setting['general']['default_role'] = $default_slug;
             SettingsHelper::update_settings( $setting );
+            $enable_wizard = true;
         } elseif ( empty( $setting['general']['default_role'] ) ) {
             $active_roles = RolesHelper::get_active_wholesale_roles();
             if ( empty( $active_roles ) ) {
@@ -79,10 +81,13 @@ class ActDeact {
             }
             $setting['general']['default_role'] = $default_slug;
             SettingsHelper::update_settings( $setting );
+            $enable_wizard = true;
         }
 
-        if ( 'fresh' === SetupWizardHelper::get_setup_wizard_status() ) {
+        if ( $enable_wizard ) {
             SetupWizardHelper::init_setup_wizard();
+        } else {
+            SetupWizardHelper::save_setup_wizard_status( 'completed' );
         }
 
         if ( class_exists( 'YayWholesaleB2B\Pro\YayWholesaleB2BPro', true ) ) {

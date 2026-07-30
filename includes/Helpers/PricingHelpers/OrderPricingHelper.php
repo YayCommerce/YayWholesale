@@ -66,7 +66,8 @@ class OrderPricingHelper {
         } else {
             $order->delete_meta_data( '_ywhs_wholesale_role' );
         }
-
+        $order->save_meta_data();
+        
         ReportsHelper::delete_ywhs_report_transient();
     }
 
