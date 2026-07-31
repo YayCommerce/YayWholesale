@@ -110,24 +110,13 @@ export default function RoleSetup({ setStep, skip, isPendingSkip, isPendingSave 
       </div>
 
       <div className="flex w-full items-center justify-between">
-        <Button variant="secondary" size="sm" onClick={() => setStep(0)}>
+        <Button variant="secondary" size="lg" className="px-8 py-6" onClick={() => setStep(0)}>
           {__('Go Back', 'yay-wholesale-b2b')}
         </Button>
-        <div className="flex gap-3">
-          <LoadingButton
-            size="lg"
-            className="text-muted-foreground hover:text-foreground font-semibold"
-            variant="ghost"
-            loading={isPendingSkip}
-            onClick={skip}
-          >
-            {__('Skip for Now', 'yay-wholesale')}
-          </LoadingButton>
 
-          <LoadingButton size="lg" loading={isPendingSave} type="submit">
-            {__('Next', 'yay-wholesale')}
-          </LoadingButton>
-        </div>
+        <LoadingButton size="lg" loading={isPendingSave} type="submit" className="px-8 py-6">
+          {__('Create Role', 'yay-wholesale')}
+        </LoadingButton>
       </div>
     </div>
   );

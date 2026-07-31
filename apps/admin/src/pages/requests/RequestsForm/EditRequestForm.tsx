@@ -29,6 +29,8 @@ import { SheetDescription, SheetFooter, SheetHeader, SheetTitle } from '@/compon
 import { toast } from '@/components/ui/sonner';
 import { Textarea } from '@/components/ui/textarea';
 import RequestsStatusIcon from '@/components/icons/RequestsStatusIcon';
+import { isPhoneField } from '@/pages/requests/requests.helper';
+import EditRequestField from '@/pages/requests/RequestsForm/EditRequestField';
 
 export function EditRequestForm({ request }: { request: Request }) {
   const navigate = useNavigate();
@@ -96,7 +98,7 @@ export function EditRequestForm({ request }: { request: Request }) {
                 />
               )}
             </SheetTitle>
-            <SheetDescription className="mt-1 leading-5">
+            <SheetDescription className="mt-3 leading-5">
               {__("Use the button below to approve or reject this user's wholesale user request", 'yay-wholesale-b2b')}
             </SheetDescription>
           </div>
@@ -141,40 +143,14 @@ export function EditRequestForm({ request }: { request: Request }) {
           <Textarea className="h-fit min-h-25 resize-none" readOnly value={request.message} onChange={() => {}} />
         </div>
 
-        {request.fields.map((field) => {
-          const handleDataByType = () => {
-            const value = field.value;
-            if (value.length == 0) {
-              return value;
-            }
-
-            if (field.type.toLowerCase() == 'date') {
-              return parseWPDate(value);
-            }
-
-            if (field.type.toLowerCase() == 'time') {
-              return parseWPTime(value);
-            }
-
-            return value;
-          };
+        {request.fields.map((field, index) => {
+          if (isPhoneField(field)) return null;
 
           return (
-            !isPhoneField(field) && (
-              <div className="flex flex-col gap-2">
-                <Label>{field.label}</Label>
-                {field.type.toLowerCase() === 'textarea' ? (
-                  <Textarea
-                    className="h-fit min-h-25 resize-none"
-                    readOnly
-                    value={handleDataByType()}
-                    onChange={() => {}}
-                  />
-                ) : (
-                  <Input readOnly value={handleDataByType()} onChange={() => {}} />
-                )}
-              </div>
-            )
+            <div className="flex flex-col gap-2" key={index}>
+              <Label>{field.label}</Label>
+              <EditRequestField requestId={request.id} field={field} />
+            </div>
           );
         })}
       </div>
@@ -234,7 +210,3 @@ export function EditRequestForm({ request }: { request: Request }) {
     </>
   );
 }
-
-const isPhoneField = (field: RequestField) => {
-  return field.label.toLowerCase().includes(__('phone', 'yay-wholesale-b2b')) || field.type.toLowerCase() === 'phone';
-};

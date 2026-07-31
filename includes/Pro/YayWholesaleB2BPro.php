@@ -1,6 +1,7 @@
 <?php
 namespace YayWholesaleB2B\Pro;
 
+use YayWholesaleB2B\Pro\Engine\Admin\PromotionRulesCron;
 use YayWholesaleB2B\Pro\YayWholesaleB2BProLicenseAdapter;
 use YayWholesaleB2B\Utils\SingletonTrait;
 
@@ -29,6 +30,7 @@ class YayWholesaleB2BPro {
         \YayWholesaleB2B\Pro\Engine\Admin\PaymentGateway::get_instance();
         \YayWholesaleB2B\Pro\Engine\Admin\ShippingMethod::get_instance();
         \YayWholesaleB2B\Pro\Engine\Admin\TemplateEditor::get_instance();
+        \YayWholesaleB2B\Pro\Engine\Admin\PromotionRulesCron::get_instance();
 
         \YayWholesaleB2B\Pro\Engine\Support\Support::get_instance();
     }
@@ -41,5 +43,15 @@ class YayWholesaleB2BPro {
         \YayWholesaleB2BScoped\YayCommerce\AdminShell\AdminShell::register_plugin(
             new YayWholesaleB2BProLicenseAdapter()
         );
+    }
+
+    public static function activate() {
+        // Register the promotion rules cron schedule.
+        PromotionRulesCron::register_schedule();
+    }
+
+    public static function deactivate() {
+        // Clear the promotion rules cron schedule .
+        wp_clear_scheduled_hook( PromotionRulesCron::CRON_HOOK );
     }
 }

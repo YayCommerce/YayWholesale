@@ -20,8 +20,7 @@ class LocalizeHelper {
             'wholesale_emails' => SettingsHelper::get_email_templates(),
             'roles'            => RolesHelper::handle_roles_data( $roles, $settings ),
             'setup_wizard'     => [
-                'status'  => SetupWizardHelper::get_setup_wizard_status(),
-                'helpful' => get_option( 'yaywholesaleb2b_setup_helpful', 'blank' ),
+                'status' => SetupWizardHelper::get_setup_wizard_status(),
             ],
             'wc_page_ids'      => array_values(
                 array_filter(
@@ -95,7 +94,7 @@ class LocalizeHelper {
                 'setting_urls'          => [
                     'payment'        => esc_url_raw( admin_url( 'admin.php?page=wc-settings&tab=checkout' ) ),
                     'shipping'       => esc_url_raw( admin_url( 'admin.php?page=wc-settings&tab=shipping' ) ),
-                    'templateEditor' => esc_url_raw( admin_url( 'site-editor.php?p=%2Ftemplate&activeView=root' ) ),
+                    'templateEditor' => esc_url_raw( admin_url( 'site-editor.php?p=%2Ftemplate&activeView=' . rawurlencode( wp_get_current_user()->user_login ) ) ),
                 ],
                 'currency_data'         => [
                     'currency'     => get_woocommerce_currency(),

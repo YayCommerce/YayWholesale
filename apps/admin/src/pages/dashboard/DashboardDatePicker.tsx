@@ -52,15 +52,16 @@ const DashboardDatePicker: FC<DashboardDatePickerProps> = ({ dateRange, setDateR
               <CalendarIcon />
               {displayDateRange}
             </div>
-            <ChevronDown className="text-muted-foreground/70 size-6  cursor-pointer" />
+            <ChevronDown className="text-muted-foreground/70 size-4 cursor-pointer" />
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="size-fit  px-1 sm:-translate-x-5 lg:-translate-x-6" align="start">
+        <PopoverContent className="size-fit px-1" align="end">
           <Calendar
             mode="range"
             defaultMonth={previewDateRange?.from}
             selected={previewDateRange}
             onSelect={setPreviewDateRange}
+            showOutsideDays={false}
             numberOfMonths={2}
             disabled={{
               after: new Date(),

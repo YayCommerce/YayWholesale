@@ -33,7 +33,7 @@ export default function Welcome({ setStep, skip, isPendingSkip }: SingleSetupSte
         </Button>
         <LoadingButton
           size="lg"
-          className="text-muted-foreground hover:text-foreground w-79 font-semibold"
+          className="text-muted-foreground hover:text-foreground w-79 font-medium"
           variant="ghost"
           loading={isPendingSkip}
           onClick={skip}

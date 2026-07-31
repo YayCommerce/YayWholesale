@@ -1,8 +1,12 @@
 <?php
-namespace YayWholesaleB2B\Helpers;
+namespace YayWholesaleB2B\Pro\Helpers;
 
 use Automattic\WooCommerce\Utilities\OrderUtil;
-use YayWholesaleB2B\Engine\PromotionRules\PromotionRulesCron;
+use YayWholesaleB2B\Helpers\CustomerHelper;
+use YayWholesaleB2B\Helpers\RolesHelper;
+use YayWholesaleB2B\Helpers\SettingsHelper;
+use YayWholesaleB2B\Pro\Engine\Admin\PromotionRulesCron;
+
 /**
  * Promotion Rules Helper Class
  */
@@ -331,7 +335,7 @@ class PromotionRulesHelper {
         $last_year_start = $this_year_start->modify( '-1 year' );
 
         if ( OrderUtil::custom_orders_table_usage_is_enabled() ) {
-            $sql_query = "SELECT 
+            $sql_query = "SELECT
                     COUNT(o.id) AS completed_orders,
                     COALESCE(SUM(o.total_amount), 0) AS total,
                     COALESCE( SUM( CASE WHEN od.date_completed_gmt >= %s AND od.date_completed_gmt < %s THEN o.total_amount ELSE 0 END),0) AS last_year,
@@ -356,9 +360,9 @@ class PromotionRulesHelper {
                 COALESCE(SUM( CASE WHEN completed.meta_value >= %d AND completed.meta_value < %d THEN CAST(total.meta_value AS DECIMAL(20,4)) ELSE 0 END),0) AS last_month
                 FROM {$wpdb->posts} p
                 INNER JOIN {$wpdb->postmeta} customer ON customer.post_id = p.ID AND customer.meta_key = '_customer_user'
-    
+
                 INNER JOIN {$wpdb->postmeta} total ON total.post_id = p.ID AND total.meta_key = '_order_total'
-    
+
                 LEFT JOIN {$wpdb->postmeta} completed ON completed.post_id = p.ID AND completed.meta_key = '_date_completed'
                 WHERE p.post_type = 'shop_order' AND p.post_status = 'wc-completed' AND customer.meta_value = %d";
 

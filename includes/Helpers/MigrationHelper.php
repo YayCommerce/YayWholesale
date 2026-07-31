@@ -7,11 +7,15 @@ use YayWholesaleB2B\Helpers\RolesHelper;
  * WholeSalers Helper Class
  */
 class MigrationHelper {
-    const LAST_MIGRATION_VERSION = 'yaywholesaleb2b_version';
+    const CORE_DB_VERSION = 'yaywholesaleb2b_version';
+
+    public static function get_core_db_version() {
+        return get_option( self::CORE_DB_VERSION, '0.0.0' );
+    }
 
     public static function migrate_data() {
         $migrations   = self::get_available_migrations();
-        $last_version = get_option( self::LAST_MIGRATION_VERSION, '0.0.0' );
+        $last_version = self::get_core_db_version();
 
         if ( version_compare( $last_version, YAYWHOLESALEB2B_VERSION, '=' ) ) {
             return;
@@ -25,7 +29,7 @@ class MigrationHelper {
             }
         }
 
-        update_option( self::LAST_MIGRATION_VERSION, YAYWHOLESALEB2B_VERSION );
+        update_option( self::CORE_DB_VERSION, YAYWHOLESALEB2B_VERSION );
     }
 
     public static function get_available_migrations() {
@@ -36,7 +40,7 @@ class MigrationHelper {
     }
 
     public static function v1_0_5_add_input_name_for_registration_fields_settings( string $last_version ) {
-        if ( ! version_compare( $last_version, '1.0.5', '<=' ) ) {
+        if ( ! version_compare( $last_version, '1.0.5', '<' ) ) {
             return;
         }
 
@@ -92,7 +96,7 @@ class MigrationHelper {
     }
 
     public static function v1_2_0_refactor_product_based_discount_settings( string $last_version ) {
-        if ( ! version_compare( $last_version, '1.2.0', '<=' ) ) {
+        if ( ! version_compare( $last_version, '1.2.0', '<' ) ) {
             return;
         }
 

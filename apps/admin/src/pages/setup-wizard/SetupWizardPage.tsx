@@ -14,6 +14,7 @@ import { useIsMutatingSetup, useSaveSetupWizardMutation } from '@/lib/queries/wi
 import { setupRegistration, setupRoleSchema, SetupWizardForm, setupWizardFormSchema } from '@/lib/schema/wizard.schema';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { WholeSaleToolTip } from '@/components/ui/custom/WholeSaleToolTip';
 import {
   Dialog,
   DialogClose,
@@ -115,9 +116,20 @@ export function SetupWizardPage() {
       <div className="text-muted-foreground absolute top-5 right-10 flex items-center gap-4">
         <span>{sprintf(__('Version %s', 'yay-wholesale-b2b'), version)}</span>
         <Separator orientation="vertical" className="h-4.5! w-px bg-[#E4E4E7]" />
-        <Button variant="outline" size="icon-sm" className="rounded-full border-none" onClick={skipBtnHandle}>
-          <X />
-        </Button>
+        <WholeSaleToolTip
+          trigger={
+            <Button
+              variant="outline"
+              size="icon-sm"
+              className="hover:bg-background rounded-full border-none"
+              onClick={skipBtnHandle}
+            >
+              <X />
+            </Button>
+          }
+          content={__('Skip for Now')}
+          side="bottom"
+        />
       </div>
       <div className="mt-20 flex flex-col gap-12.5 lg:mt-30">
         <div className="flex flex-col items-center justify-center gap-4">

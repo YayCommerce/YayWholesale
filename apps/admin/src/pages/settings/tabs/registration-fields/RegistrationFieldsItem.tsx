@@ -54,16 +54,17 @@ export function RegistrationFieldsItem({
 
         <div className="text-muted-foreground flex items-center gap-2 text-xs">
           <span>{field.type[0].toUpperCase() + field.type.slice(1)} field</span>
-          {field.billingMapping !== '' && field.billingMapping !== 'none' && (
-            <span className="flex items-center gap-0.5">
-              <MapPinIcon className="size-2.5" />
-              {__('Mapping:', 'yay-wholesale-b2b')}
-              {field.billingMapping != 'custom'
-                ? ` ${getBillingMappingLabel(field.billingMapping)}`
-                : ` ${field.customBillingMetaKey} ${__('[custom]', 'yay-wholesale-b2b')}`}{' '}
-              {__('billing', 'yay-wholesale-b2b')}
-            </span>
-          )}
+          {!field.billingMapping ||
+            (field.billingMapping !== 'none' && (
+              <span className="flex items-center gap-0.5">
+                <MapPinIcon className="size-2.5" />
+                {__('Mapping:', 'yay-wholesale-b2b')}
+                {field.billingMapping != 'custom'
+                  ? ` ${getBillingMappingLabel(field.billingMapping)}`
+                  : ` ${field.customBillingMetaKey} ${__('[custom]', 'yay-wholesale-b2b')}`}{' '}
+                {__('billing', 'yay-wholesale-b2b')}
+              </span>
+            ))}
         </div>
       </div>
 

@@ -15,7 +15,7 @@ import WholesalersIcon from '@/components/icons/WholesalersIcon';
 
 export function HeaderMenu() {
   return (
-    <HeaderNavMenuList>
+    <HeaderNavMenuList className="*:data-[slot=header-navigation-menu-indicator]:bg-primary">
       <CustomMenuItem asChild key="dashboard">
         <NavLink to="/dashboard">
           <DashboardIcon className="stroke-2" />
@@ -60,6 +60,7 @@ function CustomMenuItem({ className, ...props }: ComponentProps<typeof HeaderNav
         'sm:max-md:pt-2',
         '*:[svg]:size-4 sm:*:[svg]:size-3.5 md:*:[svg]:size-4',
         'max-md:text-xs max-sm:*:[span]:hidden',
+        'aria-[current=page]:text-primary',
         className,
       )}
       {...props}

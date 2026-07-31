@@ -1,7 +1,6 @@
 <?php
 namespace YayWholesaleB2B\Engine;
 
-use YayWholesaleB2B\Engine\PromotionRules\PromotionRulesCron;
 use YayWholesaleB2B\Helpers\MigrationHelper;
 use YayWholesaleB2B\Helpers\RolesHelper;
 use YayWholesaleB2B\Helpers\SettingsHelper;
@@ -54,8 +53,10 @@ class ActDeact {
         if ( ! function_exists( 'WC' ) ) {
             return;
         }
-        // Clear the promotion rules cron schedule.
-        wp_clear_scheduled_hook( PromotionRulesCron::CRON_HOOK );
+
+        if ( class_exists( 'YayWholesaleB2B\Pro\YayWholesaleB2BPro', true ) ) {
+            \YayWholesaleB2B\Pro\YayWholesaleB2BPro::deactivate();
+        }
     }
 
     protected static function single_activate() {
@@ -63,12 +64,14 @@ class ActDeact {
 
         $setting         = SettingsHelper::get_settings();
         $wholesale_roles = RolesHelper::get_wholesale_roles();
+        $enable_wizard   = false;
 
-        if ( count( $wholesale_roles ) === 0 ) {
+        if ( empty( $wholesale_roles ) ) {
             $default_slug = RolesHelper::generate_default_role();
             SetupWizardHelper::save_setup_wizard_status( 'fresh' );
             $setting['general']['default_role'] = $default_slug;
             SettingsHelper::update_settings( $setting );
+            $enable_wizard = true;
         } elseif ( empty( $setting['general']['default_role'] ) ) {
             $active_roles = RolesHelper::get_active_wholesale_roles();
             if ( empty( $active_roles ) ) {
@@ -78,12 +81,17 @@ class ActDeact {
             }
             $setting['general']['default_role'] = $default_slug;
             SettingsHelper::update_settings( $setting );
+            $enable_wizard = true;
         }
 
-        if ( 'fresh' === SetupWizardHelper::get_setup_wizard_status() ) {
+        if ( $enable_wizard ) {
             SetupWizardHelper::init_setup_wizard();
+        } else {
+            SetupWizardHelper::save_setup_wizard_status( 'completed' );
         }
-        // Register the promotion rules cron schedule.
-        PromotionRulesCron::register_schedule();
+
+        if ( class_exists( 'YayWholesaleB2B\Pro\YayWholesaleB2BPro', true ) ) {
+            \YayWholesaleB2B\Pro\YayWholesaleB2BPro::activate();
+        }
     }
 }

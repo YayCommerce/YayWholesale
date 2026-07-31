@@ -153,7 +153,7 @@ export default function RequestsList() {
   const noFilteredRequest = !isLoading && requestsPage?.data.length === 0;
 
   return (
-    <Card className="gap-4 p-4 shadow-sm md:p-5 2xl:p-6">
+    <Card className="gap-4 p-4 shadow-xs md:p-5 2xl:p-6">
       {/* Header */}
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="flex w-fit items-center gap-2 overflow-visible sm:w-1 md:w-fit">
@@ -221,9 +221,9 @@ export default function RequestsList() {
       {/* Table */}
       <div className="relative overflow-x-auto rounded-lg border">
         <Table className="min-w-full">
-          <TableHeader>
+          <TableHeader className="border-divider border-b">
             {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
+              <TableRow key={headerGroup.id} className="border-b-divider">
                 {headerGroup.headers.map((header) => (
                   <TableHead
                     key={header.id}
@@ -331,7 +331,7 @@ export default function RequestsList() {
                 <Button
                   size="icon"
                   variant="ghost"
-                  className="hover:text-destructive text-muted-foreground size-8 hover:bg-transparent hover:shadow-sm"
+                  className="hover:text-destructive text-muted-foreground size-8 hover:bg-transparent hover:shadow-xs"
                   onClick={() => setOpenDeleteDialog(true)}
                 >
                   <DeleteIcon className="size-4" />

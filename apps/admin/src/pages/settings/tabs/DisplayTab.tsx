@@ -153,7 +153,10 @@ export default function DisplayTab() {
         {isBlockTheme ? (
           <div className="flex items-center justify-between gap-15 rounded-md">
             <div>
-              <p className="text-foreground text-[13px] font-semibold">Template Editor</p>
+              <FieldLabel className="flex items-center gap-2 leading-3.5 font-medium">
+                {__('Template Editor', 'yay-wholesale-b2b')}
+                {!isPro && <UpgradeToProBadge />}
+              </FieldLabel>
               <span className="text-muted-foreground mt-2 text-xs font-normal">
                 {__(
                   "Create, customize and manage access permissions for each user role in the shop page. Build your shop catalog using the 'Products with Wholesale' template.",

@@ -8,7 +8,6 @@ const attachmentFieldTypes = ['attachment'] as const;
 const systemFields = ['firstname', 'lastname', 'email', 'company', 'vatId'] as const;
 
 export const billingMappingValues = [
-  '',
   'none',
   'billing_first_name',
   'billing_last_name',
@@ -71,7 +70,7 @@ const attachmentFieldSchema = z.object({
 const baseFieldSchema = z.discriminatedUnion('type', [textFieldSchema, choiceFieldSchema, attachmentFieldSchema]);
 
 export const fieldSchema = baseFieldSchema.superRefine((field, ctx) => {
-  if (field.billingMapping === 'custom' && !field.customBillingMetaKey.trim()) {
+  if (field.billingMapping === 'custom' && (!field.customBillingMetaKey || !field.customBillingMetaKey.trim())) {
     ctx.addIssue({
       code: 'custom',
       path: ['customBillingMetaKey'],
@@ -96,8 +95,9 @@ export const registrationFieldsArraySchema = z.array(fieldSchema).superRefine((f
 
   fields.forEach((field, idx) => {
     // Check for duplicated WooCommerce billing field mapping
-    if (!IGNORED_BILLING_MAPPINGS.has(field.billingMapping)) {
-      const existingIdx = billingMappingToIndex.get(field.billingMapping);
+    const billingMapping = field.billingMapping ?? 'none';
+    if (!IGNORED_BILLING_MAPPINGS.has(billingMapping)) {
+      const existingIdx = billingMappingToIndex.get(billingMapping);
       if (existingIdx !== undefined) {
         const message = __(
           'This billing field is already connected to another registration field.',
@@ -106,13 +106,13 @@ export const registrationFieldsArraySchema = z.array(fieldSchema).superRefine((f
         ctx.addIssue({ code: 'custom', path: [existingIdx, 'billingMapping'], message });
         ctx.addIssue({ code: 'custom', path: [idx, 'billingMapping'], message });
       } else {
-        billingMappingToIndex.set(field.billingMapping, idx);
+        billingMappingToIndex.set(billingMapping, idx);
       }
     }
 
     // Check for duplicated custom user meta key
-    if (field.billingMapping === 'custom') {
-      const trimmedMetaKey = field.customBillingMetaKey.trim();
+    if (billingMapping === 'custom') {
+      const trimmedMetaKey = field.customBillingMetaKey ? field.customBillingMetaKey.trim() : '';
       if (trimmedMetaKey) {
         const existingIdx = customMetaKeyToIndex.get(trimmedMetaKey);
         if (existingIdx !== undefined) {

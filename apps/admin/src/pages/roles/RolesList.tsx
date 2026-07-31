@@ -117,7 +117,7 @@ export default function RolesList() {
   const selectedCount = table.getSelectedRowModel().rows.length;
 
   return (
-    <Card className="gap-4 p-4 shadow-sm md:p-5 2xl:p-6">
+    <Card className="gap-4 p-4 shadow-xs md:p-5 2xl:p-6">
       {/* Header */}
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="flex items-center gap-2">
@@ -151,7 +151,7 @@ export default function RolesList() {
               </InputGroupAddon>
             </InputGroup>
           )}
-          <Button variant="primary-outline-fill" onClick={() => navigate('/roles/new')}>
+          <Button variant="primary" onClick={() => navigate('/roles/new')}>
             <Plus className="size-4" />
             {__('Add New Role', 'yay-wholesale-b2b')}
           </Button>
