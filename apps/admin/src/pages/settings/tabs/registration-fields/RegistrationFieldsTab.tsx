@@ -30,15 +30,6 @@ export default function RegistrationFieldsTab() {
     }
   };
 
-  const handleCheckedChange = (index: number, checked: boolean) => {
-    const field = fields[index];
-
-    update(index, {
-      ...field,
-      isHidden: !checked,
-    });
-  };
-
   const isAdding = fieldSheetState[0] === 'add';
   const isEditing = fieldSheetState[0] === 'edit';
   const editingIndex = isEditing ? fieldSheetState[1] : undefined;
@@ -85,11 +76,9 @@ export default function RegistrationFieldsTab() {
                   {fields.map((field, index) => (
                     <RegistrationFieldsItem
                       key={field.id}
-                      field={field}
+                      registrationField={field}
                       index={index}
-                      fieldId={field.id}
-                      onCheckedChange={handleCheckedChange}
-                      onClick={(index) => setFieldSheetState(['edit', index])}
+                      onEdit={() => setFieldSheetState(['edit', index])}
                     />
                   ))}
                 </SortableContext>

@@ -40,14 +40,6 @@ export default function PromotionRulesTab() {
     }
   };
 
-  const handleCheckedChange = (index: number, checked: boolean) => {
-    const promotionRule = fields[index];
-    update(index, {
-      ...promotionRule,
-      enableStatus: checked,
-    });
-  };
-
   const closeSheet = () => {
     setPromotionRuleSheetState(['closed']);
   };
@@ -106,10 +98,8 @@ export default function PromotionRulesTab() {
                           key={promotionRule.id}
                           promotionRule={promotionRule}
                           index={index}
-                          promotionRuleId={promotionRule.id}
                           activeRoles={activeRoles}
-                          onCheckedChange={handleCheckedChange}
-                          onClick={() => setPromotionRuleSheetState(['edit', index])}
+                          onEdit={() => setPromotionRuleSheetState(['edit', index])}
                         />
                       ))}
                     </SortableContext>
