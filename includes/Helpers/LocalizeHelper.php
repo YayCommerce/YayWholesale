@@ -94,7 +94,7 @@ class LocalizeHelper {
                 'setting_urls'          => [
                     'payment'        => esc_url_raw( admin_url( 'admin.php?page=wc-settings&tab=checkout' ) ),
                     'shipping'       => esc_url_raw( admin_url( 'admin.php?page=wc-settings&tab=shipping' ) ),
-                    'templateEditor' => esc_url_raw( admin_url( 'site-editor.php?p=%2Ftemplate&activeView=' . rawurlencode( wp_get_current_user()->user_login ) ) ),
+                    'templateEditor' => esc_url_raw( admin_url( 'site-editor.php?p=%2Ftemplate&activeView=' . rawurlencode( wp_get_current_user()->display_name ) ) ),
                 ],
                 'currency_data'         => [
                     'currency'     => get_woocommerce_currency(),

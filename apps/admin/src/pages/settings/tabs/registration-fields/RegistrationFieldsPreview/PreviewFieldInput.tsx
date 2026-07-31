@@ -77,7 +77,7 @@ export function PreviewFieldInput({ field }: PreviewFieldInputProps) {
                 field.columnWidth === '50%' ? 'items-start' : 'items-center',
               )}
             >
-              <Upload className={cn('size-4', field.columnWidth === '50%' && 'mt-1')} />
+              <Upload className={cn(field.columnWidth === '50%' ? 'min-size-4' : 'size-4')} />
               <span className="text-sm/6">
                 {createInterpolateElement(__('Drop file here, or <click/> to upload'), {
                   click: <span className="text-foreground underline">{__('click', 'yay-wholesale-b2b')}</span>,

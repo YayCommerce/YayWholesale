@@ -22,7 +22,7 @@ export default function TopWholesaleCustomers({ reportQuery, startDate, endDate 
     <Card className="overflow-hidden p-4 shadow-xs md:p-5 2xl:p-6">
       <CardContent className="flex min-h-0 flex-1 flex-col">
         {/* Header */}
-        <div className="mb-4 flex items-center justify-between">
+        <div className="mb-5 flex items-center justify-between">
           <h3 className="text-base font-medium">{__('Top Wholesale Customers', 'yay-wholesale-b2b')}</h3>
         </div>
 

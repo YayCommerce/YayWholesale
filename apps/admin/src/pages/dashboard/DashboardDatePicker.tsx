@@ -55,7 +55,7 @@ const DashboardDatePicker: FC<DashboardDatePickerProps> = ({ dateRange, setDateR
             <ChevronDown className="text-muted-foreground/70 size-4 cursor-pointer" />
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="size-fit px-1" align="end">
+        <PopoverContent className="size-fit" align="end">
           <Calendar
             mode="range"
             defaultMonth={previewDateRange?.from}
@@ -66,7 +66,7 @@ const DashboardDatePicker: FC<DashboardDatePickerProps> = ({ dateRange, setDateR
             disabled={{
               after: new Date(),
             }}
-            className="hidden md:block"
+            className="hidden p-0 md:block"
           />
           <Calendar
             mode="range"
@@ -77,12 +77,12 @@ const DashboardDatePicker: FC<DashboardDatePickerProps> = ({ dateRange, setDateR
             disabled={{
               after: new Date(),
             }}
-            className="block md:hidden"
+            className="block p-0 md:hidden"
           />
-          <div className="px-4 pt-2">
+          <div className="pt-2">
             <Separator />
           </div>
-          <div className="mt-4 flex justify-end gap-2 bg-white px-2">
+          <div className="mt-4 flex justify-end gap-2 bg-white">
             <PopoverClose asChild>
               <Button className="px-3" variant="outline">
                 {__('Close', 'yay-wholesale-b2b')}

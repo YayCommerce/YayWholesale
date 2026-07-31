@@ -72,7 +72,7 @@ class PluginSubmenu
         $needs_redirect = \false;
         if ($this->adapter instanceof LicenseConfigAdapter) {
             $license = new License($this->adapter);
-            if (!$license->is_active() || $license->is_expired()) {
+            if (!$license->is_active()) {
                 $needs_redirect = \true;
                 $callback = null;
             }
