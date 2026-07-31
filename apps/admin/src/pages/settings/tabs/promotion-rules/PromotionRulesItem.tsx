@@ -1,38 +1,37 @@
-import { Fragment, useMemo } from 'react';
+import { Fragment } from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { GripVertical } from 'lucide-react';
+import { Controller, FieldArrayWithId, useController, useFormContext } from 'react-hook-form';
 import { __ } from '@wordpress/i18n';
 
-import type { PromotionRuleFormValues } from '@/lib/schema/promotion.schema';
 import { Role } from '@/lib/schema/roles.schema';
+import { Settings } from '@/lib/schema/settings.schema';
 import { cn } from '@/lib/utils';
 import { Switch } from '@/components/ui/switch';
 import { getPromotionSummaryItems } from './promotion-rule.helper';
 
 interface PromotionRulesItemProps {
   index: number;
-  promotionRule: PromotionRuleFormValues;
-  promotionRuleId: string; // use for dnd-kit
+  promotionRule: FieldArrayWithId<Settings, 'promotion_rules.promotionRules'>;
   activeRoles: Role[];
-  onCheckedChange: (index: number, checked: boolean) => void;
-  onClick: (index: number) => void;
+  onEdit: () => void;
 }
 
-export default function PromotionRulesItem({
-  index,
-  promotionRule,
-  promotionRuleId,
-  activeRoles,
-  onCheckedChange,
-  onClick,
-}: PromotionRulesItemProps) {
+export default function PromotionRulesItem({ index, promotionRule, activeRoles, onEdit }: PromotionRulesItemProps) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
-    id: promotionRuleId,
+    id: promotionRule.id,
   });
 
   const summaryItems = getPromotionSummaryItems(promotionRule, activeRoles);
-
+  const { control } = useFormContext<Settings>();
+  const { field: enableStatusField } = useController({
+    control,
+    name: `promotion_rules.promotionRules.${index}.enableStatus`,
+  });
+  const stopPropagation = (e: React.SyntheticEvent) => {
+    e.stopPropagation();
+  };
   return (
     <div
       ref={setNodeRef}
@@ -42,7 +41,7 @@ export default function PromotionRulesItem({
         isDragging && 'z-10 opacity-60 shadow-md',
         !isDragging && 'hover:shadow-xs',
       )}
-      onClick={() => onClick(index)}
+      onClick={onEdit}
     >
       <div
         {...attributes}
@@ -56,7 +55,7 @@ export default function PromotionRulesItem({
         <span
           className={cn(
             'truncate text-sm font-medium',
-            !promotionRule.enableStatus && 'text-muted-foreground font-normal',
+            !enableStatusField.value && 'text-muted-foreground font-normal',
           )}
         >
           {promotionRule.title}
@@ -76,13 +75,11 @@ export default function PromotionRulesItem({
         </div>
       </div>
 
-      <div onPointerDown={(e) => e.stopPropagation()} onClick={(e) => e.stopPropagation()}>
+      <div onPointerDown={stopPropagation} onClick={stopPropagation}>
         <Switch
           size="sm"
-          checked={promotionRule.enableStatus}
-          onCheckedChange={(checked) => {
-            onCheckedChange(index, checked);
-          }}
+          checked={enableStatusField.value}
+          onCheckedChange={enableStatusField.onChange}
           aria-label={__('Enabled status', 'yay-wholesale-b2b')}
         />
       </div>

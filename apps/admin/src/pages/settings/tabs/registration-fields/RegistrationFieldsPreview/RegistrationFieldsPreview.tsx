@@ -27,13 +27,26 @@ export function RegistrationFieldsPreview() {
 
       <div className="bg-background flex h-full flex-col gap-2 rounded-lg border">
         <div className="flex flex-1 flex-col gap-7.5 p-5">
-          {visibleFields.length === 0 ? (
-            <p className="text-muted-foreground py-8 text-center text-sm">
-              {__('No visible fields to preview', 'yay-wholesale-b2b')}
-            </p>
-          ) : (
-            <div className="grid grid-cols-2 gap-6">
-              {visibleFields.map((field, index) => (
+          <div className="grid grid-cols-2 gap-6">
+            <div className={cn('col-span-2 flex flex-col gap-2')}>
+              <Label className="text-foreground gap-0 text-[13px] font-medium">
+                {__('Email Address', 'yay-wholesale-b2b')}
+                {<span className="text-destructive ms-0.5">*</span>}
+              </Label>
+              <PreviewFieldInput
+                field={{
+                  type: 'email',
+                  inputName: 'email_address',
+                  label: __('Email Address', 'yay-wholesale-b2b'),
+                  columnWidth: '100%',
+                  isRequired: true,
+                  isHidden: false,
+                  placeholder: __('Enter Email Address', 'yay-wholesale-b2b'),
+                }}
+              />
+            </div>
+            {visibleFields.length > 0 &&
+              visibleFields.map((field, index) => (
                 <div
                   key={index}
                   className={cn('flex flex-col gap-2', field.columnWidth === '100%' ? 'col-span-2' : 'col-span-1')}
@@ -45,8 +58,7 @@ export function RegistrationFieldsPreview() {
                   <PreviewFieldInput field={field} />
                 </div>
               ))}
-            </div>
-          )}
+          </div>
 
           <Button type="button" className="mt-auto w-full">
             {submitLabel || __('Register now', 'yay-wholesale-b2b')}

@@ -17,6 +17,22 @@ class RegistrationFieldsHelper {
         $fields       = $settings['registration_fields']['fields'];
         $submit_label = $settings['registration']['submit_button_label'];
 
+        // Add email address field to the beginning of the fields array.
+        array_unshift(
+            $fields,
+            [
+                'label'          => __( 'Email Address', 'yay-wholesale-b2b' ),
+                'inputName'      => 'email_address',
+                'type'           => 'email',
+                'placeholder'    => __( 'Enter Email Address', 'yay-wholesale-b2b' ),
+                'columnWidth'    => '100%',
+                'isRequired'     => true,
+                'isHidden'       => false,
+                'billingMapping' => 'none',
+            ]
+        );
+
+        // Filter out hidden fields.
         $visible_fields = array_values(
             array_filter(
                 $fields,
