@@ -14,7 +14,6 @@ class RequestsHelper {
     public const REQUEST_META_DISPLAY_NAME = 'ywhs_request_display_name';
     public const REQUEST_META_EMAIL        = 'ywhs_request_email';
     public const REQUEST_META_STATUS       = 'ywhs_request_status';
-    public const REQUEST_META_MESSAGE      = 'ywhs_request_message';
 
     public const STATUS_PENDING  = 'pending';
     public const STATUS_APPROVED = 'approved';
@@ -22,7 +21,7 @@ class RequestsHelper {
 
     public const USER_META_REQUEST = 'ywhs_user_request_approved';
 
-    public const EDIT_USER_EXCLUDED_FIELD_KEYS = [ 'first_name', 'last_name', 'message', 'email_address' ];
+    public const EDIT_USER_EXCLUDED_FIELD_KEYS = [ 'first_name', 'last_name', 'email_address' ];
     /**
      * Insert new Wholesale request.
      *
@@ -35,17 +34,19 @@ class RequestsHelper {
         $name         = '';
         $display_name = '';
 
-        if ( array_key_exists( 'first_name', $body_params ) && array_key_exists( 'last_name', $body_params ) ) {
-            $name         = $body_params['first_name'] . ' ' . $body_params['last_name'];
-            $display_name = $body_params['first_name'] . ' ' . $body_params['last_name'];
-        }
-
-        if ( empty( $name ) ) {
-            $name = gmdate( 'YmdHi' );
-            if ( $user_id ) {
+        if ( $user_id ) {
                 $user         = get_user_by( 'ID', $user_id );
-                $display_name = 'Request ' . gmdate( 'YmdHi' ) . ' : ' . $user->display_name;
+                $display_name = $user->display_name;
+        } else {
+            if ( array_key_exists( 'email_address', $body_params ) ) {
+                $name = explode( '@', $body_params['email_address'] )[0] ?? '';
             }
+
+            if ( array_key_exists( 'first_name', $body_params ) && array_key_exists( 'last_name', $body_params ) ) {
+                $name = $body_params['first_name'] . ' ' . $body_params['last_name'];
+            }
+
+            $display_name = $name;
         }
 
         $new_request_id = wp_insert_post(
@@ -67,22 +68,19 @@ class RequestsHelper {
 
         foreach ( $general_setting['registration_fields']['fields'] as $gsetting ) {
             $key = $gsetting['inputName'];
+
             if ( array_key_exists( $key, $body_params ) ) {
                 $request_data[ $gsetting['label'] ] = [
-                    'type'       => $gsetting['type'],
-                    'is_default' => isset( $gsetting['isDefault'] ) ? $gsetting['isDefault'] : false,
-                    'key'        => $key,
+                    'type' => $gsetting['type'],
+                    'key'  => $key,
                 ];
 
-                if ( 'email_address' === $key ) {
-                    update_post_meta( $new_request_id, self::REQUEST_META_EMAIL, $body_params[ $key ] );
-                } elseif ( 'message' === $key ) {
-                    update_post_meta( $new_request_id, self::REQUEST_META_MESSAGE, $body_params[ $key ] );
-                } else {
-                    $request_data[ $gsetting['label'] ]['value'] = $body_params[ $key ];
-                }
+                $request_data[ $gsetting['label'] ]['value'] = $body_params[ $key ];
             }
         }
+
+        update_post_meta( $new_request_id, self::REQUEST_META_EMAIL, $body_params['email_address'] );
+
         update_post_meta( $new_request_id, self::REQUEST_META_DATA, $request_data );
 
         update_post_meta( $new_request_id, self::REQUEST_META_DISPLAY_NAME, $display_name );
@@ -181,62 +179,27 @@ class RequestsHelper {
         $display_name = get_post_meta( $data->ID, self::REQUEST_META_DISPLAY_NAME, true );
         $post_meta    = get_post_meta( $data->ID, self::REQUEST_META_DATA, true );
         $email        = get_post_meta( $data->ID, self::REQUEST_META_EMAIL, true );
-        $message      = get_post_meta( $data->ID, self::REQUEST_META_MESSAGE, true );
         $status       = get_post_meta( $data->ID, self::REQUEST_META_STATUS, true );
 
         $cleaned = [
-            'id'                 => $data->ID,
-            'fields'             => [],
-            'name'               => $display_name,
-            'email'              => $email,
-            'message'            => $message,
-            'status'             => $status,
-            'date'               => $data->post_date,
-            'avatar'             => $data->post_author > 0 ? get_avatar_url( $data->post_author ) : '',
-            'firstName'          => '',
-            'lastName'           => '',
-            'defaultFieldLabels' => [
-                'firstName' => __( 'First Name', 'yay-wholesale-b2b' ),
-                'lastName'  => __( 'Last Name', 'yay-wholesale-b2b' ),
-                'email'     => __( 'Email address', 'yay-wholesale-b2b' ),
-                'message'   => __( 'Message', 'yay-wholesale-b2b' ),
-            ],
+            'id'     => $data->ID,
+            'fields' => [],
+            'name'   => $display_name,
+            'email'  => $email,
+            'status' => $status,
+            'date'   => $data->post_date,
+            'avatar' => $data->post_author > 0 ? get_avatar_url( $data->post_author ) : '',
         ];
 
         if ( $is_extra_fields ) {
             foreach ( $post_meta as $key => $field ) {
-                $is_added = false;
-                if ( isset( $field['key'] ) && 'first_name' === $field['key'] ) {
-                    $cleaned['firstName']                       = $field['value'];
-                    $cleaned['defaultFieldLabels']['firstName'] = $key;
-                    $is_added                                   = true;
-                }
+                $tmp = [
+                    'label' => $key,
+                    'value' => $field['value'],
+                    'type'  => $field['type'],
+                ];
 
-                if ( isset( $field['key'] ) && 'last_name' === $field['key'] ) {
-                    $cleaned['lastName']                       = $field['value'];
-                    $cleaned['defaultFieldLabels']['lastName'] = $key;
-                    $is_added                                  = true;
-                }
-
-                if ( isset( $field['key'] ) && 'email_address' === $field['key'] ) {
-                    $cleaned['defaultFieldLabels']['email'] = $key;
-                    $is_added                               = true;
-                }
-
-                if ( isset( $field['key'] ) && 'message' === $field['key'] ) {
-                    $cleaned['defaultFieldLabels']['message'] = $key;
-                    $is_added                                 = true;
-                }
-
-                if ( ! $is_added ) {
-                    $tmp = [
-                        'label' => $key,
-                        'value' => $field['value'],
-                        'type'  => $field['type'],
-                    ];
-
-                    $cleaned['fields'][] = $tmp;
-                }
+                $cleaned['fields'][] = $tmp;
             }//end foreach
         }//end if
 
@@ -300,18 +263,16 @@ class RequestsHelper {
             $excluded_keys = self::EDIT_USER_EXCLUDED_FIELD_KEYS;
         }
 
-        $settings       = SettingsHelper::get_settings();
-        $fields_config  = $settings['registration_fields']['fields'] ?? [];
-        $values_by_key  = [];
-        $default_by_key = [];
+        $settings      = SettingsHelper::get_settings();
+        $fields_config = $settings['registration_fields']['fields'] ?? [];
+        $values_by_key = [];
 
         foreach ( $request_data as $field ) {
             if ( ! is_array( $field ) || empty( $field['key'] ) ) {
                 continue;
             }
 
-            $values_by_key[ $field['key'] ]  = $field['value'] ?? '';
-            $default_by_key[ $field['key'] ] = ! empty( $field['is_default'] );
+            $values_by_key[ $field['key'] ] = $field['value'] ?? '';
         }
 
         $merged = [];
@@ -326,9 +287,8 @@ class RequestsHelper {
             $merged[] = array_merge(
                 $field_config,
                 [
-                    'key'        => $input_name,
-                    'value'      => $values_by_key[ $input_name ] ?? '',
-                    'is_default' => $field_config['isDefault'] ?? ( $default_by_key[ $input_name ] ?? false ),
+                    'key'   => $input_name,
+                    'value' => $values_by_key[ $input_name ] ?? '',
                 ]
             );
         }
@@ -355,12 +315,11 @@ class RequestsHelper {
             }
 
             $entry = [
-                'type'       => $type,
-                'is_default' => ! empty( $field['is_default'] ) || ! empty( $field['isDefault'] ),
-                'key'        => $key,
+                'type' => $type,
+                'key'  => $key,
             ];
 
-            if ( ! in_array( $key, [ 'email_address', 'message' ], true ) ) {
+            if ( ! in_array( $key, [ 'email_address' ], true ) ) {
                 $entry['value'] = $field['value'] ?? '';
             }
 
@@ -417,7 +376,6 @@ class RequestsHelper {
         $result       = true;
         $display_name = get_post_meta( $request_id, self::REQUEST_META_DISPLAY_NAME, true );
         $email        = get_post_meta( $request_id, self::REQUEST_META_EMAIL, true );
-        $message      = get_post_meta( $request_id, self::REQUEST_META_MESSAGE, true );
         $status       = get_post_meta( $request_id, self::REQUEST_META_STATUS, true );
 
         // Save display name
@@ -447,15 +405,6 @@ class RequestsHelper {
         if ( array_key_exists( 'email', $args ) && $email !== $args['email'] ) {
             $email  = $args['email'];
             $result = update_post_meta( $request_id, self::REQUEST_META_EMAIL, $email );
-            if ( ! $result ) {
-                return false;
-            }
-        }
-
-        // Save message
-        if ( array_key_exists( 'message', $args ) && $message !== $args['message'] ) {
-            $message = $args['message'];
-            $result  = update_post_meta( $request_id, self::REQUEST_META_MESSAGE, $message );
             if ( ! $result ) {
                 return false;
             }
@@ -530,17 +479,17 @@ class RequestsHelper {
     public static function approve_request( int $request_id, string $role_slug ) {
         $request   = get_post( $request_id );
         $post_meta = get_post_meta( $request_id, self::REQUEST_META_DATA, true );
-        $message   = get_post_meta( $request_id, self::REQUEST_META_MESSAGE, true );
         $user_id   = 0;
 
         if ( $request->post_author < 1 ) {
             $display_name = get_post_meta( $request_id, self::REQUEST_META_DISPLAY_NAME, true );
             $email        = get_post_meta( $request_id, self::REQUEST_META_EMAIL, true );
+            $username     = explode( '@', $email )[0];
             $password     = wp_generate_password( 12, true, true );
 
             $request_user = wp_insert_user(
                 [
-                    'user_login'   => sanitize_key( remove_accents( $display_name ) ),
+                    'user_login'   => $username,
                     'user_pass'    => $password,
                     'display_name' => $display_name,
                     'user_email'   => $email,
@@ -553,8 +502,6 @@ class RequestsHelper {
             }
 
             $user_id = $request_user;
-
-            update_user_meta( $user_id, 'description', $message );
 
             $result = wp_update_post(
                 [
@@ -650,7 +597,6 @@ class RequestsHelper {
 
     public static function apply_billing_field_mappings_on_approval( int $user_id, array $request_data ): void {
         self::apply_billing_field_mappings( $user_id, $request_data );
-        self::update_billing_data_for_user( $user_id, $request_data );
     }
 
     protected static function apply_billing_field_mappings( int $user_id, array $request_data ): void {
@@ -700,6 +646,20 @@ class RequestsHelper {
                 continue;
             }
 
+            if ( 'billing_first_name' === $billing_mapping ) {
+                $current_first_name = get_user_meta( $user_id, 'first_name', true );
+                if ( empty( $current_first_name ) ) {
+                    update_user_meta( $user_id, 'first_name', $value );
+                }
+            }
+
+            if ( 'billing_last_name' === $billing_mapping ) {
+                $current_first_name = get_user_meta( $user_id, 'last_name', true );
+                if ( empty( $current_first_name ) ) {
+                    update_user_meta( $user_id, 'last_name', $value );
+                }
+            }
+
             update_user_meta( $user_id, $billing_mapping, $value );
         }//end foreach
     }
@@ -730,66 +690,6 @@ class RequestsHelper {
         if ( '' !== $state ) {
             update_user_meta( $user_id, 'billing_state', $state );
         }
-    }
-
-    protected static function update_billing_data_for_user( int $user_id, array $request_data ) {
-        $settings           = SettingsHelper::get_settings();
-        $fields_config      = $settings['registration_fields']['fields'] ?? [];
-        $mapped_input_names = [];
-
-        foreach ( $fields_config as $field_config ) {
-            $billing_mapping = $field_config['billingMapping'] ?? '';
-            if ( ! empty( $billing_mapping ) && 'none' !== $billing_mapping && ! empty( $field_config['inputName'] ) ) {
-                $mapped_input_names[] = $field_config['inputName'];
-            }
-        }
-
-        $customer    = new \WC_Customer( $user_id );
-        $updated_map = [];
-        foreach ( $request_data as $key => $val ) {
-            if ( ! empty( $val['key'] ) && in_array( $val['key'], $mapped_input_names, true ) ) {
-                continue;
-            }
-
-            if ( 'first_name' === $val['key'] ) {
-                $customer->set_first_name( $val['value'] );
-                $customer->set_billing_first_name( $val['value'] );
-            }
-
-            if ( 'last_name' === $val['key'] ) {
-                $customer->set_last_name( $val['value'] );
-                $customer->set_billing_last_name( $val['value'] );
-            }
-
-            if ( ! $val['is_default'] ) {
-                if ( str_contains( strtolower( $key ), 'company name' ) &&
-                ! in_array( 'company', $updated_map, true ) ) {
-                    $customer->set_billing_company( $val['value'] );
-                    $updated_map[] = 'company';
-                }
-
-                if ( str_contains( strtolower( $key ), 'address' ) &&
-                ! str_contains( 'email', strtolower( $key ) ) &&
-                ! in_array( 'address', $updated_map, true ) ) {
-                    $customer->set_billing_address( $val['value'] );
-                    $updated_map[] = 'address';
-                }
-
-                if ( ( str_contains( strtolower( $key ), 'phone' ) || 'phone' === $val['type'] ) &&
-                ! in_array( 'phone', $updated_map, true ) ) {
-                    $customer->set_billing_phone( $val['value'] );
-                    $updated_map[] = 'phone';
-                }
-
-                if ( str_contains( strtolower( $key ), 'city' ) &&
-                ! in_array( 'city', $updated_map, true ) ) {
-                    $customer->set_billing_city( $val['value'] );
-                    $updated_map[] = 'city';
-                }
-            }//end if
-        }//end foreach
-
-        $customer->save();
     }
 
     public static function get_the_last_approved_request_id_of_user( int $user_id ) {

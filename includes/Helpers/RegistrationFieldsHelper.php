@@ -174,4 +174,44 @@ class RegistrationFieldsHelper {
 
         include YAYWHOLESALEB2B_PLUGIN_DIR . 'includes/Templates/request-form/registration-form.php';
     }
+
+    /**
+     * Get the initial default registration fields.
+     *
+     * @return array
+     */
+    public static function get_default_fields() {
+        return [
+            [
+                'label'          => 'First Name',
+                'inputName'      => 'first_name',
+                'type'           => 'text',
+                'placeholder'    => 'Enter First Name',
+                'columnWidth'    => '50%',
+                'isRequired'     => true,
+                'isHidden'       => false,
+                'billingMapping' => 'billing_first_name',
+            ],
+            [
+                'label'          => 'Last Name',
+                'inputName'      => 'last_name',
+                'type'           => 'text',
+                'placeholder'    => 'Enter Last Name',
+                'columnWidth'    => '50%',
+                'isRequired'     => true,
+                'isHidden'       => false,
+                'billingMapping' => 'billing_last_name',
+            ],
+            [
+                'label'          => 'Message',
+                'inputName'      => 'message',
+                'type'           => 'textarea',
+                'placeholder'    => 'Enter Message',
+                'columnWidth'    => '100%',
+                'isRequired'     => true,
+                'isHidden'       => false,
+                'billingMapping' => 'none',
+            ],
+        ];
+    }
 }

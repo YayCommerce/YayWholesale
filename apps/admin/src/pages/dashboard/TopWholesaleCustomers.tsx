@@ -57,8 +57,8 @@ export default function TopWholesaleCustomers({ reportQuery, startDate, endDate 
                   </TableCell>
                 </TableRow>
               ) : reportData?.topProducts && reportData?.topProducts.length > 0 ? (
-                reportData.topWholesalers.map((data) => (
-                  <TableRow className="border-divider border-b">
+                reportData.topWholesalers.map((data, index) => (
+                  <TableRow key={index} className="border-divider border-b">
                     <TableCell className="text-foreground py-3 text-[14px]">
                       <span className="flex justify-center">{reportData.topWholesalers.indexOf(data) + 1}</span>
                     </TableCell>

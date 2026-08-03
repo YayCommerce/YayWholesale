@@ -93,7 +93,7 @@ export function RequestStatusCell({ request }: { request: Request }) {
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   {activeRoles.map((role) => (
-                    <DropdownMenuItem onClick={() => handleApproveRequest(role.slug)}>
+                    <DropdownMenuItem key={role.slug} onClick={() => handleApproveRequest(role.slug)}>
                       <RequestsStatusIcon status="approved" />{' '}
                       {sprintf(__('Approved to %s', 'yay-wholesale-b2b'), role.name)}
                     </DropdownMenuItem>

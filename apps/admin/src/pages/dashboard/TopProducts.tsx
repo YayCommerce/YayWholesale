@@ -54,8 +54,8 @@ export default function TopProducts(props: { reportQuery: ReturnType<typeof useR
                   </TableCell>
                 </TableRow>
               ) : reportData && reportData.topProducts.length > 0 ? (
-                reportData.topProducts.map((data) => (
-                  <TableRow className="border-divider border-b">
+                reportData.topProducts.map((data, index) => (
+                  <TableRow key={index} className="border-divider border-b">
                     <TableCell className="text-foreground py-3 text-[14px]">
                       <span className="flex items-center justify-center">
                         {reportData.topProducts.indexOf(data) + 1}

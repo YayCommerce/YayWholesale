@@ -105,7 +105,7 @@ export function EditRequestForm({ request }: { request: Request }) {
         </div>
       </SheetHeader>
       <div className="flex cursor-default flex-col gap-5 overflow-auto p-5">
-        <div className="grid cursor-default grid-cols-2 gap-5">
+        {/* <div className="grid cursor-default grid-cols-2 gap-5">
           <div className="flex flex-col gap-2">
             <Label htmlFor="firstName">{request.defaultFieldLabels.firstName}</Label>
             <Input id="firstName" readOnly value={request.firstName} onChange={() => {}} />
@@ -114,9 +114,9 @@ export function EditRequestForm({ request }: { request: Request }) {
             <Label htmlFor="lastName">{request.defaultFieldLabels.lastName}</Label>
             <Input id="lastName" readOnly value={request.lastName} onChange={() => {}} />
           </div>
-        </div>
+        </div> */}
         <div className="flex cursor-default flex-col gap-2">
-          <Label htmlFor="email">{request.defaultFieldLabels.email}</Label>
+          <Label htmlFor="email">{__('Email Address')}</Label>
           <Input id="email" readOnly value={request.email} onChange={() => {}} />
         </div>
         <div className="flex cursor-default flex-col gap-2">
@@ -129,19 +129,19 @@ export function EditRequestForm({ request }: { request: Request }) {
           />
         </div>
 
-        {phoneFields.map((field) => {
+        {phoneFields.map((field, index) => {
           return (
-            <div className="flex flex-col gap-2">
+            <div key={index} className="flex flex-col gap-2">
               <Label>{field.label}</Label>
               <Input readOnly value={field.value} onChange={() => {}} />
             </div>
           );
         })}
 
-        <div className="flex flex-col gap-2">
+        {/* <div className="flex flex-col gap-2">
           <Label htmlFor="message">{request.defaultFieldLabels.message}</Label>
           <Textarea className="h-fit min-h-25 resize-none" readOnly value={request.message} onChange={() => {}} />
-        </div>
+        </div> */}
 
         {request.fields.map((field, index) => {
           if (isPhoneField(field)) return null;

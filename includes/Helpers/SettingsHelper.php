@@ -12,6 +12,10 @@ class SettingsHelper {
 
         $settings = array_replace_recursive( self::get_default_settings(), get_option( 'yaywholesaleb2b_settings', [] ) );
 
+        if ( empty( $settings['registration_fields']['fields'] ) ) {
+            $settings['registration_fields']['fields'] = RegistrationFieldsHelper::get_default_fields();
+        }
+
         return $settings;
     }
 
@@ -97,38 +101,7 @@ class SettingsHelper {
                 'successful_registration_message' => 'Thank you for registering. Your account begin reviewing. Please wait to be approved.',
             ],
             'registration_fields' => [
-                'fields' => [
-                    [
-                        'label'          => 'First Name',
-                        'inputName'      => 'first_name',
-                        'type'           => 'text',
-                        'placeholder'    => 'Enter First Name',
-                        'columnWidth'    => '50%',
-                        'isRequired'     => true,
-                        'isHidden'       => false,
-                        'billingMapping' => 'billing_first_name',
-                    ],
-                    [
-                        'label'          => 'Last Name',
-                        'inputName'      => 'last_name',
-                        'type'           => 'text',
-                        'placeholder'    => 'Enter Last Name',
-                        'columnWidth'    => '50%',
-                        'isRequired'     => true,
-                        'isHidden'       => false,
-                        'billingMapping' => 'billing_last_name',
-                    ],
-                    [
-                        'label'          => 'Message',
-                        'inputName'      => 'message',
-                        'type'           => 'textarea',
-                        'placeholder'    => 'Enter Message',
-                        'columnWidth'    => '100%',
-                        'isRequired'     => true,
-                        'isHidden'       => false,
-                        'billingMapping' => 'none',
-                    ],
-                ],
+                'fields' => [],
             ],
             'promotion_rules'     => [
                 'promotionRules' => [],

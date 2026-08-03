@@ -36,7 +36,7 @@ class MigrationHelper {
         return [
             [ self::class, 'v1_0_5_add_input_name_for_registration_fields_settings' ],
             [ self::class, 'v1_2_0_refactor_product_based_discount_settings' ],
-            [ self::class, 'v1_2_1_refactor_registration_fields_settings' ],
+            [ self::class, 'v1_2_0_refactor_registration_fields_settings' ],
         ];
     }
 
@@ -142,8 +142,8 @@ class MigrationHelper {
         }//end foreach
     }
 
-    public static function v1_2_1_refactor_registration_fields_settings( string $last_version ) {
-        if ( ! version_compare( $last_version, '1.2.1', '<' ) ) {
+    public static function v1_2_0_refactor_registration_fields_settings( string $last_version ) {
+        if ( ! version_compare( $last_version, '1.2.0', '<' ) ) {
             return;
         }
 
@@ -153,7 +153,11 @@ class MigrationHelper {
             return;
         }
 
-        unset( $settings['registration_fields']['fields'] );
+        foreach ( $settings['registration_fields']['fields'] as $key => $field ) {
+            if ( 'email_address' === $field['inputName'] ) {
+                unset( $settings['registration_fields']['fields'][ $key ] );
+            }
+        }
 
         update_option( 'yaywholesaleb2b_settings', $settings );
     }
