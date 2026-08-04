@@ -9,7 +9,7 @@ export default function ReadyToGo() {
 
   return (
     <div className="flex w-full flex-col items-center justify-center gap-9">
-      <div className="flex w-full flex-col gap-6">
+      <div className="flex w-full flex-col gap-3">
         <span className="flex gap-0.5">
           <span className="text-3xl font-bold">{__('You’re all set!', 'yay-wholesale-b2b')}</span>
           <img

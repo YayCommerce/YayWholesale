@@ -151,7 +151,7 @@ export default function DisplayTab() {
         />
 
         {isBlockTheme ? (
-          <div className="flex items-center justify-between gap-15 rounded-md">
+          <div className="flex items-center justify-between gap-15 rounded-md md:flex-col md:items-start md:gap-2 lg:flex-row lg:items-center lg:gap-15">
             <div>
               <FieldLabel className="flex items-center gap-2 leading-3.5 font-medium">
                 {__('Template Editor', 'yay-wholesale-b2b')}
@@ -181,7 +181,7 @@ export default function DisplayTab() {
               control={control}
               name="display.classic_retailer_template"
               render={({ field }) => (
-                <div className="flex items-center justify-between gap-5 rounded-md">
+                <div className="flex items-center justify-between gap-2 rounded-md md:flex-col md:items-start lg:flex-row lg:items-center">
                   <div>
                     <FieldLabel className="flex items-center gap-2 leading-3.5 font-medium">
                       {__('Retailer Shop Template', 'yay-wholesale-b2b')}
@@ -192,7 +192,7 @@ export default function DisplayTab() {
                     </p>
                   </div>
                   <Select value={field.value ? field.value : 'wc'} onValueChange={field.onChange} disabled={!isPro}>
-                    <SelectTrigger className="w-35 min-w-35 sm:w-55 sm:min-w-55">
+                    <SelectTrigger className="w-35 min-w-35 sm:w-55 sm:min-w-55 md:w-full md:min-w-full lg:w-55 lg:min-w-55">
                       <SelectValue placeholder={__('Select the template', 'yay-wholesale-b2b')} />
                     </SelectTrigger>
                     <SelectContent align="end">
@@ -211,7 +211,7 @@ export default function DisplayTab() {
               control={control}
               name="display.classic_wholesaler_template"
               render={({ field }) => (
-                <div className="flex items-center justify-between gap-5 rounded-md">
+                <div className="flex items-center justify-between gap-2 rounded-md md:flex-col md:items-start lg:flex-row lg:items-center">
                   <div>
                     <FieldLabel className="flex items-center gap-2 leading-3.5 font-medium">
                       {__('Wholesaler Shop Template', 'yay-wholesale-b2b')}
@@ -222,7 +222,7 @@ export default function DisplayTab() {
                     </p>
                   </div>
                   <Select value={field.value ? field.value : 'wc'} onValueChange={field.onChange} disabled={!isPro}>
-                    <SelectTrigger className="w-35 min-w-35 sm:w-55 sm:min-w-55">
+                    <SelectTrigger className="w-35 min-w-35 sm:w-55 sm:min-w-55 md:w-full md:min-w-full lg:w-55 lg:min-w-55">
                       <SelectValue placeholder={__('Select the template', 'yay-wholesale-b2b')} />
                     </SelectTrigger>
                     <SelectContent align="end">

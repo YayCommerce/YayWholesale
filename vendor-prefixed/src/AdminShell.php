@@ -30,7 +30,7 @@ defined('ABSPATH') || exit;
 class AdminShell
 {
     /** Package version — used for cross-scope version election. */
-    const VERSION = '2.8.0';
+    const VERSION = '2.8.1';
     private static ?self $instance = null;
     private static bool $booted = \false;
     private static array $enabled_slugs = [];

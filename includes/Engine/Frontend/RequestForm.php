@@ -63,20 +63,20 @@ class RequestForm {
             setcookie( 'yaywholesaleb2b_cid', $cid, time() + MONTH_IN_SECONDS, COOKIEPATH, COOKIE_DOMAIN, is_ssl(), true );
         }
         ob_start();
-        if ( is_user_logged_in() ) {
-            echo '<span class="yaywholesaleb2b_already_logged_in_message">';
-            $text = esc_html__( 'You are currently logged in. To register a new wholesale account, please log out first. ', 'yay-wholesale-b2b' );
-            echo esc_html( apply_filters( 'yaywholesaleb2b_already_logged_in_message', $text ) );
-            echo '<a href="' . esc_url( wp_logout_url( get_permalink() ) ) . '">' . esc_html__( 'Click here to log out', 'yay-wholesale-b2b' ) . '</a></span>';
-        } else {
-            ?>
+        // if ( is_user_logged_in() ) {
+        // echo '<span class="yaywholesaleb2b_already_logged_in_message">';
+        // $text = esc_html__( 'You are currently logged in. To register a new wholesale account, please log out first. ', 'yay-wholesale-b2b' );
+        // echo esc_html( apply_filters( 'yaywholesaleb2b_already_logged_in_message', $text ) );
+        // echo '<a href="' . esc_url( wp_logout_url( get_permalink() ) ) . '">' . esc_html__( 'Click here to log out', 'yay-wholesale-b2b' ) . '</a></span>';
+        // } else {
+        ?>
             <div>
                 <h4><?php echo esc_html( $attr['title'] ); ?></h4>
                 <?php RegistrationFieldsHelper::render_form(); ?>
             </div>
             <?php
-        }
-        return ob_get_clean();
+            // }
+            return ob_get_clean();
     }
 
     public function create_ywhs_block_request_form_block_init() {

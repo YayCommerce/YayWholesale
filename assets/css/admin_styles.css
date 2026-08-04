@@ -502,7 +502,8 @@
   border-top: none;
   max-width: 575px;
 
-  textarea, input {
+  input:not([type="radio"]):not([type="checkbox"]),
+  textarea {
     width: 350px !important;
     resize: none;
   }

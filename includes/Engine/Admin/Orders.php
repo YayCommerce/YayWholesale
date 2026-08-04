@@ -86,7 +86,9 @@ class Orders {
 
         OrderPricingHelper::update_and_recalculate_order( $order );
 
-        return array_first( array_filter( $order->get_items(), fn( $value ) =>  $value->get_id() === $item_id ) ) ?? $item;
+        $items = array_filter( $order->get_items(), fn( $value ) =>  $value->get_id() === $item_id );
+
+        return $items[ array_key_first( $items ) ] ?? $item;
     }
 
     /**

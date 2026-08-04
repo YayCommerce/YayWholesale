@@ -184,10 +184,19 @@ class ProductAccessHelper {
                     'type'    => 'CHAR',
                 ],
                 [
-                    'key'     => self::ACCESS_SELECTED_ROLES,
-                    'value'   => $wholesale_role['slug'],
-                    'compare' => 'NOT LIKE',
-                    'type'    => 'CHAR',
+                    'relation' => 'AND',
+                    [
+                        'key'     => self::ACCESS_WHOLESALERS,
+                        'value'   => 'enabled-selected-roles',
+                        'compare' => '=',
+                        'type'    => 'CHAR',
+                    ],
+                    [
+                        'key'     => self::ACCESS_SELECTED_ROLES,
+                        'value'   => $wholesale_role['slug'],
+                        'compare' => 'NOT LIKE',
+                        'type'    => 'CHAR',
+                    ],
                 ],
             ];
         }//end if

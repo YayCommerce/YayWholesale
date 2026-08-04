@@ -85,20 +85,46 @@ elseif ( 'attachment' === $field_type ) :
     $allowed_extensions = $field['allowedExtensions'] ?? [];
     $max_file_size      = $field['maxFileSize'] ?? 1;
     $extensions_label   = implode( ', ', $allowed_extensions );
+    $extensions_values  = implode( ',', array_map( fn( $item ) => '.' . $item, $allowed_extensions ) );
     ?>
     <div
         class="ywhs_registration_form_attachment"
         data-max-file-size="<?php echo esc_attr( $max_file_size ); ?>"
         data-allowed-extensions="<?php echo esc_attr( wp_json_encode( $allowed_extensions ) ); ?>"
     >
+    <label htmlFor="<?php echo esc_attr( $field_id ); ?>" class="ywhs_registration_form_drop_zone">
+        <div class="ywhs_registration_form_zone_placeholder">
+            <svg width="16" height="16" fill="currentColor" aria-hidden="true">
+                <use href="<?php echo ( esc_url( YAYWHOLESALEB2B_PLUGIN_URL . 'assets/images/icon/upload.svg' ) ); ?>">#plus_icon</use>
+            </svg>
+            <span>
+                <?php
+                printf(
+                    /* translators: %s: the word "click" */
+                    esc_html__( 'Drop file here, or %s to upload', 'yay-wholesale-b2b' ),
+                    '<span>' . esc_html__( 'click', 'yay-wholesale-b2b' ) . '</span>'
+                );
+                ?>
+            </span>
+        </div>
+        <div class="ywhs_registration_form_zone_file">
+            <div>
+                <span class="ywhs_registration_form_file_name"></span>
+                <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true" class="ywhs_registration_form_file_remove">
+                    <use href="<?php echo ( esc_url( YAYWHOLESALEB2B_PLUGIN_URL . 'assets/images/icon/x.svg' ) ); ?>">#plus_icon</use>
+                </svg>
+            </div>
+        </div>
+
         <input
             class="ywhs_registration_form_file_input"
             type="file"
             id="<?php echo esc_attr( $field_id ); ?>"
             name="<?php echo esc_attr( $input_name ); ?>"
+            accept="<?php echo esc_attr( $extensions_values ); ?>"
             <?php echo esc_attr( $required_attr ); ?>
         />
-        
+    </label>
         <?php if ( ! empty( $extensions_label ) ) : ?>
             <p class="ywhs_registration_form_file_hint">
                 <?php

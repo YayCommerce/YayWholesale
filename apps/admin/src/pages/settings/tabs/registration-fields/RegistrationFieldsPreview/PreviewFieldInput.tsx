@@ -1,6 +1,9 @@
+import { Upload } from 'lucide-react';
+import { createInterpolateElement } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 import type { Field } from '@/lib/schema/settingsRegistration.schema';
+import { cn } from '@/lib/utils';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -35,7 +38,7 @@ export function PreviewFieldInput({ field }: PreviewFieldInputProps) {
     case 'radio':
       return (
         field.choices && (
-          <RadioGroup defaultValue={field.choices[0]} className="flex gap-4">
+          <RadioGroup defaultValue={field.choices[0]} className="flex flex-wrap gap-4">
             {field.choices.map((choice) => (
               <div key={choice} className="flex items-center gap-2">
                 <RadioGroupItem value={choice} id={`${field.inputName}-${choice}`} />
@@ -67,11 +70,22 @@ export function PreviewFieldInput({ field }: PreviewFieldInputProps) {
     case 'attachment':
       return (
         <div className="relative flex flex-col items-start gap-1">
-          <div className="flex items-center gap-1">
-            <input
-              className="file:border-border file:bg-muted-400 hover:file:bg-muted file:rounded-xs file:border file:px-1.5 file:py-px file:text-sm file:font-medium"
-              type="file"
-            />
+          <div className="flex w-full flex-1 items-center">
+            <label
+              className={cn(
+                'border-muted-foreground-400 text-muted-foreground flex w-full items-center justify-center gap-2 rounded-md border border-dashed px-6 py-4',
+                field.columnWidth === '50%' ? 'items-start' : 'items-center',
+              )}
+            >
+              <Upload className={cn(field.columnWidth === '50%' ? 'min-size-4' : 'size-4')} />
+              <span className="text-sm/6">
+                {createInterpolateElement(__('Drop file here, or <click/> to upload'), {
+                  click: <span className="text-foreground underline">{__('click', 'yay-wholesale-b2b')}</span>,
+                })}
+              </span>
+
+              <input className="hidden" type="file" />
+            </label>
           </div>
           <p className="text-muted-foreground pl-2 text-sm">
             {__('Allowed extensions:', 'yay-wholesale-b2b')} {field.allowedExtensions?.join(', ')}

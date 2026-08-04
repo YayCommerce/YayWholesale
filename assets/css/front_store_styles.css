@@ -15,6 +15,7 @@
   --ywhs-primary-foreground: #ffffff;
   --ywhs-primary-accent: #2f4ac4;
   --ywhs-muted-foreground: #7b7c80;
+  --ywhs-muted-foreground-400: #c7c7ca;
   --ywhs-muted-400: #fafafa;
   --ywhs-background: #ffffff;
   --ywhs-radius-md: 8px;
@@ -189,7 +190,7 @@
 }
 
 .ywhs_registration_form_radios {
-  flex-wrap: nowrap;
+  flex-wrap: wrap;
 }
 
 .ywhs_registration_form_choice {
@@ -284,16 +285,51 @@
   gap: 4px;
 }
 
+.ywhs_registration_form_drop_zone {
+  padding: 16px 24px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: var(--ywhs-radius-md);
+  width: 100%;
+  border: 1px dashed var(--ywhs-muted-foreground-400);
+  cursor: pointer;
+}
+
+.ywhs_registration_form_drop_zone:hover, .ywhs_registration_form_dropenter {
+  background: var(--ywhs-muted-400);
+}
+
+.ywhs_registration_form_zone_placeholder, .ywhs_registration_form_zone_file > div {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  line-height: 24px;
+  color:  var(--ywhs-muted-foreground) ;
+}
+
+.ywhs_registration_form_zone_placeholder > span > span {
+  color: var(--ywhs-foreground);
+  text-decoration: underline;
+}
+
+.ywhs_registration_form_file_input, .ywhs_registration_form_zone_file {
+  display: none;
+}
+
+.ywhs_registration_form_file_remove {
+  cursor: pointer;
+  background-color: var(--ywhs-muted-foreground);
+  color: white;
+  border-radius: 50%;
+}
+
 .ywhs_registration_form_attachment_controls {
   display: flex;
   align-items: center;
   gap: 4px;
-}
-
-.ywhs_registration_form_file_name {
-  padding-left: 8px;
-  font-size: 14px;
-  color: var(--ywhs-muted-foreground);
 }
 
 .ywhs_registration_form_file_hint {

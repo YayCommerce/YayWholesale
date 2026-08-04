@@ -14,7 +14,7 @@ export default function TopProducts(props: { reportQuery: ReturnType<typeof useR
     <Card className="overflow-hidden p-4 shadow-xs md:p-5 2xl:p-6">
       <CardContent className="flex min-h-0 flex-1 flex-col">
         {/* Header */}
-        <div className="mb-4 flex items-center justify-between">
+        <div className="mb-5 flex items-center justify-between">
           <h3 className="text-base font-medium">{__('Top Products', 'yay-wholesale-b2b')}</h3>
         </div>
 
@@ -54,8 +54,8 @@ export default function TopProducts(props: { reportQuery: ReturnType<typeof useR
                   </TableCell>
                 </TableRow>
               ) : reportData && reportData.topProducts.length > 0 ? (
-                reportData.topProducts.map((data) => (
-                  <TableRow className="border-divider border-b">
+                reportData.topProducts.map((data, index) => (
+                  <TableRow key={index} className="border-divider border-b">
                     <TableCell className="text-foreground py-3 text-[14px]">
                       <span className="flex items-center justify-center">
                         {reportData.topProducts.indexOf(data) + 1}

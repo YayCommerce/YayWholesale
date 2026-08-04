@@ -204,14 +204,8 @@ export default function RequestsList() {
               <SelectGroup>
                 <SelectLabel>{__('Status Filter', 'yay-wholesale-b2b')}</SelectLabel>
                 <SelectItem value="all">{__('All status', 'yay-wholesale-b2b')}</SelectItem>
-                <SelectItem value="pending">
-                  <RequestsStatusIcon status="pending" />
-                  {__('Pending', 'yay-wholesale-b2b')}
-                </SelectItem>
-                <SelectItem value="rejected">
-                  <RequestsStatusIcon status="rejected" />
-                  {__('Rejected', 'yay-wholesale-b2b')}
-                </SelectItem>
+                <SelectItem value="pending">{__('Pending', 'yay-wholesale-b2b')}</SelectItem>
+                <SelectItem value="rejected">{__('Rejected', 'yay-wholesale-b2b')}</SelectItem>
               </SelectGroup>
             </SelectContent>
           </Select>

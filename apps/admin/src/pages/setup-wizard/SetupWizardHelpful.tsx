@@ -84,7 +84,7 @@ const SetupWizardHelpful = ({ step, maxSteps }: SetupWizardHelpfulProps) => {
           </div>
           <Separator orientation="vertical" className="bg-border h-12.5! w-[0.5px]!" />
           <Button variant="ghost" className="text-muted-foreground py-3" onClick={() => setSkippingHelpful(true)}>
-            <X />
+            <X className="size-4.5" />
           </Button>
         </div>
       </Card>

@@ -107,51 +107,54 @@ export default function SettingsPage() {
               <div className="flex flex-col gap-4 sm:flex-row">
                 <div className="w-full sm:w-37.5">
                   <TabsPrimitive.List asChild>
-                    <SideNavMenuList mode="tabs" className="flex w-full items-start justify-start sm:flex-col">
+                    <SideNavMenuList
+                      mode="tabs"
+                      className="flex w-full flex-wrap items-start justify-start sm:flex-col"
+                    >
                       <TabsPrimitive.Trigger value="general" asChild>
-                        <SideNavMenuItem>
+                        <SideNavMenuItem className="w-fit p-3 sm:w-full">
                           <span>{__('General', 'yay-wholesale-b2b')}</span>
                           <SettingsErrorIndicator tab="general" />
                         </SideNavMenuItem>
                       </TabsPrimitive.Trigger>
                       <TabsPrimitive.Trigger value="display" asChild>
-                        <SideNavMenuItem>
+                        <SideNavMenuItem className="w-fit p-3 sm:w-full">
                           <span>{__('Display', 'yay-wholesale-b2b')}</span>
                           <SettingsErrorIndicator tab="display" />
                         </SideNavMenuItem>
                       </TabsPrimitive.Trigger>
                       <TabsPrimitive.Trigger value="registration" asChild>
-                        <SideNavMenuItem>
+                        <SideNavMenuItem className="w-fit p-3 sm:w-full">
                           <span>{__('Registration', 'yay-wholesale-b2b')}</span>
                           <SettingsErrorIndicator tab="registration" />
                         </SideNavMenuItem>
                       </TabsPrimitive.Trigger>
 
                       <TabsPrimitive.Trigger value="registration-fields" asChild>
-                        <SideNavMenuItem>
+                        <SideNavMenuItem className="w-fit p-3 sm:w-full">
                           <span>{__('Registration Fields', 'yay-wholesale-b2b')}</span>
                           <SettingsErrorIndicator tab="registration_fields" />
                         </SideNavMenuItem>
                       </TabsPrimitive.Trigger>
                       <TabsPrimitive.Trigger value="promotion-rules" asChild>
-                        <SideNavMenuItem>
+                        <SideNavMenuItem className="w-fit p-3 sm:w-full">
                           <span>{__('Promotion Rules', 'yay-wholesale-b2b')}</span>
                           <SettingsErrorIndicator tab="promotion_rules" />
                         </SideNavMenuItem>
                       </TabsPrimitive.Trigger>
                       <TabsPrimitive.Trigger value="emails" asChild>
-                        <SideNavMenuItem>
+                        <SideNavMenuItem className="w-fit p-3 sm:w-full">
                           <span>{__('Emails', 'yay-wholesale-b2b')}</span>
                         </SideNavMenuItem>
                       </TabsPrimitive.Trigger>
                       <TabsPrimitive.Trigger value="payment-roles" asChild>
-                        <SideNavMenuItem>
+                        <SideNavMenuItem className="w-fit p-3 sm:w-full">
                           <span>{__('Payment Roles', 'yay-wholesale-b2b')}</span>
                           <SettingsErrorIndicator tab="payment_roles" />
                         </SideNavMenuItem>
                       </TabsPrimitive.Trigger>
                       <TabsPrimitive.Trigger value="shipping-roles" asChild>
-                        <SideNavMenuItem>
+                        <SideNavMenuItem className="w-fit p-3 sm:w-full">
                           <span>{__('Shipping Roles', 'yay-wholesale-b2b')}</span>
                           <SettingsErrorIndicator tab="shipping_roles" />
                         </SideNavMenuItem>

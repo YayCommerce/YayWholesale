@@ -56,7 +56,7 @@ export default function GeneralTab() {
             </FieldLabel>
             <FieldContent>
               <Select value={field.value ? field.value : ''} onValueChange={field.onChange}>
-                <SelectTrigger className="min-w-40">
+                <SelectTrigger className="min-w-67.5">
                   <SelectValue placeholder={__('Select a role', 'yay-wholesale-b2b')} />
                 </SelectTrigger>
                 <SelectContent>
@@ -155,7 +155,7 @@ export default function GeneralTab() {
               </p>
             </div>
             <Select value={field.value ? field.value : 'inherit'} onValueChange={field.onChange} disabled={!isPro}>
-              <SelectTrigger className="w-25 min-w-25 sm:w-45 sm:min-w-45">
+              <SelectTrigger className="w-25 min-w-25 sm:w-67.5 sm:min-w-67.5">
                 <SelectValue placeholder={__('Select the display mode', 'yay-wholesale-b2b')} />
               </SelectTrigger>
               <SelectContent align="end">
@@ -191,7 +191,7 @@ export default function GeneralTab() {
               onValueChange={field.onChange}
               disabled={!isPro}
             >
-              <SelectTrigger className="w-25 min-w-25 sm:w-45 sm:min-w-45">
+              <SelectTrigger className="w-25 min-w-25 sm:w-67.5 sm:min-w-67.5">
                 <SelectValue placeholder={__('Select the guest restriction rule', 'yay-wholesale-b2b')} />
               </SelectTrigger>
               <SelectContent align="end">
