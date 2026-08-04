@@ -1,9 +1,10 @@
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { GripVertical, MapPinIcon } from 'lucide-react';
+import { FieldArrayWithId, useController, useFormContext } from 'react-hook-form';
 import { __ } from '@wordpress/i18n';
 
-import type { Field } from '@/lib/schema/settingsRegistration.schema';
+import { Settings } from '@/lib/schema/settings.schema';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
@@ -11,22 +12,25 @@ import { getBillingMappingLabel } from './registration-fields.helper';
 
 interface RegistrationFieldsItemProps {
   index: number;
-  field: Field;
-  fieldId: string; // use for dnd-kit
-  onCheckedChange: (index: number, checked: boolean) => void;
-  onClick: (index: number) => void;
+  registrationField: FieldArrayWithId<Settings, 'registration_fields.fields'>;
+  onEdit: () => void;
 }
 
-export function RegistrationFieldsItem({
-  index,
-  field,
-  fieldId,
-  onCheckedChange,
-  onClick,
-}: RegistrationFieldsItemProps) {
+export function RegistrationFieldsItem({ index, registrationField, onEdit }: RegistrationFieldsItemProps) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
-    id: fieldId,
+    id: registrationField.id,
   });
+
+  const { control } = useFormContext<Settings>();
+
+  const { field: hiddenField } = useController({
+    control,
+    name: `registration_fields.fields.${index}.isHidden`,
+  });
+
+  const stopPropagation = (e: React.PointerEvent | React.MouseEvent) => {
+    e.stopPropagation();
+  };
 
   return (
     <div
@@ -37,7 +41,7 @@ export function RegistrationFieldsItem({
         isDragging && 'z-10 opacity-60 shadow-md',
         !isDragging && 'hover:shadow-xs',
       )}
-      onClick={() => onClick(index)}
+      onClick={onEdit}
     >
       <div
         {...attributes}
@@ -48,33 +52,30 @@ export function RegistrationFieldsItem({
       </div>
 
       <div className="flex w-full flex-1 flex-col items-start gap-1 text-left">
-        <span className={cn('truncate text-sm font-medium', field.isHidden && 'text-muted-foreground line-through')}>
-          {field.label} {field.isRequired && <Badge variant="outline">Required</Badge>}
+        <span className={cn('truncate text-sm font-medium', hiddenField.value && 'text-muted-foreground line-through')}>
+          {registrationField.label} {registrationField.isRequired && <Badge variant="outline">Required</Badge>}
         </span>
 
         <div className="text-muted-foreground flex items-center gap-2 text-xs">
-          <span>{field.type[0].toUpperCase() + field.type.slice(1)} field</span>
-          {!field.billingMapping ||
-            (field.billingMapping !== 'none' && (
-              <span className="flex items-center gap-0.5">
-                <MapPinIcon className="size-2.5" />
-                {__('Mapping:', 'yay-wholesale-b2b')}
-                {field.billingMapping != 'custom'
-                  ? ` ${getBillingMappingLabel(field.billingMapping)}`
-                  : ` ${field.customBillingMetaKey} ${__('[custom]', 'yay-wholesale-b2b')}`}{' '}
-                {__('billing', 'yay-wholesale-b2b')}
-              </span>
-            ))}
+          <span>{registrationField.type[0].toUpperCase() + registrationField.type.slice(1)} field</span>
+          {registrationField.billingMapping && registrationField.billingMapping !== 'none' && (
+            <span className="flex items-center gap-0.5">
+              <MapPinIcon className="size-2.5" />
+              {__('Mapping:', 'yay-wholesale-b2b')}
+              {registrationField.billingMapping != 'custom'
+                ? ` ${getBillingMappingLabel(registrationField.billingMapping)}`
+                : ` ${registrationField.customBillingMetaKey} ${__('[custom]', 'yay-wholesale-b2b')}`}{' '}
+              {__('billing', 'yay-wholesale-b2b')}
+            </span>
+          )}
         </div>
       </div>
 
-      <div onPointerDown={(e) => e.stopPropagation()} onClick={(e) => e.stopPropagation()}>
+      <div onPointerDown={stopPropagation} onClick={stopPropagation}>
         <Switch
           size="sm"
-          checked={!field.isHidden}
-          onCheckedChange={(checked) => {
-            onCheckedChange(index, checked);
-          }}
+          checked={!hiddenField.value}
+          onCheckedChange={(checked) => hiddenField.onChange(!checked)}
           aria-label={__('Enabled status', 'yay-wholesale-b2b')}
         />
       </div>

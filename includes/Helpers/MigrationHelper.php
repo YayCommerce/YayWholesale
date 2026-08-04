@@ -36,6 +36,7 @@ class MigrationHelper {
         return [
             [ self::class, 'v1_0_5_add_input_name_for_registration_fields_settings' ],
             [ self::class, 'v1_2_0_refactor_product_based_discount_settings' ],
+            [ self::class, 'v1_2_1_refactor_registration_fields_settings' ],
         ];
     }
 
@@ -139,5 +140,21 @@ class MigrationHelper {
                 update_post_meta( $product->ID, 'yaywholesaleb2b_product_based_discount', $discount );
             }
         }//end foreach
+    }
+
+    public static function v1_2_1_refactor_registration_fields_settings( string $last_version ) {
+        if ( ! version_compare( $last_version, '1.2.1', '<' ) ) {
+            return;
+        }
+
+        $settings = get_option( 'yaywholesaleb2b_settings', [] );
+
+        if ( ! isset( $settings['registration_fields'] ) || ! array_key_exists( 'fields', $settings['registration_fields'] ) ) {
+            return;
+        }
+
+        unset( $settings['registration_fields']['fields'] );
+
+        update_option( 'yaywholesaleb2b_settings', $settings );
     }
 }
