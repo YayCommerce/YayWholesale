@@ -113,7 +113,10 @@ export default function TopWholesaleCustomers({ reportQuery, startDate, endDate 
                     </TableCell>
                     <TableCell className="text-foreground py-3 text-[14px]">
                       <div className="flex justify-center">
-                        <Badge variant="dimmed-outline" className="cursor-default leading-0 font-semibold shadow-xs">
+                        <Badge
+                          variant="outline"
+                          className="cursor-default rounded-md text-xs/4 leading-0 font-semibold shadow-xs"
+                        >
                           {data.role}
                         </Badge>
                       </div>

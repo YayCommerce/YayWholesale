@@ -42,6 +42,9 @@ class Barn2WoocommerceProductTable {
         add_filter( 'ywhs_classic_shop_template_list', [ $this, 'add_wpt_templates' ], 10, 1 );
         add_action( 'ywhs_wpt_before_shop_loop', [ WPT_Template_Handler::class, 'disable_default_woocommerce_loop' ] );
         add_action( 'ywhs_wpt_after_shop_loop', [ WPT_Template_Handler::class, 'add_product_table_after_shop_loop' ] );
+
+        // --------Access Restricted -----------
+        add_filter( 'wc_product_table_ajax_update_args', [ $this, 'exclude_product_ids' ], 10, 1 );
     }
 
     /**
@@ -144,6 +147,34 @@ class Barn2WoocommerceProductTable {
         return $templates;
     }
 
+    /**
+     * Exclude the hidden products and categories.
+     *
+     * @param array $args The table query args.
+     * @return array
+     */
+    public function exclude_product_ids( $args ) {
+        if ( ! class_exists( 'YayWholesaleB2B\Pro\Helpers\AccessHelpers\ProductAccessHelper' ) ||
+        ! class_exists( 'YayWholesaleB2B\Pro\Helpers\AccessHelpers\CategoryAccessHelper' ) ) {
+            return $args;
+        }
+
+        $wholesale_role = CustomerHelper::get_current_user_wholesale_role();
+
+        // All products id that is blocked (products and variations)
+        $general_hidden_product_ids = \YayWholesaleB2B\Pro\Helpers\AccessHelpers\ProductAccessHelper::get_blocked_product_ids( $wholesale_role );
+        // Variable and Grouped Product ids (if all the children are blocked, then blocked the parent too)
+        $product_with_all_children_hidden_ids = \YayWholesaleB2B\Pro\Helpers\AccessHelpers\ProductAccessHelper::get_blocked_product_with_children_ids( $general_hidden_product_ids );
+        // Blocked Product IDs
+        $hidden_ids = array_merge( $general_hidden_product_ids, $product_with_all_children_hidden_ids );
+
+        $args['exclude'] = $hidden_ids;
+
+        $args['exclude_category'] = \YayWholesaleB2B\Pro\Helpers\AccessHelpers\CategoryAccessHelper::get_excluded_categories( $wholesale_role );
+
+        return $args;
+    }
+
 
     /**
      * Modifies the table display setting description to include details about wholesale layout.
@@ -154,7 +185,7 @@ class Barn2WoocommerceProductTable {
     public function custom_table_display_description( $description ) {
 
         $description .= '<p>' . sprintf(
-            // translators: % 1: Settings page link open % 2: Settings page link close < / a >
+        // translators: % 1: Settings page link open % 2: Settings page link close < / a >
             __( 'This will only affect your retail customers, as the wholesale layouts are controlled on the wholesale layout settings page.', 'yay-wholesale-b2b' ),
             // Lib_Util::format_link_open( add_query_arg( 'section', 'layout', woocommerce_wholesale_pro()->get_settings_page_url() ) ),
             // '</a>'
@@ -272,8 +303,8 @@ class Barn2WoocommerceProductTable {
         if ( isset( $settings['yay_wholesale_b2b_override'] ) && $settings['yay_wholesale_b2b_override'] === true && get_option( 'ywhs_wholesale_layout', 'default' ) === 'default' ) {
             update_option( 'ywhs_wholesale_layout', 'product_table' );
         } elseif ( isset( $tables['yay_wholesale_b2b_override'] ) && $tables['yay_wholesale_b2b_override']['id'] === (int) $table_id
-            && ( ! isset( $settings['yay_wholesale_b2b_override'] ) || $settings['yay_wholesale_b2b_override'] === false )
-            && ( get_option( 'ywhs_wholesale_layout', 'default' ) === 'product_table' )
+        && ( ! isset( $settings['yay_wholesale_b2b_override'] ) || $settings['yay_wholesale_b2b_override'] === false )
+        && ( get_option( 'ywhs_wholesale_layout', 'default' ) === 'product_table' )
         ) {
             update_option( 'ywhs_wholesale_layout', 'default' );
 

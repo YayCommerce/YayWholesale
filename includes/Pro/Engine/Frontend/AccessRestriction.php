@@ -30,7 +30,7 @@ class AccessRestriction {
         add_filter( 'woocommerce_variation_is_purchasable', [ $this, 'restrict_variation_purchasable' ], 10, 2 );
 
         // -----Category-----
-        add_filter( 'get_terms', [ $this, 'restrict_category_visibility' ], 10, 2 );
+        add_filter( 'get_terms', [ $this, 'restrict_category_visibility' ], 10, 3 );
 
         // -----Guest----
         add_action( 'woocommerce_get_price_html', [ $this, 'price_display_for_guest' ], 101, 1 );
@@ -137,15 +137,23 @@ class AccessRestriction {
      *
      * @param array $terms  The unfiltered terms.
      * @param array $taxonomies The taxonomies.
+     * @param array $args The argument.
      * @return array
      */
-    public function restrict_category_visibility( array $terms, array $taxonomies ) {
+    public function restrict_category_visibility( array $terms, array $taxonomies, $args ) {
+        if ( is_admin() && ! wp_doing_ajax() ) {
+            return $terms;
+        }
 
         if ( ! is_shop() && ! is_product_category() ) {
             return $terms;
         }
 
         if ( ! in_array( 'product_cat', $taxonomies, true ) ) {
+            return $terms;
+        }
+
+        if ( ! empty( $args['ywhs_force_get_all'] ) ) {
             return $terms;
         }
 

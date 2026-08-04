@@ -144,7 +144,7 @@ export default function GeneralTab() {
         control={control}
         name="general.tax_display_mode"
         render={({ field }) => (
-          <div className="flex items-center justify-between gap-5 rounded-md border p-4">
+          <div className="flex flex-col items-start justify-between gap-5 rounded-md border p-4 md:flex-row md:items-center">
             <div>
               <h2 className="flex items-center gap-2 leading-3.5 font-medium">
                 {__('Display prices in the shop', 'yay-wholesale-b2b')}
@@ -155,7 +155,7 @@ export default function GeneralTab() {
               </p>
             </div>
             <Select value={field.value ? field.value : 'inherit'} onValueChange={field.onChange} disabled={!isPro}>
-              <SelectTrigger className="w-25 min-w-25 sm:w-67.5 sm:min-w-67.5">
+              <SelectTrigger className="w-full min-w-full md:w-67.5 md:min-w-67.5">
                 <SelectValue placeholder={__('Select the display mode', 'yay-wholesale-b2b')} />
               </SelectTrigger>
               <SelectContent align="end">
@@ -172,7 +172,7 @@ export default function GeneralTab() {
         control={control}
         name="general.guest_access_rule"
         render={({ field }) => (
-          <div className="flex items-center justify-between gap-5 rounded-md border p-4">
+          <div className="flex flex-col items-start justify-between gap-5 rounded-md border p-4 md:flex-row md:items-center">
             <div>
               <h2 className="flex items-center gap-2 leading-3.5 font-medium">
                 {__('Guest Access Rule', 'yay-wholesale-b2b')}
@@ -191,7 +191,7 @@ export default function GeneralTab() {
               onValueChange={field.onChange}
               disabled={!isPro}
             >
-              <SelectTrigger className="w-25 min-w-25 sm:w-67.5 sm:min-w-67.5">
+              <SelectTrigger className="w-full min-w-full md:w-67.5 md:min-w-67.5">
                 <SelectValue placeholder={__('Select the guest restriction rule', 'yay-wholesale-b2b')} />
               </SelectTrigger>
               <SelectContent align="end">

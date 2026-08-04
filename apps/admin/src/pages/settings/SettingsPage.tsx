@@ -102,7 +102,7 @@ export default function SettingsPage() {
         )}
       <FormProvider {...form}>
         <form id="settings-form" onSubmit={handleSubmit(onSubmit, onError)}>
-          <div className="xs:p-6 mx-auto max-w-7xl px-6 pt-8 pb-4">
+          <div className="xs:p-6 mx-auto max-w-7xl px-6 pb-4">
             <TabsPrimitive.Root value={subMenu} onValueChange={(value) => navigate(`/settings/${value}`)}>
               <div className="flex flex-col gap-4 sm:flex-row">
                 <div className="w-full sm:w-37.5">
@@ -163,42 +163,39 @@ export default function SettingsPage() {
                   </TabsPrimitive.List>
                 </div>
                 <div className="bg-muted flex flex-1 flex-col overflow-hidden">
-                  <TabsPrimitive.Content value="general" className="bg-card h-full rounded-md border p-6 sm:w-full">
+                  <TabsPrimitive.Content value="general" className="bg-card h-fit rounded-md border p-6 sm:w-full">
                     <GeneralTab />
                   </TabsPrimitive.Content>
-                  <TabsPrimitive.Content value="display" className="bg-card h-full rounded-md border p-6 sm:w-full">
+                  <TabsPrimitive.Content value="display" className="bg-card h-fit rounded-md border p-6 sm:w-full">
                     <DisplayTab />
                   </TabsPrimitive.Content>
-                  <TabsPrimitive.Content
-                    value="registration"
-                    className="bg-card h-full rounded-md border p-6 sm:w-full"
-                  >
+                  <TabsPrimitive.Content value="registration" className="bg-card h-fit rounded-md border p-6 sm:w-full">
                     <RegistrationTab />
                   </TabsPrimitive.Content>
                   <TabsPrimitive.Content
                     value="registration-fields"
-                    className="bg-card h-full rounded-md border p-6 sm:w-full"
+                    className="bg-card h-fit rounded-md border p-6 sm:w-full"
                   >
                     <RegistrationFieldsTab />
                   </TabsPrimitive.Content>
                   <TabsPrimitive.Content
                     value="promotion-rules"
-                    className="bg-card h-full rounded-md border p-6 sm:w-full"
+                    className="bg-card h-fit rounded-md border p-6 sm:w-full"
                   >
                     <PromotionRulesTab />
                   </TabsPrimitive.Content>
-                  <TabsPrimitive.Content value="emails" className="bg-card h-full rounded-md border p-6 sm:w-full">
+                  <TabsPrimitive.Content value="emails" className="bg-card h-fit rounded-md border p-6 sm:w-full">
                     <EmailsTab />
                   </TabsPrimitive.Content>
                   <TabsPrimitive.Content
                     value="payment-roles"
-                    className="bg-card h-full rounded-md border p-6 sm:w-full"
+                    className="bg-card h-fit rounded-md border p-6 sm:w-full"
                   >
                     <PaymentRolesTab />
                   </TabsPrimitive.Content>
                   <TabsPrimitive.Content
                     value="shipping-roles"
-                    className="bg-card h-full rounded-md border p-6 sm:w-full"
+                    className="bg-card h-fit rounded-md border p-6 sm:w-full"
                   >
                     <ShippingRolesTab />
                   </TabsPrimitive.Content>
