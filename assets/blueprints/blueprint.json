@@ -1,0 +1,283 @@
+{
+  "$schema": "https://playground.wordpress.net/blueprint-schema.json",
+  "landingPage": "/wp-admin/admin.php?page=yay_wholesale_b2b#/roles",
+  "preferredVersions": {
+    "php": "8.0",
+    "wp": "latest"
+  },
+  "phpExtensionBundles": ["kitchen-sink"],
+  "features": {
+    "networking": true
+  },
+  "login": true,
+  "steps": [
+    {
+      "step": "login",
+      "username": "admin",
+      "password": "password"
+    },
+    {
+      "step": "setSiteOptions",
+      "options": {
+        "blogname": "Yay Wholesale B2B Demo",
+        "woocommerce_onboarding_profile": {
+          "completed": true,
+          "skipped": true
+        },
+        "yaywholesaleb2b_roles": [
+          {
+            "name": "Gold",
+            "description": "Customers who buy every 3 months",
+            "discount": 30,
+            "minOrderQuantity": 0,
+            "minOrderAmount": 500,
+            "applyToSalePrice": true,
+            "status": true,
+            "slug": "gold"
+          },
+          {
+            "name": "Platinum",
+            "description": "Customers who buy every month",
+            "discount": 40,
+            "minOrderQuantity": 0,
+            "minOrderAmount": 1000,
+            "applyToSalePrice": true,
+            "status": true,
+            "slug": "platinum"
+          },
+          {
+            "name": "Silver",
+            "description": "Customers who buy every year",
+            "discount": 20,
+            "minOrderQuantity": 0,
+            "minOrderAmount": 500,
+            "applyToSalePrice": true,
+            "status": true,
+            "slug": "silver"
+          }
+        ],
+        "yaywholesaleb2b_settings": {
+          "general": {
+            "default_role": "gold"
+          },
+          "registration_fields": {
+            "fields": [
+                {
+                    "inputName": "first_name",
+                    "label": "First Name",
+                    "columnWidth": "50%",
+                    "isRequired": true,
+                    "isHidden": false,
+                    "isDefault": false,
+                    "billingMapping": "billing_first_name",
+                    "type": "text",
+                    "placeholder": "Enter First Name"
+                },
+                {
+                    "inputName": "last_name",
+                    "label": "Last Name",
+                    "columnWidth": "50%",
+                    "isRequired": true,
+                    "isHidden": false,
+                    "isDefault": false,
+                    "billingMapping": "billing_last_name",
+                    "type": "text",
+                    "placeholder": "Enter Last Name"
+                },
+                {
+                    "inputName": "message",
+                    "label": "Message",
+                    "columnWidth": "100%",
+                    "isRequired": false,
+                    "isHidden": false,
+                    "isDefault": false,
+                    "billingMapping": "none",
+                    "type": "textarea",
+                    "placeholder": "Enter Message"
+                },
+                {
+                    "inputName": "custom_field_b1739654-843c-4211-a852-afb8264c89e5",
+                    "label": "Company Name",
+                    "columnWidth": "50%",
+                    "isRequired": false,
+                    "isHidden": false,
+                    "isDefault": false,
+                    "billingMapping": "billing_company",
+                    "customBillingMetaKey": "",
+                    "type": "text",
+                    "placeholder": "Enter the company"
+                },
+                {
+                    "inputName": "custom_field_49d005a9-cdab-44c8-bd14-ff57e2e95c87",
+                    "label": "Country",
+                    "columnWidth": "50%",
+                    "isRequired": false,
+                    "isHidden": false,
+                    "isDefault": false,
+                    "billingMapping": "billing_state",
+                    "customBillingMetaKey": "",
+                    "type": "text",
+                    "placeholder": "Enter the state"
+                },
+                {
+                    "inputName": "custom_field_97febe50-8581-48da-8af6-8b43273fb43f",
+                    "label": "VAT / Tax ID",
+                    "columnWidth": "50%",
+                    "isRequired": false,
+                    "isHidden": false,
+                    "isDefault": false,
+                    "billingMapping": "billing_vat",
+                    "customBillingMetaKey": "",
+                    "type": "text",
+                    "placeholder": "Enter VAT / Tax ID"
+                },
+                {
+                    "inputName": "custom_field_5645f418-96c8-4c87-8108-3d0d2f92f7a7",
+                    "label": "Contact Number",
+                    "columnWidth": "50%",
+                    "isRequired": false,
+                    "isHidden": false,
+                    "isDefault": false,
+                    "billingMapping": "billing_phone",
+                    "customBillingMetaKey": "",
+                    "type": "phone",
+                    "placeholder": "Enter your phone for us to contact"
+                },
+                {
+                    "inputName": "custom_field_ced7a4a1-385f-4a7d-8a45-41b56093360a",
+                    "label": "Address",
+                    "columnWidth": "100%",
+                    "isRequired": false,
+                    "isHidden": false,
+                    "isDefault": false,
+                    "billingMapping": "billing_address_1",
+                    "customBillingMetaKey": "",
+                    "type": "text",
+                    "placeholder": "Enter your address"
+                },
+                {
+                    "inputName": "custom_field_fe49bc15-3e66-4eae-8b08-c0ee56c60d5b",
+                    "label": "Company Logo",
+                    "columnWidth": "100%",
+                    "isRequired": false,
+                    "isHidden": false,
+                    "isDefault": false,
+                    "billingMapping": "none",
+                    "customBillingMetaKey": "",
+                    "type": "attachment",
+                    "allowedExtensions": [
+                        "jpg",
+                        "jpeg",
+                        "png"
+                    ],
+                    "maxFileSize": 3
+                },
+                {
+                    "inputName": "custom_field_e249b03d-4a76-4edc-92df-8f26312fae2c",
+                    "label": "Where do you know our store from",
+                    "columnWidth": "100%",
+                    "isRequired": false,
+                    "isHidden": false,
+                    "isDefault": false,
+                    "billingMapping": "none",
+                    "customBillingMetaKey": "",
+                    "type": "radio",
+                    "choices": [
+                        "Facebook",
+                        "Instagram",
+                        "Our Flyer",
+                        "Our Saleman",
+                        "Our Website"
+                    ]
+                }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "step": "installPlugin",
+      "pluginData": {
+        "resource": "wordpress.org/plugins",
+        "slug": "woocommerce"
+      },
+      "options": {
+        "activate": true
+      }
+    },
+    {
+      "step": "installPlugin",
+      "pluginData": {
+        "resource": "wordpress.org/plugins",
+        "slug": "yay-wholesale-b2b"
+      },
+      "options": {
+        "activate": true
+      }
+    },
+    {
+      "step": "installTheme",
+      "themeData": {
+        "resource": "wordpress.org/themes",
+        "slug": "brandy"
+      },
+      "options": {
+        "activate": true
+      }
+    },
+    {
+      "step": "importWxr",
+      "file": {
+        "resource": "url",
+        "url": "https://raw.githubusercontent.com/woocommerce/woocommerce/trunk/plugins/woocommerce/sample-data/sample_products.xml"
+      },
+      "fetchAttachments": true,
+      "authorsMode": "default-author",
+      "defaultAuthorUsername": "admin"
+    },
+    {
+      "step": "runPHP",
+      "progress": {
+        "caption": "Prevent woocommerce redirect"
+      },
+      "code": "<?php\nrequire_once '/wordpress/wp-load.php';\ndelete_transient( '_wc_activation_redirect' );\ndelete_option( 'woocommerce_admin_install_timestamp' );\n"
+    },
+    {
+      "step": "runPHP",
+      "progress": {
+        "caption": "Register wholesale roles"
+      },
+      "code": "<?php\nrequire_once '/wordpress/wp-load.php';\nadd_role( 'gold', 'Gold', [ 'read' => true ] );\nadd_role( 'platinum', 'Platinum', [ 'read' => true ] );\nadd_role( 'silver', 'Silver', [ 'read' => true ] );\n"
+    },
+    {
+      "step": "runPHP",
+      "progress": {
+        "caption": "Register wholesalers"
+      },
+      "code": "<?php\nrequire_once '/wordpress/wp-load.php';\n\n$admin = new WP_User( 1 );\n$admin->add_role( 'gold' );\n"
+    },
+    {
+      "step": "wp-cli",
+      "command": "wp user create frank_j frank@gmail.com --user_pass=password --role=platinum --display_name='Frank J.'"
+    },
+    {
+      "step": "wp-cli",
+      "command": "wp user create jack_m jackma@gmail.com --user_pass=password --role=gold --display_name='Jack M.'"
+    },
+    {
+      "step": "wp-cli",
+      "command": "wp user create katrin_r k@k-gmbh.com --user_pass=password --role=silver --display_name='Katrin R.'"
+    },
+    {
+      "step": "wp-cli",
+      "command": "wp post create --post_type=page --post_title='Become a Wholesaler' --post_content='<!-- wp:paragraph --><p>Thank you for your interest in becoming a wholesale partner. Please complete the registration form below to apply for a wholesale account. Once your application has been reviewed and approved, you will gain access to exclusive wholesale pricing, bulk ordering options, and partner benefits. We look forward to building a successful business relationship with you.</p><!-- /wp:paragraph --><!-- wp:shortcode -->[ywhs_request_form]<!-- /wp:shortcode -->' --post_status=publish"
+    },
+    {
+      "step": "runPHP",
+      "progress": {
+        "caption": "Add new page"
+      },
+      "code": "<?php\nrequire_once '/wordpress/wp-load.php';\n\n$page = get_page_by_path('become-a-wholesaler');\nif (!$page) {\n    return;\n}\n\n$menu_name = 'Primary Menu';\n$menu = wp_get_nav_menu_object($menu_name);\n\nif (!$menu) {\n    $menu_id = wp_create_nav_menu($menu_name);\n} else {\n    $menu_id = $menu->term_id;\n}\n\nwp_update_nav_menu_item($menu_id, 0, [\n    'menu-item-title'     => 'Become a Wholesaler',\n    'menu-item-object'    => 'page',\n    'menu-item-object-id' => $page->ID,\n    'menu-item-type'      => 'post_type',\n    'menu-item-status'    => 'publish',\n]);\n\n$locations = get_theme_mod('nav_menu_locations') ?: [];\n$locations['primary'] = $menu_id;\n$locations['primary-menu'] = $menu_id;\nset_theme_mod('nav_menu_locations', $locations);\n"
+    }
+  ]
+}
