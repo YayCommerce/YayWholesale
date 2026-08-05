@@ -137,17 +137,7 @@ class CategoryAccessHelper {
      * @param array|null $wholesale_role the user wholesale role.
      */
     public static function filter_accessible_categories( $categories, $wholesale_role ) {
-        $blocked_ids = [];
-        foreach ( $categories as $cat ) {
-            if ( $cat->taxonomy === 'product_cat' ) {
-                if ( ! in_array( $cat->term_id, $blocked_ids, true ) && ! self::is_accessible_category( $cat->term_id, $wholesale_role ) ) {
-                    $blocked_ids[] = $cat->term_id;
-                }
-                if ( ! empty( $cat->parent ) && ! in_array( $cat->parent, $blocked_ids, true ) && ! self::is_accessible_category( $cat->parent, $wholesale_role ) ) {
-                    $blocked_ids[] = $cat->parent;
-                }
-            }
-        }
+        $blocked_ids = self::get_excluded_categories( $wholesale_role, $categories );
 
         return array_filter( $categories, fn( $value ) => ! in_array( $value->term_id, $blocked_ids, true ) && ! in_array( $value->parent, $blocked_ids, true ) );
     }
@@ -159,5 +149,42 @@ class CategoryAccessHelper {
             'wholesalers'    => 'enabled',
             'selected_roles' => [],
         ];
+    }
+
+    /**
+     * Get the hidden categories id
+     *
+     * @param array|null $wholesale_role the user wholesale role.
+     * @param array      $categories the initial categories.
+     */
+    public static function get_excluded_categories( $wholesale_role, $categories = [] ) {
+        if ( empty( $categories ) ) {
+            $categories = get_terms(
+                [
+                    'taxonomy'           => 'product_cat',
+                    'hide_empty'         => false,
+                    'ywhs_force_get_all' => true,
+                ]
+            );
+        }
+
+        $blocked_ids = [];
+        if ( ! is_wp_error( $categories ) && ! empty( $categories ) ) {
+
+            $term_ids = wp_list_pluck( $categories, 'term_id' );
+
+            update_termmeta_cache( $term_ids );
+
+            foreach ( $categories as $cat ) {
+                if ( ! in_array( $cat->term_id, $blocked_ids, true ) && ! self::is_accessible_category( $cat->term_id, $wholesale_role ) ) {
+                    $blocked_ids[] = $cat->term_id;
+                }
+                if ( ! empty( $cat->parent ) && ! in_array( $cat->parent, $blocked_ids, true ) && ! self::is_accessible_category( $cat->parent, $wholesale_role ) ) {
+                    $blocked_ids[] = $cat->parent;
+                }
+            }
+        }
+
+        return $blocked_ids;
     }
 }

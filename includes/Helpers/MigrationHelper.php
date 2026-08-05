@@ -153,11 +153,15 @@ class MigrationHelper {
             return;
         }
 
-        foreach ( $settings['registration_fields']['fields'] as $key => $field ) {
+        $tmp = $settings['registration_fields']['fields'];
+
+        foreach ( $tmp  as $key => $field ) {
             if ( 'email_address' === $field['inputName'] ) {
-                unset( $settings['registration_fields']['fields'][ $key ] );
+                unset( $tmp[ $key ] );
             }
         }
+
+        $settings['registration_fields']['fields'] = array_values( $tmp );
 
         update_option( 'yaywholesaleb2b_settings', $settings );
     }

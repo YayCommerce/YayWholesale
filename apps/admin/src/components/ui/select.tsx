@@ -32,7 +32,7 @@ const SelectTrigger = React.forwardRef<
       data-slot="select-trigger"
       data-size={size}
       className={cn(
-        "border-input data-placeholder:text-muted-foreground dark:bg-input/30 dark:hover:bg-input/50 disabled:hover:border-input disabled:bg-muted transition-default flex w-fit items-center justify-between gap-2 rounded-md border bg-transparent px-3 py-2 text-sm font-normal whitespace-nowrap outline-none disabled:cursor-not-allowed disabled:opacity-50 data-[size=default]:h-9 data-[size=sm]:h-8 *:data-[slot=select-value]:line-clamp-1 *:data-[slot=select-value]:flex *:data-[slot=select-value]:items-center *:data-[slot=select-value]:gap-2 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+        "border-input data-placeholder:text-muted-foreground [&_svg:not([class*='text-'])]:text-muted-foreground dark:bg-input/30 dark:hover:bg-input/50 disabled:hover:border-input disabled:bg-muted transition-default flex w-fit items-center justify-between gap-2 rounded-md border bg-transparent px-3 py-2 text-sm font-normal whitespace-nowrap outline-none disabled:cursor-not-allowed disabled:opacity-50 data-[size=default]:h-9 data-[size=sm]:h-8 *:data-[slot=select-value]:line-clamp-1 *:data-[slot=select-value]:flex *:data-[slot=select-value]:items-center *:data-[slot=select-value]:gap-2 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
         focusVariants(),
         inputVariants({ variant: 'picker' }),
         className,
@@ -94,14 +94,17 @@ function SelectLabel({ className, ...props }: React.ComponentProps<typeof Select
 
 const SelectItem = React.forwardRef<
   React.ElementRef<typeof SelectPrimitive.Item>,
-  React.ComponentPropsWithoutRef<typeof SelectPrimitive.Item>
->(({ className, children, ...props }, ref) => {
+  React.ComponentPropsWithoutRef<typeof SelectPrimitive.Item> & {
+    color?: 'default' | 'primary';
+  }
+>(({ className, children, color = 'default', ...props }, ref) => {
   return (
     <SelectPrimitive.Item
       ref={ref}
       data-slot="select-item"
       className={cn(
-        "focus:bg-accent focus:text-accent-foreground data-[state=checked]:text-primary hover:bg-accent relative flex w-full cursor-default items-center gap-2 rounded-sm py-1.5 pr-8 pl-2 text-sm outline-hidden select-none data-disabled:pointer-events-none data-disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 *:[span]:last:flex *:[span]:last:items-center *:[span]:last:gap-2",
+        "focus:bg-accent focus:text-accent-foreground data-[state=checked]:text-foreground [&_svg:not([class*='text-'])]:text-foreground data-[state=checked]:bg-muted-400 hover:bg-accent relative flex w-full cursor-default items-center gap-2 rounded-sm py-1.5 pr-8 pl-2 text-sm outline-hidden select-none data-disabled:pointer-events-none data-disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 *:[span]:last:flex *:[span]:last:items-center *:[span]:last:gap-2",
+        color === 'primary' && "data-[state=checked]:text-primary [&_svg:not([class*='text-'])]:text-primary",
         className,
       )}
       {...props}
@@ -119,16 +122,18 @@ const SelectItem = React.forwardRef<
 type DescribedSelectItemProps = Omit<React.ComponentPropsWithoutRef<typeof SelectPrimitive.Item>, 'children'> & {
   label: React.ReactNode;
   description: React.ReactNode;
+  color?: 'default' | 'primary';
 };
 
 const DescribedSelectItem = React.forwardRef<React.ElementRef<typeof SelectPrimitive.Item>, DescribedSelectItemProps>(
-  ({ description, className, label, ...props }, ref) => {
+  ({ description, className, label, color = 'default', ...props }, ref) => {
     return (
       <SelectPrimitive.Item
         ref={ref}
         data-slot="select-item"
         className={cn(
-          "focus:bg-accent focus:text-accent-foreground data-[state=checked]:text-primary hover:bg-accent relative flex w-full cursor-default flex-col justify-center gap-y-0.5 rounded-sm py-1.5 pr-8 pl-2 text-sm outline-hidden select-none data-disabled:pointer-events-none data-disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+          "focus:bg-accent focus:text-accent-foreground data-[state=checked]:text-foreground [&_svg:not([class*='text-'])]:text-foreground data-[state=checked]:bg-muted-400 hover:bg-accent relative flex w-full cursor-default flex-col justify-center gap-y-0.5 rounded-sm py-1.5 pr-8 pl-2 text-sm outline-hidden select-none data-disabled:pointer-events-none data-disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+          color === 'primary' && "data-[state=checked]:text-primary [&_svg:not([class*='text-'])]:text-primary",
           className,
         )}
         {...props}

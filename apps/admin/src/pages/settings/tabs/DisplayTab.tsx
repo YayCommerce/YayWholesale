@@ -135,13 +135,13 @@ export default function DisplayTab() {
           control={control}
           name="display.requirement_bar_visible"
           render={({ field }) => (
-            <div className="flex items-center justify-between gap-5 rounded-md">
+            <div className="flex items-center justify-between gap-5 rounded-md border p-4">
               <div>
-                <FieldLabel className="flex items-center gap-2 leading-3.5 font-medium">
+                <h2 className="flex items-center gap-2 leading-3.5 font-medium">
                   {__('Requirement Bar', 'yay-wholesale-b2b')}
                   {!isPro && <UpgradeToProBadge />}
-                </FieldLabel>
-                <p className="text-muted-foreground mt-1 text-xs font-normal">
+                </h2>
+                <p className="text-muted-foreground mt-2 text-xs font-normal">
                   {__('Display a requirement progress bar in mini cart, cart and checkout pages.', 'yay-wholesale-b2b')}
                 </p>
               </div>
@@ -151,12 +151,12 @@ export default function DisplayTab() {
         />
 
         {isBlockTheme ? (
-          <div className="flex items-center justify-between gap-15 rounded-md md:flex-col md:items-start md:gap-2 lg:flex-row lg:items-center lg:gap-15">
+          <div className="flex flex-col items-end justify-between gap-4 rounded-md border p-4 lg:flex-row lg:items-center lg:gap-15">
             <div>
-              <FieldLabel className="flex items-center gap-2 leading-3.5 font-medium">
+              <h2 className="flex items-center gap-2 leading-3.5 font-medium">
                 {__('Template Editor', 'yay-wholesale-b2b')}
                 {!isPro && <UpgradeToProBadge />}
-              </FieldLabel>
+              </h2>
               <span className="text-muted-foreground mt-2 text-xs font-normal">
                 {__(
                   "Create, customize and manage access permissions for each user role in the shop page. Build your shop catalog using the 'Products with Wholesale' template.",
@@ -176,23 +176,23 @@ export default function DisplayTab() {
             </Button>
           </div>
         ) : (
-          <div className="flex flex-col gap-6">
+          <div className="flex flex-col gap-5">
             <Controller
               control={control}
               name="display.classic_retailer_template"
               render={({ field }) => (
-                <div className="flex items-center justify-between gap-2 rounded-md md:flex-col md:items-start lg:flex-row lg:items-center">
+                <div className="flex flex-col items-start justify-between gap-2 rounded-md border p-4 lg:flex-row lg:items-center">
                   <div>
-                    <FieldLabel className="flex items-center gap-2 leading-3.5 font-medium">
+                    <h2 className="flex items-center gap-2 leading-3.5 font-medium">
                       {__('Retailer Shop Template', 'yay-wholesale-b2b')}
                       {!isPro && <UpgradeToProBadge />}
-                    </FieldLabel>
-                    <p className="text-muted-foreground mt-1 text-xs font-normal">
+                    </h2>
+                    <p className="text-muted-foreground mt-2 text-xs font-normal">
                       {__("Select a template for your retailer's product catalog page", 'yay-wholesale-b2b')}
                     </p>
                   </div>
                   <Select value={field.value ? field.value : 'wc'} onValueChange={field.onChange} disabled={!isPro}>
-                    <SelectTrigger className="w-35 min-w-35 sm:w-55 sm:min-w-55 md:w-full md:min-w-full lg:w-55 lg:min-w-55">
+                    <SelectTrigger className="w-full min-w-full lg:w-55 lg:min-w-55">
                       <SelectValue placeholder={__('Select the template', 'yay-wholesale-b2b')} />
                     </SelectTrigger>
                     <SelectContent align="end">
@@ -211,18 +211,18 @@ export default function DisplayTab() {
               control={control}
               name="display.classic_wholesaler_template"
               render={({ field }) => (
-                <div className="flex items-center justify-between gap-2 rounded-md md:flex-col md:items-start lg:flex-row lg:items-center">
+                <div className="flex flex-col items-start justify-between gap-2 rounded-md border p-4 lg:flex-row lg:items-center">
                   <div>
-                    <FieldLabel className="flex items-center gap-2 leading-3.5 font-medium">
+                    <h2 className="flex items-center gap-2 leading-3.5 font-medium">
                       {__('Wholesaler Shop Template', 'yay-wholesale-b2b')}
                       {!isPro && <UpgradeToProBadge />}
-                    </FieldLabel>
-                    <p className="text-muted-foreground mt-1 text-xs font-normal">
+                    </h2>
+                    <p className="text-muted-foreground mt-2 text-xs font-normal">
                       {__("Select a template for your wholesaler's product catalog page", 'yay-wholesale-b2b')}
                     </p>
                   </div>
                   <Select value={field.value ? field.value : 'wc'} onValueChange={field.onChange} disabled={!isPro}>
-                    <SelectTrigger className="w-35 min-w-35 sm:w-55 sm:min-w-55 md:w-full md:min-w-full lg:w-55 lg:min-w-55">
+                    <SelectTrigger className="w-full min-w-full lg:w-55 lg:min-w-55">
                       <SelectValue placeholder={__('Select the template', 'yay-wholesale-b2b')} />
                     </SelectTrigger>
                     <SelectContent align="end">

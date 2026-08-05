@@ -38,12 +38,12 @@ class RequestsHelper {
                 $user         = get_user_by( 'ID', $user_id );
                 $display_name = $user->display_name;
         } else {
-            if ( array_key_exists( 'email_address', $body_params ) ) {
-                $name = explode( '@', $body_params['email_address'] )[0] ?? '';
+            if ( array_key_exists( 'first_name', $body_params ) && array_key_exists( 'last_name', $body_params ) ) {
+                $name = trim( $body_params['first_name'] . ' ' . $body_params['last_name'] );
             }
 
-            if ( array_key_exists( 'first_name', $body_params ) && array_key_exists( 'last_name', $body_params ) ) {
-                $name = $body_params['first_name'] . ' ' . $body_params['last_name'];
+            if ( empty( $name ) && array_key_exists( 'email_address', $body_params ) ) {
+                $name = explode( '@', $body_params['email_address'] )[0] ?? '';
             }
 
             $display_name = $name;
