@@ -141,7 +141,7 @@ export default function DisplayTab() {
                   {__('Requirement Bar', 'yay-wholesale-b2b')}
                   {!isPro && <UpgradeToProBadge />}
                 </h2>
-                <p className="text-muted-foreground mt-1 text-xs font-normal">
+                <p className="text-muted-foreground mt-2 text-xs font-normal">
                   {__('Display a requirement progress bar in mini cart, cart and checkout pages.', 'yay-wholesale-b2b')}
                 </p>
               </div>
@@ -187,7 +187,7 @@ export default function DisplayTab() {
                       {__('Retailer Shop Template', 'yay-wholesale-b2b')}
                       {!isPro && <UpgradeToProBadge />}
                     </h2>
-                    <p className="text-muted-foreground mt-1 text-xs font-normal">
+                    <p className="text-muted-foreground mt-2 text-xs font-normal">
                       {__("Select a template for your retailer's product catalog page", 'yay-wholesale-b2b')}
                     </p>
                   </div>
@@ -217,7 +217,7 @@ export default function DisplayTab() {
                       {__('Wholesaler Shop Template', 'yay-wholesale-b2b')}
                       {!isPro && <UpgradeToProBadge />}
                     </h2>
-                    <p className="text-muted-foreground mt-1 text-xs font-normal">
+                    <p className="text-muted-foreground mt-2 text-xs font-normal">
                       {__("Select a template for your wholesaler's product catalog page", 'yay-wholesale-b2b')}
                     </p>
                   </div>
