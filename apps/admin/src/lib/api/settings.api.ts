@@ -16,3 +16,7 @@ export function updateEmailStatus(emailId: string, status: boolean) {
 export function markReviewed() {
   return api.post('mark-reviewed').json<boolean>();
 }
+
+export function exportPricingCsv() {
+  return api.post('pricing/export').json<{ file: string }>();
+}

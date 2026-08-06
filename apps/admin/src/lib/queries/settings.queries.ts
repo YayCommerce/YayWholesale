@@ -1,6 +1,6 @@
 import { queryOptions, useIsMutating, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
-import { getSettings, postSettings, updateEmailStatus } from '@/lib/api/settings.api';
+import { exportPricingCsv, getSettings, postSettings, updateEmailStatus } from '@/lib/api/settings.api';
 import type { Settings } from '@/lib/schema/settings.schema';
 
 /** ─── Query Options ─────────────────────────────────── */
@@ -29,6 +29,7 @@ export const SETTINGS_QUERIES = {
 const SETTINGS_MUTATION_KEYS = {
   save: ['settings', 'main'] as const,
   updateEmailStatus: ['settings', 'emails', 'update-status'] as const,
+  exportPricing: ['settings', 'pricing', 'export'] as const,
 };
 
 /** ─── Query Hooks ───────────────────────────────────── */
@@ -81,6 +82,13 @@ export function useUpdateEmailStatusMutation() {
         queryClient.setQueryData(SETTINGS_QUERIES.emails.queryKey, context.previous); // Rollback
       }
     },
+  });
+}
+
+export function usePricingExportMutation() {
+  return useMutation({
+    mutationKey: SETTINGS_MUTATION_KEYS.exportPricing,
+    mutationFn: async () => exportPricingCsv(),
   });
 }
 

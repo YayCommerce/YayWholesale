@@ -2,6 +2,8 @@
 
 namespace YayWholesaleB2B\Pro\Helpers\PricingHelpers;
 
+use YayWholesaleB2B\Helpers\RolesHelper;
+
 /**
  * Product Based Pricing Helper
  */
@@ -9,6 +11,7 @@ class ProductPricingHelper {
 
 
     public const PRODUCT_BASED_DISCOUNT_KEY = 'yaywholesaleb2b_product_based_discount';
+    public const PRODUCT_BASED_CSV_CACHED   = 'yaywholesaleb2b_product_pricing_csv';
 
     /**
      * Get the allowed product types for displaying setting on editing single product page
@@ -217,5 +220,63 @@ class ProductPricingHelper {
                 'wholesaler' => [],
             ],
         ];
+    }
+
+    public static function get_cached_csv() {
+        $cached_csv = get_transient( self::PRODUCT_BASED_CSV_CACHED );
+        if ( empty( $cached_csv ) || ! is_file( YAYWHOLESALEB2B_PLUGIN_DIR . $cached_csv ) ) {
+            return false;
+        }
+
+        return $cached_csv;
+    }
+
+    public static function build_csv() {
+        $rows = [ self::get_csv_header() ];
+
+        $filename    = 'assets/pro/csv/ywhs_product_price_list.csv';
+        $cached_dir  = YAYWHOLESALEB2B_PLUGIN_DIR . 'assets/pro/csv';
+        $csv_content = '';
+
+        foreach ( $rows as $row ) {
+            $escaped      = array_map( fn( $item ) => '"' . $item . '"', $row );
+            $csv_content .= implode( ',', $escaped ) . "\n";
+        }
+
+        global $wp_filesystem;
+
+        if ( ! $wp_filesystem ) {
+            require_once ABSPATH . 'wp-admin/includes/file.php';
+            WP_Filesystem();
+        }
+
+        if ( ! $wp_filesystem->is_dir( $cached_dir ) ) {
+            $wp_filesystem->mkdir( $cached_dir );
+        }
+
+        $wp_filesystem->put_contents( YAYWHOLESALEB2B_PLUGIN_DIR . $filename, $csv_content, FS_CHMOD_FILE );
+        set_transient( self::PRODUCT_BASED_CSV_CACHED, $filename, 24 * 60 * 60 );
+        return $filename;
+    }
+
+    protected static function get_csv_header() {
+        $headers = [
+            __( 'Product / Variation ID & SKU', 'yay-wholesale-b2b' ),
+            __( 'Regular Price', 'yay-wholesale-b2b' ),
+            __( 'Sale Price', 'yay-wholesale-b2b' ),
+        ];
+
+        $roles = RolesHelper::get_wholesale_roles();
+        foreach ( $roles as $role ) {
+            $role_headers = [
+                $role['slug'] . ': ' . $role['name'] . __( ' discount type', 'yay-wholesale-b2b' ),
+                $role['slug'] . ': ' . $role['name'] . __( ' fixed price', 'yay-wholesale-b2b' ),
+                $role['slug'] . ': ' . $role['name'] . __( ' percentage', 'yay-wholesale-b2b' ),
+                $role['slug'] . ': ' . $role['name'] . __( ' tier', 'yay-wholesale-b2b' ),
+            ];
+            $headers      = array_merge( $headers, $role_headers );
+        }
+
+        return $headers;
     }
 }

@@ -5,6 +5,7 @@ node_modules
 
 /assets/dist/*
 /assets/pro/dist/*
+/assets/pro/csv/*
 /release/dest/*
 /release/*.zip
 /blocks/dist/

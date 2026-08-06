@@ -18,6 +18,8 @@ class YayWholesaleB2BPro {
             return;
         }
 
+        \YayWholesaleB2B\Pro\Engine\RestAPI::get_instance();
+
         \YayWholesaleB2B\Pro\Engine\Frontend\PaymentGateway::get_instance();
         \YayWholesaleB2B\Pro\Engine\Frontend\ShippingMethod::get_instance();
         \YayWholesaleB2B\Pro\Engine\Frontend\Requirement::get_instance();
