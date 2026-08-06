@@ -12,10 +12,10 @@ import { bulkUpdateWholesalerRole, getWholesalers, updateWholesalerRole } from '
 import { Wholesaler, WholesalerFilter } from '@/lib/schema/wholesalers.type';
 import { ROLES_QUERIES } from './roles.queries';
 
-/** Options */
+/** ─── Query Options ─────────────────────────────────── */
 
 export const WHOLESALERS_QUERIES = {
-  all: ['wholesalers'],
+  all: ['wholesalers'] as const,
   list: (filter: WholesalerFilter) =>
     queryOptions({
       queryKey: ['wholesalers', filter],
@@ -24,18 +24,27 @@ export const WHOLESALERS_QUERIES = {
     }),
 };
 
-/** Queries */
+/** ─── Mutation Keys ─────────────────────────────────── */
+
+const WHOLESALERS_MUTATION_KEYS = {
+  updateRole: (id: number) => ['wholesalers', id, 'update-role'] as const,
+  bulkUpdateRole: ['wholesalers', 'bulk-update-roles'] as const,
+  // prefix keys for useIsMutating
+  allWholesalers: ['wholesalers'] as const,
+};
+
+/** ─── Query Hooks ───────────────────────────────────── */
 
 export function useWholesalersQuery(filter: WholesalerFilter) {
   return useQuery(WHOLESALERS_QUERIES.list(filter));
 }
 
-/** Mutations */
+/** ─── Mutation Hooks ────────────────────────────────── */
 
 export function useUpdateWholesalersRoleMutation(userId: number) {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationKey: ['wholesalers', userId, 'update-role'],
+    mutationKey: WHOLESALERS_MUTATION_KEYS.updateRole(userId),
     mutationFn: (roleSlug: string) => updateWholesalerRole(userId, roleSlug),
     onMutate: (roleSlug) => {
       queryClient
@@ -57,7 +66,7 @@ export function useUpdateWholesalersRoleMutation(userId: number) {
 export function useBulkUpdateWholesalersRoleMutation() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationKey: ['wholesalers', 'bulk-update-roles'],
+    mutationKey: WHOLESALERS_MUTATION_KEYS.bulkUpdateRole,
     mutationFn: ({ userIds, roleSlug }: { userIds: number[]; roleSlug: string }) =>
       bulkUpdateWholesalerRole(userIds, roleSlug),
     onMutate: ({ userIds, roleSlug }) => {
@@ -79,8 +88,8 @@ export function useBulkUpdateWholesalersRoleMutation() {
   });
 }
 
-/** Utils */
+/** ─── Mutation State ────────────────────────────────── */
 
 export function useIsMutatingWholesalers() {
-  return useIsMutating({ mutationKey: ['wholesalers'] });
+  return useIsMutating({ mutationKey: WHOLESALERS_MUTATION_KEYS.allWholesalers });
 }

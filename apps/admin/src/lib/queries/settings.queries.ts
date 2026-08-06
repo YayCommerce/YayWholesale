@@ -3,7 +3,7 @@ import { queryOptions, useIsMutating, useMutation, useQuery, useQueryClient } fr
 import { getSettings, postSettings, updateEmailStatus } from '@/lib/api/settings.api';
 import type { Settings } from '@/lib/schema/settings.schema';
 
-/** Options */
+/** ─── Query Options ─────────────────────────────────── */
 
 export const SETTINGS_QUERIES = {
   main: queryOptions({
@@ -13,18 +13,25 @@ export const SETTINGS_QUERIES = {
       window.yayWholesaleB2BAdmin.settings = settings;
       return settings;
     },
-    initialData: window.yayWholesaleB2BAdmin.settings,
+    initialData: () => window.yayWholesaleB2BAdmin.settings,
     staleTime: Infinity,
   }),
   emails: queryOptions({
     queryKey: ['settings', 'emails'],
     queryFn: () => window.yayWholesaleB2BAdmin.wholesale_emails,
-    initialData: window.yayWholesaleB2BAdmin.wholesale_emails,
+    initialData: () => window.yayWholesaleB2BAdmin.wholesale_emails,
     staleTime: Infinity,
   }),
 };
 
-/** Queries */
+/** ─── Mutation Keys ─────────────────────────────────── */
+
+const SETTINGS_MUTATION_KEYS = {
+  save: ['settings', 'main'] as const,
+  updateEmailStatus: ['settings', 'emails', 'update-status'] as const,
+};
+
+/** ─── Query Hooks ───────────────────────────────────── */
 
 export function useSettingsQuery() {
   return useQuery(SETTINGS_QUERIES.main);
@@ -34,13 +41,13 @@ export function useSettingsEmailsQuery() {
   return useQuery(SETTINGS_QUERIES.emails);
 }
 
-/** Mutations */
+/** ─── Mutation Hooks ────────────────────────────────── */
 
 export function useSaveSettingsMutation() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationKey: ['settings', 'main'],
+    mutationKey: SETTINGS_MUTATION_KEYS.save,
     mutationFn: async (data: Settings) => postSettings(data),
     onSuccess: (res) => {
       window.yayWholesaleB2BAdmin.settings = res;
@@ -54,7 +61,7 @@ export function useUpdateEmailStatusMutation() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationKey: ['settings', 'emails', 'update-status'],
+    mutationKey: SETTINGS_MUTATION_KEYS.updateEmailStatus,
     mutationFn: async ({ emailId, status }: { emailId: string; status: boolean }) => updateEmailStatus(emailId, status),
 
     onMutate: async ({ emailId, status }) => {
@@ -77,8 +84,8 @@ export function useUpdateEmailStatusMutation() {
   });
 }
 
-/** Utils */
+/** ─── Mutation State ────────────────────────────────── */
 
 export function useIsMutatingSettings() {
-  return useIsMutating({ mutationKey: ['settings', 'main'] });
+  return useIsMutating({ mutationKey: SETTINGS_MUTATION_KEYS.save });
 }

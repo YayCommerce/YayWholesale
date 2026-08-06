@@ -5,11 +5,19 @@ import { ROLES_QUERIES } from '@/lib/queries/roles.queries';
 import { SETTINGS_QUERIES } from '@/lib/queries/settings.queries';
 import { SetupWizardForm } from '@/lib/schema/wizard.schema';
 
+/** ─── Mutation Keys ─────────────────────────────────── */
+
+const WIZARD_MUTATION_KEYS = {
+  saveSetup: ['setup-wizard'] as const,
+};
+
+/** ─── Mutation Hooks ────────────────────────────────── */
+
 export function useSaveSetupWizardMutation() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationKey: ['setup-wizard'],
+    mutationKey: WIZARD_MUTATION_KEYS.saveSetup,
     mutationFn: async (setupWizardForm: SetupWizardForm) => saveSetup(setupWizardForm),
     onSuccess: (res) => {
       window.yayWholesaleB2BAdmin.settings = res.settings;
@@ -20,6 +28,8 @@ export function useSaveSetupWizardMutation() {
   });
 }
 
+/** ─── Mutation State ────────────────────────────────── */
+
 export function useIsMutatingSetup() {
-  return useIsMutating({ mutationKey: ['setup-wizard'] });
+  return useIsMutating({ mutationKey: WIZARD_MUTATION_KEYS.saveSetup });
 }
