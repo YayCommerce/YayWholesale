@@ -14,7 +14,7 @@ import {
 import { RoleFormValues } from '@/lib/schema/roles.schema';
 import { SETTINGS_QUERIES, useSettingsQuery } from './settings.queries';
 
-/** Options */
+/** ─── Query Options ─────────────────────────────────── */
 
 export const ROLES_QUERIES = {
   all: queryOptions({
@@ -24,7 +24,7 @@ export const ROLES_QUERIES = {
       window.yayWholesaleB2BAdmin.roles = roles;
       return roles;
     },
-    initialData: window.yayWholesaleB2BAdmin.roles,
+    initialData: () => window.yayWholesaleB2BAdmin.roles,
     staleTime: Infinity,
   }),
   userCountByRole: queryOptions({
@@ -34,7 +34,22 @@ export const ROLES_QUERIES = {
   }),
 };
 
-/** Queries */
+/** ─── Mutation Keys ─────────────────────────────────── */
+
+const ROLES_MUTATION_KEYS = {
+  add: ['roles', 'add'] as const,
+  update: (slug: string) => ['roles', slug, 'update'] as const,
+  updateStatus: (slug: string) => ['roles', slug, 'update-status'] as const,
+  delete: (slug: string) => ['roles', slug, 'delete'] as const,
+  bulkDelete: ['roles', 'bulk', 'delete'] as const,
+  bulkUpdateStatus: ['roles', 'bulk', 'update-status'] as const,
+  // prefix keys for useIsMutating
+  allRoles: ['roles'] as const,
+  role: (slug: string) => ['roles', slug] as const,
+  allBulk: ['roles', 'bulk'] as const,
+};
+
+/** ─── Query Hooks ───────────────────────────────────── */
 
 export function useAllRolesQuery() {
   return useQuery(ROLES_QUERIES.all);
@@ -65,12 +80,12 @@ export function useUserCountByRoleQuery(roleSlug: string) {
   });
 }
 
-/** Mutations */
+/** ─── Mutation Hooks ────────────────────────────────── */
 
 export function useAddRoleMutation() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationKey: ['roles', 'add'],
+    mutationKey: ROLES_MUTATION_KEYS.add,
     mutationFn: addRole,
     onSuccess: (res) => {
       queryClient.setQueryData(ROLES_QUERIES.all.queryKey, res.roles);
@@ -84,7 +99,7 @@ export function useAddRoleMutation() {
 export function useUpdateRoleMutation(roleSlug: string) {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationKey: ['roles', roleSlug, 'update'],
+    mutationKey: ROLES_MUTATION_KEYS.update(roleSlug),
     mutationFn: (data: RoleFormValues) => updateRole(roleSlug, data),
     onSuccess: (res) => {
       queryClient.setQueryData(ROLES_QUERIES.all.queryKey, res.roles);
@@ -98,7 +113,7 @@ export function useUpdateRoleMutation(roleSlug: string) {
 export function useUpdateRoleStatusMutation(roleSlug: string) {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationKey: ['roles', roleSlug, 'update-status'],
+    mutationKey: ROLES_MUTATION_KEYS.updateStatus(roleSlug),
     mutationFn: (status: boolean) => updateRoleStatus(roleSlug, status),
 
     onMutate: (status) => {
@@ -130,7 +145,7 @@ export function useUpdateRoleStatusMutation(roleSlug: string) {
 export function useDeleteRoleMutation(roleSlug: string) {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationKey: ['roles', roleSlug, 'delete'],
+    mutationKey: ROLES_MUTATION_KEYS.delete(roleSlug),
     mutationFn: () => deleteRole(roleSlug),
     onSuccess: (res) => {
       queryClient.setQueryData(ROLES_QUERIES.all.queryKey, res.roles);
@@ -144,7 +159,7 @@ export function useDeleteRoleMutation(roleSlug: string) {
 export function useBulkDeleteRolesMutation() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationKey: ['roles', 'bulk', 'delete'],
+    mutationKey: ROLES_MUTATION_KEYS.bulkDelete,
     mutationFn: bulkDeleteRoles,
     onSuccess: (res) => {
       queryClient.setQueryData(ROLES_QUERIES.all.queryKey, res.roles);
@@ -158,7 +173,7 @@ export function useBulkDeleteRolesMutation() {
 export function useBulkUpdateRoleStatusMutation() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationKey: ['roles', 'bulk', 'update-status'],
+    mutationKey: ROLES_MUTATION_KEYS.bulkUpdateStatus,
     mutationFn: ({ roleSlugs, status }: { roleSlugs: string[]; status: boolean }) =>
       bulkUpdateRoleStatus(roleSlugs, status),
     onSuccess: (res) => queryClient.setQueryData(ROLES_QUERIES.all.queryKey, res),
@@ -166,19 +181,21 @@ export function useBulkUpdateRoleStatusMutation() {
   });
 }
 
-/** Mutate Status */
+/** ─── Mutation State ────────────────────────────────── */
 
 export function useIsMutatingRoles() {
-  return useIsMutating({ mutationKey: ['roles'] });
+  return useIsMutating({ mutationKey: ROLES_MUTATION_KEYS.allRoles });
 }
 
 export function useIsMutatingRole(roleSlug: string) {
-  return useIsMutating({ mutationKey: ['role', roleSlug] });
+  return useIsMutating({ mutationKey: ROLES_MUTATION_KEYS.role(roleSlug) });
 }
 
 export function useIsMutatingRolesBulk() {
-  return useIsMutating({ mutationKey: ['role', 'bulk'] });
+  return useIsMutating({ mutationKey: ROLES_MUTATION_KEYS.allBulk });
 }
+
+/** ─── Derived Hooks ─────────────────────────────────── */
 
 export function useDefaultRole() {
   const { data: activeRoles } = useActiveRolesQuery();
