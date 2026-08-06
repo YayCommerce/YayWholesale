@@ -27,7 +27,7 @@ export const SETTINGS_QUERIES = {
 /** ─── Mutation Keys ─────────────────────────────────── */
 
 const SETTINGS_MUTATION_KEYS = {
-  save:              ['settings', 'main']                    as const,
+  save: ['settings', 'main'] as const,
   updateEmailStatus: ['settings', 'emails', 'update-status'] as const,
 };
 

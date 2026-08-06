@@ -27,10 +27,10 @@ export const WHOLESALERS_QUERIES = {
 /** ─── Mutation Keys ─────────────────────────────────── */
 
 const WHOLESALERS_MUTATION_KEYS = {
-  updateRole:     (id: number) => ['wholesalers', id, 'update-role'] as const,
-  bulkUpdateRole: ['wholesalers', 'bulk-update-roles']               as const,
+  updateRole: (id: number) => ['wholesalers', id, 'update-role'] as const,
+  bulkUpdateRole: ['wholesalers', 'bulk-update-roles'] as const,
   // prefix keys for useIsMutating
-  allWholesalers: ['wholesalers']                                    as const,
+  allWholesalers: ['wholesalers'] as const,
 };
 
 /** ─── Query Hooks ───────────────────────────────────── */

@@ -48,16 +48,16 @@ const REQUESTS_QUERIES = {
 /** ─── Mutation Keys ─────────────────────────────────── */
 
 const REQUESTS_MUTATION_KEYS = {
-  approve:     (id: number) => ['requests', id, 'approve'] as const,
-  reject:      (id: number) => ['requests', id, 'reject']  as const,
-  delete:      (id: number) => ['requests', id, 'delete']  as const,
-  bulkApprove: ['requests', 'bulk', 'approve']             as const,
-  bulkReject:  ['requests', 'bulk', 'reject']              as const,
-  bulkDelete:  ['requests', 'bulk', 'delete']              as const,
+  approve: (id: number) => ['requests', id, 'approve'] as const,
+  reject: (id: number) => ['requests', id, 'reject'] as const,
+  delete: (id: number) => ['requests', id, 'delete'] as const,
+  bulkApprove: ['requests', 'bulk', 'approve'] as const,
+  bulkReject: ['requests', 'bulk', 'reject'] as const,
+  bulkDelete: ['requests', 'bulk', 'delete'] as const,
   // prefix keys for useIsMutating
-  allRequests: ['requests']                                as const,
-  request:     (id: number) => ['requests', id]            as const,
-  allBulk:     ['requests', 'bulk']                        as const,
+  allRequests: ['requests'] as const,
+  request: (id: number) => ['requests', id] as const,
+  allBulk: ['requests', 'bulk'] as const,
 };
 
 /** ─── Query Hooks ───────────────────────────────────── */
