@@ -111,6 +111,9 @@ class ProductPricingHelper {
      */
     public static function save_product_based_discount_setting( int $product_id, $data ) {
         update_post_meta( $product_id, self::PRODUCT_BASED_DISCOUNT_KEY, $data );
+
+        // Flush Cache
+        self::flush_cache_csv();
     }
 
     /**
@@ -233,6 +236,7 @@ class ProductPricingHelper {
 
     public static function build_csv() {
         $rows = [ self::get_csv_header() ];
+        $rows = array_merge( $rows, self::get_csv_products_pricing() );
 
         $filename    = 'assets/pro/csv/ywhs_product_price_list.csv';
         $cached_dir  = YAYWHOLESALEB2B_PLUGIN_DIR . 'assets/pro/csv';
@@ -261,7 +265,8 @@ class ProductPricingHelper {
 
     protected static function get_csv_header() {
         $headers = [
-            __( 'Product / Variation ID & SKU', 'yay-wholesale-b2b' ),
+            __( 'Product / Variation ID', 'yay-wholesale-b2b' ),
+            __( 'Product / Variation Name & SKU', 'yay-wholesale-b2b' ),
             __( 'Regular Price', 'yay-wholesale-b2b' ),
             __( 'Sale Price', 'yay-wholesale-b2b' ),
         ];
@@ -278,5 +283,102 @@ class ProductPricingHelper {
         }
 
         return $headers;
+    }
+
+    protected static function get_csv_products_pricing() {
+        $products = wc_get_products(
+            [
+                'limit'                  => -1,
+                'status'                 => 'publish',
+                'type'                   => array_merge( self::get_allowed_product_types_for_display_setting(), [ 'variable' ] ),
+                'update_post_meta_cache' => true,
+            ]
+        );
+
+        $rows  = [];
+        $queue = $products;
+
+        while ( ! empty( $queue ) ) {
+            $product = array_shift( $queue );
+            if ( $product->is_type( 'variable' ) ) {
+
+                $queue = array_merge(
+                    $queue,
+                    array_map( 'wc_get_product', $product->get_children() )
+                    // wc_get_products(
+                    // [
+                    // 'include'                => $product->get_children(),
+                    // 'type'                   => 'product_variation',
+                    // 'limit'                  => -1,
+                    // 'update_post_meta_cache' => true,
+                    // ]
+                    // )
+                );
+                continue;
+            }//end if
+            $row = [
+                $product->get_id(),
+                $product->get_name() . ' (SKU: ' . $product->get_sku() . ' )',
+                $product->get_regular_price(),
+                $product->get_sale_price() ?? '',
+            ];
+
+            $pricing                = self::get_product_based_discount_setting( $product->get_id() );
+            $roles                  = RolesHelper::get_wholesale_roles();
+            $discount_rule          = $pricing['discount_rule'];
+            $discount_type          = $pricing['discount_type'];
+            $wholesalers_fixed_rate = $pricing['discount_by_role']['wholesaler'];
+            $wholesalers_tier       = $pricing['discount_tiered']['wholesaler'];
+
+            // Handle by role
+            foreach ( $roles as $role ) {
+                $slug = $role['slug'];
+                if ( array_key_exists( $slug, $wholesalers_fixed_rate ) ) {
+                    $type  = $wholesalers_fixed_rate[ $slug ]['type'];
+                    $fixed = $wholesalers_fixed_rate[ $slug ]['fixed'];
+                    $rate  = $wholesalers_fixed_rate[ $slug ]['rate'];
+                } else {
+                    $type  = 'fixed';
+                    $fixed = '';
+                    $rate  = '';
+                }
+
+                if ( $discount_rule === 'default' ) {
+                    $type = 'default';
+                } elseif ( $discount_type === 'tiered' ) {
+                    $type = 'tiered';
+                }
+
+                if ( array_key_exists( $slug, $wholesalers_tier ) ) {
+                    $tier_str  = '0:' . $wholesalers_tier[ $slug ]['base_tier']['price'] . ';';
+                    $tier_str .= implode( ';', array_map( fn( $tier ) => $tier['from'] . ':' . $tier['price'], $wholesalers_tier[ $slug ]['tier_list'] ) );
+                } else {
+                    $tier_str = '';
+                }
+
+                $row = array_merge(
+                    $row,
+                    [
+                        $type,
+                        $fixed,
+                        $rate,
+                        $tier_str,
+                    ]
+                );
+            }//end foreach
+
+            $rows[] = $row;
+        }//end while
+
+        return $rows;
+    }
+
+    public static function flush_cache_csv() {
+        $filename = get_transient( self::PRODUCT_BASED_CSV_CACHED );
+
+        if ( $filename ) {
+            delete_transient( self::PRODUCT_BASED_CSV_CACHED );
+            wp_delete_file( YAYWHOLESALEB2B_PLUGIN_DIR . $filename );
+        }
     }
 }

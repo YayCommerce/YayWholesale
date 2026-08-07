@@ -12,9 +12,9 @@ use YayWholesaleB2B\Pro\Helpers\PricingHelpers\ProductPricingHelper;
 defined( 'ABSPATH' ) || exit;
 
 /**
- * Handles Wholesale Tools API endpoints.
+ * Handles Wholesale Pricing API endpoints.
  */
-class ToolsRestController extends BaseRestController {
+class PricingRestController extends BaseRestController {
     use SingletonTrait;
 
     protected function __construct() {
@@ -52,20 +52,7 @@ class ToolsRestController extends BaseRestController {
             $filename = $cached_csv;
         }
 
-        // $response = new WP_REST_Response();
-
-        // $response->header( 'Content-Type', 'text/csv; charset=utf-8' );
-        // $response->header( 'Content-Disposition', 'attachment; filename="' . $filename . '"' );
-        // $response->header( 'Pragma', 'no-cache' );
-        // $response->header( 'Expires', '0' );
-        // $response->header( 'Content-Length', strlen( $content ) );
-
-        // echo esc_html( $content );
-
-        // // Add UTF-8 BOM
-        // $response->set_data( chr( 0xEF ) . chr( 0xBB ) . chr( 0xBF ) . $content );
-
-        return [ 'file' => YAYWHOLESALEB2B_PLUGIN_URL . $filename . '?q=' . gmdate( 'Ymd' ) ];
+        return [ 'file' => YAYWHOLESALEB2B_PLUGIN_URL . $filename . '?q=' . gmdate( 'YmdHis' ) ];
     }
 
     // public function import_product_pricing(WP_REST_Request $request) {

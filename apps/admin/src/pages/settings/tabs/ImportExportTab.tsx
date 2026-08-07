@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import { Download, File, Upload, X } from 'lucide-react';
+import { toast } from 'sonner';
 import { createInterpolateElement } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 import { downloadAsset } from '@/lib/helpers/assets.helper';
+import { getErrorMsg } from '@/lib/helpers/response.helper';
 import { usePricingExportMutation } from '@/lib/queries/settings.queries';
 import { isPro } from '@/lib/utils';
 import { AttachmentDropzone, AttachmentDropzoneError } from '@/components/ui/attachment';
@@ -34,8 +36,8 @@ export default function ImportExportTab() {
     try {
       const response = await exportPricing();
       downloadAsset(response.file, 'yaywholesaleb2b_products_price.csv');
-    } catch (e) {
-      console.log(e);
+    } catch (error) {
+      toast.error(await getErrorMsg(error));
     }
   };
   return (

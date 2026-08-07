@@ -1,7 +1,7 @@
 <?php
 namespace YayWholesaleB2B\Pro\Engine;
 
-use YayWholesaleB2B\Pro\Controllers\ToolsRestController;
+use YayWholesaleB2B\Pro\Controllers\PricingRestController;
 use YayWholesaleB2B\Utils\SingletonTrait;
 
 defined( 'ABSPATH' ) || exit;
@@ -9,7 +9,7 @@ defined( 'ABSPATH' ) || exit;
 /**
  * Class RestAPI
  *
- * Handles Yay Wholesale REST API endpoints.
+ * Handles Yay Wholesale Pro REST API endpoints.
  */
 class RestAPI {
     use SingletonTrait;
@@ -19,6 +19,6 @@ class RestAPI {
     }
 
     public function wholesale_endpoints() {
-        ToolsRestController::get_instance();
+        PricingRestController::get_instance();
     }
 }
