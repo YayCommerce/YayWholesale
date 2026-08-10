@@ -1,13 +1,18 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Download, File, Upload, X } from 'lucide-react';
+import { progress } from 'motion/react';
 import { toast } from 'sonner';
 import { createInterpolateElement } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 import { downloadAsset } from '@/lib/helpers/assets.helper';
 import { getErrorMsg } from '@/lib/helpers/response.helper';
-import { usePricingExportMutation } from '@/lib/queries/settings.queries';
-import { isPro } from '@/lib/utils';
+import {
+  useIsMutatingPricing,
+  usePricingExportMutation,
+  usePricingImportMutation,
+} from '@/lib/queries/settings.queries';
+import { cn, isPro } from '@/lib/utils';
 import { AttachmentDropzone, AttachmentDropzoneError } from '@/components/ui/attachment';
 import { Button, LoadingButton } from '@/components/ui/button';
 import { UpgradeToProBadge } from '@/components/ui/custom/upgrate-to-pro';
@@ -16,8 +21,13 @@ import { WholeSaleToolTip } from '@/components/ui/custom/WholeSaleToolTip';
 export default function ImportExportTab() {
   const [file, setFile] = useState<File | null>(null);
   const [uploadError, setError] = useState('');
+  const [showProgress, setShowProgress] = useState(false);
+  const [importProgress, setProgress] = useState(0);
+  const [importLogs, setLogs] = useState<string[]>([]);
 
   const { mutateAsync: exportPricing, isPending: isExportPending } = usePricingExportMutation();
+  const { mutateAsync: importPricing, isPending: isImportPending } = usePricingImportMutation();
+  const isMutatingPricing = useIsMutatingPricing();
 
   const onUploadError = (err: AttachmentDropzoneError | null) => {
     switch (err) {
@@ -33,13 +43,46 @@ export default function ImportExportTab() {
   };
 
   const exportPricingCSV = async () => {
+    if (isMutatingPricing) return;
     try {
       const response = await exportPricing();
-      downloadAsset(response.file, 'yaywholesaleb2b_products_price.csv');
+      if (response.file) {
+        downloadAsset(response.file, 'yaywholesaleb2b_products_price.csv');
+      }
     } catch (error) {
       toast.error(await getErrorMsg(error));
     }
   };
+
+  const importPricingCSV = async () => {
+    if (isMutatingPricing) return;
+    if (!file) return;
+
+    setProgress(0);
+    setShowProgress(true);
+    setLogs([]);
+    const formData = new FormData();
+    setTimeout(() => setProgress(50), 500);
+    setTimeout(() => setProgress(75), 1000);
+    formData.append('file', file);
+
+    try {
+      const response = await importPricing(formData);
+      setLogs(response.logs);
+      toast.success(__('Imported completed', 'yay-wholesale-b2b'));
+    } catch (error) {
+      toast.error(await getErrorMsg(error));
+    } finally {
+      setProgress(100);
+    }
+  };
+
+  useEffect(() => {
+    setProgress(0);
+    setShowProgress(false);
+    setLogs([]);
+  }, [file]);
+
   return (
     <div className="flex flex-col gap-4">
       {/* Export */}
@@ -81,13 +124,13 @@ export default function ImportExportTab() {
               trigger={
                 <Button
                   variant="ghost"
-                  className="absolute top-2.5 right-2.5 z-999 rounded-full bg-white"
+                  className="absolute top-3 right-3 z-1 size-6 rounded-full bg-white"
                   onClick={() => setFile(null)}
                 >
                   <X className="size-3.5" />
                 </Button>
               }
-              content={__('Delete file', 'yay-wholesale-b2b')}
+              content={__('Remove file', 'yay-wholesale-b2b')}
             />
           )}
           <AttachmentDropzone
@@ -112,7 +155,7 @@ export default function ImportExportTab() {
             ) : (
               <div className="relative w-full">
                 <div className="-z-1 flex flex-col items-center justify-center gap-2">
-                  <div className="bg-muted-foreground-400 rounded-[50%] p-3 text-white">
+                  <div className="bg-muted-foreground-400 rounded-full p-3 text-white">
                     <File className="min-size-6 size-6" />
                   </div>
                   <div className="flex flex-col items-center justify-center gap-1">
@@ -125,11 +168,39 @@ export default function ImportExportTab() {
           </AttachmentDropzone>
           {uploadError && <span className="text-destructive px-2">{uploadError}</span>}
         </div>
+        {showProgress && (
+          <div className="border-border flex w-full flex-col gap-2 rounded-md border p-3">
+            <h2>{isImportPending ? __('Importing...', 'yay-wholesale-b2b') : __('Imported', 'yay-wholesale-b2b')}</h2>
+            <div className="bg-muted relative h-3.25 w-full rounded-full">
+              <div
+                className={cn(
+                  'absolute top-0 left-0 size-full rounded-full transition-all duration-500',
+                  importProgress === 100 ? 'bg-success' : 'bg-primary',
+                )}
+                style={{ width: `${importProgress}%` }}
+              ></div>
+            </div>
+          </div>
+        )}
         <div className="flex justify-end">
-          <Button variant="outline" className="flex items-center gap-2" disabled={!file}>
+          <LoadingButton
+            loading={isImportPending}
+            variant="outline"
+            className="flex items-center gap-2"
+            disabled={!file}
+            onClick={importPricingCSV}
+          >
             <span className="text-[13px]">{__('Import', 'yay-wholesale-b2b')}</span>
-          </Button>
+          </LoadingButton>
         </div>
+        {importLogs.length > 0 && (
+          <div className="bg-muted text-muted-foreground flex flex-col gap-1 rounded-md p-3 font-mono text-sm">
+            <h2 className="text-foreground mb-2 text-[16px] font-medium">{__('Import Logs', 'yay-wholesale-b2b')}</h2>
+            {importLogs.map((log, index) => (
+              <span key={index}>{log}</span>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

@@ -3,6 +3,7 @@ namespace YayWholesaleB2B\Pro\Engine\Admin;
 
 use YayWholesaleB2B\Helpers\RolesHelper;
 use YayWholesaleB2B\Pro\Helpers\AccessHelpers\ProductAccessHelper;
+use YayWholesaleB2B\Pro\Helpers\PricingHelpers\CsvPricingHelper;
 use YayWholesaleB2B\Pro\Helpers\PricingHelpers\ProductPricingHelper;
 use YayWholesaleB2B\Utils\SingletonTrait;
 
@@ -221,6 +222,6 @@ class ProductBasedRule {
      * Flush cache of Csv export
      */
     public function remove_cache_csv() {
-        ProductPricingHelper::flush_cache_csv();
+        CsvPricingHelper::flush_cache_csv();
     }
 }

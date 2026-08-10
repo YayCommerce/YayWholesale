@@ -52,7 +52,7 @@ export default function SettingsPage() {
   } = form;
 
   async function onSubmit(data: Settings) {
-    if (isMutating > 0) return;
+    if (isMutating) return;
 
     try {
       await saveMutation.mutateAsync(data);

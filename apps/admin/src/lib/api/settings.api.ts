@@ -20,3 +20,11 @@ export function markReviewed() {
 export function exportPricingCsv() {
   return api.post('pricing/export').json<{ file: string }>();
 }
+
+export function importPricingCsv(formData: FormData) {
+  return api
+    .post('pricing/import', {
+      body: formData,
+    })
+    .json<{ logs: string[] }>();
+}
