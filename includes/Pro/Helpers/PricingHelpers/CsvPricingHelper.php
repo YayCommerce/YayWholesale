@@ -76,13 +76,8 @@ class CsvPricingHelper {
 
         $roles = RolesHelper::get_wholesale_roles();
         foreach ( $roles as $role ) {
-            $role_headers = [
-                $role['slug'] . ': ' . $role['name'] . __( ' fixed or percentage type', 'yay-wholesale-b2b' ),
-                $role['slug'] . ': ' . $role['name'] . __( ' fixed price', 'yay-wholesale-b2b' ),
-                $role['slug'] . ': ' . $role['name'] . __( ' percentage', 'yay-wholesale-b2b' ),
-                $role['slug'] . ': ' . $role['name'] . __( ' tier', 'yay-wholesale-b2b' ),
-            ];
-            $headers      = array_merge( $headers, $role_headers );
+            // translators: %s : Role name
+            $headers[] = $role['slug'] . ': ' . sprintf( __( '%s price', 'yay-wholesale-b2b' ), $role['name'] );
         }
 
         return $headers;
@@ -120,7 +115,7 @@ class CsvPricingHelper {
             $pricing                = ProductPricingHelper::get_product_based_discount_setting( $product->get_id() );
             $roles                  = RolesHelper::get_wholesale_roles();
             $discount_rule          = $pricing['discount_rule'] ?? 'default';
-            $discount_type          = ! isset( $pricing['discount_type'] ) || $pricing['discount_type'] === 'by_role' ? 'fixed_percentage' : 'tier';
+            $discount_type          = $pricing['discount_type'] ?? 'by_role';
             $wholesalers_fixed_rate = $pricing['discount_by_role']['wholesaler'];
             $wholesalers_tier       = $pricing['discount_tiered']['wholesaler'];
 
@@ -129,38 +124,31 @@ class CsvPricingHelper {
                 $product->get_name() . ' (SKU: ' . $product->get_sku() . ' )',
                 $product->get_regular_price(),
                 $product->get_sale_price() ?? '',
-                $discount_rule === 'custom' ? $discount_type : $discount_rule,
+                $discount_rule,
             ];
 
             // Handle by role
             foreach ( $roles as $role ) {
                 $slug = $role['slug'];
-                if ( array_key_exists( $slug, $wholesalers_fixed_rate ) ) {
-                    $type  = $wholesalers_fixed_rate[ $slug ]['type'] === 'rate' ? 'percentage' : 'fixed';
-                    $fixed = $wholesalers_fixed_rate[ $slug ]['fixed'];
-                    $rate  = $wholesalers_fixed_rate[ $slug ]['rate'];
+                if ( $discount_type === 'by_role' ) {
+                    if ( array_key_exists( $slug, $wholesalers_fixed_rate ) ) {
+                        $type = $wholesalers_fixed_rate[ $slug ]['type'];
+                        if ( $type === 'fixed' ) {
+                            $value = $wholesalers_fixed_rate[ $slug ]['fixed'];
+                        } else {
+                            $value = ! empty( $wholesalers_fixed_rate[ $slug ]['rate'] ) ? $wholesalers_fixed_rate[ $slug ]['rate'] . '%' : '';
+                        }
+                    } else {
+                        $value = '';
+                    }
+                } elseif ( array_key_exists( $slug, $wholesalers_tier ) ) {
+                        $value  = '0:' . $wholesalers_tier[ $slug ]['base_tier']['price'] . ';';
+                        $value .= implode( ';', array_map( fn( $tier ) => $tier['from'] . ':' . $tier['price'], $wholesalers_tier[ $slug ]['tier_list'] ) );
                 } else {
-                    $type  = 'fixed';
-                    $fixed = '';
-                    $rate  = '';
+                    $value = '';
                 }
 
-                if ( array_key_exists( $slug, $wholesalers_tier ) ) {
-                    $tier_str  = '0:' . $wholesalers_tier[ $slug ]['base_tier']['price'] . ';';
-                    $tier_str .= implode( ';', array_map( fn( $tier ) => $tier['from'] . ':' . $tier['price'], $wholesalers_tier[ $slug ]['tier_list'] ) );
-                } else {
-                    $tier_str = '';
-                }
-
-                $row = array_merge(
-                    $row,
-                    [
-                        $type,
-                        $fixed,
-                        $rate,
-                        $tier_str,
-                    ]
-                );
+                $row[] = $value;
             }//end foreach
 
             $rows[] = $row;
@@ -192,7 +180,7 @@ class CsvPricingHelper {
         $logs = [];
 
         if ( ! file_exists( $filepath ) ) {
-            $logs[] = __( 'The csv file is not found.', 'yay-wholesale-b2b' );
+            $logs[] = __( 'The CSV file could not be found.', 'yay-wholesale-b2b' );
             return $logs;
         }
 
@@ -206,7 +194,7 @@ class CsvPricingHelper {
         $csv_content = $wp_filesystem->get_contents( $filepath );
 
         if ( false === $csv_content ) {
-            $logs[] = __( 'Unable to read the csv file.', 'yay-wholesale-b2b' );
+            $logs[] = __( 'The CSV file could not be read.', 'yay-wholesale-b2b' );
             return $logs;
         }
 
@@ -214,67 +202,95 @@ class CsvPricingHelper {
         $headers = array_shift( $rows );
         $mapping = self::operate_header( $headers );
 
-        $product_ids = array_filter(
-            array_map( 'absint', array_column( $rows, $mapping['id'] ) )
-        );
-
-        $products = [];
-
-        if ( ! empty( $product_ids ) ) {
-            $query = new \WP_Query(
-                [
-                    'post_type'              => [ 'product', 'product_variation' ],
-                    'post_status'            => 'any',
-                    'posts_per_page'         => -1,
-                    'post__in'               => $product_ids,
-                    'fields'                 => 'ids',
-                    'update_post_meta_cache' => true,
-                ]
+        foreach ( array_chunk( $rows, 100 ) as $batch ) {
+            $product_ids = array_filter(
+                array_map( 'absint', array_column( $batch, $mapping['id'] ) )
             );
 
-            $products = array_map( 'wc_get_product', $query->posts );
-        }
+            $products = [];
 
-        $import_data = [];
+            if ( ! empty( $product_ids ) ) {
+                $query = new \WP_Query(
+                    [
+                        'post_type'              => [ 'product', 'product_variation' ],
+                        'post_status'            => 'any',
+                        'posts_per_page'         => -1,
+                        'post__in'               => $product_ids,
+                        'fields'                 => 'ids',
+                        'update_post_meta_cache' => true,
+                    ]
+                );
 
-        foreach ( $rows as $index => $row ) {
-            if ( empty( $row ) ) {
-                // translators: %d: the error row number
-                $logs[] = sprintf( __( 'Line %d : Empty row detected.', 'yay-wholesale-b2b' ), $index + 2 );
-                continue;
+                $products = array_map( 'wc_get_product', $query->posts );
             }
 
-            if ( count( $row ) !== count( $mapping ) ) {
-                // translators: %d: the error row number
-                $logs[] = sprintf( __( 'Line %d : The data row does not match the expected mapping.', 'yay-wholesale-b2b' ), $index + 2 );
-                continue;
-            }
+            $import_list = [];
+            foreach ( $batch as $index => $row ) {
+                if ( empty( $row ) ) {
+                    // translators: %d: the row number
+                    $logs[] = sprintf( __( 'Row %d: This row is empty and was skipped.', 'yay-wholesale-b2b' ), $index + 2 );
+                    continue;
+                }
 
-            $product = array_filter( $products, fn( $p ) => $p->get_id() === intval( $row[ $mapping['id'] ] ) );
+                if ( count( $row ) !== count( $mapping ) ) {
+                    // translators: %d: the row number
+                    $logs[] = sprintf( __( 'Row %d: The number of columns does not match the CSV header and was skipped.', 'yay-wholesale-b2b' ), $index + 2 );
+                    continue;
+                }
 
-            if ( empty( $product ) ) {
-                // translators: %d: the error row number
-                $logs[] = sprintf( __( 'Line %d : This product is not found.', 'yay-wholesale-b2b' ), $index + 2 );
-                continue;
-            }
+                $product = array_filter( $products, fn( $p ) => $p->get_id() === intval( $row[ $mapping['id'] ] ) );
 
-            $import_data[] = self::operate_pricing( $row, $mapping );
+                if ( empty( $product ) ) {
+                    // translators: %d: the row number
+                    $logs[] = sprintf( __( 'Row %d: No matching product was found.', 'yay-wholesale-b2b' ), $index + 2 );
+                    continue;
+                }
+
+                $data = self::operate_pricing( $row, $mapping, $logs, $index + 2 );
+
+                if ( ! empty( $data ) ) {
+                    self::save_pricing_meta( $data, $index + 2, $logs );
+
+                    $import_list[] = $data;
+                    do_action( 'ywhs_after_imported_pricing_item', $data, $logs );
+                }
+            }//end foreach
         }//end foreach
 
-        if ( ! empty( $import_data ) ) {
-            $result = self::bulk_update_pricing( $import_data );
-            if ( $result ) {
-                $logs[] = __( 'Pricing imported successfully', 'yay-wholesale-b2b' );
-            } else {
-                $logs[] = __( 'Pricing imported failed', 'yay-wholesale-b2b' );
-            }
-        } else {
-            $logs[] = __( 'Invalid Import Data', 'yay-wholesale-b2b' );
-        }
-
-        do_action( 'ywhs_after_imported_pricing', $import_data, $logs );
+        do_action( 'ywhs_after_imported_pricing', $import_list, $logs );
 
         return $logs;
+    }
+
+    /**
+     * Save the pricing meta, logging any meta write that fails at the DB level
+     *
+     * @param array $data the row data from operate_pricing().
+     * @param int   $row_number the csv row number.
+     * @param array $logs the logging.
+     */
+    protected static function save_pricing_meta( array $data, int $row_number, array &$logs ) {
+        global $wpdb;
+
+        $meta_updates = [
+            '_regular_price' => $data['regular_price'],
+            '_sale_price'    => $data['sale_price'],
+            '_price'         => ! empty( $data['sale_price'] ) ? $data['sale_price'] : $data['regular_price'],
+            ProductPricingHelper::PRODUCT_BASED_DISCOUNT_KEY => $data['discount_setting'],
+        ];
+
+        foreach ( $meta_updates as $meta_key => $meta_value ) {
+            $result = update_post_meta( $data['id'], $meta_key, $meta_value );
+
+            if ( false === $result && ! empty( $wpdb->last_error ) ) {
+                // translators: %1$d: the row number, %2$s: the meta key, %3$d: the product id, %4$s: the database error message
+                $logs[] = sprintf( __( 'Row %1$d: Could not save %2$s for product #%3$d — %4$s', 'yay-wholesale-b2b' ), $row_number, $meta_key, $data['id'], $wpdb->last_error );
+                return;
+            }
+        }
+
+        // translators: %d: the row number
+        $logs[] = sprintf( __( 'Row %d: Pricing saved successfully.', 'yay-wholesale-b2b' ), $row_number );
     }
 
     /**
@@ -289,50 +305,28 @@ class CsvPricingHelper {
             'product_name'  => 1,
             'regular_price' => 2,
             'sale_price'    => 3,
-            'discount_type' => 4,
+            'discount_rule' => 4,
         ];
 
         if ( count( $row ) > 5 ) {
-            $current_role_slug = '';
             foreach ( $row as $index => $col ) {
                 if ( $index < 5 ) {
                     continue;
                 }
 
-                switch ( ( $index - 1 ) % 4 ) {
-                    case 0:
-                        $header_role_map   = explode( ':', $col );
-                        $current_role_slug = $header_role_map[ array_key_first( $header_role_map ) ] ?? '';
-                        if ( ! empty( $current_role_slug ) ) {
-                            $mapping[ "{$current_role_slug}_type" ] = $index;
-                        }
-                        break;
-                    case 1:
-                        if ( ! empty( $current_role_slug ) ) {
-                            $mapping[ "{$current_role_slug}_fixed" ] = $index;
-                        }
-                        break;
-                    case 2:
-                        if ( ! empty( $current_role_slug ) ) {
-                            $mapping[ "{$current_role_slug}_rate" ] = $index;
-                        }
-                        break;
-                    case 3:
-                        if ( ! empty( $current_role_slug ) ) {
-                            $mapping[ "{$current_role_slug}_tiered" ] = $index;
-                        }
-                        break;
-                }//end switch
+                $header_role_map = explode( ':', $col );
+                $role_slug       = $header_role_map[ array_key_first( $header_role_map ) ] ?? '';
+                if ( ! empty( $role_slug ) ) {
+                    $mapping[ $role_slug ] = $index;
+                }
             }//end foreach
-        } else {
+        }
+
+        if ( count( $mapping ) <= 5 ) {
             $roles = RolesHelper::get_wholesale_roles();
             $index = 5;
             foreach ( $roles as $role ) {
-                $slug                        = $role['slug'];
-                $mapping[ "{$slug}_type" ]   = $index++;
-                $mapping[ "{$slug}_fixed" ]  = $index++;
-                $mapping[ "{$slug}_rate" ]   = $index++;
-                $mapping[ "{$slug}_tiered" ] = $index++;
+                $mapping[ $role['slug'] ] = $index++;
             }
         }//end if
 
@@ -344,239 +338,244 @@ class CsvPricingHelper {
      *
      * @param array $row the data row.
      * @param array $mapping the mapping data from header.
+     * @param array $logs The logging.
+     * @param int   $row_number The current handling row number.
      * @return array
      */
-    protected static function operate_pricing( array $row, array $mapping ) {
+    protected static function operate_pricing( array $row, array $mapping, array &$logs, int $row_number ) {
         $data = [
-            $row[ $mapping['id'] ],
-            $row[ $mapping['regular_price'] ],
-            $row[ $mapping['sale_price'] ],
+            'id'               => $row[ $mapping['id'] ],
+            'regular_price'    => $row[ $mapping['regular_price'] ],
+            'sale_price'       => $row[ $mapping['sale_price'] ],
+            'discount_setting' => [],
         ];
 
         $pricing = ProductPricingHelper::get_product_based_discount_setting( $row[ $mapping['id'] ] );
         $roles   = RolesHelper::get_wholesale_roles();
 
-        $discount_type = $row[ $mapping['discount_type'] ];
+        $discount_rule            = $row[ $mapping['discount_rule'] ];
+        $pricing['discount_rule'] = $discount_rule !== 'custom' ? 'default' : 'custom';
 
-        if ( $discount_type !== 'default' ) {
-            $pricing['discount_rule'] = 'custom';
-            $pricing['discount_type'] = $discount_type === 'fixed_percentage' ? 'by_role' : 'tiered';
-        } else {
-            $pricing['discount_rule'] = 'default';
+        $discount_type_map = [
+            'tiered'  => 0,
+            'by_role' => 0,
+        ];
+        foreach ( $roles as $role ) {
+            $slug = $role['slug'];
+
+            if ( ! array_key_exists( $slug, $mapping ) ) {
+                continue;
+            }
+
+            $price = $row[ $mapping[ $slug ] ];
+            if ( ! empty( $price ) ) {
+                if ( self::is_tiered_price_format( $price ) ) {
+                    ++$discount_type_map['tiered'];
+                }
+
+                if ( self::is_fixed_price_format( $price ) || self::is_rate_discount_format( $price ) ) {
+                    ++$discount_type_map['by_role'];
+                }
+            }
         }
+
+        if ( $discount_type_map['tiered'] > 0 && $discount_type_map['by_role'] > 0 ) {
+            // translators: %1$d: the row number
+            $logs[] = sprintf( __( 'Row %1$d: The price settings mixes fixed/percentage pricing with tiered pricing.', 'yay-wholesale-b2b' ), $row_number );
+            return [];
+        }
+
+        $discount_type = array_search( max( $discount_type_map ), $discount_type_map, true );
 
         // Map each role to data map
         foreach ( $roles as $role ) {
             $slug = $role['slug'];
 
-            if ( ! array_key_exists( "{$slug}_type", $mapping ) ) {
+            if ( ! array_key_exists( $slug, $mapping ) ) {
                 continue;
             }
 
-            // Fixed N Rate data
-            $type  = $row[ $mapping[ "{$slug}_type" ] ];
-            $fixed = floatval( $row[ $mapping[ "{$slug}_fixed" ] ] );
-            $rate  = floatval( $row[ $mapping[ "{$slug}_rate" ] ] );
+            $price = $row[ $mapping[ $slug ] ];
 
-            $pricing['discount_by_role']['wholesaler'][ $slug ] = [
-                'type'  => empty( $type ) || $type !== 'percentage' ? 'fixed' : 'rate',
-                'fixed' => $fixed > 0 ? $fixed : '',
-                'rate'  => $rate > 0 ? $rate : '',
-            ];
-
-            // Tier data
-            $tier_str = $row[ $mapping[ "{$slug}_tiered" ] ];
-
-            if ( ! empty( $tier_str ) ) {
-                $tiers = explode( ';', $tier_str );
-                if ( empty( $tiers ) ) {
-                    continue;
+            if ( 'tiered' === $discount_type ) {
+                if ( ! self::is_tiered_price_format( $price ) ) {
+                    // translators: %1$d: the row number, %2$s: the role name
+                    $logs[] = sprintf( __( 'Row %1$d: The price for %2$s is in an invalid format.', 'yay-wholesale-b2b' ), $row_number, $role['name'] );
+                    return [];
                 }
+            }
 
-                $pricing['discount_tiered']['wholesaler'][ $slug ]['tier_list'] = [];
-                foreach ( $tiers as $tier ) {
-                    $tier_data = explode( ':', $tier );
-                    if ( count( $tier_data ) !== 2 ) {
-                        continue;
-                    }
-
-                    $from  = intval( $tier_data[0] );
-                    $price = floatval( $tier_data[1] );
-
-                    if ( $from === 0 ) {
-                        $pricing['discount_tiered']['wholesaler'][ $slug ]['base_tier']['price'] = $price;
-                    } else {
-                        $pricing['discount_tiered']['wholesaler'][ $slug ]['tier_list'][] = [
-                            'from'  => $from,
-                            'price' => $price,
-                        ];
-                    }
+            if ( 'by_role' === $discount_type ) {
+                if ( ! self::is_fixed_price_format( $price ) && ! self::is_rate_discount_format( $price ) ) {
+                    // translators: %1$d: the row number, %2$s: the role name
+                    $logs[] = sprintf( __( 'Row %1$d: The price for %2$s is in an invalid format.', 'yay-wholesale-b2b' ), $row_number, $role['name'] );
+                    return [];
                 }
             }//end if
+
+            $pricing['discount_type'] = $discount_type;
+
+            if ( 'by_role' === $discount_type && ! self::apply_by_role_pricing( $pricing, $slug, $price, $role, $row_number, $logs ) ) {
+                return [];
+            }
+
+            if ( 'tiered' === $discount_type && ! self::apply_tiered_pricing( $pricing, $slug, $price, $role, $row_number, $logs ) ) {
+                return [];
+            }
         }//end foreach
 
-        $data[] = $pricing;
+        $data['discount_setting'] = $pricing;
 
         return $data;
     }
 
     /**
-     * Bulk save pricing from data array
+     * Apply fixed / rate pricing for a role onto the pricing data.
      *
-     * @param array $data The data array.
-     * @return bool
+     * @param array  $pricing pricing data, passed by reference.
+     * @param string $slug the role slug.
+     * @param string $price the role's raw price value.
+     * @param array  $role the wholesale role.
+     * @param int    $row_number the csv row number (for logging).
+     * @param array  $logs logs passed by reference.
+     * @return bool true on success, false when the row is invalid.
      */
-    protected static function bulk_update_pricing( array $data ) {
-        if ( empty( $data ) ) {
-            return;
-        }
+    protected static function apply_by_role_pricing( array &$pricing, string $slug, string $price, array $role, int $row_number, array &$logs ) {
+        $is_rate = self::is_rate_discount_format( $price );
+        $value   = floatval( $price );
 
-        global $wpdb;
+        $pricing['discount_by_role']['wholesaler'][ $slug ]['type'] = $is_rate ? 'rate' : 'fixed';
 
-        $meta_values = [
-            '_regular_price' => [],
-            '_sale_price'    => [],
-            '_price'         => [],
-            ProductPricingHelper::PRODUCT_BASED_DISCOUNT_KEY => [],
-        ];
-
-        $ids = [];
-
-        foreach ( $data as $row ) {
-            [ $id, $regular_price, $sale_price, $pricing ] = $row;
-
-            $regular_price = wc_format_decimal( $regular_price );
-            $sale_price    = ! empty( $sale_price ) ? wc_format_decimal( $sale_price ) : '';
-            $active_price  = ( '' !== $sale_price && (float) $sale_price < (float) $regular_price ) ? $sale_price : $regular_price;
-
-            $ids[] = $id;
-
-            $meta_values['_regular_price'][ $id ] = $regular_price;
-            $meta_values['_sale_price'][ $id ]    = $sale_price;
-            $meta_values['_price'][ $id ]         = $active_price;
-            $meta_values[ ProductPricingHelper::PRODUCT_BASED_DISCOUNT_KEY ][ $id ] = maybe_serialize( $pricing );
-        }//end foreach
-
-        if ( empty( $ids ) ) {
-            return;
-        }
-
-        $ids_placeholder = implode( ',', array_fill( 0, count( $ids ), '%d' ) );
-
-        foreach ( $meta_values as $meta_key => $values ) {
-            if ( $meta_key === ProductPricingHelper::PRODUCT_BASED_DISCOUNT_KEY || '_sale_price' === $meta_key ) {
-                // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
-                $existing_ids = $wpdb->get_col(
-                    $wpdb->prepare(
-                        "SELECT post_id FROM {$wpdb->postmeta} WHERE meta_key = %s AND post_id IN ({$ids_placeholder})",
-                        array_merge( [ $meta_key ], $ids )
-                    )
-                );
-                $existing_ids = array_flip( array_map( 'absint', $existing_ids ) );
-
-                $to_update = array_intersect_key( $values, $existing_ids );
-                $to_insert = array_diff_key( $values, $to_update );
-            } else {
-                $to_update = $values;
-                $to_insert = [];
+        if ( $is_rate ) {
+            if ( $value > 100 || $value < 0 ) {
+                // translators: %1$d: the row number, %2$s: the role name
+                $logs[] = sprintf( __( 'Row %1$d: The percentage for %2$s must be between 0 and 100.', 'yay-wholesale-b2b' ), $row_number, $role['name'] );
+                return false;
             }
-
-            // Update _regular_price, _price, existed _sale_price, existed yaywholesale price
-            if ( ! empty( $to_update ) ) {
-                $updated = self::bulk_update_meta( $meta_key, $to_update );
-                if ( false === $updated ) {
-                    return false;
-                }
-            }//end if
-
-            // Insert unexisted yaywholesale price, unexisted _sale_price
-            if ( ! empty( $to_insert ) ) {
-                $inserted = self::bulk_insert_meta( $meta_key, $to_insert );
-                if ( false === $inserted ) {
-                    return false;
-                }
-            }//end if
-        }//end foreach
-
-        foreach ( $ids as $id ) {
-            clean_post_cache( $id );
-            wc_delete_product_transients( $id );
+            $pricing['discount_by_role']['wholesaler'][ $slug ]['rate'] = $value > 0 ? $value : '';
+            return true;
         }
 
-        self::flush_cache_csv();
+        if ( $value < 0 ) {
+            // translators: %1$d: the row number, %2$s: the role name
+            $logs[] = sprintf( __( 'Row %1$d: The price for %2$s cannot be negative.', 'yay-wholesale-b2b' ), $row_number, $role['name'] );
+            return false;
+        }
+        $pricing['discount_by_role']['wholesaler'][ $slug ]['fixed'] = $value > 0 ? $value : '';
 
         return true;
     }
 
     /**
-     * Bulk update meta with SQL
+     * Apply tiered pricing for a role onto the pricing data.
      *
-     * @param string $meta_key The meta key.
-     * @param array  $values The meta values with product id.
-     * @return bool
+     * @param array  $pricing pricing data, passed by reference.
+     * @param string $slug the role slug.
+     * @param string $price the role's raw tiered price value, e.g. "0:12;1:2312;10:2345".
+     * @param array  $role the wholesale role.
+     * @param int    $row_number the csv row number (for logging).
+     * @param array  $logs logs passed by reference.
+     * @return bool true on success, false when the row is invalid.
      */
-    protected static function bulk_update_meta( string $meta_key, array $values ) {
-        global $wpdb;
-
-        $cases = '';
-        $args  = [];
-
-        foreach ( $values as $id => $value ) {
-            $cases .= 'WHEN %d THEN %s ';
-            $args[] = $id;
-            $args[] = $value;
+    protected static function apply_tiered_pricing( array &$pricing, string $slug, string $price, array $role, int $row_number, array &$logs ) {
+        if ( empty( $price ) ) {
+            return true;
         }
 
-        $args[] = $meta_key;
-        $args   = array_merge( $args, array_keys( $values ) );
+        $tiers            = explode( ';', $price );
+        $has_base_price   = false;
+        $base_price       = 0;
+        $tmp_tier_list    = [];
+        $existed_quantity = [];
 
-        $update_ids_placeholder = implode( ',', array_fill( 0, count( $values ), '%d' ) );
+        foreach ( $tiers as $tier ) {
+            $tier_data = explode( ':', $tier );
+            if ( count( $tier_data ) !== 2 ) {
+                continue;
+            }
 
-        // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
-        $result = $wpdb->query(
-            $wpdb->prepare(
-                "UPDATE {$wpdb->postmeta}
-                    SET meta_value = CASE post_id {$cases} END
-                WHERE
-                    meta_key = %s AND
-                    post_id IN ({$update_ids_placeholder})", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-                $args
-            )
-        );
+            $from  = intval( $tier_data[0] );
+            $price = $tier_data[1];
 
-        return $result;
+            if ( in_array( $from, $existed_quantity, true ) ) {
+                // translators: %1$d: the row number, %2$s: the role name
+                $logs[] = sprintf( __( 'Row %1$d: The tiered pricing for %2$s has a duplicate quantity threshold.', 'yay-wholesale-b2b' ), $row_number, $role['name'] );
+                return false;
+            }
+
+            if ( ! self::is_fixed_price_format( $price ) ) {
+                // translators: %1$d: the row number, %2$s: the role name
+                $logs[] = sprintf( __( 'Row %1$d: The tiered pricing for %2$s contains an invalid price value.', 'yay-wholesale-b2b' ), $row_number, $role['name'] );
+                return false;
+            }
+
+            $existed_quantity[] = $from;
+            $price              = floatval( $price );
+
+            if ( $from === 0 ) {
+                $has_base_price = true;
+                $base_price     = $price;
+            } else {
+                $tmp_tier_list[] = [
+                    'from'  => $from,
+                    'price' => $price,
+                ];
+            }
+        }//end foreach
+
+        if ( ! $has_base_price ) {
+            // translators: %1$d: the row number, %2$s: the role name
+            $logs[] = sprintf( __( 'Row %1$d: The tiered pricing for %2$s is missing a base price (quantity 0).', 'yay-wholesale-b2b' ), $row_number, $role['name'] );
+            return false;
+        }
+
+        usort( $tmp_tier_list, fn( $a, $b ) => $a['from'] <=> $b['from'] );
+
+        $pricing['discount_tiered']['wholesaler'][ $slug ]['base_tier']['price'] = $base_price > 0 ? $base_price : '';
+        $pricing['discount_tiered']['wholesaler'][ $slug ]['tier_list']          = $tmp_tier_list;
+
+        return true;
     }
 
     /**
-     * Bulk insert meta with SQL
+     * Check whether a value follows the tiered format: "from:price;from:price;..."
      *
-     * @param string $meta_key The meta key.
-     * @param array  $values The meta values with product id.
+     * @param string $value
      * @return bool
      */
-    protected static function bulk_insert_meta( string $meta_key, array $values ) {
-        global $wpdb;
-        $rows_sql = [];
-        $args     = [];
-
-        foreach ( $values as $id => $value ) {
-            $rows_sql[] = '(%d, %s, %s)';
-            $args[]     = $id;
-            $args[]     = $meta_key;
-            $args[]     = $value;
+    protected static function is_tiered_price_format( $value ) {
+        if ( empty( $value ) ) {
+            return true;
         }
 
-        // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
-        $result = $wpdb->query(
-            $wpdb->prepare(
-                "INSERT INTO
-                {$wpdb->postmeta}
-                (post_id, meta_key, meta_value)
-                VALUES " . implode( ', ', $rows_sql ), // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-                $args
-            )
-        );
+        return (bool) preg_match( '/^\d+:\d+(\.\d+)?(;\d+:\d+(\.\d+)?)*$/', trim( $value ) );
+    }
 
-        return $result;
+    /**
+     * Check whether a value follows the percentage format: "value%"
+     *
+     * @param string $value
+     * @return bool
+     */
+    protected static function is_rate_discount_format( $value ) {
+        if ( empty( $value ) ) {
+            return true;
+        }
+
+        return (bool) preg_match( '/\d+(\.\d+)?%/', trim( $value ) );
+    }
+
+    /**
+     * Check whether a value is a plain numeric price using only "." as the decimal separator.
+     *
+     * @param string $value
+     * @return bool
+     */
+    protected static function is_fixed_price_format( $value ) {
+        if ( empty( $value ) ) {
+            return true;
+        }
+
+        return (bool) preg_match( '/^\d+(\.\d+)?$/', trim( $value ) );
     }
 }
