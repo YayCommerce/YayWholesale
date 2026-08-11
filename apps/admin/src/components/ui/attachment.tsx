@@ -187,6 +187,7 @@ interface AttachmentDropzoneProps extends Omit<React.ComponentProps<'input'>, 't
   maxSize?: number;
   className?: string;
   accept?: string;
+  disabled?: boolean;
   children?: React.ReactNode;
 }
 
@@ -197,6 +198,7 @@ function AttachmentDropzone({
   className,
   maxSize = 10 * 1024 * 1024, // Max Size: 10MB
   accept,
+  disabled,
   children,
   ...props
 }: AttachmentDropzoneProps) {
@@ -231,18 +233,21 @@ function AttachmentDropzone({
 
   const onDragOver = (e: React.DragEvent) => {
     e.preventDefault();
+    if (disabled) return;
     setError(false);
     setIsDragActive(true);
   };
 
   const onDragLeave = (e: React.DragEvent) => {
     e.preventDefault();
+    if (disabled) return;
     setError(false);
     setIsDragActive(false);
   };
 
   const onDrop = (e: React.DragEvent) => {
     e.preventDefault();
+    if (disabled) return;
     setIsDragActive(false);
     handleFiles(e.dataTransfer.files);
   };
@@ -259,9 +264,10 @@ function AttachmentDropzone({
     <label
       data-slot="attachment-dropzone"
       className={cn(
-        'border-muted-foreground-400 text-muted-foreground hover:bg-muted flex w-full cursor-pointer flex-col items-center justify-center gap-2 rounded-md border border-dashed p-4',
-        focusVariants(),
-        inputVariants({ variant: 'input' }),
+        'border-muted-foreground-400 text-muted-foreground flex w-full cursor-not-allowed flex-col items-center justify-center gap-2 rounded-md border border-dashed p-4',
+        !disabled && focusVariants(),
+        !disabled && inputVariants({ variant: 'input' }),
+        !disabled && 'hover:bg-muted cursor-pointer',
         isDragActive && 'bg-muted',
         error && 'border-destructive hover:border-destructive',
         className,
@@ -277,6 +283,7 @@ function AttachmentDropzone({
         className="hidden"
         onChange={(e) => handleFiles(e.target.files)}
         accept={accept}
+        disabled={disabled}
         {...props}
       />
     </label>

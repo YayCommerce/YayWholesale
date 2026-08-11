@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Download, File, Upload, X } from 'lucide-react';
-import { progress } from 'motion/react';
+import { Download, File, HelpCircle, Upload, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { createInterpolateElement } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
@@ -86,7 +85,7 @@ export default function ImportExportTab() {
   return (
     <div className="flex flex-col gap-4">
       {/* Export */}
-      <div className="flex flex-col items-end justify-between gap-4 rounded-md border p-4 lg:flex-row lg:items-center lg:gap-15">
+      <div className="flex items-center justify-between gap-4 rounded-md border p-4">
         <div>
           <h2 className="flex items-center gap-2 leading-3.5 font-medium">
             {__('Export Price List', 'yay-wholesale-b2b')}
@@ -101,6 +100,7 @@ export default function ImportExportTab() {
           loading={isExportPending}
           className="flex items-center gap-2"
           onClick={exportPricingCSV}
+          disabled={!isPro}
         >
           <Download className="size-4" />
           <span className="text-[13px]">{__('Export', 'yay-wholesale-b2b')}</span>
@@ -110,10 +110,33 @@ export default function ImportExportTab() {
       {/* Import */}
       <div className="flex flex-col gap-4 rounded-md border p-4">
         <div>
-          <h2 className="flex items-center gap-2 leading-3.5 font-medium">
-            {__('Import Price List', 'yay-wholesale-b2b')}
-            {!isPro && <UpgradeToProBadge />}
-          </h2>
+          <div className="flex items-center justify-between gap-3">
+            <h2 className="flex items-center gap-2 leading-3.5 font-medium">
+              {__('Import Price List', 'yay-wholesale-b2b')}
+              {!isPro && <UpgradeToProBadge />}
+            </h2>
+            <WholeSaleToolTip
+              trigger={<HelpCircle className="size-4" />}
+              content={
+                <div className="flex flex-col items-start justify-start gap-1 text-left">
+                  <p className="font-medium">{__('Recommended Workflow', 'yay-wholesale-b2b')}</p>{' '}
+                  <p>{__('1. Export the current pricing list as a CSV file.', 'yay-wholesale-b2b')}</p>{' '}
+                  <p>
+                    {__(
+                      '2. Modify the price values in the exported CSV file. The first column must contain valid product IDs.',
+                      'yay-wholesale-b2b',
+                    )}
+                  </p>
+                  <p>
+                    {__(
+                      '3. Import the modified CSV file to apply the updated prices and discounts.',
+                      'yay-wholesale-b2b',
+                    )}
+                  </p>
+                </div>
+              }
+            />
+          </div>
           <span className="text-muted-foreground mt-2 text-xs font-normal">
             {__('Bulk update all product prices with CSV file', 'yay-wholesale-b2b')}
           </span>
@@ -139,6 +162,7 @@ export default function ImportExportTab() {
             accept=".csv"
             maxSize={5 * 1024 * 1024} //  Max size: 5MB
             onUploadError={onUploadError}
+            disabled={!isPro}
             className="min-h-45"
           >
             {!file ? (
@@ -170,7 +194,9 @@ export default function ImportExportTab() {
         </div>
         {showProgress && (
           <div className="border-border flex w-full flex-col gap-2 rounded-md border p-3">
-            <h2>{isImportPending ? __('Importing...', 'yay-wholesale-b2b') : __('Imported', 'yay-wholesale-b2b')}</h2>
+            <h2 className="font-medium">
+              {isImportPending ? __('Importing...', 'yay-wholesale-b2b') : __('Imported', 'yay-wholesale-b2b')}
+            </h2>
             <div className="bg-muted relative h-3.25 w-full rounded-full">
               <div
                 className={cn(
@@ -187,7 +213,7 @@ export default function ImportExportTab() {
             loading={isImportPending}
             variant="outline"
             className="flex items-center gap-2"
-            disabled={!file}
+            disabled={!file || !isPro}
             onClick={importPricingCSV}
           >
             <span className="text-[13px]">{__('Import', 'yay-wholesale-b2b')}</span>

@@ -51,6 +51,8 @@ class PricingRestController extends BaseRestController {
             $filename = $cached_csv;
         }
 
+        do_action( 'ywhs_after_exported_pricing', $filename );
+
         return [ 'file' => YAYWHOLESALEB2B_PLUGIN_URL . $filename . '?q=' . gmdate( 'YmdHis' ) ];
     }
 
@@ -61,7 +63,7 @@ class PricingRestController extends BaseRestController {
             return $this->error_invalid_arguments();
         }
 
-        $logs = CsvPricingHelper::apply_csv( $file['file']['tmp_name'] );
+        $logs = CsvPricingHelper::import_csv( $file['file']['tmp_name'] );
 
         return [ 'logs' => $logs ];
     }

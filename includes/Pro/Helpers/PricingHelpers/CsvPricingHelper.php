@@ -12,6 +12,11 @@ class CsvPricingHelper {
     public const PRODUCT_BASED_CSV_CACHED = 'yaywholesaleb2b_product_pricing_csv';
 
     // EXPORT HANDLER
+    /**
+     * Get the pricing csv from cache
+     *
+     * @return string|false
+     */
     public static function get_cached_csv() {
         $cached_csv = get_transient( self::PRODUCT_BASED_CSV_CACHED );
         if ( empty( $cached_csv ) || ! is_file( YAYWHOLESALEB2B_PLUGIN_DIR . $cached_csv ) ) {
@@ -21,6 +26,11 @@ class CsvPricingHelper {
         return $cached_csv;
     }
 
+    /**
+     * Build a csv file for export pricing
+     *
+     * @return string filepath
+     */
     public static function build_csv() {
         $rows = [ self::get_csv_header() ];
         $rows = array_merge( $rows, self::get_csv_products_pricing() );
@@ -50,6 +60,11 @@ class CsvPricingHelper {
         return $filename;
     }
 
+    /**
+     * Build csv file headers
+     *
+     * @return array
+     */
     protected static function get_csv_header() {
         $headers = [
             __( 'Product / Variation ID', 'yay-wholesale-b2b' ),
@@ -73,6 +88,11 @@ class CsvPricingHelper {
         return $headers;
     }
 
+    /**
+     * Build csv file content (product pricing)
+     *
+     * @return array
+     */
     protected static function get_csv_products_pricing() {
         $products = wc_get_products(
             [
@@ -149,6 +169,9 @@ class CsvPricingHelper {
         return $rows;
     }
 
+    /**
+     * Clear pricing csv cache and file
+     */
     public static function flush_cache_csv() {
         $filename = get_transient( self::PRODUCT_BASED_CSV_CACHED );
 
@@ -159,10 +182,16 @@ class CsvPricingHelper {
     }
 
     // IMPORT HANDLER
-    public static function apply_csv( string $filename ) {
+    /**
+     * Import pricing csv to products
+     *
+     * @param string $filepath The full file path (usually in temp folder of server).
+     * @return array logs
+     */
+    public static function import_csv( string $filepath ) {
         $logs = [];
 
-        if ( ! file_exists( $filename ) ) {
+        if ( ! file_exists( $filepath ) ) {
             $logs[] = __( 'The csv file is not found.', 'yay-wholesale-b2b' );
             return $logs;
         }
@@ -174,10 +203,10 @@ class CsvPricingHelper {
             WP_Filesystem();
         }
 
-        $csv_content = $wp_filesystem->get_contents( $filename );
+        $csv_content = $wp_filesystem->get_contents( $filepath );
 
         if ( false === $csv_content ) {
-            $logs[] = __( 'Unable to read the csv file', 'yay-wholesale-b2b' );
+            $logs[] = __( 'Unable to read the csv file.', 'yay-wholesale-b2b' );
             return $logs;
         }
 
@@ -211,13 +240,13 @@ class CsvPricingHelper {
         foreach ( $rows as $index => $row ) {
             if ( empty( $row ) ) {
                 // translators: %d: the error row number
-                $logs[] = sprintf( __( 'Line %d : Empty row detected', 'yay-wholesale-b2b' ), $index + 2 );
+                $logs[] = sprintf( __( 'Line %d : Empty row detected.', 'yay-wholesale-b2b' ), $index + 2 );
                 continue;
             }
 
             if ( count( $row ) !== count( $mapping ) ) {
                 // translators: %d: the error row number
-                $logs[] = sprintf( __( 'Line %d : Mismatch data row and mapping detected', 'yay-wholesale-b2b' ), $index + 2 );
+                $logs[] = sprintf( __( 'Line %d : The data row does not match the expected mapping.', 'yay-wholesale-b2b' ), $index + 2 );
                 continue;
             }
 
@@ -225,7 +254,7 @@ class CsvPricingHelper {
 
             if ( empty( $product ) ) {
                 // translators: %d: the error row number
-                $logs[] = sprintf( __( 'Line %d : This product is not found', 'yay-wholesale-b2b' ), $index + 2 );
+                $logs[] = sprintf( __( 'Line %d : This product is not found.', 'yay-wholesale-b2b' ), $index + 2 );
                 continue;
             }
 
@@ -243,9 +272,17 @@ class CsvPricingHelper {
             $logs[] = __( 'Invalid Import Data', 'yay-wholesale-b2b' );
         }
 
+        do_action( 'ywhs_after_imported_pricing', $import_data, $logs );
+
         return $logs;
     }
 
+    /**
+     * Operate to get the mapping array for data rows (if the row is empty, then use the default mapping)
+     *
+     * @param array $row the header row.
+     * @return array
+     */
     protected static function operate_header( array $row ) {
         $mapping = [
             'id'            => 0,
@@ -302,6 +339,13 @@ class CsvPricingHelper {
         return $mapping;
     }
 
+    /**
+     * Operate to convert data row to data map can be saved
+     *
+     * @param array $row the data row.
+     * @param array $mapping the mapping data from header.
+     * @return array
+     */
     protected static function operate_pricing( array $row, array $mapping ) {
         $data = [
             $row[ $mapping['id'] ],
@@ -316,7 +360,7 @@ class CsvPricingHelper {
 
         if ( $discount_type !== 'default' ) {
             $pricing['discount_rule'] = 'custom';
-            $pricing['discount_type'] = $discount_type === 'fixed_rate' ? 'by_role' : 'tiered';
+            $pricing['discount_type'] = $discount_type === 'fixed_percentage' ? 'by_role' : 'tiered';
         } else {
             $pricing['discount_rule'] = 'default';
         }
@@ -376,6 +420,12 @@ class CsvPricingHelper {
         return $data;
     }
 
+    /**
+     * Bulk save pricing from data array
+     *
+     * @param array $data The data array.
+     * @return bool
+     */
     protected static function bulk_update_pricing( array $data ) {
         if ( empty( $data ) ) {
             return;
@@ -431,7 +481,7 @@ class CsvPricingHelper {
                 $to_insert = [];
             }
 
-            // Update _regular_price, _sale_price, _price, existed yaywholesale price
+            // Update _regular_price, _price, existed _sale_price, existed yaywholesale price
             if ( ! empty( $to_update ) ) {
                 $updated = self::bulk_update_meta( $meta_key, $to_update );
                 if ( false === $updated ) {
@@ -439,7 +489,7 @@ class CsvPricingHelper {
                 }
             }//end if
 
-            // Insert unexisted yaywholesale price
+            // Insert unexisted yaywholesale price, unexisted _sale_price
             if ( ! empty( $to_insert ) ) {
                 $inserted = self::bulk_insert_meta( $meta_key, $to_insert );
                 if ( false === $inserted ) {
@@ -458,6 +508,13 @@ class CsvPricingHelper {
         return true;
     }
 
+    /**
+     * Bulk update meta with SQL
+     *
+     * @param string $meta_key The meta key.
+     * @param array  $values The meta values with product id.
+     * @return bool
+     */
     protected static function bulk_update_meta( string $meta_key, array $values ) {
         global $wpdb;
 
@@ -490,6 +547,13 @@ class CsvPricingHelper {
         return $result;
     }
 
+    /**
+     * Bulk insert meta with SQL
+     *
+     * @param string $meta_key The meta key.
+     * @param array  $values The meta values with product id.
+     * @return bool
+     */
     protected static function bulk_insert_meta( string $meta_key, array $values ) {
         global $wpdb;
         $rows_sql = [];
