@@ -142,8 +142,10 @@ class CsvPricingHelper {
                         $value = '';
                     }
                 } elseif ( array_key_exists( $slug, $wholesalers_tier ) ) {
-                        $value  = '0:' . $wholesalers_tier[ $slug ]['base_tier']['price'] . ';';
-                        $value .= implode( ';', array_map( fn( $tier ) => $tier['from'] . ':' . $tier['price'], $wholesalers_tier[ $slug ]['tier_list'] ) );
+                        $value = '0:' . $wholesalers_tier[ $slug ]['base_tier']['price'];
+                    if ( ! empty( $wholesalers_tier[ $slug ]['tier_list'] ) ) {
+                        $value .= ';' . implode( ';', array_map( fn( $tier ) => $tier['from'] . ':' . $tier['price'], $wholesalers_tier[ $slug ]['tier_list'] ) );
+                    }
                 } else {
                     $value = '';
                 }
