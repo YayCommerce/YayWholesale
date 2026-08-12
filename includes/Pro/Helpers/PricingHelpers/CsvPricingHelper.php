@@ -257,6 +257,8 @@ class CsvPricingHelper {
             }//end foreach
         }//end foreach
 
+        self::flush_cache_csv();
+
         do_action( 'ywhs_after_imported_pricing', $import_list, $logs );
 
         return $logs;
@@ -446,13 +448,14 @@ class CsvPricingHelper {
 
         $pricing['discount_by_role']['wholesaler'][ $slug ]['type'] = $is_rate ? 'rate' : 'fixed';
 
+        $decimals = absint( get_option( 'woocommerce_price_num_decimals', 2 ) );
         if ( $is_rate ) {
             if ( $value > 100 || $value < 0 ) {
                 // translators: %1$d: the row number, %2$s: the role name
                 $logs[] = sprintf( __( 'Row %1$d: The percentage for %2$s must be between 0 and 100.', 'yay-wholesale-b2b' ), $row_number, $role['name'] );
                 return false;
             }
-            $pricing['discount_by_role']['wholesaler'][ $slug ]['rate'] = $value > 0 ? $value : '';
+            $pricing['discount_by_role']['wholesaler'][ $slug ]['rate'] = $value > 0 ? wc_format_decimal( $value, $decimals, true ) : '';
             return true;
         }
 
@@ -461,7 +464,7 @@ class CsvPricingHelper {
             $logs[] = sprintf( __( 'Row %1$d: The price for %2$s cannot be negative.', 'yay-wholesale-b2b' ), $row_number, $role['name'] );
             return false;
         }
-        $pricing['discount_by_role']['wholesaler'][ $slug ]['fixed'] = $value > 0 ? $value : '';
+        $pricing['discount_by_role']['wholesaler'][ $slug ]['fixed'] = $value > 0 ? wc_format_decimal( $value, $decimals, true ) : '';
 
         return true;
     }
@@ -509,8 +512,21 @@ class CsvPricingHelper {
                 return false;
             }
 
+            if ( $from < 0 ) {
+                // translators: %1$d: the row number, %2$s: the role name
+                $logs[] = sprintf( __( 'Row %1$d: The tiered pricing for %2$s contains a negative threshold.', 'yay-wholesale-b2b' ), $row_number, $role['name'] );
+                return false;
+            }
+
+            if ( $price < 0 ) {
+                // translators: %1$d: the row number, %2$s: the role name
+                $logs[] = sprintf( __( 'Row %1$d: The tiered pricing for %2$s contains a negative price.', 'yay-wholesale-b2b' ), $row_number, $role['name'] );
+                return false;
+            }
+
             $existed_quantity[] = $from;
-            $price              = floatval( $price );
+            $decimals           = absint( get_option( 'woocommerce_price_num_decimals', 2 ) );
+            $price              = wc_format_decimal( floatval( $price ), $decimals, true );
 
             if ( $from === 0 ) {
                 $has_base_price = true;
@@ -548,7 +564,7 @@ class CsvPricingHelper {
             return true;
         }
 
-        return (bool) preg_match( '/^\d+:\d+(\.\d+)?(;\d+:\d+(\.\d+)?)*$/', trim( $value ) );
+        return (bool) preg_match( '/^-?\d+:-?\d+(\.\d+)?(?:;-?\d+:-?\d+(\.\d+)?)*$/', trim( $value ) );
     }
 
     /**
@@ -576,6 +592,6 @@ class CsvPricingHelper {
             return true;
         }
 
-        return (bool) preg_match( '/^\d+(\.\d+)?$/', trim( $value ) );
+        return (bool) preg_match( '/^-?\d+(\.\d+)?$/', trim( $value ) );
     }
 }

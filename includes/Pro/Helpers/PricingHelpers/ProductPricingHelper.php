@@ -9,9 +9,7 @@ use YayWholesaleB2B\Helpers\RolesHelper;
  */
 class ProductPricingHelper {
 
-
     public const PRODUCT_BASED_DISCOUNT_KEY = 'yaywholesaleb2b_product_based_discount';
-    public const PRODUCT_BASED_CSV_CACHED   = 'yaywholesaleb2b_product_pricing_csv';
 
     /**
      * Get the allowed product types for displaying setting on editing single product page
