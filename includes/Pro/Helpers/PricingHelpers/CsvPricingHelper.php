@@ -122,8 +122,8 @@ class CsvPricingHelper {
             $row = [
                 $product->get_id(),
                 $product->get_name() . ' (SKU: ' . $product->get_sku() . ' )',
-                $product->get_regular_price(),
-                $product->get_sale_price() ?? '',
+                $product->get_regular_price( 'edit' ),
+                $product->get_sale_price( 'edit' ) ?? '',
                 $discount_rule,
             ];
 
