@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
-import { Download, File, HelpCircle, Upload, X } from 'lucide-react';
+import { Download, File, Upload, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { createInterpolateElement } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 
 import { downloadAsset } from '@/lib/helpers/assets.helper';
 import { getErrorMsg } from '@/lib/helpers/response.helper';
@@ -14,6 +14,7 @@ import {
 import { cn, isPro } from '@/lib/utils';
 import { AttachmentDropzone, AttachmentDropzoneError } from '@/components/ui/attachment';
 import { Button, LoadingButton } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
 import { UpgradeToProBadge } from '@/components/ui/custom/upgrate-to-pro';
 import { WholeSaleToolTip } from '@/components/ui/custom/WholeSaleToolTip';
 
@@ -22,7 +23,7 @@ export default function ImportExportTab() {
   const [uploadError, setError] = useState('');
   const [showProgress, setShowProgress] = useState(false);
   const [importProgress, setProgress] = useState(0);
-  const [importLogs, setLogs] = useState<string[]>([]);
+  const [importLogs, setLogs] = useState<{ success: number; failed: string[] } | null>(null);
 
   const { mutateAsync: exportPricing, isPending: isExportPending } = usePricingExportMutation();
   const { mutateAsync: importPricing, isPending: isImportPending } = usePricingImportMutation();
@@ -44,10 +45,10 @@ export default function ImportExportTab() {
   const exportPricingCSV = async () => {
     if (isMutatingPricing) return;
     try {
-      const response = await exportPricing();
-      if (response.file) {
-        downloadAsset(response.file, 'yaywholesaleb2b_products_price.csv');
-      }
+      const blob = await exportPricing();
+      const url = URL.createObjectURL(blob);
+      downloadAsset(url, 'yaywholesaleb2b_products_price.csv');
+      URL.revokeObjectURL(url);
     } catch (error) {
       toast.error(await getErrorMsg(error));
     }
@@ -59,7 +60,7 @@ export default function ImportExportTab() {
 
     setProgress(0);
     setShowProgress(true);
-    setLogs([]);
+    setLogs(null);
     const formData = new FormData();
     setTimeout(() => setProgress(50), 500);
     setTimeout(() => setProgress(75), 1000);
@@ -79,7 +80,7 @@ export default function ImportExportTab() {
   useEffect(() => {
     setProgress(0);
     setShowProgress(false);
-    setLogs([]);
+    setLogs(null);
   }, [file]);
 
   return (
@@ -98,7 +99,7 @@ export default function ImportExportTab() {
         <LoadingButton
           variant="outline"
           loading={isExportPending}
-          className="flex items-center gap-2"
+          className="flex w-23 items-center gap-2"
           onClick={exportPricingCSV}
           disabled={!isPro}
         >
@@ -109,38 +110,27 @@ export default function ImportExportTab() {
 
       {/* Import */}
       <div className="flex flex-col gap-4 rounded-md border p-4">
-        <div>
-          <div className="flex items-center justify-between gap-3">
+        <div className="flex items-center justify-between gap-3">
+          <div>
             <h2 className="flex items-center gap-2 leading-3.5 font-medium">
               {__('Import Price List', 'yay-wholesale-b2b')}
               {!isPro && <UpgradeToProBadge />}
             </h2>
-            <WholeSaleToolTip
-              trigger={<HelpCircle className="size-4" />}
-              content={
-                <div className="flex flex-col items-start justify-start gap-1 text-left">
-                  <p className="font-medium">{__('Recommended Workflow', 'yay-wholesale-b2b')}</p>{' '}
-                  <p>{__('1. Export the current pricing list as a CSV file.', 'yay-wholesale-b2b')}</p>{' '}
-                  <p>
-                    {__(
-                      '2. Modify the price values in the exported CSV file. The first column must contain valid product IDs.',
-                      'yay-wholesale-b2b',
-                    )}
-                  </p>
-                  <p>
-                    {__(
-                      '3. Import the modified CSV file to apply the updated prices and discounts.',
-                      'yay-wholesale-b2b',
-                    )}
-                  </p>
-                </div>
-              }
-            />
+            <span className="text-muted-foreground mt-2 text-xs font-normal">
+              {__('Bulk update all product prices with CSV file', 'yay-wholesale-b2b')}
+            </span>
           </div>
-          <span className="text-muted-foreground mt-2 text-xs font-normal">
-            {__('Bulk update all product prices with CSV file', 'yay-wholesale-b2b')}
-          </span>
+          <LoadingButton
+            loading={isImportPending}
+            variant="outline"
+            className="flex w-23 items-center gap-2"
+            disabled={!file || !isPro}
+            onClick={importPricingCSV}
+          >
+            <span className="text-[13px]">{__('Import', 'yay-wholesale-b2b')}</span>
+          </LoadingButton>
         </div>
+
         <div className="relative flex flex-col gap-1">
           {file && (
             <WholeSaleToolTip
@@ -208,26 +198,52 @@ export default function ImportExportTab() {
             </div>
           </div>
         )}
-        <div className="flex justify-end">
-          <LoadingButton
-            loading={isImportPending}
-            variant="outline"
-            className="flex items-center gap-2"
-            disabled={!file || !isPro}
-            onClick={importPricingCSV}
-          >
-            <span className="text-[13px]">{__('Import', 'yay-wholesale-b2b')}</span>
-          </LoadingButton>
-        </div>
-        {importLogs.length > 0 && (
+        {importLogs && (
           <div className="bg-muted text-muted-foreground flex flex-col gap-1 rounded-md p-3 font-mono text-sm">
             <h2 className="text-foreground mb-2 text-[16px] font-medium">{__('Import Logs', 'yay-wholesale-b2b')}</h2>
-            {importLogs.map((log, index) => (
+            <span>
+              <span className="font-medium">{__('Successfully imported', 'yay-wholesale-b2b')}: </span>
+              {sprintf(__('%d row(s)', 'yay-wholesale-b2b'), importLogs.success)}
+            </span>
+            <span>
+              <span className="font-medium">{__('Failed to imported', 'yay-wholesale-b2b')}: </span>
+              {sprintf(__('%d row(s)', 'yay-wholesale-b2b'), importLogs.failed.length)}
+            </span>
+            {importLogs.failed.map((log, index) => (
               <span key={index}>{log}</span>
             ))}
           </div>
         )}
+        <ImportHelpBanner />
       </div>
     </div>
   );
 }
+
+const ImportHelpBanner = () => {
+  const [visible, setVisible] = useState(true);
+  return (
+    visible && (
+      <Card className="bg-primary/7 border-primary-accent text-primary-accent relative border px-4 py-2">
+        <Button
+          variant="primary-soft"
+          className="absolute top-3 right-3 z-1 size-2 bg-transparent"
+          onClick={() => setVisible(false)}
+        >
+          <X className="size-3" />
+        </Button>
+        <div className="flex flex-col items-start justify-start gap-1 text-left">
+          <p className="font-medium">{__('Recommended Workflow', 'yay-wholesale-b2b')}</p>{' '}
+          <p>{__('1. Export the current pricing list as a CSV file.', 'yay-wholesale-b2b')}</p>{' '}
+          <p>
+            {__(
+              '2. Modify the price values in the exported CSV file. The first column must contain valid product IDs.',
+              'yay-wholesale-b2b',
+            )}
+          </p>
+          <p>{__('3. Import the modified CSV file to apply the updated prices and discounts.', 'yay-wholesale-b2b')}</p>
+        </div>
+      </Card>
+    )
+  );
+};

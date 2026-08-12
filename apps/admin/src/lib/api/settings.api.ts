@@ -18,7 +18,7 @@ export function markReviewed() {
 }
 
 export function exportPricingCsv() {
-  return api.post('pricing/export').json<{ file: string }>();
+  return api.post('pricing/export').blob();
 }
 
 export function importPricingCsv(formData: FormData) {
@@ -26,5 +26,5 @@ export function importPricingCsv(formData: FormData) {
     .post('pricing/import', {
       body: formData,
     })
-    .json<{ logs: string[] }>();
+    .json<{ logs: { success: number; failed: string[] } }>();
 }

@@ -3,7 +3,6 @@ namespace YayWholesaleB2B\Pro\Engine\Admin;
 
 use YayWholesaleB2B\Helpers\RolesHelper;
 use YayWholesaleB2B\Pro\Helpers\AccessHelpers\ProductAccessHelper;
-use YayWholesaleB2B\Pro\Helpers\PricingHelpers\CsvPricingHelper;
 use YayWholesaleB2B\Pro\Helpers\PricingHelpers\ProductPricingHelper;
 use YayWholesaleB2B\Utils\SingletonTrait;
 
@@ -27,10 +26,6 @@ class ProductBasedRule {
         // Column
         add_filter( 'manage_edit-product_columns', [ $this, 'add_custom_data_columns_for_product' ], 10, 1 );
         add_action( 'manage_product_posts_custom_column', [ $this, 'render_custom_data_columns_for_product' ], 10, 2 );
-
-        // Removed Cached CSV
-        add_action( 'ywhs_after_admin_saved_roles', [ $this, 'remove_cache_csv' ] );
-        add_action( 'ywhs_after_admin_removed_roles', [ $this, 'remove_cache_csv' ] );
     }
 
     /**
@@ -216,12 +211,5 @@ class ProductBasedRule {
                 <?php
                 break;
         }//end switch
-    }
-
-    /**
-     * Flush cache of Csv export
-     */
-    public function remove_cache_csv() {
-        CsvPricingHelper::flush_cache_csv();
     }
 }

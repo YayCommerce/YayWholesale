@@ -9,34 +9,16 @@ use YayWholesaleB2B\Helpers\RolesHelper;
  */
 class CsvPricingHelper {
 
-    public const PRODUCT_BASED_CSV_CACHED = 'yaywholesaleb2b_product_pricing_csv';
-
     // EXPORT HANDLER
     /**
-     * Get the pricing csv from cache
+     * Build the csv content for export pricing (in-memory, no file is written to disk)
      *
-     * @return string|false
-     */
-    public static function get_cached_csv() {
-        $cached_csv = get_transient( self::PRODUCT_BASED_CSV_CACHED );
-        if ( empty( $cached_csv ) || ! is_file( YAYWHOLESALEB2B_PLUGIN_DIR . $cached_csv ) ) {
-            return false;
-        }
-
-        return $cached_csv;
-    }
-
-    /**
-     * Build a csv file for export pricing
-     *
-     * @return string filepath
+     * @return string csv content
      */
     public static function build_csv() {
         $rows = [ self::get_csv_header() ];
         $rows = array_merge( $rows, self::get_csv_products_pricing() );
 
-        $filename    = 'assets/pro/csv/ywhs_product_price_list.csv';
-        $cached_dir  = YAYWHOLESALEB2B_PLUGIN_DIR . 'assets/pro/csv';
         $csv_content = '';
 
         foreach ( $rows as $row ) {
@@ -44,20 +26,7 @@ class CsvPricingHelper {
             $csv_content .= implode( ',', $escaped ) . "\n";
         }
 
-        global $wp_filesystem;
-
-        if ( ! $wp_filesystem ) {
-            require_once ABSPATH . 'wp-admin/includes/file.php';
-            WP_Filesystem();
-        }
-
-        if ( ! $wp_filesystem->is_dir( $cached_dir ) ) {
-            $wp_filesystem->mkdir( $cached_dir );
-        }
-
-        $wp_filesystem->put_contents( YAYWHOLESALEB2B_PLUGIN_DIR . $filename, $csv_content, FS_CHMOD_FILE );
-        set_transient( self::PRODUCT_BASED_CSV_CACHED, $filename, 24 * 60 * 60 );
-        return $filename;
+        return $csv_content;
     }
 
     /**
@@ -71,7 +40,6 @@ class CsvPricingHelper {
             __( 'Product / Variation Name & SKU', 'yay-wholesale-b2b' ),
             __( 'Regular Price', 'yay-wholesale-b2b' ),
             __( 'Sale Price', 'yay-wholesale-b2b' ),
-            __( 'Discount Rule', 'yay-wholesale-b2b' ),
         ];
 
         $roles = RolesHelper::get_wholesale_roles();
@@ -124,12 +92,17 @@ class CsvPricingHelper {
                 $product->get_name() . ' (SKU: ' . $product->get_sku() . ' )',
                 $product->get_regular_price( 'edit' ),
                 $product->get_sale_price( 'edit' ) ?? '',
-                $discount_rule,
             ];
 
             // Handle by role
             foreach ( $roles as $role ) {
                 $slug = $role['slug'];
+
+                if ( $discount_rule === 'default' ) {
+                    $row[] = '';
+                    continue;
+                }
+
                 if ( $discount_type === 'by_role' ) {
                     if ( array_key_exists( $slug, $wholesalers_fixed_rate ) ) {
                         $type = $wholesalers_fixed_rate[ $slug ]['type'];
@@ -142,13 +115,17 @@ class CsvPricingHelper {
                         $value = '';
                     }
                 } elseif ( array_key_exists( $slug, $wholesalers_tier ) ) {
-                        $value = '0:' . $wholesalers_tier[ $slug ]['base_tier']['price'];
-                    if ( ! empty( $wholesalers_tier[ $slug ]['tier_list'] ) ) {
-                        $value .= ';' . implode( ';', array_map( fn( $tier ) => $tier['from'] . ':' . $tier['price'], $wholesalers_tier[ $slug ]['tier_list'] ) );
+                    $tier_arr = [];
+                    if ( ! empty( $wholesalers_tier[ $slug ]['base_tier']['price'] ) ) {
+                        $tier_arr[] = '0:' . $wholesalers_tier[ $slug ]['base_tier']['price'];
                     }
+                    if ( ! empty( $wholesalers_tier[ $slug ]['tier_list'] ) ) {
+                        $tier_arr = array_merge( $tier_arr, array_map( fn( $tier ) => $tier['from'] . ':' . $tier['price'], $wholesalers_tier[ $slug ]['tier_list'] ) );
+                    }
+                    $value = implode( ';', $tier_arr );
                 } else {
                     $value = '';
-                }
+                }//end if
 
                 $row[] = $value;
             }//end foreach
@@ -159,18 +136,6 @@ class CsvPricingHelper {
         return $rows;
     }
 
-    /**
-     * Clear pricing csv cache and file
-     */
-    public static function flush_cache_csv() {
-        $filename = get_transient( self::PRODUCT_BASED_CSV_CACHED );
-
-        if ( $filename ) {
-            delete_transient( self::PRODUCT_BASED_CSV_CACHED );
-            wp_delete_file( YAYWHOLESALEB2B_PLUGIN_DIR . $filename );
-        }
-    }
-
     // IMPORT HANDLER
     /**
      * Import pricing csv to products
@@ -179,10 +144,13 @@ class CsvPricingHelper {
      * @return array logs
      */
     public static function import_csv( string $filepath ) {
-        $logs = [];
+        $logs = [
+            'success' => 0,
+            'failed'  => [],
+        ];
 
         if ( ! file_exists( $filepath ) ) {
-            $logs[] = __( 'The CSV file could not be found.', 'yay-wholesale-b2b' );
+            $logs['failed'][] = __( 'The CSV file could not be found.', 'yay-wholesale-b2b' );
             return $logs;
         }
 
@@ -196,7 +164,7 @@ class CsvPricingHelper {
         $csv_content = $wp_filesystem->get_contents( $filepath );
 
         if ( false === $csv_content ) {
-            $logs[] = __( 'The CSV file could not be read.', 'yay-wholesale-b2b' );
+            $logs['failed'][] = __( 'The CSV file could not be read.', 'yay-wholesale-b2b' );
             return $logs;
         }
 
@@ -230,13 +198,13 @@ class CsvPricingHelper {
             foreach ( $batch as $index => $row ) {
                 if ( empty( $row ) ) {
                     // translators: %d: the row number
-                    $logs[] = sprintf( __( 'Row %d: This row is empty and was skipped.', 'yay-wholesale-b2b' ), $index + 2 );
+                    $logs['failed'][] = sprintf( __( 'Row %d: This row is empty and was skipped.', 'yay-wholesale-b2b' ), $index + 2 );
                     continue;
                 }
 
                 if ( count( $row ) !== count( $mapping ) ) {
                     // translators: %d: the row number
-                    $logs[] = sprintf( __( 'Row %d: The number of columns does not match the CSV header and was skipped.', 'yay-wholesale-b2b' ), $index + 2 );
+                    $logs['failed'][] = sprintf( __( 'Row %d: The number of columns does not match the CSV header and was skipped.', 'yay-wholesale-b2b' ), $index + 2 );
                     continue;
                 }
 
@@ -244,7 +212,7 @@ class CsvPricingHelper {
 
                 if ( empty( $product ) ) {
                     // translators: %d: the row number
-                    $logs[] = sprintf( __( 'Row %d: No matching product was found.', 'yay-wholesale-b2b' ), $index + 2 );
+                    $logs['failed'][] = sprintf( __( 'Row %d: No matching product was found.', 'yay-wholesale-b2b' ), $index + 2 );
                     continue;
                 }
 
@@ -258,8 +226,6 @@ class CsvPricingHelper {
                 }
             }//end foreach
         }//end foreach
-
-        self::flush_cache_csv();
 
         do_action( 'ywhs_after_imported_pricing', $import_list, $logs );
 
@@ -288,13 +254,12 @@ class CsvPricingHelper {
 
             if ( false === $result && ! empty( $wpdb->last_error ) ) {
                 // translators: %1$d: the row number, %2$s: the meta key, %3$d: the product id, %4$s: the database error message
-                $logs[] = sprintf( __( 'Row %1$d: Could not save %2$s for product #%3$d — %4$s', 'yay-wholesale-b2b' ), $row_number, $meta_key, $data['id'], $wpdb->last_error );
+                $logs['failed'][] = sprintf( __( 'Row %1$d: Could not save %2$s for product #%3$d — %4$s', 'yay-wholesale-b2b' ), $row_number, $meta_key, $data['id'], $wpdb->last_error );
                 return;
             }
         }
 
-        // translators: %d: the row number
-        $logs[] = sprintf( __( 'Row %d: Pricing saved successfully.', 'yay-wholesale-b2b' ), $row_number );
+        ++$logs['success'];
     }
 
     /**
@@ -304,31 +269,38 @@ class CsvPricingHelper {
      * @return array
      */
     protected static function operate_header( array $row ) {
-        $mapping = [
+        $fixed_mapping = [
             'id'            => 0,
             'product_name'  => 1,
             'regular_price' => 2,
             'sale_price'    => 3,
-            'discount_rule' => 4,
         ];
 
-        if ( count( $row ) > 5 ) {
+        $start_index = count( $fixed_mapping );
+        $roles       = RolesHelper::get_wholesale_roles();
+        $role_slugs  = array_column( $roles, 'slug' );
+
+        $mapping = $fixed_mapping;
+
+        if ( count( $row ) > $start_index ) {
             foreach ( $row as $index => $col ) {
-                if ( $index < 5 ) {
+                if ( $index < $start_index ) {
                     continue;
                 }
 
                 $header_role_map = explode( ':', $col );
                 $role_slug       = $header_role_map[ array_key_first( $header_role_map ) ] ?? '';
-                if ( ! empty( $role_slug ) ) {
+
+                $existed = array_filter( $role_slugs, fn( $slug ) => $slug === $role_slug );
+
+                if ( ! empty( $role_slug ) && ! empty( $existed ) ) {
                     $mapping[ $role_slug ] = $index;
                 }
             }//end foreach
         }
 
-        if ( count( $mapping ) <= 5 ) {
-            $roles = RolesHelper::get_wholesale_roles();
-            $index = 5;
+        if ( count( $mapping ) <= $start_index ) {
+            $index = $start_index;
             foreach ( $roles as $role ) {
                 $mapping[ $role['slug'] ] = $index++;
             }
@@ -354,16 +326,20 @@ class CsvPricingHelper {
             'discount_setting' => [],
         ];
 
+        if ( empty( $data['regular_price'] ) ) {
+            // translators: %1$d: the row number
+            $logs['failed'][] = sprintf( __( 'Row %1$d: The regular price of this product is required.', 'yay-wholesale-b2b' ), $row_number );
+            return [];
+        }
+
         $pricing = ProductPricingHelper::get_product_based_discount_setting( $row[ $mapping['id'] ] );
         $roles   = RolesHelper::get_wholesale_roles();
-
-        $discount_rule            = $row[ $mapping['discount_rule'] ];
-        $pricing['discount_rule'] = $discount_rule !== 'custom' ? 'default' : 'custom';
 
         $discount_type_map = [
             'tiered'  => 0,
             'by_role' => 0,
         ];
+        $empty_count       = 0;
         foreach ( $roles as $role ) {
             $slug = $role['slug'];
 
@@ -380,53 +356,61 @@ class CsvPricingHelper {
                 if ( self::is_fixed_price_format( $price ) || self::is_rate_discount_format( $price ) ) {
                     ++$discount_type_map['by_role'];
                 }
+            } else {
+                ++$empty_count;
             }
         }
 
         if ( $discount_type_map['tiered'] > 0 && $discount_type_map['by_role'] > 0 ) {
             // translators: %1$d: the row number
-            $logs[] = sprintf( __( 'Row %1$d: The price settings mixes fixed/percentage pricing with tiered pricing.', 'yay-wholesale-b2b' ), $row_number );
+            $logs['failed'][] = sprintf( __( 'Row %1$d: The price settings mixes fixed/percentage pricing with tiered pricing.', 'yay-wholesale-b2b' ), $row_number );
             return [];
         }
 
         $discount_type = array_search( max( $discount_type_map ), $discount_type_map, true );
 
-        // Map each role to data map
-        foreach ( $roles as $role ) {
-            $slug = $role['slug'];
+        if ( $empty_count === count( $roles ) ) {
+            $pricing['discount_rule'] = 'default';
+        } else {
+            $pricing['discount_rule'] = 'custom';
 
-            if ( ! array_key_exists( $slug, $mapping ) ) {
-                continue;
-            }
+            // Map each role to data map
+            foreach ( $roles as $role ) {
+                $slug = $role['slug'];
 
-            $price = $row[ $mapping[ $slug ] ];
+                if ( ! array_key_exists( $slug, $mapping ) ) {
+                    continue;
+                }
 
-            if ( 'tiered' === $discount_type ) {
-                if ( ! self::is_tiered_price_format( $price ) ) {
-                    // translators: %1$d: the row number, %2$s: the role name
-                    $logs[] = sprintf( __( 'Row %1$d: The price for %2$s is in an invalid format.', 'yay-wholesale-b2b' ), $row_number, $role['name'] );
+                $price = $row[ $mapping[ $slug ] ];
+
+                if ( 'tiered' === $discount_type ) {
+                    if ( ! self::is_tiered_price_format( $price ) ) {
+                        // translators: %1$d: the row number, %2$s: the role name
+                        $logs['failed'][] = sprintf( __( 'Row %1$d: The tiered pricing for %2$s is in an invalid format.', 'yay-wholesale-b2b' ), $row_number, $role['name'] );
+                        return [];
+                    }
+                }
+
+                if ( 'by_role' === $discount_type ) {
+                    if ( ! self::is_fixed_price_format( $price ) && ! self::is_rate_discount_format( $price ) ) {
+                        // translators: %1$d: the row number, %2$s: the role name
+                        $logs['failed'][] = sprintf( __( 'Row %1$d: The price for %2$s is in an invalid format.', 'yay-wholesale-b2b' ), $row_number, $role['name'] );
+                        return [];
+                    }
+                }//end if
+
+                $pricing['discount_type'] = $discount_type;
+
+                if ( 'by_role' === $discount_type && ! self::apply_by_role_pricing( $pricing, $slug, $price, $role, $row_number, $logs ) ) {
                     return [];
                 }
-            }
 
-            if ( 'by_role' === $discount_type ) {
-                if ( ! self::is_fixed_price_format( $price ) && ! self::is_rate_discount_format( $price ) ) {
-                    // translators: %1$d: the row number, %2$s: the role name
-                    $logs[] = sprintf( __( 'Row %1$d: The price for %2$s is in an invalid format.', 'yay-wholesale-b2b' ), $row_number, $role['name'] );
+                if ( 'tiered' === $discount_type && ! self::apply_tiered_pricing( $pricing, $slug, $price, $role, $row_number, $logs ) ) {
                     return [];
                 }
-            }//end if
-
-            $pricing['discount_type'] = $discount_type;
-
-            if ( 'by_role' === $discount_type && ! self::apply_by_role_pricing( $pricing, $slug, $price, $role, $row_number, $logs ) ) {
-                return [];
-            }
-
-            if ( 'tiered' === $discount_type && ! self::apply_tiered_pricing( $pricing, $slug, $price, $role, $row_number, $logs ) ) {
-                return [];
-            }
-        }//end foreach
+            }//end foreach
+        }//end if
 
         $data['discount_setting'] = $pricing;
 
@@ -454,7 +438,7 @@ class CsvPricingHelper {
         if ( $is_rate ) {
             if ( $value > 100 || $value < 0 ) {
                 // translators: %1$d: the row number, %2$s: the role name
-                $logs[] = sprintf( __( 'Row %1$d: The percentage for %2$s must be between 0 and 100.', 'yay-wholesale-b2b' ), $row_number, $role['name'] );
+                $logs['failed'][] = sprintf( __( 'Row %1$d: The percentage for %2$s must be between 0 and 100.', 'yay-wholesale-b2b' ), $row_number, $role['name'] );
                 return false;
             }
             $pricing['discount_by_role']['wholesaler'][ $slug ]['rate'] = $value > 0 ? wc_format_decimal( $value, $decimals, true ) : '';
@@ -463,7 +447,7 @@ class CsvPricingHelper {
 
         if ( $value < 0 ) {
             // translators: %1$d: the row number, %2$s: the role name
-            $logs[] = sprintf( __( 'Row %1$d: The price for %2$s cannot be negative.', 'yay-wholesale-b2b' ), $row_number, $role['name'] );
+            $logs['failed'][] = sprintf( __( 'Row %1$d: The price for %2$s cannot be negative.', 'yay-wholesale-b2b' ), $row_number, $role['name'] );
             return false;
         }
         $pricing['discount_by_role']['wholesaler'][ $slug ]['fixed'] = $value > 0 ? wc_format_decimal( $value, $decimals, true ) : '';
@@ -483,12 +467,7 @@ class CsvPricingHelper {
      * @return bool true on success, false when the row is invalid.
      */
     protected static function apply_tiered_pricing( array &$pricing, string $slug, string $price, array $role, int $row_number, array &$logs ) {
-        if ( empty( $price ) ) {
-            return true;
-        }
-
-        $tiers            = explode( ';', $price );
-        $has_base_price   = false;
+        $tiers            = explode( ';', trim( $price ) );
         $base_price       = 0;
         $tmp_tier_list    = [];
         $existed_quantity = [];
@@ -504,25 +483,25 @@ class CsvPricingHelper {
 
             if ( in_array( $from, $existed_quantity, true ) ) {
                 // translators: %1$d: the row number, %2$s: the role name
-                $logs[] = sprintf( __( 'Row %1$d: The tiered pricing for %2$s has a duplicate quantity threshold.', 'yay-wholesale-b2b' ), $row_number, $role['name'] );
+                $logs['failed'][] = sprintf( __( 'Row %1$d: The tiered pricing for %2$s has a duplicate quantity threshold.', 'yay-wholesale-b2b' ), $row_number, $role['name'] );
                 return false;
             }
 
             if ( ! self::is_fixed_price_format( $price ) ) {
                 // translators: %1$d: the row number, %2$s: the role name
-                $logs[] = sprintf( __( 'Row %1$d: The tiered pricing for %2$s contains an invalid price value.', 'yay-wholesale-b2b' ), $row_number, $role['name'] );
+                $logs['failed'][] = sprintf( __( 'Row %1$d: The tiered pricing for %2$s contains an invalid price value.', 'yay-wholesale-b2b' ), $row_number, $role['name'] );
                 return false;
             }
 
             if ( $from < 0 ) {
                 // translators: %1$d: the row number, %2$s: the role name
-                $logs[] = sprintf( __( 'Row %1$d: The tiered pricing for %2$s contains a negative threshold.', 'yay-wholesale-b2b' ), $row_number, $role['name'] );
+                $logs['failed'][] = sprintf( __( 'Row %1$d: The tiered pricing for %2$s contains a negative threshold.', 'yay-wholesale-b2b' ), $row_number, $role['name'] );
                 return false;
             }
 
             if ( $price < 0 ) {
                 // translators: %1$d: the row number, %2$s: the role name
-                $logs[] = sprintf( __( 'Row %1$d: The tiered pricing for %2$s contains a negative price.', 'yay-wholesale-b2b' ), $row_number, $role['name'] );
+                $logs['failed'][] = sprintf( __( 'Row %1$d: The tiered pricing for %2$s contains a negative price.', 'yay-wholesale-b2b' ), $row_number, $role['name'] );
                 return false;
             }
 
@@ -531,8 +510,7 @@ class CsvPricingHelper {
             $price              = wc_format_decimal( floatval( $price ), $decimals, true );
 
             if ( $from === 0 ) {
-                $has_base_price = true;
-                $base_price     = $price;
+                $base_price = $price;
             } else {
                 $tmp_tier_list[] = [
                     'from'  => $from,
@@ -541,13 +519,9 @@ class CsvPricingHelper {
             }
         }//end foreach
 
-        if ( ! $has_base_price ) {
-            // translators: %1$d: the row number, %2$s: the role name
-            $logs[] = sprintf( __( 'Row %1$d: The tiered pricing for %2$s is missing a base price (quantity 0).', 'yay-wholesale-b2b' ), $row_number, $role['name'] );
-            return false;
+        if ( ! empty( $tmp_tier_list ) ) {
+            usort( $tmp_tier_list, fn( $a, $b ) => $a['from'] <=> $b['from'] );
         }
-
-        usort( $tmp_tier_list, fn( $a, $b ) => $a['from'] <=> $b['from'] );
 
         $pricing['discount_tiered']['wholesaler'][ $slug ]['base_tier']['price'] = $base_price > 0 ? $base_price : '';
         $pricing['discount_tiered']['wholesaler'][ $slug ]['tier_list']          = $tmp_tier_list;

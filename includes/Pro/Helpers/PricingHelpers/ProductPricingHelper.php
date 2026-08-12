@@ -109,9 +109,6 @@ class ProductPricingHelper {
      */
     public static function save_product_based_discount_setting( int $product_id, $data ) {
         update_post_meta( $product_id, self::PRODUCT_BASED_DISCOUNT_KEY, $data );
-
-        // Flush Cache
-        CsvPricingHelper::flush_cache_csv();
     }
 
     /**

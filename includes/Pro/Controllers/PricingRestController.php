@@ -43,17 +43,18 @@ class PricingRestController extends BaseRestController {
     }
 
     public function export_product_pricing( WP_REST_Request $request ) {
-        $filename   = '';
-        $cached_csv = CsvPricingHelper::get_cached_csv();
-        if ( empty( $cached_csv ) ) {
-            $filename = CsvPricingHelper::build_csv();
-        } else {
-            $filename = $cached_csv;
-        }
+        $csv_content = CsvPricingHelper::build_csv();
+        $filename    = 'yaywholesaleb2b_products_price.csv';
 
-        do_action( 'ywhs_after_exported_pricing', $filename );
+        do_action( 'ywhs_before_export_pricing', $csv_content );
 
-        return [ 'file' => YAYWHOLESALEB2B_PLUGIN_URL . $filename . '?q=' . gmdate( 'YmdHis' ) ];
+        nocache_headers();
+        header( 'Content-Type: text/csv; charset=utf-8' );
+        header( 'Content-Disposition: attachment; filename="' . $filename . '"' );
+        header( 'Content-Length: ' . strlen( $csv_content ) );
+        echo $csv_content; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+
+        return null;
     }
 
     public function import_product_pricing( WP_REST_Request $request ) {
