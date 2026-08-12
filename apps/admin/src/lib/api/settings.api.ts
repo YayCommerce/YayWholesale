@@ -16,15 +16,3 @@ export function updateEmailStatus(emailId: string, status: boolean) {
 export function markReviewed() {
   return api.post('mark-reviewed').json<boolean>();
 }
-
-export function exportPricingCsv() {
-  return api.post('pricing/export').blob();
-}
-
-export function importPricingCsv(formData: FormData) {
-  return api
-    .post('pricing/import', {
-      body: formData,
-    })
-    .json<{ logs: { success: number; failed: string[] } }>();
-}

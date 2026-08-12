@@ -10,7 +10,7 @@ import {
   useIsMutatingPricing,
   usePricingExportMutation,
   usePricingImportMutation,
-} from '@/lib/queries/settings.queries';
+} from '@/lib/queries/pricings.queries';
 import { cn, isPro } from '@/lib/utils';
 import { AttachmentDropzone, AttachmentDropzoneError } from '@/components/ui/attachment';
 import { Button, LoadingButton } from '@/components/ui/button';
@@ -214,7 +214,7 @@ export default function ImportExportTab() {
             ))}
           </div>
         )}
-        <ImportHelpBanner />
+        {isPro && <ImportHelpBanner />}
       </div>
     </div>
   );
@@ -237,11 +237,13 @@ const ImportHelpBanner = () => {
           <p>{__('1. Export the current pricing list as a CSV file.', 'yay-wholesale-b2b')}</p>{' '}
           <p>
             {__(
-              '2. Modify the price values in the exported CSV file. The first column must contain valid product IDs.',
+              '2. Modify the price values in the exported CSV file. Ensure the first column contains valid product IDs.',
               'yay-wholesale-b2b',
             )}
           </p>
-          <p>{__('3. Import the modified CSV file to apply the updated prices and discounts.', 'yay-wholesale-b2b')}</p>
+          <p>
+            {__('3. Import the modified CSV file to apply the new prices, discounts and tiers.', 'yay-wholesale-b2b')}
+          </p>
         </div>
       </Card>
     )
