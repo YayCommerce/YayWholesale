@@ -168,7 +168,7 @@ class CsvPricingHelper {
             return $logs;
         }
 
-        $rows    = array_map( fn( $row ) => str_getcsv( $row, ',', '"', '\\' ), preg_split( "/\r\n|\n|\r/", $csv_content ) );
+        $rows    = array_map( fn( $row ) => '' === $row ? [] : str_getcsv( $row, ',', '"', '\\' ), preg_split( "/\r\n|\n|\r/", $csv_content ) );
         $headers = array_shift( $rows );
         $mapping = self::operate_header( $headers );
 
@@ -205,6 +205,12 @@ class CsvPricingHelper {
                 if ( count( $row ) !== count( $mapping ) ) {
                     // translators: %d: the row number
                     $logs['failed'][] = sprintf( __( 'Row %d: The number of columns does not match the CSV header and was skipped.', 'yay-wholesale-b2b' ), $index + 2 );
+                    continue;
+                }
+
+                if ( empty( $row[ $mapping['id'] ] ) ) {
+                    // translators: %1$d: the row number
+                    $logs['failed'][] = sprintf( __( 'Row %1$d: The product / variation ID is required.', 'yay-wholesale-b2b' ), $index + 2 );
                     continue;
                 }
 

@@ -62,8 +62,7 @@ export default function ImportExportTab() {
     setShowProgress(true);
     setLogs(null);
     const formData = new FormData();
-    setTimeout(() => setProgress(50), 500);
-    setTimeout(() => setProgress(75), 1000);
+    setTimeout(() => setProgress(75), 300);
     formData.append('file', file);
 
     try {
