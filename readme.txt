@@ -2,8 +2,8 @@
 Contributors: YayCommerce
 Tags: wholesale, b2b, wholesale pricing, discount rules, sale
 Requires at least: 6.5
-Tested up to: 7.0
-Stable tag: 1.2.0
+Tested up to: 7.1
+Stable tag: 1.2.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -110,6 +110,37 @@ You can enable/disable coupon functionality for wholesale orders in Settings > G
 For documentation, support, and updates, visit our website or [contact YayCommerce support team](http://yaycommerce.com/support/).
 
 ## Changelog
+
+= Aug 12, 2026 - Version 1.2.0 =
+- New: Payment and Shipping methods can now be edited directly on the Role Edit page (PRO)
+- New: Order recalculation now only triggers on actual item changes, improving performance
+- New: Order notification emails now correctly prioritize the Wholesale New Order template
+- New: Registration field data now viewable/editable from the WP Users and User Profile pages
+- New: Split Price Display settings into separate options for retailers and wholesalers
+- Added: Setup Wizard to guide initial configuration after activation
+- Added: Guest Access options for wholesale pricing (No Restriction, Hidden Price, Hidden Shop) (PRO)
+- Added: Promotion Rules to auto-upgrade customers to wholesale roles based on revenue milestones (PRO)
+- Added: Template Editor to design separate shop layouts for retailers and wholesalers (PRO)
+- Added: New registration field types: Select, Radio, Checkbox, and Attachment
+- Added: Option to sync registration fields with WooCommerce Customer Billing Details
+- Added: Requirement Bar toggle for classic and block themes (PRO)
+- Added: Discount Rule and Access Rule columns to Product/Category list tables
+- Updated: Redesigned UI for Product-based Discount, with easier percentage/fixed amount switching and tiered pricing (PRO)
+- Improved: Product/Category-based Access logic for parent-category visibility (PRO)
+- Improved: General UI/UX improvements: updated system font, refined input styles, added loading states, smoother data updates
+
+= July 25, 2026 - Version 1.1.1 =
+- Fixed: role update and delete API
+
+= June 03, 2025 - Version 1.1.0 =
+- Improved: Registration field settings
+- Improved: Requirements progress bar (hide condition row if it's not set)
+- Implement the checkout restriction for wholesaler
+- Implement the displaying price in shop setting for wholesaler (Pro version)
+- Implement the role-based shipping methods (Pro version)
+- Implement the role-based payment methods (Pro version)
+- Implement the product-based price or discount (Pro version)
+- Implement the category-based discount (Pro version)
 
 = Mar 24, 2026 - Version 1.0.6 =
 - Improved: Registration fields setting

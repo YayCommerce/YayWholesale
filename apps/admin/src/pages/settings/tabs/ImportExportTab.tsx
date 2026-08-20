@@ -62,7 +62,7 @@ export default function ImportExportTab() {
     setShowProgress(true);
     setLogs(null);
     const formData = new FormData();
-    setTimeout(() => setProgress(75), 300);
+    const timeoutKey = setTimeout(() => setProgress(75), 500);
     formData.append('file', file);
 
     try {
@@ -73,6 +73,7 @@ export default function ImportExportTab() {
       toast.error(await getErrorMsg(error));
     } finally {
       setProgress(100);
+      clearTimeout(timeoutKey);
     }
   };
 
