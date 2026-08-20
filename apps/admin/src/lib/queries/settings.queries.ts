@@ -87,5 +87,5 @@ export function useUpdateEmailStatusMutation() {
 /** ─── Mutation State ────────────────────────────────── */
 
 export function useIsMutatingSettings() {
-  return useIsMutating({ mutationKey: SETTINGS_MUTATION_KEYS.save });
+  return useIsMutating({ mutationKey: SETTINGS_MUTATION_KEYS.save }) > 0;
 }

@@ -178,6 +178,118 @@ function AttachmentGroup({ className, ...props }: React.ComponentProps<'div'>) {
   );
 }
 
+type AttachmentDropzoneError = 'invalid_type' | 'file_too_large';
+
+interface AttachmentDropzoneProps extends Omit<React.ComponentProps<'input'>, 'type' | 'onChange' | 'value'> {
+  value?: File | null;
+  onChange?: (file: File | null) => void;
+  onUploadError?: (error: AttachmentDropzoneError | null) => void;
+  maxSize?: number;
+  className?: string;
+  accept?: string;
+  disabled?: boolean;
+  children?: React.ReactNode;
+}
+
+function AttachmentDropzone({
+  value,
+  onChange,
+  onUploadError,
+  className,
+  maxSize = 10 * 1024 * 1024, // Max Size: 10MB
+  accept,
+  disabled,
+  children,
+  ...props
+}: AttachmentDropzoneProps) {
+  const inputRef = React.useRef<HTMLInputElement>(null);
+  const [isDragActive, setIsDragActive] = React.useState(false);
+  const [error, setError] = React.useState(false);
+
+  const handleUploadError = (err: AttachmentDropzoneError) => {
+    onUploadError?.(err);
+    setError(true);
+    onChange?.(null);
+  };
+
+  const handleFiles = (files: FileList | null) => {
+    if (files && files[0]) {
+      setError(false);
+      onUploadError?.(null);
+
+      if (accept && !accept?.includes(files[0].name.split('.')[1])) {
+        handleUploadError('invalid_type');
+        return;
+      }
+
+      if (files[0].size > maxSize) {
+        handleUploadError('file_too_large');
+        return;
+      }
+
+      onChange?.(files[0]);
+    }
+  };
+
+  const onDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    if (disabled) return;
+    setError(false);
+    setIsDragActive(true);
+  };
+
+  const onDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    if (disabled) return;
+    setError(false);
+    setIsDragActive(false);
+  };
+
+  const onDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    if (disabled) return;
+    setIsDragActive(false);
+    handleFiles(e.dataTransfer.files);
+  };
+
+  React.useEffect(() => {
+    if (!value) {
+      if (inputRef.current) {
+        inputRef.current.value = '';
+      }
+    }
+  }, [value]);
+
+  return (
+    <label
+      data-slot="attachment-dropzone"
+      className={cn(
+        'border-muted-foreground-400 text-muted-foreground flex w-full cursor-not-allowed flex-col items-center justify-center gap-2 rounded-md border border-dashed p-4',
+        !disabled && focusVariants(),
+        !disabled && inputVariants({ variant: 'input' }),
+        !disabled && 'hover:bg-muted cursor-pointer',
+        isDragActive && 'bg-muted',
+        error && 'border-destructive hover:border-destructive',
+        className,
+      )}
+      onDragOver={onDragOver}
+      onDragLeave={onDragLeave}
+      onDrop={onDrop}
+    >
+      {children}
+      <input
+        ref={inputRef}
+        type="file"
+        className="hidden"
+        onChange={(e) => handleFiles(e.target.files)}
+        accept={accept}
+        disabled={disabled}
+        {...props}
+      />
+    </label>
+  );
+}
+
 export {
   Attachment,
   AttachmentGroup,
@@ -188,4 +300,6 @@ export {
   AttachmentActions,
   AttachmentAction,
   AttachmentTrigger,
+  AttachmentDropzone,
+  type AttachmentDropzoneError,
 };
