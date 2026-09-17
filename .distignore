@@ -36,3 +36,4 @@ scoper.inc.php
 composer.json
 composer.lock
 /assets/pro/.gitkeep
+/assets/blueprints/blueprint.json
