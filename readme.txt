@@ -3,7 +3,7 @@ Contributors: YayCommerce
 Tags: wholesale, b2b, wholesale pricing, discount rules, sale
 Requires at least: 6.5
 Tested up to: 7.1
-Stable tag: 1.2.1
+Stable tag: 1.2.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -111,6 +111,11 @@ For documentation, support, and updates, visit our website or [contact YayCommer
 
 ## Changelog
 
+= Aug 22, 2026 - Version 1.2.1 =
+- Added: blueprint.json for Playground previewing
+- Added: Import/Export Product Pricing (Pro)
+- Updated: Automatically hide Requirement Bar when minOrderQuantity and minOrderAmount are set to zero
+
 = Aug 12, 2026 - Version 1.2.0 =
 - New: Payment and Shipping methods can now be edited directly on the Role Edit page (PRO)
 - New: Order recalculation now only triggers on actual item changes, improving performance
@@ -132,7 +137,7 @@ For documentation, support, and updates, visit our website or [contact YayCommer
 = July 25, 2026 - Version 1.1.1 =
 - Fixed: role update and delete API
 
-= June 03, 2025 - Version 1.1.0 =
+= June 03, 2026 - Version 1.1.0 =
 - Improved: Registration field settings
 - Improved: Requirements progress bar (hide condition row if it's not set)
 - Implement the checkout restriction for wholesaler
@@ -150,7 +155,7 @@ For documentation, support, and updates, visit our website or [contact YayCommer
 - Fixed: Bugs from admin notice
 - Updated: Requirements progress bar (Pro version)
 
-= Mar 13, 2026 – Version 1.0.4 =
+= Mar 13, 2026 - Version 1.0.4 =
 - Updated: Plugin logo in admin dashboard
 - Improved: Recommended plugins screen
 - Improved: Licenses screen (Pro version)
