@@ -94,6 +94,10 @@ const { state, callbacks } = store("ywhs_wholesale_requirement", {
 				return;
 			}
 
+			if (isHiddenQuantity && isHiddenAmount) {
+				return;
+			}
+
 			const cart = wcState?.cart;
 
 			if (!cart) return;

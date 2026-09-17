@@ -19,6 +19,8 @@ defined( 'ABSPATH' ) || exit;
 
 get_header( 'shop' );
 
+woocommerce_output_content_wrapper();
+
 /**
  * Hook: woocommerce_before_main_content.
  *
@@ -44,6 +46,8 @@ do_action( 'woocommerce_before_main_content' );
 
 if ( woocommerce_product_loop() ) {
 
+    do_action( 'ywhs_wpt_before_shop_loop' );
+
     /**
      * Hook: woocommerce_before_shop_loop.
      *
@@ -52,8 +56,6 @@ if ( woocommerce_product_loop() ) {
      * @hooked woocommerce_catalog_ordering - 30
      */
     do_action( 'woocommerce_before_shop_loop' );
-
-    do_action( 'ywhs_wpt_before_shop_loop' );
 
     woocommerce_product_loop_start();
 
@@ -72,14 +74,14 @@ if ( woocommerce_product_loop() ) {
 
     woocommerce_product_loop_end();
 
-    do_action( 'ywhs_wpt_after_shop_loop' );
-
     /**
      * Hook: woocommerce_after_shop_loop.
      *
      * @hooked woocommerce_pagination - 10
      */
     do_action( 'woocommerce_after_shop_loop' );
+
+    do_action( 'ywhs_wpt_after_shop_loop' );
 } else {
     /**
      * Hook: woocommerce_no_products_found.
@@ -95,11 +97,6 @@ if ( woocommerce_product_loop() ) {
  */
 do_action( 'woocommerce_after_main_content' );
 
-/**
- * Hook: woocommerce_sidebar.
- *
- * @hooked woocommerce_get_sidebar - 10
- */
-do_action( 'woocommerce_sidebar' );
+woocommerce_output_content_wrapper_end();
 
 get_footer( 'shop' );

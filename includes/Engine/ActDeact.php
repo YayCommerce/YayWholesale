@@ -77,7 +77,7 @@ class ActDeact {
             if ( empty( $active_roles ) ) {
                 $default_slug = $wholesale_roles[ array_key_first( $wholesale_roles ) ]['slug'];
             } else {
-                $default_slug = $wholesale_roles[ array_key_first( $wholesale_roles ) ]['slug'];
+                $default_slug = $active_roles[ array_key_first( $active_roles ) ]['slug'];
             }
             $setting['general']['default_role'] = $default_slug;
             SettingsHelper::update_settings( $setting );

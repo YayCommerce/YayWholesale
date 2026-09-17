@@ -2,7 +2,6 @@
 namespace YayWholesaleB2B\Engine\Frontend;
 
 use YayWholesaleB2B\Helpers\CustomerHelper;
-use YayWholesaleB2B\Helpers\PricingHelpers\OrderPricingHelper;
 use YayWholesaleB2B\Utils\SingletonTrait;
 use YayWholesaleB2B\Helpers\SettingsHelper;
 use YayWholesaleB2B\Helpers\PricingHelpers\ShopPricingHelper;
@@ -18,7 +17,7 @@ defined( 'ABSPATH' ) || exit;
 class Pricing {
     use SingletonTrait;
 
-    protected $settings;
+    protected array $settings;
 
     protected function __construct() {
         $this->settings = SettingsHelper::get_settings();
@@ -238,7 +237,7 @@ class Pricing {
             $discounted_to_show = wc_get_price_excluding_tax( $product, [ 'price' => $discounted_price ] );
         }
 
-        return $this->get_wholesale_price_html( wc_price( $discounted_to_show ) );
+        return $this->get_wholesale_price_html( wc_price( $discounted_to_show ), $product );
     }
 
     /**
@@ -258,12 +257,24 @@ class Pricing {
             $discounted_to_show = wc_get_price_excluding_tax( $product, [ 'price' => $discounted_price ] );
         }
 
+        return $this->compose_labeled_price_html(
+            $price_html,
+            $this->get_wholesale_price_html( wc_price( $discounted_to_show ), $product )
+        );
+    }
+
+    /**
+     * Compose the labeled two-line "Retail / Wholesale price" layout
+     *
+     * @param string $price_html the retail price HTML.
+     * @param string $wholesale_price_html the wholesale price HTML, label included.
+     * @return string The formatted HTML.
+     */
+    protected function compose_labeled_price_html( string $price_html, string $wholesale_price_html ) {
         $html  = '<span class="yay-retail-price">' . __( 'Retail', 'yay-wholesale-b2b' ) . ': ';
         $html .= $price_html;
         $html .= '</span><br>';
-        $html .= '<span class="yay-wholesale-price">'
-            . $this->get_wholesale_price_html( wc_price( $discounted_to_show ) )
-            . '</span>';
+        $html .= '<span class="yay-wholesale-price">' . $wholesale_price_html . '</span>';
 
         return $html;
     }
@@ -296,11 +307,16 @@ class Pricing {
         ? wc_format_price_range( wc_price( $min_ws ), wc_price( $max_ws ) )
         : wc_price( $min_ws );
 
-        $wholesale_price_html = $this->get_wholesale_price_html( $wholesale_price . $product->get_price_suffix() );
+        $wholesale_price_html = $this->get_wholesale_price_html( $wholesale_price . $product->get_price_suffix(), $product, $wholesale_role );
 
         // Wholesale-only mode
         if ( 'wholesale-only' === $display_mode ) {
             return $wholesale_price_html;
+        }
+
+        $use_labeled_price = apply_filters( 'ywhs_use_labeled_price_layout', false, $product, $price_html );
+        if ( $use_labeled_price ) {
+            return $this->compose_labeled_price_html( $price_html, $wholesale_price_html );
         }
 
         if ( $price_html === $wholesale_price ) {
@@ -347,11 +363,16 @@ class Pricing {
         ? wc_format_price_range( wc_price( $min_ws ), wc_price( $max_ws ) )
         : wc_price( $min_ws );
 
-        $wholesale_price_html = $this->get_wholesale_price_html( $wholesale_price . $product->get_price_suffix() );
+        $wholesale_price_html = $this->get_wholesale_price_html( $wholesale_price . $product->get_price_suffix(), $product, $wholesale_role );
 
         // Wholesale-only mode
         if ( 'wholesale-only' === $display_mode ) {
             return $wholesale_price_html;
+        }
+
+        $use_labeled_price = apply_filters( 'ywhs_use_labeled_price_layout', false, $product, $price_html );
+        if ( $use_labeled_price ) {
+            return $this->compose_labeled_price_html( $price_html, $wholesale_price_html );
         }
 
         // Retail-and-wholesale mode
@@ -374,12 +395,17 @@ class Pricing {
     /**
      * Get the wholesale label HTML
      *
-     * @param string $discounted_price_html the discounted price HTML.
+     * @param string           $discounted_price_html the discounted price HTML.
+     * @param \WC_Product|null $product the product being rendered.
+     * @param array|null       $role the wholesale role config.
      * @return string The wholesale price HTML.
      */
-    protected function get_wholesale_price_html( string $discounted_price_html ) {
+    protected function get_wholesale_price_html( string $discounted_price_html, $product = null, $role = null ) {
         $label = $this->settings['display']['wholesale_price_label'] ?? __( 'Wholesale price', 'yay-wholesale-b2b' );
         $color = $this->settings['display']['wholesale_price_color'] ?? '#333333';
+
+        $discounted_price_html = apply_filters( 'ywhs_wholesale_price_html', $discounted_price_html, $product, $role );
+
         $value = '<span style="color:' . esc_attr( $color ) . '">' . $discounted_price_html . '</span>';
 
         if ( ! empty( $label ) ) {

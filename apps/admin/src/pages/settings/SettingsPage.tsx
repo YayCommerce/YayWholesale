@@ -15,6 +15,7 @@ import { useRouteLeaveGuard } from '@/hooks/useRouteLeaveGuard';
 import { LoadingButton } from '@/components/ui/button';
 import { UnsavedChangeDialog } from '@/components/ui/custom/unsaved-changed-dialog';
 import { SideNavMenuItem, SideNavMenuList } from '@/components/ui/navmenu-side';
+import ImportExportTab from '@/pages/settings/tabs/ImportExportTab';
 import { getFirstErrorSection, makeDefaultSettings } from './settings.helper';
 import DisplayTab from './tabs/DisplayTab';
 import EmailsTab from './tabs/EmailsTab';
@@ -51,7 +52,7 @@ export default function SettingsPage() {
   } = form;
 
   async function onSubmit(data: Settings) {
-    if (isMutating > 0) return;
+    if (isMutating) return;
 
     try {
       await saveMutation.mutateAsync(data);
@@ -142,11 +143,6 @@ export default function SettingsPage() {
                           <SettingsErrorIndicator tab="promotion_rules" />
                         </SideNavMenuItem>
                       </TabsPrimitive.Trigger>
-                      <TabsPrimitive.Trigger value="emails" asChild>
-                        <SideNavMenuItem className="w-fit p-3 sm:w-full">
-                          <span>{__('Emails', 'yay-wholesale-b2b')}</span>
-                        </SideNavMenuItem>
-                      </TabsPrimitive.Trigger>
                       <TabsPrimitive.Trigger value="payment-roles" asChild>
                         <SideNavMenuItem className="w-fit p-3 sm:w-full">
                           <span>{__('Payment Roles', 'yay-wholesale-b2b')}</span>
@@ -157,6 +153,16 @@ export default function SettingsPage() {
                         <SideNavMenuItem className="w-fit p-3 sm:w-full">
                           <span>{__('Shipping Roles', 'yay-wholesale-b2b')}</span>
                           <SettingsErrorIndicator tab="shipping_roles" />
+                        </SideNavMenuItem>
+                      </TabsPrimitive.Trigger>
+                      <TabsPrimitive.Trigger value="emails" asChild>
+                        <SideNavMenuItem className="w-fit p-3 sm:w-full">
+                          <span>{__('Emails', 'yay-wholesale-b2b')}</span>
+                        </SideNavMenuItem>
+                      </TabsPrimitive.Trigger>
+                      <TabsPrimitive.Trigger value="import-export" asChild>
+                        <SideNavMenuItem className="w-fit p-3 sm:w-full">
+                          <span>{__('Import / Export', 'yay-wholesale-b2b')}</span>
                         </SideNavMenuItem>
                       </TabsPrimitive.Trigger>
                     </SideNavMenuList>
@@ -198,6 +204,12 @@ export default function SettingsPage() {
                     className="bg-card h-fit rounded-md border p-6 sm:w-full"
                   >
                     <ShippingRolesTab />
+                  </TabsPrimitive.Content>
+                  <TabsPrimitive.Content
+                    value="import-export"
+                    className="bg-card h-fit rounded-md border p-6 sm:w-full"
+                  >
+                    <ImportExportTab />
                   </TabsPrimitive.Content>
                 </div>
               </div>

@@ -2,11 +2,12 @@
 
 namespace YayWholesaleB2B\Pro\Helpers\PricingHelpers;
 
+use YayWholesaleB2B\Helpers\RolesHelper;
+
 /**
  * Product Based Pricing Helper
  */
 class ProductPricingHelper {
-
 
     public const PRODUCT_BASED_DISCOUNT_KEY = 'yaywholesaleb2b_product_based_discount';
 

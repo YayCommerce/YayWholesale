@@ -105,4 +105,5 @@ const settingSubMenus = [
   'emails',
   'payment-roles',
   'shipping-roles',
+  'import-export',
 ];

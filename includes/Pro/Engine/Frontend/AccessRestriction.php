@@ -93,6 +93,11 @@ class AccessRestriction {
         if ( $query->get( 'post_type' ) !== 'product' || ! wc_current_theme_supports_woocommerce_or_fse() ) {
             return $query;
         }
+
+        if ( ! $query->is_main_query() ) {
+            return $query;
+        }
+
         $shop_page         = apply_filters( 'ywhs_shop_page_id', wc_get_page_id( 'shop' ) );
         $is_main_shop_page = $query->get_queried_object() && ( $query->is_post_type_archive( 'product' ) || $query->is_page( $shop_page ) );
         if ( ! $is_main_shop_page || is_admin() ) {

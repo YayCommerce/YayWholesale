@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import { Download, FileText } from 'lucide-react';
 import { __ } from '@wordpress/i18n';
 
+import { downloadAsset } from '@/lib/helpers/assets.helper';
 import { RequestField } from '@/lib/schema/requests.type';
 import {
   Attachment,
@@ -47,13 +48,7 @@ const AttachmentField = ({ requestId, field }: EditRequestFieldProps) => {
 
   const handleDownload = () => {
     if (field.type.toLowerCase() !== 'attachment') return '';
-    const link = document.createElement('a');
-    link.href = field.value.replace(/^http:\/\//i, 'https://');
-    link.download = fileName || 'download';
-    link.target = '_blank';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    downloadAsset(field.value, fileName);
   };
 
   return (
