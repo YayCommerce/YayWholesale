@@ -10,12 +10,11 @@
     "networking": true
   },
   "login": true,
+  "plugins": [
+    "woocommerce",
+    "yay-wholesale-b2b"
+  ],
   "steps": [
-    {
-      "step": "login",
-      "username": "admin",
-      "password": "password"
-    },
     {
       "step": "setSiteOptions",
       "options": {
@@ -24,41 +23,77 @@
           "completed": true,
           "skipped": true
         },
+        "yaywholesaleb2b_setup_wizard_status": "completed",
         "yaywholesaleb2b_roles": [
           {
-            "name": "Gold",
-            "description": "Customers who buy every 3 months",
+            "name": "Partner",
+            "description": "Wholesale partners with steady, recurring orders every 3 months",
             "discount": 30,
             "minOrderQuantity": 0,
             "minOrderAmount": 500,
             "applyToSalePrice": true,
             "status": true,
-            "slug": "gold"
+            "slug": "partner"
           },
           {
-            "name": "Platinum",
-            "description": "Customers who buy every month",
+            "name": "Premium Wholesaler",
+            "description": "High-volume wholesale partners ordering every month",
             "discount": 40,
             "minOrderQuantity": 0,
             "minOrderAmount": 1000,
             "applyToSalePrice": true,
             "status": true,
-            "slug": "platinum"
+            "slug": "premium-wholesaler"
           },
           {
-            "name": "Silver",
-            "description": "Customers who buy every year",
+            "name": "Standard Wholesaler",
+            "description": "Wholesale accounts with occasional orders, about once a year",
             "discount": 20,
             "minOrderQuantity": 0,
             "minOrderAmount": 500,
             "applyToSalePrice": true,
             "status": true,
-            "slug": "silver"
+            "slug": "standard-wholesaler"
+          },
+          {
+            "name": "Starter Wholesaler",
+            "description": "Entry-level tier for new wholesale business accounts",
+            "discount": 10,
+            "minOrderQuantity": 0,
+            "minOrderAmount": 200,
+            "applyToSalePrice": true,
+            "status": true,
+            "slug": "starter-wholesaler"
+          },
+          {
+            "name": "Distributor",
+            "description": "Bulk distributors reordering every 2 weeks",
+            "discount": 50,
+            "minOrderQuantity": 0,
+            "minOrderAmount": 2000,
+            "applyToSalePrice": true,
+            "status": true,
+            "slug": "distributor"
+          },
+          {
+            "name": "Master Distributor",
+            "description": "Top-tier distributors with the highest order volume",
+            "discount": 60,
+            "minOrderQuantity": 0,
+            "minOrderAmount": 5000,
+            "applyToSalePrice": true,
+            "status": true,
+            "slug": "master-distributor"
           }
-        ],
+        ]
+      }
+    },
+    {
+      "step": "setSiteOptions",
+      "options": {
         "yaywholesaleb2b_settings": {
           "general": {
-            "default_role": "gold"
+            "default_role": "partner"
           },
           "registration_fields": {
             "fields": [
@@ -196,26 +231,6 @@
       }
     },
     {
-      "step": "installPlugin",
-      "pluginData": {
-        "resource": "wordpress.org/plugins",
-        "slug": "woocommerce"
-      },
-      "options": {
-        "activate": true
-      }
-    },
-    {
-      "step": "installPlugin",
-      "pluginData": {
-        "resource": "wordpress.org/plugins",
-        "slug": "yay-wholesale-b2b"
-      },
-      "options": {
-        "activate": true
-      }
-    },
-    {
       "step": "installTheme",
       "themeData": {
         "resource": "wordpress.org/themes",
@@ -247,35 +262,64 @@
       "progress": {
         "caption": "Register wholesale roles"
       },
-      "code": "<?php\nrequire_once '/wordpress/wp-load.php';\nadd_role( 'gold', 'Gold', [ 'read' => true ] );\nadd_role( 'platinum', 'Platinum', [ 'read' => true ] );\nadd_role( 'silver', 'Silver', [ 'read' => true ] );\n"
+      "code": "<?php\nrequire_once '/wordpress/wp-load.php';\nadd_role( 'partner', 'Partner', [ 'read' => true ] );\nadd_role( 'premium-wholesaler', 'Premium Wholesaler', [ 'read' => true ] );\nadd_role( 'standard-wholesaler', 'Standard Wholesaler', [ 'read' => true ] );\nadd_role( 'starter-wholesaler', 'Starter Wholesaler', [ 'read' => true ] );\nadd_role( 'distributor', 'Distributor', [ 'read' => true ] );\nadd_role( 'master-distributor', 'Master Distributor', [ 'read' => true ] );\n"
     },
     {
       "step": "runPHP",
       "progress": {
         "caption": "Register wholesalers"
       },
-      "code": "<?php\nrequire_once '/wordpress/wp-load.php';\n\n$admin = new WP_User( 1 );\n$admin->add_role( 'gold' );\n"
+      "code": "<?php\nrequire_once '/wordpress/wp-load.php';\n\n$admin = new WP_User( 1 );\n$admin->add_role( 'partner' );\n"
     },
     {
       "step": "wp-cli",
-      "command": "wp user create frank_j frank@gmail.com --user_pass=password --role=platinum --display_name='Frank J.'"
+      "command": "wp user create frank_j frank@gmail.com --user_pass=password --role=premium-wholesaler --display_name='Frank J.'"
     },
     {
       "step": "wp-cli",
-      "command": "wp user create jack_m jackma@gmail.com --user_pass=password --role=gold --display_name='Jack M.'"
+      "command": "wp user create jack_m jackma@gmail.com --user_pass=password --role=partner --display_name='Jack M.'"
     },
     {
       "step": "wp-cli",
-      "command": "wp user create katrin_r k@k-gmbh.com --user_pass=password --role=silver --display_name='Katrin R.'"
+      "command": "wp user create katrin_r k@k-gmbh.com --user_pass=password --role=standard-wholesaler --display_name='Katrin R.'"
     },
     {
       "step": "wp-cli",
+      "command": "wp user create emma_b emma.b@gmail.com --user_pass=password --role=starter-wholesaler --display_name='Emma B.'"
+    },
+    {
+      "step": "wp-cli",
+      "command": "wp user create david_d david.d@gmail.com --user_pass=password --role=distributor --display_name='David D.'"
+    },
+    {
+      "step": "wp-cli",
+      "command": "wp user create sophia_e sophia.e@gmail.com --user_pass=password --role=master-distributor --display_name='Sophia E.'"
+    },
+    {
+      "step": "runPHP",
+      "progress": {
+        "caption": "Add another wholesaler"
+      },
+      "code": "<?php\nrequire_once '/wordpress/wp-load.php';\n\n$admin = new WP_User( 1 );\n$admin->add_role( 'master-distributor' );\n"
+    },
+    {
+      "step": "runPHP",
+      "progress": {
+        "caption": "Add sample orders for wholesalers"
+      },
+      "code": "<?php\nrequire_once '/wordpress/wp-load.php';\n\n$products = wc_get_products( [ 'limit' => 10, 'status' => 'publish' ] );\nif ( empty( $products ) ) {\n    return;\n}\n\n$usernames = [ 'frank_j', 'jack_m', 'katrin_r', 'emma_b', 'david_d', 'sophia_e' ];\n$wp_roles  = wp_roles();\n\nforeach ( $usernames as $username ) {\n    $user = get_user_by( 'login', $username );\n    if ( ! $user ) {\n        continue;\n    }\n\n    $order = wc_create_order( [ 'customer_id' => $user->ID ] );\n\n    $line_items_count = rand( 1, 3 );\n    $chosen_products  = (array) array_rand( $products, min( $line_items_count, count( $products ) ) );\n    foreach ( $chosen_products as $index ) {\n        $order->add_product( $products[ $index ], rand( 15, 50 ) );\n    }\n\n    $address = [\n        'first_name' => $user->first_name ?: $user->display_name,\n        'last_name'  => $user->last_name,\n        'email'      => $user->user_email,\n    ];\n    $order->set_address( $address, 'billing' );\n    $order->set_address( $address, 'shipping' );\n\n    $role_slug = $user->roles[0] ?? '';\n    $role_name = $wp_roles->roles[ $role_slug ]['name'] ?? '';\n    if ( $role_name ) {\n        $order->update_meta_data( '_ywhs_wholesale_role', $role_name );\n    }\n\n    $order->calculate_totals();\n    $order->set_status( 'completed' );\n    $order->save();\n}\n"
+    },
+    {
+      "step": "wp-cli",
+      "progress": {
+        "caption": "Add new page"
+      },
       "command": "wp post create --post_type=page --post_title='Become a Wholesaler' --post_content='<!-- wp:paragraph --><p>Thank you for your interest in becoming a wholesale partner. Please complete the registration form below to apply for a wholesale account. Once your application has been reviewed and approved, you will gain access to exclusive wholesale pricing, bulk ordering options, and partner benefits. We look forward to building a successful business relationship with you.</p><!-- /wp:paragraph --><!-- wp:shortcode -->[ywhs_request_form]<!-- /wp:shortcode -->' --post_status=publish"
     },
     {
       "step": "runPHP",
       "progress": {
-        "caption": "Add new page"
+        "caption": "Add new page to Menu"
       },
       "code": "<?php\nrequire_once '/wordpress/wp-load.php';\n\n$page = get_page_by_path('become-a-wholesaler');\nif (!$page) {\n    return;\n}\n\n$menu_name = 'Primary Menu';\n$menu = wp_get_nav_menu_object($menu_name);\n\nif (!$menu) {\n    $menu_id = wp_create_nav_menu($menu_name);\n} else {\n    $menu_id = $menu->term_id;\n}\n\nwp_update_nav_menu_item($menu_id, 0, [\n    'menu-item-title'     => 'Become a Wholesaler',\n    'menu-item-object'    => 'page',\n    'menu-item-object-id' => $page->ID,\n    'menu-item-type'      => 'post_type',\n    'menu-item-status'    => 'publish',\n]);\n\n$locations = get_theme_mod('nav_menu_locations') ?: [];\n$locations['primary'] = $menu_id;\n$locations['primary-menu'] = $menu_id;\nset_theme_mod('nav_menu_locations', $locations);\n"
     }
