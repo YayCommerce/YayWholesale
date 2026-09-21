@@ -30,6 +30,7 @@ class YayWholesaleB2BPro {
         \YayWholesaleB2B\Pro\Engine\Admin\ProductBasedRule::get_instance();
         \YayWholesaleB2B\Pro\Engine\Admin\CategoryBasedRule::get_instance();
         \YayWholesaleB2B\Pro\Engine\Admin\PaymentGateway::get_instance();
+        \YayWholesaleB2B\Pro\Engine\Admin\POGatewayAdmin::get_instance();
         \YayWholesaleB2B\Pro\Engine\Admin\ShippingMethod::get_instance();
         \YayWholesaleB2B\Pro\Engine\Admin\TemplateEditor::get_instance();
         \YayWholesaleB2B\Pro\Engine\Admin\PromotionRulesCron::get_instance();

@@ -1,0 +1,16 @@
+{
+  "name": "@yay-wholesale-blocks/po-gateway-block",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start": "wp-scripts start --output-path=../../../assets/dist/blocks/po-gateway-block",
+    "build": "wp-scripts build --config ../webpack.config.js --output-path=../../../assets/dist/blocks/po-gateway-block"
+  },
+  "devDependencies": {
+    "@wordpress/scripts": "^31.0.0"
+  },
+  "dependencies": {
+    "@wordpress/element": "^6.36.0",
+    "@wordpress/i18n": "^6.9.0"
+  }
+}

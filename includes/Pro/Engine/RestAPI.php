@@ -2,6 +2,7 @@
 namespace YayWholesaleB2B\Pro\Engine;
 
 use YayWholesaleB2B\Pro\Controllers\PricingRestController;
+use YayWholesaleB2B\Pro\Controllers\POGatewayRestController;
 use YayWholesaleB2B\Utils\SingletonTrait;
 
 defined( 'ABSPATH' ) || exit;
@@ -20,5 +21,6 @@ class RestAPI {
 
     public function wholesale_endpoints() {
         PricingRestController::get_instance();
+        POGatewayRestController::get_instance();
     }
 }
