@@ -1,0 +1,28 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(php -r ' *)",
+      "Bash(pnpm install *)",
+      "Read(//f/LT/php/wordpress/**)",
+      "Read(//c/xampp/**)",
+      "Read(//c/xampp/php/**)",
+      "Read(//c/xampp/apache/**)",
+      "Bash(tasklist)",
+      "Read(//f/XAMPP/php/**)",
+      "Bash(grep -in \"opcache\" /f/XAMPP/php/php.ini 2>&1 | head -20)",
+      "Bash(curl -sk -X OPTIONS \"http://localhost/wp-json/yay-wholesale/v1/po-gateway/attachment\" -w \"\\\\nHTTP_STATUS:%{http_code}\\\\n\")",
+      "Bash(curl -sk \"http://localhost/wp-json/yay-wholesale/v1\" -H \"Cache-Control: no-cache\")",
+      "Bash(php -r '$d=json_decode\\(stream_get_contents\\(STDIN\\),true\\); foreach\\(array_keys\\($d[\"routes\"]??[]\\) as $r\\){ echo $r.\"\\\\n\"; }')",
+      "Bash(pnpm --filter @yay-wholesale-blocks/po-gateway-block build)",
+      "Bash(find /f/XAMPP/apache/conf -iname \"httpd.conf\" -o -iname \"httpd-vhosts.conf\" 2>/dev/null)",
+      "Read(//f/XAMPP/apache/conf/**)",
+      "Bash(grep -n \"DocumentRoot\\\\|ServerName\\\\|ServerAlias\" /f/XAMPP/apache/conf/extra/httpd-vhosts.conf 2>&1 | grep -v \"^#\")",
+      "Read(//f/XAMPP/apache/conf/extra/**)",
+      "Bash(grep -n \"^DocumentRoot\\\\|^<Directory\" /f/XAMPP/apache/conf/httpd.conf 2>&1)",
+      "Bash(git add *)",
+      "Bash(curl -sk \"http://localhost/wp-json/yay-wholesale/v1\" -H \"Cache-Control: no-cache, no-store\" -H \"Pragma: no-cache\")",
+      "Bash(php -r '$d=json_decode\\(stream_get_contents\\(STDIN\\),true\\); foreach\\(array_keys\\($d[\"routes\"]??[]\\) as $r\\){ if\\(stripos\\($r,\"po-gateway\"\\)!==false\\) echo \"FOUND: $r\\\\n\"; } echo \"total routes: \".count\\($d[\"routes\"]??[]\\).\"\\\\n\";')",
+      "Bash(curl -sk -I \"http://localhost/wp-json/yay-wholesale/v1\")"
+    ]
+  }
+}

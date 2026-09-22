@@ -27,6 +27,8 @@ Prefixes: `feature/...`, `fix/...`, `research/...`, `release/...`. Branch off `d
 
 Plan files: `.claude/plans/<slug>.md`.
 
+**Always set upstream on first push: `git push -u origin <branch-name>`.** A branch created off `develop` inherits `develop`'s tracking config until its own upstream is set — `git branch -vv` will show it as `[origin/develop: ...]`. A bare `git push` in that state pushes straight to `origin/develop`, not the feature branch. This has happened before (commits landed on `origin/develop` unnoticed). Check `git branch -vv` before the first push on any new branch; if it shows `origin/develop`, use the explicit `-u origin <branch-name>` form.
+
 ---
 
 ## Format Before Commit
@@ -38,7 +40,31 @@ pnpm --filter <app-package-name> lint:fix
 git add <files>
 ```
 
-`lint:fix` runs eslint --fix then prettier --write. There is no root-level or PHP linter configured in this repo (no phpcs/phpcbf) — PHP changes are not auto-formatted, just reviewed by hand.
+`lint:fix` runs eslint --fix then prettier --write.
+
+PHP is linted with PHPCS via root `phpcs.xml` (WordPress-Extra + PHPCompatibilityWP, PHP 7.4+). `phpcs`/`phpcbf` are not project-local (not in `vendor/bin` or `composer.json` scripts) — install globally (`composer global require squizlabs/php_codesniffer wp-coding-standards/wpcs phpcompatibility/phpcompatibility-wp`) and run:
+
+```bash
+phpcs --standard=phpcs.xml <path>     # check
+phpcbf --standard=phpcs.xml <path>    # auto-fix
+```
+
+---
+
+## Adding a JS Block
+
+Any new JS block (under `apps/blocks/*`) needs a build step before it can be used — raw source is never loaded directly. Split the block into at least:
+
+- `src/index.js` — main entry, registers the block/payment method (`registerBlockType`, `registerPaymentMethod`, etc.). Keep it thin.
+- `src/render.js` — the UI: components, settings/state, markup. Exported and imported by `index.js`.
+
+See `apps/blocks/requirement-slot-fill/src/` for the pattern. Run `pnpm build` (or the block's own build script) after adding/editing, then verify with `/wcheck` — an unbuilt block will not appear in WP.
+
+Before shipping, check that WP block APIs used aren't deprecated (e.g. current `@wordpress/*` package APIs, current block.json schema version) — WordPress deprecates block APIs across major versions and stale patterns break silently or trigger console warnings.
+
+**Write JSX, not `createElement`.** Use HTML tags directly (`<div className="...">`) instead of nested `createElement( 'div', {...} )` calls — JSX is what the build pipeline already supports and it's far more readable.
+
+**Avoid `useEffect`.** Prefer event handlers and derived values computed during render. Reach for `useEffect` only as a last resort (e.g. subscribing to an external API like `onPaymentSetup` that has no other integration point) — most state updates don't need it.
 
 ---
 
