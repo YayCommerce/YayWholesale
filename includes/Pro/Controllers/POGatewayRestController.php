@@ -15,10 +15,10 @@ class POGatewayRestController extends BaseRestController {
     use SingletonTrait;
 
     protected function __construct() {
-        add_action( 'rest_api_init', [ $this, 'register_routes' ] );
+        $this->register_routes();
     }
 
-    public function register_routes() {
+    protected function register_routes() {
         register_rest_route(
             self::REST_NAMESPACE,
             '/po-gateway/attachment',

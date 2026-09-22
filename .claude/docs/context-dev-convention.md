@@ -27,6 +27,8 @@ Prefixes: `feature/...`, `fix/...`, `research/...`, `release/...`. Branch off `d
 
 Plan files: `.claude/plans/<slug>.md`.
 
+**Always set upstream on first push: `git push -u origin <branch-name>`.** A branch created off `develop` inherits `develop`'s tracking config until its own upstream is set — `git branch -vv` will show it as `[origin/develop: ...]`. A bare `git push` in that state pushes straight to `origin/develop`, not the feature branch. This has happened before (commits landed on `origin/develop` unnoticed). Check `git branch -vv` before the first push on any new branch; if it shows `origin/develop`, use the explicit `-u origin <branch-name>` form.
+
 ---
 
 ## Format Before Commit

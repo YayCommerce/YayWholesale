@@ -33,6 +33,7 @@ Before starting any non-trivial task, scan this index. If the task or files matc
 | `.claude/docs/context-model-list.md` | context, reference, backend, frontend | data model, model relationship, Schema, options, meta data in order, post, taxonomy, products |
 | `.claude/docs/context-dev-convention.md` | workflow, convention | branch naming, dev workflow, format, lint, prettier, eslint, checkpoint, /wplan, /wdev, plan, skill, lifecycle, verify, verification |
 | `.claude/docs/context-page-map.md` | context, reference, pages, features | page map, feature map, admin pages, frontend pages, what pages exist, drawer, list, REST API endpoints, planning |
+| `.claude/docs/context-project-structure.md` | context, reference, backend, frontend, workflow | project structure, directory structure, bootstrap, hook order, plugins_loaded, rest_api_init, singleton, register_rest_route, new controller, new engine class |
 
 Advanced/rare-topic docs (background tasks, SSR sync, booking-form internals, admin appt form, booking pricing) are not indexed here — `/wplan`'s research step checks `.claude/docs/` directly for these during planning. For a quick task outside `/wplan`, name the doc yourself if you know it applies.
 
